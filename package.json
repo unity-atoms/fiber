@@ -1,0 +1,27 @@
+{
+    "name": "com.unity-atoms.fiber",
+    "displayName": "Fiber",
+    "version": "0.1.0",
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/unity-atoms/fiber.git"
+    },
+    "unity": "2018.3",
+    "description": "A declarative library for creating games in Unity",
+    "keywords": [
+      "declarative",
+      "unity"
+    ],
+    "category": "Unity",
+    "files": [
+      "/LICENSE.md",
+      "/LICENSE.md.meta",
+      "/README.md",
+      "/README.md.meta",
+      "/package.json",
+      "/package.json.meta",
+      "/Packages",
+      "/Packages.meta"
+    ]
+  }
+  
