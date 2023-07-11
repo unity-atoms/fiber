@@ -1,0 +1,3 @@
+.fiber-ui-elements--hidden {
+    display: none;
+}
