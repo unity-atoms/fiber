@@ -139,6 +139,7 @@ namespace Fiber
             BaseSignal<T3> signal3,
             bool runOnMount
         );
+        public void CreateUpdateEffect(Action<float> onUpdate);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, BaseSignal<T1> signal1
         );
@@ -679,6 +680,7 @@ namespace Fiber
         {
             Api.CreateEffect(effect, signal1, signal2, signal3, runOnMount);
         }
+        public void CreateUpdateEffect(Action<float> onUpdate) => Api.CreateUpdateEffect(onUpdate);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, BaseSignal<T1> signal1
         ) => Api.CreateComputedSignal<T1, RT>(compute, signal1);
@@ -1709,6 +1711,19 @@ namespace Fiber
             inlineEffect.Api = this;
             inlineEffect.FiberNode = _currentFiberNode;
             _currentFiberNode.PushEffect(inlineEffect);
+        }
+
+
+        public void CreateUpdateEffect(Action<float> onUpdate)
+        {
+            CreateEffect(() =>
+            {
+                var subId = MonoBehaviourHelper.AddOnUpdateHandler(onUpdate);
+                return () =>
+                {
+                    MonoBehaviourHelper.RemoveOnUpdateHandler(subId);
+                };
+            });
         }
 
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
