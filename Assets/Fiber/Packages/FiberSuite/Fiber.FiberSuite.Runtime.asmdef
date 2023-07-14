@@ -1,0 +1,22 @@
+{
+    "name": "Fiber.FiberSuite.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:a3c713fc88b2e468cb383ff8d4fbf47a",
+        "GUID:65089febca52b453ca77d867849cfdcc",
+        "GUID:ea832e42155d8448ea3274eb9e35a121",
+        "GUID:713f7d393b1d7468e94a98ac79d07465",
+        "GUID:98d3c4a469c914c208eaed136a59b26c",
+        "GUID:7d4df59988a124f1092a78e2f7af90fd",
+        "GUID:75469ad4d38634e559750d17036d5f7c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
