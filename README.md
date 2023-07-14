@@ -10,41 +10,95 @@ Fiber is a declarative library for creating games in Unity. It is derived and in
 
 ## Example
 
+<img src="/docs/rotating-cubes-example.gif" />
+
+
 ```csharp
+using System;
 using UnityEngine;
-using UnityEngine.UIElements;
-using Fiber.Suite;
 using Fiber;
-using Fiber.UIElements;
+using Fiber.GameObjects;
+using Fiber.Suite;
 using Signals;
 
-public class CounterExample : MonoBehaviour
+public class RotatingCubesExample : MonoBehaviour
 {
-    [SerializeField] private PanelSettings _defaultPanelSettings;
-    public class CounterComponent : BaseComponent
+    [Serializable]
+    public class Materials
     {
+        public Material CubeDefault;
+        public Material CubeHovered;
+    }
+
+    [SerializeField]
+    private Materials _materials;
+
+    public class CubeComponent : BaseComponent
+    {
+        private Vector3 _position;
+
+        public CubeComponent(Vector3 position)
+        {
+            _position = position;
+        }
+
         public override VirtualNode Render()
         {
-            var count = new Signal<int>(0);
+            var _ref = new Ref<GameObject>();
+            F.CreateUpdateEffect((deltaTime) =>
+            {
+                _ref.Current.transform.Rotate(new Vector3(25, 25, 25) * deltaTime);
+            });
 
-            return F.UIDocument(
+            var isHovered = new Signal<bool>(false);
+            var clicked = new Signal<bool>(false);
+
+            return F.GameObject(
+                name: "Cube",
+                _ref: _ref,
+                position: _position,
+                localScale: F.CreateComputedSignal((clicked) => clicked ? Vector3.one * 1.5f : Vector3.one, clicked),
+                primitiveType: PrimitiveType.Cube,
                 children: F.Children(
-                    F.Button(text: "Increment", onClick: (e) => { count.Value += 1; }),
-                    F.Text(text: new IntToStringSignal(count))
+                    F.GameObjectPointerEvents(
+                        onClick: () => { clicked.Value = !clicked.Value; },
+                        onPointerEnter: () => { isHovered.Value = true; },
+                        onPointerExit: () => { isHovered.Value = false; }
+                    ),
+                    F.MeshRenderer(
+                        material: F.CreateComputedSignal((isHovered) => isHovered ?
+                            G<Materials>().CubeHovered : G<Materials>().CubeDefault,
+                            isHovered
+                        )
+                    )
                 )
             );
         }
     }
 
+    public class RotatingCubesComponent : BaseComponent
+    {
+        public override VirtualNode Render()
+        {
+            return F.GameObjectPointerEventsManager(F.Children(
+                new CubeComponent(new Vector3(1.2f, 0, 0)),
+                new CubeComponent(new Vector3(-1.2f, 0, 0))
+            ));
+        }
+    }
+
     void Start()
     {
-        var fiber = new FiberSuite(rootGameObject: gameObject, defaultPanelSettings: _defaultPanelSettings);
-        fiber.Render(new CounterComponent());
+        var fiber = new FiberSuite(rootGameObject: gameObject, globals: new()
+        {
+            { typeof(Materials), _materials }
+        });
+        fiber.Render(new RotatingCubesComponent());
     }
 }
 ```
 
-The above will render a classic counter that increments when clicking a button.
+**Disclaimer: This example is inspired and taken from [@react/three-fiber](https://github.com/pmndrs/react-three-fiber/tree/master). Since there is a lot of overlap between the projects, but they are operating in different tech stacks, it is interesting to compare how the 2 differ when rendering the same scene.**
 
 ## Installation
 
