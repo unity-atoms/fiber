@@ -6,7 +6,7 @@
       "type": "git",
       "url": "git+https://github.com/unity-atoms/fiber.git"
     },
-    "unity": "2018.3",
+    "unity": "2021.2",
     "description": "A declarative library for creating games in Unity",
     "keywords": [
       "declarative",
