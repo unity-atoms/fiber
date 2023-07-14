@@ -10,6 +10,8 @@ namespace Fiber.GameObjects
             this BaseComponent component,
             string name = null,
             bool active = true,
+            SignalProp<Vector3> position = new(),
+            SignalProp<Vector3> localScale = new(),
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
             Action<GameObject> onMount = null,
@@ -22,6 +24,8 @@ namespace Fiber.GameObjects
                 name: name,
                 active: active,
                 _ref: _ref,
+                position: position,
+                localScale: localScale,
                 onCreateRef: onCreateRef,
                 onMount: onMount,
                 getInstance: getInstance,
@@ -49,6 +53,9 @@ namespace Fiber.GameObjects
         public SignalProp<string> Name { get; private set; }
         public SignalProp<bool> Active { get; private set; }
 
+        public SignalProp<Vector3> Position { get; private set; }
+        public SignalProp<Vector3> LocalScale { get; private set; }
+
         public Ref<GameObject> Ref { get; set; }
         public Action<GameObject> OnCreateRef { get; set; }
         // At a glance it might seem that this can be replaced with an effect. However, an effect in a component
@@ -66,6 +73,8 @@ namespace Fiber.GameObjects
         public GameObjectComponent(
             SignalProp<string> name = new(),
             SignalProp<bool> active = new(),
+            SignalProp<Vector3> position = new(),
+            SignalProp<Vector3> localScale = new(),
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
             Action<GameObject> onMount = null,
@@ -76,6 +85,9 @@ namespace Fiber.GameObjects
         {
             Name = name;
             Active = !active.IsEmpty ? active : true;
+
+            Position = position;
+            LocalScale = localScale;
 
             Ref = _ref;
             OnCreateRef = onCreateRef;
@@ -92,6 +104,8 @@ namespace Fiber.GameObjects
         private GameObjectsRendererExtension _rendererExtension;
         private WorkLoopSignalProp<string> _nameWorkLoopItem;
         private WorkLoopSignalProp<bool> _activeWorkLoopItem;
+        private WorkLoopSignalProp<Vector3> _positionWorkLoopItem;
+        private WorkLoopSignalProp<Vector3> _localScaleWorkLoopItem;
         protected bool VisibilitySetFromFiber { get; set; }
 
         public GameObjectNativeNode(GameObjectComponent virtualNode, GameObject instance, GameObjectsRendererExtension rendererExtension)
@@ -107,6 +121,16 @@ namespace Fiber.GameObjects
             if (!virtualNode.Active.IsEmpty)
             {
                 _activeWorkLoopItem = new(virtualNode.Active);
+            }
+            if (!virtualNode.Position.IsEmpty)
+            {
+                Instance.transform.position = virtualNode.Position.Get();
+                _positionWorkLoopItem = new(virtualNode.Position);
+            }
+            if (!virtualNode.LocalScale.IsEmpty)
+            {
+                Instance.transform.localScale = virtualNode.LocalScale.Get();
+                _localScaleWorkLoopItem = new(virtualNode.LocalScale);
             }
             if (virtualNode.Ref != null)
             {
@@ -188,6 +212,14 @@ namespace Fiber.GameObjects
             if (_activeWorkLoopItem.Check())
             {
                 UpdateVisibility();
+            }
+            if (_positionWorkLoopItem.Check())
+            {
+                Instance.transform.position = _positionWorkLoopItem.Get();
+            }
+            if (_localScaleWorkLoopItem.Check())
+            {
+                Instance.transform.localScale = _localScaleWorkLoopItem.Get();
             }
         }
     }
