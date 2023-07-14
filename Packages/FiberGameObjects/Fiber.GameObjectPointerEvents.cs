@@ -10,13 +10,13 @@ namespace Fiber.GameObjects
 {
     public static partial class BaseComponentExtensions
     {
-        public static GameObjectPointerManager GameObjectPointerManager(
+        public static GameObjectPointerEventsManager GameObjectPointerEventsManager(
             this BaseComponent component,
             List<VirtualNode> children,
             Ref<Camera> currentCameraRef = null
         )
         {
-            return new GameObjectPointerManager(
+            return new GameObjectPointerEventsManager(
                 children: children,
                 currentCameraRef: currentCameraRef
             );
@@ -65,7 +65,7 @@ namespace Fiber.GameObjects
 
             F.CreateEffect(() =>
             {
-                var subId = C<GameObjectPointerContext>().Subscribe(
+                var subId = C<GameObjectPointerEventsContext>().Subscribe(
                     transform: parentGO.transform,
                     onPointerEnter: OnPointerEnter,
                     onPointerExit: OnPointerExit,
@@ -75,7 +75,7 @@ namespace Fiber.GameObjects
 
                 return () =>
                 {
-                    C<GameObjectPointerContext>().Unsubscribe(subId);
+                    C<GameObjectPointerEventsContext>().Unsubscribe(subId);
                 };
             });
 
@@ -83,7 +83,7 @@ namespace Fiber.GameObjects
         }
     }
 
-    public class GameObjectPointerContext
+    public class GameObjectPointerEventsContext
     {
         public class Subscriber
         {
@@ -115,7 +115,7 @@ namespace Fiber.GameObjects
         private IndexedDictionary<int, Subscriber> _subscribers = new();
         public int SubscriberCount => _subscribers.Count;
 
-        public GameObjectPointerContext()
+        public GameObjectPointerEventsContext()
         {
             _idGenerator = new IntIdGenerator();
         }
@@ -136,22 +136,22 @@ namespace Fiber.GameObjects
         }
     }
 
-    public class GameObjectPointerManager : BaseComponent
+    public class GameObjectPointerEventsManager : BaseComponent
     {
         private Ref<Camera> _currentCameraRef;
-        private GameObjectPointerContext _context;
+        private GameObjectPointerEventsContext _context;
 
-        public GameObjectPointerManager(List<VirtualNode> children, Ref<Camera> currentCameraRef = null) : base(children)
+        public GameObjectPointerEventsManager(List<VirtualNode> children, Ref<Camera> currentCameraRef = null) : base(children)
         {
             _currentCameraRef = currentCameraRef;
-            _context = new GameObjectPointerContext();
+            _context = new GameObjectPointerEventsContext();
         }
 
         public override VirtualNode Render()
         {
             F.CreateUpdateEffect(Update);
 
-            return ContextProvider<GameObjectPointerContext>(
+            return ContextProvider<GameObjectPointerEventsContext>(
                 value: _context,
                 children: children
             );
