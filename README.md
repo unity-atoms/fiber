@@ -48,9 +48,11 @@ The above will render a classic counter that increments when clicking a button.
 
 ## Installation
 
-Clone the repository into your project's Assets folder or make this repo a git submodule of your Unity project. 
+Add the package via Unity's package manager using the git url:
 
-___A more sophisticated installation process using Unity's package manager is on the roadmap.___
+`https://github.com/unity-atoms/fiber.git?path=/Assets/Fiber`
+
+See [Unity's docs](https://docs.unity3d.com/Manual/upm-ui-giturl.html) for more info.
 
 ## Packages
 - `FiberUtils`: Common utils and classes used by all other Fiber packages.
