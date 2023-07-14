@@ -271,7 +271,9 @@ namespace Fiber.GameObjects
             var type = virtualNode.GetType();
 
             return type == typeof(GameObjectComponent)
-                || type == typeof(GameObjectPointerEventsComponent);
+                || type == typeof(GameObjectPointerEventsManager)
+                || type == typeof(GameObjectPointerEventsComponent)
+                || type == typeof(MeshRendererComponent);
         }
     }
 }
