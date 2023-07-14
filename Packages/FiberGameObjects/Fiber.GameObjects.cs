@@ -12,6 +12,7 @@ namespace Fiber.GameObjects
             bool active = true,
             SignalProp<Vector3> position = new(),
             SignalProp<Vector3> localScale = new(),
+            PrimitiveType? primitiveType = null,
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
             Action<GameObject> onMount = null,
@@ -26,6 +27,7 @@ namespace Fiber.GameObjects
                 _ref: _ref,
                 position: position,
                 localScale: localScale,
+                primitiveType: primitiveType,
                 onCreateRef: onCreateRef,
                 onMount: onMount,
                 getInstance: getInstance,
@@ -56,6 +58,8 @@ namespace Fiber.GameObjects
         public SignalProp<Vector3> Position { get; private set; }
         public SignalProp<Vector3> LocalScale { get; private set; }
 
+        public PrimitiveType? PrimitiveType { get; private set; }
+
         public Ref<GameObject> Ref { get; set; }
         public Action<GameObject> OnCreateRef { get; set; }
         // At a glance it might seem that this can be replaced with an effect. However, an effect in a component
@@ -75,6 +79,7 @@ namespace Fiber.GameObjects
             SignalProp<bool> active = new(),
             SignalProp<Vector3> position = new(),
             SignalProp<Vector3> localScale = new(),
+            PrimitiveType? primitiveType = null,
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
             Action<GameObject> onMount = null,
@@ -88,6 +93,8 @@ namespace Fiber.GameObjects
 
             Position = position;
             LocalScale = localScale;
+
+            PrimitiveType = primitiveType;
 
             Ref = _ref;
             OnCreateRef = onCreateRef;
@@ -243,7 +250,14 @@ namespace Fiber.GameObjects
 
             if (gameObject == null)
             {
-                gameObject = new GameObject();
+                if (virtualNode.PrimitiveType != null)
+                {
+                    gameObject = GameObject.CreatePrimitive(virtualNode.PrimitiveType.Value);
+                }
+                else
+                {
+                    gameObject = new GameObject();
+                }
             }
 
             return gameObject;
