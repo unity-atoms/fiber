@@ -372,7 +372,7 @@ A Fiber node is during its lifespan in different phases. Phases are chronlogical
 
 - `AddedToVirtualTree` - Initial phase for when the node is created.
 - `Rendered` - A node is set to `Rendered` after Fiber has rendered the node, eg created an underlyng game object.
-- `RendereMountedd` - A node is set to `RenderedMountedd` after Fiber has mounted the node.
+- `Mounted` - A node is set to `Mounted` after Fiber has mounted the node.
 - `RemovedFromVirtualTree` - A node is set to `RemovedFromVirtualTree` when Fiber has decided to remove it. This action also sets the underlying native node to be not visible.
 - `Unmounted` - A node is set to `Unmounted` when Fiber has unmounted the node.
 

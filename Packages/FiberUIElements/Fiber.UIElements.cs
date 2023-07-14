@@ -1615,5 +1615,17 @@ namespace Fiber.UIElements
 
             return null;
         }
+
+        public override bool OwnsComponentType(VirtualNode virtualNode)
+        {
+            var type = virtualNode.GetType();
+
+            return type == typeof(UIDocumentComponent)
+                || type == typeof(ScrollViewComponent)
+                || type == typeof(TextFieldComponent)
+                || type == typeof(TextComponent)
+                || type == typeof(ButtonComponent)
+                || type == typeof(ViewComponent);
+        }
     }
 }

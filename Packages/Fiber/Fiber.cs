@@ -121,8 +121,9 @@ namespace Fiber
     {
         public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children);
         public VirtualNode ContextProvider<C>(List<VirtualNode> children);
-        public C GetContext<C>(FiberNode node);
         public T GetGlobal<T>();
+        public C GetContext<C>(FiberNode node);
+        public NativeNode GetParentNativeNode();
         public void CreateEffect(BaseEffect effect);
         public void CreateEffect(Func<Action> effect);
         public void CreateEffect<T1>(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount);
@@ -655,9 +656,10 @@ namespace Fiber
         public T G<T>() => Api.GetGlobal<T>();
         public C GetContext<C>() => Api.GetContext<C>(FiberNode);
         public C C<C>() => GetContext<C>();
+        public NativeNode GetParentNativeNode() => Api.GetParentNativeNode();
         public void CreateEffect(BaseEffect effect) => Api.CreateEffect(effect);
         public void CreateEffect(Func<Action> effect) => Api.CreateEffect(effect);
-        public void CreateEffect<T1>(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount)
+        public void CreateEffect<T1>(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount = true)
         {
             Api.CreateEffect(effect, signal1, runOnMount);
         }
@@ -665,7 +667,7 @@ namespace Fiber
             Func<T1, T2, Action> effect,
             BaseSignal<T1> signal1,
             BaseSignal<T2> signal2,
-            bool runOnMount
+            bool runOnMount = true
         )
         {
             Api.CreateEffect(effect, signal1, signal2, runOnMount);
@@ -675,7 +677,7 @@ namespace Fiber
             BaseSignal<T1> signal1,
             BaseSignal<T2> signal2,
             BaseSignal<T3> signal3,
-            bool runOnMount
+            bool runOnMount = true
         )
         {
             Api.CreateEffect(effect, signal1, signal2, signal3, runOnMount);
@@ -1118,6 +1120,7 @@ namespace Fiber
     public abstract class RendererExtension
     {
         public abstract NativeNode CreateNativeNode(FiberNode fiberNode);
+        public abstract bool OwnsComponentType(VirtualNode node);
     }
 
     public class Renderer : IComponentAPI, IEffectAPI
@@ -1611,11 +1614,12 @@ namespace Fiber
             for (var i = 0; i < _rendererExtensions.Count; ++i)
             {
                 var rendererExtension = _rendererExtensions[i];
-                var nativeNode = rendererExtension.CreateNativeNode(fiberNode);
-                if (nativeNode != null)
+                if (!rendererExtension.OwnsComponentType(virtualNode))
                 {
-                    return nativeNode;
+                    continue;
                 }
+                var nativeNode = rendererExtension.CreateNativeNode(fiberNode);
+                return nativeNode;
             }
 
             if (virtualNode is FragmentComponent || virtualNode is BaseContextProvider || virtualNode is MatchComponent)
@@ -1661,6 +1665,16 @@ namespace Fiber
                 throw new Exception($"No context provider of type {typeof(C)} found.");
             }
             return ((ContextProvider<C>)fiberNode.VirtualNode).Value;
+        }
+
+        public NativeNode GetParentNativeNode()
+        {
+            var closestAncesorWithNativeNode = _currentFiberNode.FindClosestAncestorWithNativeNode();
+            if (closestAncesorWithNativeNode == null)
+            {
+                return null;
+            }
+            return closestAncesorWithNativeNode.NativeNode;
         }
 
         public void CreateEffect(BaseEffect effect)

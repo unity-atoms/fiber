@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Fiber.GameObjects
 {
-    public static class BaseComponentExtensions
+    public static partial class BaseComponentExtensions
     {
         public static GameObjectComponent GameObject(
             this BaseComponent component,
@@ -29,7 +29,21 @@ namespace Fiber.GameObjects
                 children: children
             );
         }
+
+        public static GameObject GetParentGameObject(
+            this BaseComponent component
+        )
+        {
+            var parentNativeNode = component.GetParentNativeNode();
+            if (parentNativeNode != null && parentNativeNode is GameObjectNativeNode gameObjectNativeNode)
+            {
+                return gameObjectNativeNode.Instance;
+            }
+
+            return null;
+        }
     }
+
     public class GameObjectComponent : VirtualNode
     {
         public SignalProp<string> Name { get; private set; }
@@ -212,8 +226,20 @@ namespace Fiber.GameObjects
                 var gameObject = GetOrCreateGameObject(fiberNode, gameObjectVirtualNode);
                 return new GameObjectNativeNode(gameObjectVirtualNode, gameObject, this);
             }
+            if (virtualNode is GameObjectPointerEventsComponent)
+            {
+                return null;
+            }
 
             return null;
+        }
+
+        public override bool OwnsComponentType(VirtualNode virtualNode)
+        {
+            var type = virtualNode.GetType();
+
+            return type == typeof(GameObjectComponent)
+                || type == typeof(GameObjectPointerEventsComponent);
         }
     }
 }
