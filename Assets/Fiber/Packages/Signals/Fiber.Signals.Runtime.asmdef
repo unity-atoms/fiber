@@ -1,0 +1,16 @@
+{
+    "name": "Fiber.Signals.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:98d3c4a469c914c208eaed136a59b26c"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
