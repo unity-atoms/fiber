@@ -1,0 +1,16 @@
+{
+    "name": "Fiber.Signals.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7d4df59988a124f1092a78e2f7af90fd"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

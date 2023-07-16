@@ -98,7 +98,7 @@ public class RotatingCubesExample : MonoBehaviour
 }
 ```
 
-**Disclaimer: This example is inspired and taken from [@react/three-fiber](https://github.com/pmndrs/react-three-fiber/tree/master). Since there is a lot of overlap between the projects, but they are operating in different tech stacks, it is interesting to compare how the 2 differ when rendering the same scene.**
+**Disclaimer: This example is inspired and taken from [@react/three-fiber](https://github.com/pmndrs/react-three-fiber). Since there is a lot of overlap between the projects, but they are operating in different tech stacks, it is interesting to compare how the 2 differ when rendering the same scene.**
 
 ## Installation
 
@@ -114,7 +114,7 @@ See [Unity's docs](https://docs.unity3d.com/Manual/upm-ui-giturl.html) for more 
 - `Fiber`: The core declarative library. Depends on FiberUtils and Signals.
 - `Fiber.GameObjects`: GameObjects renderer extension. Depends on FiberUtils, Signals and Fiber.
 - `Fiber.UIElements`: UI Elements renderer extension. Depends on FiberUtils, Signals, Fiber and FiberGameObjects.
-- [`Fiber.Router`](./Packages/FiberRouter/FiberRouter.md): A router for Fiber. Depends on Signals and Fiber.
+- [`Fiber.Router`](./Packages/FiberRouter/README.md): A router for Fiber. Depends on Signals and Fiber.
 - `Fiber.Suite`: A suite of all Fiber packages, exposing a convenient API for end users. Depends on all other Fiber packages.
 
 ## Reactivity 
