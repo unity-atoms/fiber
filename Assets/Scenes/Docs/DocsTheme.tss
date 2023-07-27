@@ -1,0 +1,3 @@
+@import url("/Assets/Fiber/Packages/FiberUI/Runtime/FiberUITheme.tss");
+
+VisualElement {}
