@@ -13,6 +13,7 @@ public class DocsFiberRoot : MonoBehaviour
 {
     [SerializeField]
     private UnityEngine.UIElements.PanelSettings _panelSettings;
+    private FiberSuite _fiber;
 
     public class DocsAppComponent : BaseComponent
     {
@@ -27,11 +28,25 @@ public class DocsFiberRoot : MonoBehaviour
         }
     }
 
-    void Start()
+    void OnEnable()
     {
-        var fiber = new FiberSuite(rootGameObject: gameObject, defaultPanelSettings: _panelSettings, globals: new()
+        if (_fiber == null)
         {
-        });
-        fiber.Render(new DocsAppComponent());
+            _fiber = new FiberSuite(rootGameObject: gameObject, defaultPanelSettings: _panelSettings, globals: new()
+            {
+            });
+        }
+        if (!_fiber.IsMounted)
+        {
+            _fiber.Render(new DocsAppComponent());
+        }
+    }
+
+    void OnDisable()
+    {
+        if (_fiber != null && _fiber.IsMounted)
+        {
+            _fiber.Unmount(immediatelyExecuteRemainingWork: true);
+        }
     }
 }

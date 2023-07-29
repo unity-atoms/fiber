@@ -1215,7 +1215,7 @@ namespace Fiber
             StartAutoWorkLoop();
         }
 
-        public void Unmount()
+        public void Unmount(bool immediatelyExecuteRemainingWork = true)
         {
             if (_root == null || _isUnmountingRoot)
             {
@@ -1226,6 +1226,11 @@ namespace Fiber
             _isUnmountingRoot = true;
             _root.Phase = FiberNodePhase.RemovedFromVirtualTree;
             _operationsQueue.Enqueue(new UnmountOperation(null, _root));
+
+            if (immediatelyExecuteRemainingWork)
+            {
+                WorkLoop(immediatelyExecuteRemainingWork: true);
+            }
         }
 
         void StartAutoWorkLoop()
@@ -1253,7 +1258,7 @@ namespace Fiber
 
         private Stopwatch _stopWatch = new Stopwatch();
         private FiberNode _currentWorkLoopNode = null;
-        public void WorkLoop()
+        public void WorkLoop(bool immediatelyExecuteRemainingWork = false)
         {
             _stopWatch.Restart();
 
@@ -1291,7 +1296,7 @@ namespace Fiber
                 {
                     break;
                 }
-            } while (_stopWatch.ElapsedMilliseconds < _workLoopTimeBudgetMs);
+            } while (_stopWatch.ElapsedMilliseconds < _workLoopTimeBudgetMs || immediatelyExecuteRemainingWork);
 
             _stopWatch.Stop();
         }

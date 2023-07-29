@@ -39,9 +39,9 @@ namespace Fiber.Suite
             _renderer.Render(component, _rootGameObjectNativeNode);
         }
 
-        public void Unmount()
+        public void Unmount(bool immediatelyExecuteRemainingWork = true)
         {
-            _renderer.Unmount();
+            _renderer.Unmount(immediatelyExecuteRemainingWork);
         }
     }
 }

@@ -16,6 +16,7 @@ public class RotatingCubesExample : MonoBehaviour
 
     [SerializeField]
     private Materials _materials;
+    private FiberSuite _fiber;
 
     public class CubeComponent : BaseComponent
     {
@@ -71,12 +72,26 @@ public class RotatingCubesExample : MonoBehaviour
         }
     }
 
-    void Start()
+    void OnEnable()
     {
-        var fiber = new FiberSuite(rootGameObject: gameObject, globals: new()
+        if (_fiber == null)
         {
-            { typeof(Materials), _materials }
-        });
-        fiber.Render(new RotatingCubesComponent());
+            _fiber = new FiberSuite(rootGameObject: gameObject, globals: new()
+            {
+                { typeof(Materials), _materials }
+            });
+        }
+        if (!_fiber.IsMounted)
+        {
+            _fiber.Render(new RotatingCubesComponent());
+        }
+    }
+
+    void OnDisable()
+    {
+        if (_fiber != null && _fiber.IsMounted)
+        {
+            _fiber.Unmount(immediatelyExecuteRemainingWork: true);
+        }
     }
 }
