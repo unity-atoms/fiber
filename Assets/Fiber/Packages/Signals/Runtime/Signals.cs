@@ -132,6 +132,52 @@ namespace Signals
     }
 
     [Serializable]
+    public class Store<T> : BaseSignal<T>
+        where T : BaseSignal
+    {
+        [SerializeField]
+        private T _value;
+        public T Value
+        {
+            get => _value;
+            set
+            {
+                if (_value != null)
+                {
+                    _value.UnregisterParent();
+                }
+                _value = value;
+                if (_value != null)
+                {
+                    _value.RegisterParent(this);
+                }
+                DirtyBit = (byte)(DirtyBit + 1);
+            }
+        }
+
+        public Store(T value = default(T), BaseSignal parent = null)
+        {
+            _value = value;
+            if (_value != null)
+            {
+                _value.RegisterParent(this);
+            }
+            _dirtyBit = 0;
+            _parent = parent;
+        }
+
+        public override T Get()
+        {
+            return Value;
+        }
+
+        public override bool IsDirty(byte otherDirtyBit)
+        {
+            return DirtyBit != otherDirtyBit;
+        }
+    }
+
+    [Serializable]
     public abstract class BaseSignalList<T, LT> : BaseSignal<LT> where LT : ISignalList<T>
     {
         [SerializeField]
@@ -514,7 +560,7 @@ namespace Signals
 
     // Tracks both mutations to the dictionary and changes to the values in the dictionary.
     [Serializable]
-    public class SignalDictionary<K, V> : BaseSignal<SignalDictionary<K, V>>
+    public class SignalDictionary<K, V> : BaseSignal<SignalDictionary<K, V>>, IEnumerable
         where V : BaseSignal
     {
         protected Dictionary<K, V> _dict;
@@ -639,6 +685,8 @@ namespace Signals
         {
             return DirtyBit != otherDirtyBit;
         }
+
+        public IEnumerator GetEnumerator() => _dict.GetEnumerator();
     }
 
     [Serializable]

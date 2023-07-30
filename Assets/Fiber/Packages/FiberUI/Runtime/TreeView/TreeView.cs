@@ -20,11 +20,16 @@ namespace Fiber.UI
 
             public override VirtualNode Render()
             {
-                // var styles = C<Styles>();
+                var theme = C<ThemeStore>().Get();
 
                 return F.View(
                     className: F.ClassName("fiber-treeView-container"),
-                    children: children
+                    style: new Style(
+                        backgroundColor: theme.DesignTokens["neutral"].Background.Regular.Default,
+                        borderRightColor: theme.DesignTokens["neutral"].Border.Regular.Default,
+                        borderRightWidth: 2
+                    ),
+                    children: F.Children(F.Text(text: "Test", style: new Style(color: theme.DesignTokens["neutral"].Text.Regular.Default)))
                 );
             }
         }

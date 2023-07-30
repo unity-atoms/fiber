@@ -19,7 +19,7 @@ public class DocsFiberRoot : MonoBehaviour
     {
         public override VirtualNode Render()
         {
-            return F.Fragment(children: F.Children(
+            return new DocsThemes.Provider(children: F.Children(
                 F.UIDocument(
                     name: "DocsDocument",
                     children: F.Children(new TreeView.Container(F.Children(), role: "neutral"))
