@@ -690,7 +690,7 @@ namespace Signals
     }
 
     [Serializable]
-    public class IndexedSignalDictionary<K, V> : BaseSignalList<V, IndexedSignalDictionary<K, V>>, ISignalList<V>
+    public class IndexedSignalDictionary<K, V> : BaseSignalList<V, IndexedSignalDictionary<K, V>>, ISignalList<V>, IEnumerable
         where V : BaseSignal
     {
         protected Dictionary<K, V> _dict;
@@ -831,5 +831,6 @@ namespace Signals
         {
             return DirtyBit != otherDirtyBit;
         }
+        public IEnumerator GetEnumerator() => _dict.GetEnumerator();
     }
 }

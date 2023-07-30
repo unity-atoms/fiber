@@ -9,13 +9,16 @@ namespace Fiber.UI
 {
     public class Theme : BaseSignal<Theme>
     {
+        public string FallbackRole;
         public TokenCollection DesignTokens;
         // TODO: public ComponentTokens...
 
         public Theme(
+            string fallbackRole,
             TokenCollection designTokens
         )
         {
+            FallbackRole = fallbackRole;
             DesignTokens = designTokens;
             designTokens.RegisterParent(this);
         }

@@ -39,19 +39,19 @@ namespace Fiber.UI
 
     public class ThemeProvider : BaseComponent
     {
-        public ThemeStore ThemeStore;
+        private ThemeStore _themeStore;
         public ThemeProvider(
             ThemeStore themeStore,
             List<VirtualNode> children
         ) : base(children)
         {
-            ThemeStore = themeStore;
+            _themeStore = themeStore;
         }
 
         public override VirtualNode Render()
         {
             return F.ContextProvider(
-                value: ThemeStore,
+                value: _themeStore,
                 children: children
             );
         }

@@ -13,7 +13,7 @@ public static class DocsThemes
         {
             return F.ThemeProvider(
                 themeStore: new ThemeStore(
-                    theme: LIGHT_THEME
+                    theme: DARK_THEME
                 ),
                 children: children
             );
@@ -21,48 +21,38 @@ public static class DocsThemes
     }
 
     public static readonly Theme DARK_THEME = new Theme(
-        new TokenCollection()
+        fallbackRole: "neutral",
+        new()
         {
-            { "neutral", new Role(
-                background: new (
-                    regular: new (
-                        @default: "#3F3F3F",
-                        hovered: "#505050"
-                    )
+            { "neutral", new(
+                background: new(
+                    @default: "#3F3F3F",
+                    hovered: "#505050"
                 ),
-                border: new (
-                    regular: new (
-                        @default: "#2B2B2B"
-                    )
+                border: new(
+                    @default: "#2B2B2B"
                 ),
-                text: new (
-                    regular: new (
-                        @default: "#FFFFFF"
-                    )
+                text: new(
+                    @default: "#FFFFFF"
                 )
             ) }
         }
     );
 
     public static readonly Theme LIGHT_THEME = new Theme(
-        new TokenCollection()
+        fallbackRole: "neutral",
+        new()
         {
-            { "neutral", new Role(
-                background: new (
-                    regular: new (
-                        @default: "#FFFFFF",
-                        hovered: "#F5F5F5"
-                    )
+            { "neutral", new(
+                background: new(
+                    @default: "#FFFFFF",
+                    hovered: "#F5F5F5"
                 ),
-                border: new (
-                    regular: new (
-                        @default: "#E0E0E0"
-                    )
+                border: new(
+                    @default: "#E0E0E0"
                 ),
-                text: new (
-                    regular: new (
-                        @default: "#000000"
-                    )
+                text: new(
+                    @default: "#000000"
                 )
             ) }
         }

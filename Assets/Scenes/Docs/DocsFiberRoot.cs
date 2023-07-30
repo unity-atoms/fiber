@@ -22,7 +22,11 @@ public class DocsFiberRoot : MonoBehaviour
             return new DocsThemes.Provider(children: F.Children(
                 F.UIDocument(
                     name: "DocsDocument",
-                    children: F.Children(new TreeView.Container(F.Children(), role: "neutral"))
+                    children: F.Children(new TreeView.Container(role: "neutral", children: F.Children(
+                        new TreeView.Item(text: "Item 1"),
+                        new TreeView.Item(text: "Item 2"),
+                        new TreeView.Item(text: "Item 3")
+                    )))
                 )
             ));
         }
