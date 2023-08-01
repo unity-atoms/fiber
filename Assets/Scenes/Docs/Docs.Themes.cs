@@ -27,7 +27,8 @@ public static class DocsThemes
             { "neutral", new(
                 background: new(
                     @default: "#3F3F3F",
-                    hovered: "#505050"
+                    selected: "#505050",
+                    hovered: "#626262"
                 ),
                 border: new(
                     @default: "#2B2B2B"
@@ -46,7 +47,8 @@ public static class DocsThemes
             { "neutral", new(
                 background: new(
                     @default: "#FFFFFF",
-                    hovered: "#F5F5F5"
+                    selected: "#D2D2D2",
+                    hovered: "#D2D2D2"
                 ),
                 border: new(
                     @default: "#E0E0E0"

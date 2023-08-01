@@ -23,9 +23,9 @@ public class DocsFiberRoot : MonoBehaviour
                 F.UIDocument(
                     name: "DocsDocument",
                     children: F.Children(new TreeView.Container(role: "neutral", children: F.Children(
-                        new TreeView.Item(text: "Item 1"),
-                        new TreeView.Item(text: "Item 2"),
-                        new TreeView.Item(text: "Item 3")
+                        new TreeView.Item(id: "1", label: "Item 1"),
+                        new TreeView.Item(id: "2", label: "Item 2"),
+                        new TreeView.Item(id: "3", label: "Item 3")
                     )))
                 )
             ));

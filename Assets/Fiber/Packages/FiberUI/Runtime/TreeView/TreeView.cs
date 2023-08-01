@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,51 +8,88 @@ using Signals;
 
 namespace Fiber.UI
 {
-    public class TreeView
+    public static class TreeView
     {
+        private class TreeViewContext
+        {
+            public Signal<string> SelectedItemId;
+            public Action<string> OnItemSelected;
+
+            public TreeViewContext(Signal<string> selectedItemId, Action<string> onItemSelected)
+            {
+                SelectedItemId = selectedItemId;
+                OnItemSelected = onItemSelected;
+            }
+        }
+
         public class Container : BaseComponent
         {
+            private Action<string> _onItemSelected;
             private string _role;
+
             public Container(
                 List<VirtualNode> children,
+                Action<string> onItemSelected = null,
                 string role = Constants.INHERIT_ROLE
             ) : base(children)
             {
                 _role = role;
+                _onItemSelected = onItemSelected;
             }
 
             public override VirtualNode Render()
             {
                 var theme = C<ThemeStore>().Get();
                 var role = F.GetRole(_role);
+                var selectedItemId = new Signal<string>(null);
 
-                return F.RoleProvider(role: _role,
-                    children: F.Children(F.View(
-                        style: new Style(
-                            backgroundColor: theme.DesignTokens[role].Background.Default,
-                            borderRightColor: theme.DesignTokens[role].Border.Default,
-                            borderRightWidth: 2,
-                            height: 100,
-                            width: 100
-                        ),
-                        children: children
-                    ))
+                return F.ContextProvider(
+                    value: new TreeViewContext(
+                        selectedItemId: selectedItemId,
+                        onItemSelected: (string id) =>
+                        {
+                            selectedItemId.Value = id;
+                            _onItemSelected?.Invoke(id);
+                        }
+                    ),
+                    children: F.Children(
+                        F.RoleProvider(
+                            role: _role,
+                            children: F.Children(
+                                F.View(
+                                    style: new Style(
+                                        backgroundColor: theme.DesignTokens[role].Background.Default,
+                                        borderRightColor: theme.DesignTokens[role].Border.Default,
+                                        borderRightWidth: 1,
+                                        minWidth: 100,
+                                        maxWidth: 200,
+                                        width: new Length(25, LengthUnit.Percent),
+                                        minHeight: 20
+                                    ),
+                                    children: children
+                                )
+                            )
+                        )
+                    )
                 );
             }
         }
 
         public class Item : BaseComponent
         {
-            private SignalProp<string> _text;
+            private SignalProp<string> _label;
             private string _role;
+            private string _id;
 
             public Item(
-                SignalProp<string> text,
+                SignalProp<string> label,
+                string id,
                 List<VirtualNode> children = null,
                 string role = Constants.INHERIT_ROLE
             ) : base(children)
             {
-                _text = text;
+                _label = label;
+                _id = id;
                 _role = role;
             }
 
@@ -61,6 +99,7 @@ namespace Fiber.UI
                 var theme = C<ThemeStore>().Get();
                 var role = F.GetRole(_role);
                 var isHovered = new Signal<bool>(false);
+                var context = F.GetContext<TreeViewContext>();
 
                 CreateEffect(() =>
                 {
@@ -72,6 +111,10 @@ namespace Fiber.UI
                     {
                         isHovered.Value = false;
                     });
+                    _ref.Current.RegisterCallback<PointerUpEvent>(evt =>
+                    {
+                        context.OnItemSelected(_id);
+                    });
                     return null;
                 });
 
@@ -81,19 +124,31 @@ namespace Fiber.UI
                         theme.DesignTokens[role].Text.Hovered.Get() : theme.DesignTokens[role].Text.Default.Get();
                 }, isHovered, theme);
 
-                var backgroundColor = CreateComputedSignal<bool, Theme, StyleColor>((isHovered, theme) =>
+                var backgroundColor = CreateComputedSignal<bool, string, Theme, StyleColor>((isHovered, selectedItemId, theme) =>
                 {
-                    return isHovered && theme.DesignTokens[role].Background.Hovered.Get().keyword != StyleKeyword.Null ?
-                        theme.DesignTokens[role].Background.Hovered.Get() : theme.DesignTokens[role].Background.Default.Get();
-                }, isHovered, theme);
+                    if (isHovered && theme.DesignTokens[role].Background.Hovered.Get().keyword != StyleKeyword.Null)
+                    {
+                        return theme.DesignTokens[role].Background.Hovered.Get();
+                    }
+                    else if (selectedItemId == _id && theme.DesignTokens[role].Background.Selected.Get().keyword != StyleKeyword.Null)
+                    {
+                        return theme.DesignTokens[role].Background.Selected.Get();
+                    }
+                    return theme.DesignTokens[role].Background.Default.Get();
+                }, isHovered, context.SelectedItemId, theme);
 
                 return F.View(
                     _ref: _ref,
-                    style: new Style(backgroundColor: backgroundColor),
-                    children: F.Children(F.Text(
-                        text: _text,
-                        style: new Style(color: color)
-                    ))
+                    style: new Style(
+                        backgroundColor: backgroundColor,
+                        display: DisplayStyle.Flex
+                    ),
+                    children: F.Children(
+                        F.Text(
+                            text: _label,
+                            style: new Style(color: color)
+                        )
+                    )
                 );
             }
         }
