@@ -526,6 +526,8 @@ namespace Fiber.UIElements
         public StyleColorProp BorderLeftColor { get; private set; }
         public StyleColorProp BorderTopColor { get; private set; }
         public DisplayStyleProp Display { get; private set; }
+        public StyleFloatProp FlexShrink { get; private set; }
+        public StyleFloatProp FlexGrow { get; private set; }
         public FlexDirectionProp FlexDirection { get; private set; }
         public JustifyProp JustifyContent { get; private set; }
         public AlignProp AlignItems { get; private set; }
@@ -568,6 +570,8 @@ namespace Fiber.UIElements
             StyleColorProp borderLeftColor = new(),
             StyleColorProp borderTopColor = new(),
             DisplayStyleProp display = new(),
+            StyleFloatProp flexShrink = new(),
+            StyleFloatProp flexGrow = new(),
             FlexDirectionProp flexDirection = new(),
             JustifyProp justifyContent = new(),
             AlignProp alignItems = new(),
@@ -610,6 +614,8 @@ namespace Fiber.UIElements
             BorderLeftColor = borderLeftColor;
             BorderBottomColor = borderBottomColor;
             Display = display;
+            FlexShrink = flexShrink;
+            FlexGrow = flexGrow;
             FlexDirection = flexDirection;
             JustifyContent = justifyContent;
             AlignItems = alignItems;

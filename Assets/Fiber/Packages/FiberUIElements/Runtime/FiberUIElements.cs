@@ -532,6 +532,8 @@ namespace Fiber.UIElements
         private WorkLoopStyleColorProp _borderLeftColorWorkLoopItem;
         private WorkLoopStyleColorProp _borderTopColorWorkLoopItem;
         private WorkLoopDisplayStyleProp _displayWorkLoopItem;
+        private WorkLoopStyleFloatProp _flexShrinkWorkLoopItem;
+        private WorkLoopStyleFloatProp _flexGrowWorkLoopItem;
         private WorkLoopFlexDirectionProp _flexDirectionWorkLoopItem;
         private WorkLoopJustifyProp _justifyContentWorkLoopItem;
         private WorkLoopAlignProp _alignItemsWorkLoopItem;
@@ -771,6 +773,22 @@ namespace Fiber.UIElements
                     if (isStyleValue)
                     {
                         _displayWorkLoopItem = new(style.Display);
+                    }
+                }
+                if (!style.FlexShrink.IsEmpty)
+                {
+                    Instance.style.flexShrink = style.FlexShrink.Get();
+                    if (isStyleValue)
+                    {
+                        _flexShrinkWorkLoopItem = new(style.FlexShrink);
+                    }
+                }
+                if (!style.FlexGrow.IsEmpty)
+                {
+                    Instance.style.flexGrow = style.FlexGrow.Get();
+                    if (isStyleValue)
+                    {
+                        _flexGrowWorkLoopItem = new(style.FlexGrow);
                     }
                 }
                 if (!style.FlexDirection.IsEmpty)
@@ -1211,6 +1229,24 @@ namespace Fiber.UIElements
                     Instance.style.display = StyleKeyword.Initial;
                 }
 
+                if (!style.FlexShrink.IsEmpty)
+                {
+                    Instance.style.flexShrink = style.FlexShrink.Get();
+                }
+                else if (!_lastStyleFromSignal.FlexShrink.IsEmpty)
+                {
+                    Instance.style.flexShrink = StyleKeyword.Initial;
+                }
+
+                if (!style.FlexGrow.IsEmpty)
+                {
+                    Instance.style.flexGrow = style.FlexGrow.Get();
+                }
+                else if (!_lastStyleFromSignal.FlexGrow.IsEmpty)
+                {
+                    Instance.style.flexGrow = StyleKeyword.Initial;
+                }
+
                 if (!style.FlexDirection.IsEmpty)
                 {
                     Instance.style.flexDirection = style.FlexDirection.Get();
@@ -1444,6 +1480,14 @@ namespace Fiber.UIElements
                 if (_displayWorkLoopItem.Check())
                 {
                     Instance.style.display = _displayWorkLoopItem.Get();
+                }
+                if (_flexShrinkWorkLoopItem.Check())
+                {
+                    Instance.style.flexShrink = _flexShrinkWorkLoopItem.Get();
+                }
+                if (_flexGrowWorkLoopItem.Check())
+                {
+                    Instance.style.flexGrow = _flexGrowWorkLoopItem.Get();
                 }
                 if (_flexDirectionWorkLoopItem.Check())
                 {

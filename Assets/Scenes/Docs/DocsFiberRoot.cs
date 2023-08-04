@@ -19,14 +19,16 @@ public class DocsFiberRoot : MonoBehaviour
     {
         public override VirtualNode Render()
         {
+            var _children = new List<VirtualNode>();
+            for (var i = 0; i < 10; i++)
+            {
+                _children.Add(new TreeView.Item(id: i.ToString(), label: $"Item {i}"));
+            }
+
             return new DocsThemes.Provider(children: F.Children(
                 F.UIDocument(
                     name: "DocsDocument",
-                    children: F.Children(new TreeView.Container(role: "neutral", children: F.Children(
-                        new TreeView.Item(id: "1", label: "Item 1"),
-                        new TreeView.Item(id: "2", label: "Item 2"),
-                        new TreeView.Item(id: "3", label: "Item 3")
-                    )))
+                    children: F.Children(new TreeView.Container(role: "neutral", children: _children))
                 )
             ));
         }

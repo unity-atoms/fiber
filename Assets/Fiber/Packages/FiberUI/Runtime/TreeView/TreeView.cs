@@ -58,13 +58,15 @@ namespace Fiber.UI
                             children: F.Children(
                                 F.View(
                                     style: new Style(
+                                        flexShrink: 0,
                                         backgroundColor: theme.DesignTokens[role].Background.Default,
                                         borderRightColor: theme.DesignTokens[role].Border.Default,
                                         borderRightWidth: 1,
                                         minWidth: 100,
                                         maxWidth: 200,
                                         width: new Length(25, LengthUnit.Percent),
-                                        minHeight: 20
+                                        minHeight: 20,
+                                        height: StyleKeyword.Auto
                                     ),
                                     children: children
                                 )
