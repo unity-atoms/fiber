@@ -65,12 +65,12 @@ namespace Fiber.DesignTokens
         public SignalDictionary<string, ColorModifiers> Variants;
 
         public Element(
-            ColorToken @default = default(ColorToken),
-            ColorToken selected = default(ColorToken),
-            ColorToken focused = default(ColorToken),
-            ColorToken hovered = default(ColorToken),
-            ColorToken pressed = default(ColorToken),
-            ColorToken disabled = default(ColorToken),
+            ColorToken @default = default,
+            ColorToken selected = default,
+            ColorToken focused = default,
+            ColorToken hovered = default,
+            ColorToken pressed = default,
+            ColorToken disabled = default,
             SignalDictionary<string, ColorModifiers> variants = null
         ) : base(
             @default: @default,
@@ -95,20 +95,20 @@ namespace Fiber.DesignTokens
         public Signal<T> Disabled;
 
         public Modifiers(
-            T @default = default(T),
-            T selected = default(T),
-            T focused = default(T),
-            T hovered = default(T),
-            T pressed = default(T),
-            T disabled = default(T)
+            T @default = default,
+            T selected = default,
+            T focused = default,
+            T hovered = default,
+            T pressed = default,
+            T disabled = default
         )
         {
-            Default = new Signal<T>(@default ?? default(T), this);
-            Selected = new Signal<T>(selected ?? default(T), this);
-            Focused = new Signal<T>(focused ?? default(T), this);
-            Hovered = new Signal<T>(hovered ?? default(T), this);
-            Pressed = new Signal<T>(pressed ?? default(T), this);
-            Disabled = new Signal<T>(disabled ?? default(T), this);
+            Default = new Signal<T>(@default ?? default, this);
+            Selected = new Signal<T>(selected ?? default, this);
+            Focused = new Signal<T>(focused ?? default, this);
+            Hovered = new Signal<T>(hovered ?? default, this);
+            Pressed = new Signal<T>(pressed ?? default, this);
+            Disabled = new Signal<T>(disabled ?? default, this);
         }
 
         public override Modifiers<T> Get() => this;
@@ -121,12 +121,12 @@ namespace Fiber.DesignTokens
     public class ColorModifiers : Modifiers<StyleColor>
     {
         public ColorModifiers(
-            ColorToken @default = default(ColorToken),
-            ColorToken selected = default(ColorToken),
-            ColorToken focused = default(ColorToken),
-            ColorToken hovered = default(ColorToken),
-            ColorToken pressed = default(ColorToken),
-            ColorToken disabled = default(ColorToken)
+            ColorToken @default = default,
+            ColorToken selected = default,
+            ColorToken focused = default,
+            ColorToken hovered = default,
+            ColorToken pressed = default,
+            ColorToken disabled = default
         ) : base(
             @default: @default.IsInitialized ? new(@default.Value) : new(StyleKeyword.Null),
             selected: selected.IsInitialized ? new(selected.Value) : new(StyleKeyword.Null),

@@ -78,8 +78,8 @@ namespace Fiber.UI
         public class Item : BaseComponent
         {
             private SignalProp<string> _label;
-            private string _role;
-            private string _id;
+            private readonly string _role;
+            private readonly string _id;
 
             public Item(
                 SignalProp<string> label,
@@ -137,13 +137,28 @@ namespace Fiber.UI
                     return theme.DesignTokens[role].Background.Default.Get();
                 }, isHovered, context.SelectedItemId, theme);
 
+
+                var fontAwesome = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
+
                 return F.View(
                     _ref: _ref,
                     style: new Style(
                         backgroundColor: backgroundColor,
-                        display: DisplayStyle.Flex
+                        display: DisplayStyle.Flex,
+                        flexDirection: FlexDirection.Row,
+                        fontSize: 10,
+                        alignItems: Align.Center,
+                        paddingLeft: 4,
+                        paddingTop: 4,
+                        paddingRight: 4,
+                        paddingBottom: 4,
+                        width: new Length(100, LengthUnit.Percent)
                     ),
                     children: F.Children(
+                        F.Text(
+                            text: '\uf054'.ToString(),
+                            style: new Style(color: color, unityFont: fontAwesome, unityFontDefinition: StyleKeyword.None)
+                        ),
                         F.Text(
                             text: _label,
                             style: new Style(color: color)

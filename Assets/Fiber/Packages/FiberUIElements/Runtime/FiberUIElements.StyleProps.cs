@@ -47,9 +47,9 @@ namespace Fiber.UIElements
     {
         public WorkLoopSignalProp<StyleEnum<Position>> WorkLoopSignalProp { get; private set; }
 
-        public WorkLoopPositionProp(PositionProp positionProp)
+        public WorkLoopPositionProp(PositionProp prop)
         {
-            WorkLoopSignalProp = new(positionProp.SignalProp);
+            WorkLoopSignalProp = new(prop.SignalProp);
         }
         public bool Check() => WorkLoopSignalProp.Check();
         public StyleEnum<Position> Get() => WorkLoopSignalProp.Get();
@@ -102,9 +102,9 @@ namespace Fiber.UIElements
     {
         public WorkLoopSignalProp<StyleLength> WorkLoopSignalProp { get; private set; }
 
-        public WorkLoopStyleLengthProp(StyleLengthProp styleLengthProp)
+        public WorkLoopStyleLengthProp(StyleLengthProp prop)
         {
-            WorkLoopSignalProp = new(styleLengthProp.SignalProp);
+            WorkLoopSignalProp = new(prop.SignalProp);
         }
         public bool Check() => WorkLoopSignalProp.Check();
         public StyleLength Get() => WorkLoopSignalProp.Get();
@@ -151,9 +151,9 @@ namespace Fiber.UIElements
     {
         public WorkLoopSignalProp<StyleFloat> WorkLoopSignalProp { get; private set; }
 
-        public WorkLoopStyleFloatProp(StyleFloatProp styleFloatProp)
+        public WorkLoopStyleFloatProp(StyleFloatProp prop)
         {
-            WorkLoopSignalProp = new(styleFloatProp.SignalProp);
+            WorkLoopSignalProp = new(prop.SignalProp);
         }
         public bool Check() => WorkLoopSignalProp.Check();
         public StyleFloat Get() => WorkLoopSignalProp.Get();
@@ -200,9 +200,9 @@ namespace Fiber.UIElements
     {
         public WorkLoopSignalProp<StyleColor> WorkLoopSignalProp { get; private set; }
 
-        public WorkLoopStyleColorProp(StyleColorProp styleColorProp)
+        public WorkLoopStyleColorProp(StyleColorProp prop)
         {
-            WorkLoopSignalProp = new(styleColorProp.SignalProp);
+            WorkLoopSignalProp = new(prop.SignalProp);
         }
         public bool Check() => WorkLoopSignalProp.Check();
         public StyleColor Get() => WorkLoopSignalProp.Get();
@@ -249,12 +249,61 @@ namespace Fiber.UIElements
     {
         public WorkLoopSignalProp<StyleEnum<DisplayStyle>> WorkLoopSignalProp { get; private set; }
 
-        public WorkLoopDisplayStyleProp(DisplayStyleProp displayStyleProp)
+        public WorkLoopDisplayStyleProp(DisplayStyleProp prop)
         {
-            WorkLoopSignalProp = new(displayStyleProp.SignalProp);
+            WorkLoopSignalProp = new(prop.SignalProp);
         }
         public bool Check() => WorkLoopSignalProp.Check();
         public StyleEnum<DisplayStyle> Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct FlexDirectionProp
+    {
+        public SignalProp<StyleEnum<FlexDirection>> SignalProp { get; private set; }
+        public readonly bool IsEmpty => SignalProp.IsEmpty;
+        public readonly bool IsValue => SignalProp.IsValue;
+        public readonly bool IsSignal => SignalProp.IsSignal;
+
+        public FlexDirectionProp(StyleEnum<FlexDirection> value)
+        {
+            SignalProp = value;
+        }
+
+        public FlexDirectionProp(BaseSignal<StyleEnum<FlexDirection>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator FlexDirectionProp(StyleKeyword keyword)
+        {
+            StyleEnum<FlexDirection> styleEnum = keyword;
+            return new FlexDirectionProp(styleEnum);
+        }
+
+        public static implicit operator FlexDirectionProp(FlexDirection flexDirection)
+        {
+            StyleEnum<FlexDirection> styleEnum = flexDirection;
+            return new FlexDirectionProp(styleEnum);
+        }
+
+        public static implicit operator FlexDirectionProp(BaseSignal<StyleEnum<FlexDirection>> signal)
+        {
+            return new FlexDirectionProp(signal);
+        }
+
+        public readonly StyleEnum<FlexDirection> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopFlexDirectionProp
+    {
+        public WorkLoopSignalProp<StyleEnum<FlexDirection>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopFlexDirectionProp(FlexDirectionProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public readonly bool Check() => WorkLoopSignalProp.Check();
+        public readonly StyleEnum<FlexDirection> Get() => WorkLoopSignalProp.Get();
     }
 
     public struct JustifyProp
@@ -298,9 +347,9 @@ namespace Fiber.UIElements
     {
         public WorkLoopSignalProp<StyleEnum<Justify>> WorkLoopSignalProp { get; private set; }
 
-        public WorkLoopJustifyProp(JustifyProp justifyProp)
+        public WorkLoopJustifyProp(JustifyProp prop)
         {
-            WorkLoopSignalProp = new(justifyProp.SignalProp);
+            WorkLoopSignalProp = new(prop.SignalProp);
         }
         public bool Check() => WorkLoopSignalProp.Check();
         public StyleEnum<Justify> Get() => WorkLoopSignalProp.Get();
@@ -347,12 +396,106 @@ namespace Fiber.UIElements
     {
         public WorkLoopSignalProp<StyleEnum<Align>> WorkLoopSignalProp { get; private set; }
 
-        public WorkLoopAlignProp(AlignProp AlignProp)
+        public WorkLoopAlignProp(AlignProp prop)
         {
-            WorkLoopSignalProp = new(AlignProp.SignalProp);
+            WorkLoopSignalProp = new(prop.SignalProp);
         }
         public bool Check() => WorkLoopSignalProp.Check();
         public StyleEnum<Align> Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct StyleFontProp
+    {
+        public SignalProp<StyleFont> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public StyleFontProp(StyleFont value)
+        {
+            SignalProp = value;
+        }
+
+        public StyleFontProp(BaseSignal<StyleFont> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator StyleFontProp(Font value)
+        {
+            return new StyleFontProp(value);
+        }
+
+        public static implicit operator StyleFontProp(StyleFont value)
+        {
+            return new StyleFontProp(value);
+        }
+
+        public static implicit operator StyleFontProp(BaseSignal<StyleFont> signal)
+        {
+            return new StyleFontProp(signal);
+        }
+
+        public StyleFont Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopStyleFontProp
+    {
+        public WorkLoopSignalProp<StyleFont> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopStyleFontProp(StyleFontProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleFont Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct StyleFontDefinitionProp
+    {
+        public SignalProp<StyleFontDefinition> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public StyleFontDefinitionProp(StyleFontDefinition value)
+        {
+            SignalProp = value;
+        }
+
+        public StyleFontDefinitionProp(BaseSignal<StyleFontDefinition> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator StyleFontDefinitionProp(StyleFontDefinition value)
+        {
+            return new StyleFontDefinitionProp(value);
+        }
+
+        public static implicit operator StyleFontDefinitionProp(StyleKeyword keyword)
+        {
+            return new StyleFontDefinitionProp(keyword);
+        }
+
+        public static implicit operator StyleFontDefinitionProp(BaseSignal<StyleFontDefinition> signal)
+        {
+            return new StyleFontDefinitionProp(signal);
+        }
+
+        public StyleFontDefinition Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopStyleFontDefinitionProp
+    {
+        public WorkLoopSignalProp<StyleFontDefinition> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopStyleFontDefinitionProp(StyleFontDefinitionProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleFontDefinition Get() => WorkLoopSignalProp.Get();
     }
 
     public struct Style
@@ -383,6 +526,7 @@ namespace Fiber.UIElements
         public StyleColorProp BorderLeftColor { get; private set; }
         public StyleColorProp BorderTopColor { get; private set; }
         public DisplayStyleProp Display { get; private set; }
+        public FlexDirectionProp FlexDirection { get; private set; }
         public JustifyProp JustifyContent { get; private set; }
         public AlignProp AlignItems { get; private set; }
         public StyleLengthProp Width { get; private set; }
@@ -394,6 +538,8 @@ namespace Fiber.UIElements
         public StyleColorProp BackgroundColor { get; private set; }
         public StyleColorProp Color { get; private set; }
         public StyleLengthProp FontSize { get; private set; }
+        public StyleFontProp UnityFont { get; private set; }
+        public StyleFontDefinitionProp UnityFontDefinition { get; private set; }
 
         public Style(
             PositionProp position = new(),
@@ -422,6 +568,7 @@ namespace Fiber.UIElements
             StyleColorProp borderLeftColor = new(),
             StyleColorProp borderTopColor = new(),
             DisplayStyleProp display = new(),
+            FlexDirectionProp flexDirection = new(),
             JustifyProp justifyContent = new(),
             AlignProp alignItems = new(),
             StyleLengthProp width = new(),
@@ -432,7 +579,9 @@ namespace Fiber.UIElements
             StyleLengthProp minHeight = new(),
             StyleColorProp backgroundColor = new(),
             StyleColorProp color = new(),
-            StyleLengthProp fontSize = new()
+            StyleLengthProp fontSize = new(),
+            StyleFontProp unityFont = new(),
+            StyleFontDefinitionProp unityFontDefinition = new()
         )
         {
             Position = position;
@@ -461,6 +610,7 @@ namespace Fiber.UIElements
             BorderLeftColor = borderLeftColor;
             BorderBottomColor = borderBottomColor;
             Display = display;
+            FlexDirection = flexDirection;
             JustifyContent = justifyContent;
             AlignItems = alignItems;
             Width = width;
@@ -472,6 +622,8 @@ namespace Fiber.UIElements
             BackgroundColor = backgroundColor;
             Color = color;
             FontSize = fontSize;
+            UnityFont = unityFont;
+            UnityFontDefinition = unityFontDefinition;
         }
     }
 }

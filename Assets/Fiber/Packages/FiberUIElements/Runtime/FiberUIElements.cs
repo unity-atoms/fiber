@@ -23,8 +23,10 @@ namespace Fiber.UIElements
             string c10 = null
         )
         {
-            var result = new List<string>();
-            result.Add(c1);
+            var result = new List<string>
+            {
+                c1
+            };
             if (c2 != null) result.Add(c2);
             if (c3 != null) result.Add(c3);
             if (c4 != null) result.Add(c4);
@@ -436,7 +438,7 @@ namespace Fiber.UIElements
             TextElementInstance = instance;
 
             if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            if (virtualNode.OnCreateRef != null) virtualNode.OnCreateRef(instance);
+            virtualNode.OnCreateRef?.Invoke(instance);
             if (!virtualNode.Text.IsEmpty)
             {
                 TextElementInstance.text = virtualNode.Text.Get();
@@ -462,7 +464,7 @@ namespace Fiber.UIElements
         {
             ScrollViewInstance = instance;
             if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            if (virtualNode.OnCreateRef != null) virtualNode.OnCreateRef(instance);
+            virtualNode.OnCreateRef?.Invoke(instance);
         }
     }
 
@@ -530,6 +532,7 @@ namespace Fiber.UIElements
         private WorkLoopStyleColorProp _borderLeftColorWorkLoopItem;
         private WorkLoopStyleColorProp _borderTopColorWorkLoopItem;
         private WorkLoopDisplayStyleProp _displayWorkLoopItem;
+        private WorkLoopFlexDirectionProp _flexDirectionWorkLoopItem;
         private WorkLoopJustifyProp _justifyContentWorkLoopItem;
         private WorkLoopAlignProp _alignItemsWorkLoopItem;
         private WorkLoopStyleLengthProp _widthWorkLoopItem;
@@ -541,18 +544,20 @@ namespace Fiber.UIElements
         private WorkLoopStyleColorProp _backgroundColorWorkLoopItem;
         private WorkLoopStyleColorProp _colorWorkLoopItem;
         private WorkLoopStyleLengthProp _fontSizeWorkLoopItem;
+        private WorkLoopStyleFontProp _unityFontWorkLoopItem;
+        private WorkLoopStyleFontDefinitionProp _unityFontDefinitionWorkLoopItem;
         #endregion
         private WorkLoopSignalProp<string> _nameWorkLoopItem;
         private WorkLoopSignalProp<PickingMode> _pickingModeWorkLoopItem;
         private WorkLoopSignalProp<List<string>> _classNameWorkLoopItem;
-        private List<string> _previousClassNameList;
+        private readonly List<string> _previousClassNameList;
 
         public VisualElementNativeNode(ViewComponent virtualNode, VisualElement instance)
         {
             Instance = instance;
 
             if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            if (virtualNode.OnCreateRef != null) virtualNode.OnCreateRef(instance);
+            virtualNode.OnCreateRef?.Invoke(instance);
             if (!virtualNode.Style.IsEmpty)
             {
                 _styleWorkLoopItem = new(virtualNode.Style);
@@ -768,6 +773,14 @@ namespace Fiber.UIElements
                         _displayWorkLoopItem = new(style.Display);
                     }
                 }
+                if (!style.FlexDirection.IsEmpty)
+                {
+                    Instance.style.flexDirection = style.FlexDirection.Get();
+                    if (isStyleValue)
+                    {
+                        _flexDirectionWorkLoopItem = new(style.FlexDirection);
+                    }
+                }
                 if (!style.JustifyContent.IsEmpty)
                 {
                     Instance.style.justifyContent = style.JustifyContent.Get();
@@ -856,6 +869,22 @@ namespace Fiber.UIElements
                         _fontSizeWorkLoopItem = new(style.FontSize);
                     }
                 }
+                if (!style.UnityFont.IsEmpty)
+                {
+                    Instance.style.unityFont = style.UnityFont.Get();
+                    if (isStyleValue)
+                    {
+                        _unityFontWorkLoopItem = new(style.UnityFont);
+                    }
+                }
+                if (!style.UnityFontDefinition.IsEmpty)
+                {
+                    Instance.style.unityFontDefinition = style.UnityFontDefinition.Get();
+                    if (isStyleValue)
+                    {
+                        _unityFontDefinitionWorkLoopItem = new(style.UnityFontDefinition);
+                    }
+                }
             }
             if (!virtualNode.Name.IsEmpty)
             {
@@ -883,7 +912,7 @@ namespace Fiber.UIElements
             }
         }
 
-        private string _hiddenClassName = "fiber-ui-elements--hidden";
+        private readonly string _hiddenClassName = "fiber-ui-elements--hidden";
         public override void SetVisible(bool visible)
         {
             var hasHiddenClassName = Instance.ClassListContains(_hiddenClassName);
@@ -1182,6 +1211,15 @@ namespace Fiber.UIElements
                     Instance.style.display = StyleKeyword.Initial;
                 }
 
+                if (!style.FlexDirection.IsEmpty)
+                {
+                    Instance.style.flexDirection = style.FlexDirection.Get();
+                }
+                else if (!_lastStyleFromSignal.FlexDirection.IsEmpty)
+                {
+                    Instance.style.flexDirection = StyleKeyword.Initial;
+                }
+
                 if (!style.JustifyContent.IsEmpty)
                 {
                     Instance.style.justifyContent = style.JustifyContent.Get();
@@ -1279,6 +1317,24 @@ namespace Fiber.UIElements
                 else if (!_lastStyleFromSignal.FontSize.IsEmpty)
                 {
                     Instance.style.fontSize = StyleKeyword.Initial;
+                }
+
+                if (!style.UnityFont.IsEmpty)
+                {
+                    Instance.style.unityFont = style.UnityFont.Get();
+                }
+                else if (!_lastStyleFromSignal.UnityFont.IsEmpty)
+                {
+                    Instance.style.unityFont = StyleKeyword.Initial;
+                }
+
+                if (!style.UnityFontDefinition.IsEmpty)
+                {
+                    Instance.style.unityFontDefinition = style.UnityFontDefinition.Get();
+                }
+                else if (!_lastStyleFromSignal.UnityFontDefinition.IsEmpty)
+                {
+                    Instance.style.unityFontDefinition = StyleKeyword.Initial;
                 }
 
                 _lastStyleFromSignal = style;
@@ -1389,6 +1445,10 @@ namespace Fiber.UIElements
                 {
                     Instance.style.display = _displayWorkLoopItem.Get();
                 }
+                if (_flexDirectionWorkLoopItem.Check())
+                {
+                    Instance.style.flexDirection = _flexDirectionWorkLoopItem.Get();
+                }
                 if (_justifyContentWorkLoopItem.Check())
                 {
                     Instance.style.justifyContent = _justifyContentWorkLoopItem.Get();
@@ -1433,6 +1493,14 @@ namespace Fiber.UIElements
                 {
                     Instance.style.fontSize = _fontSizeWorkLoopItem.Get();
                 }
+                if (_unityFontWorkLoopItem.Check())
+                {
+                    Instance.style.unityFont = _unityFontWorkLoopItem.Get();
+                }
+                if (_unityFontDefinitionWorkLoopItem.Check())
+                {
+                    Instance.style.unityFontDefinition = _unityFontDefinitionWorkLoopItem.Get();
+                }
             }
             if (_nameWorkLoopItem.Check())
             {
@@ -1474,8 +1542,8 @@ namespace Fiber.UIElements
 
     public class UIDocumentNativeNode : GameObjectNativeNode
     {
-        private UIDocument _uiDocument;
-        private StyleSheet _baseStyleSheet;
+        private readonly UIDocument _uiDocument;
+        private readonly StyleSheet _baseStyleSheet;
         private WorkLoopSignalProp<float> _sortingOrderWorkLoopItem;
 
         public UIDocumentNativeNode(
@@ -1580,8 +1648,7 @@ namespace Fiber.UIElements
             if (virtualNode is UIDocumentComponent uiDocumentComponent)
             {
                 var gameObject = GetOrCreateGameObject(fiberNode, uiDocumentComponent);
-                var uiDocument = gameObject.GetComponent<UIDocument>();
-                if (uiDocument == null)
+                if (!gameObject.TryGetComponent<UIDocument>(out var uiDocument))
                 {
                     uiDocument = gameObject.AddComponent<UIDocument>();
                 }
