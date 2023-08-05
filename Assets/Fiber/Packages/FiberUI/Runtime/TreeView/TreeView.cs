@@ -156,6 +156,7 @@ namespace Fiber.UI
                         paddingBottom: 4,
                         width: new Length(100, LengthUnit.Percent)
                     ),
+                    pickingMode: PickingMode.Position,
                     children: F.Children(
                         F.Text(
                             text: '\uf054'.ToString(),
