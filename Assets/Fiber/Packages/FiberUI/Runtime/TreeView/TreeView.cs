@@ -101,6 +101,7 @@ namespace Fiber.UI
                 var theme = C<ThemeStore>().Get();
                 var role = F.GetRole(_role);
                 var isHovered = new Signal<bool>(false);
+                var isPressed = new Signal<bool>(false);
                 var context = F.GetContext<TreeViewContext>();
 
                 CreateEffect(() =>
@@ -112,23 +113,47 @@ namespace Fiber.UI
                     _ref.Current.RegisterCallback<MouseLeaveEvent>(evt =>
                     {
                         isHovered.Value = false;
+                        isPressed.Value = false;
+                    });
+                    _ref.Current.RegisterCallback<PointerDownEvent>(evt =>
+                    {
+                        isPressed.Value = true;
                     });
                     _ref.Current.RegisterCallback<PointerUpEvent>(evt =>
                     {
-                        context.OnItemSelected(_id);
+                        if (isPressed.Value)
+                        {
+                            context.OnItemSelected(_id);
+                            isPressed.Value = false;
+                        }
                     });
                     return null;
                 });
 
-                var color = CreateComputedSignal<bool, Theme, StyleColor>((isHovered, theme) =>
+                var color = CreateComputedSignal((isHovered, isPressed, selectedItemId, theme) =>
                 {
-                    return isHovered && theme.DesignTokens[role].Text.Hovered.Get().keyword != StyleKeyword.Null ?
-                        theme.DesignTokens[role].Text.Hovered.Get() : theme.DesignTokens[role].Text.Default.Get();
-                }, isHovered, theme);
+                    if (isPressed && theme.DesignTokens[role].Text.Pressed.Get().keyword != StyleKeyword.Null)
+                    {
+                        return theme.DesignTokens[role].Text.Pressed.Get();
+                    }
+                    else if (isHovered && theme.DesignTokens[role].Text.Hovered.Get().keyword != StyleKeyword.Null)
+                    {
+                        return theme.DesignTokens[role].Text.Hovered.Get();
+                    }
+                    else if (selectedItemId == _id && theme.DesignTokens[role].Text.Selected.Get().keyword != StyleKeyword.Null)
+                    {
+                        return theme.DesignTokens[role].Text.Selected.Get();
+                    }
+                    return theme.DesignTokens[role].Text.Default.Get();
+                }, isHovered, isPressed, context.SelectedItemId, theme);
 
-                var backgroundColor = CreateComputedSignal<bool, string, Theme, StyleColor>((isHovered, selectedItemId, theme) =>
+                var backgroundColor = CreateComputedSignal((isHovered, isPressed, selectedItemId, theme) =>
                 {
-                    if (isHovered && theme.DesignTokens[role].Background.Hovered.Get().keyword != StyleKeyword.Null)
+                    if (isPressed && theme.DesignTokens[role].Background.Pressed.Get().keyword != StyleKeyword.Null)
+                    {
+                        return theme.DesignTokens[role].Background.Pressed.Get();
+                    }
+                    else if (isHovered && theme.DesignTokens[role].Background.Hovered.Get().keyword != StyleKeyword.Null)
                     {
                         return theme.DesignTokens[role].Background.Hovered.Get();
                     }
@@ -137,7 +162,7 @@ namespace Fiber.UI
                         return theme.DesignTokens[role].Background.Selected.Get();
                     }
                     return theme.DesignTokens[role].Background.Default.Get();
-                }, isHovered, context.SelectedItemId, theme);
+                }, isHovered, isPressed, context.SelectedItemId, theme);
 
 
                 var fontAwesome = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
@@ -150,6 +175,7 @@ namespace Fiber.UI
                         flexDirection: FlexDirection.Row,
                         fontSize: 10,
                         alignItems: Align.Center,
+                        justifyContent: Justify.SpaceBetween,
                         paddingLeft: 4,
                         paddingTop: 4,
                         paddingRight: 4,
@@ -159,12 +185,12 @@ namespace Fiber.UI
                     pickingMode: PickingMode.Position,
                     children: F.Children(
                         F.Text(
-                            text: '\uf054'.ToString(),
-                            style: new Style(color: color, unityFont: fontAwesome, unityFontDefinition: StyleKeyword.None)
-                        ),
-                        F.Text(
                             text: _label,
                             style: new Style(color: color)
+                        ),
+                        F.Text(
+                            text: '\uf054'.ToString(),
+                            style: new Style(color: color, unityFont: fontAwesome, unityFontDefinition: StyleKeyword.None)
                         )
                     )
                 );

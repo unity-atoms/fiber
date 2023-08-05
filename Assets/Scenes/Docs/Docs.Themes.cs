@@ -28,7 +28,8 @@ public static class DocsThemes
                 background: new(
                     @default: "#3F3F3F",
                     selected: "#505050",
-                    hovered: "#626262"
+                    hovered: "#626262",
+                    pressed: "#313131"
                 ),
                 border: new(
                     @default: "#2B2B2B"
@@ -48,7 +49,8 @@ public static class DocsThemes
                 background: new(
                     @default: "#FFFFFF",
                     selected: "#D2D2D2",
-                    hovered: "#D2D2D2"
+                    hovered: "#D2D2D2",
+                    pressed: "#BEBEBE"
                 ),
                 border: new(
                     @default: "#E0E0E0"
