@@ -102,6 +102,7 @@ namespace Fiber.UI
                 var role = F.GetRole(_role);
                 var isHovered = new Signal<bool>(false);
                 var isPressed = new Signal<bool>(false);
+                var isOpen = new Signal<bool>(false);
                 var context = F.GetContext<TreeViewContext>();
 
                 CreateEffect(() =>
@@ -125,6 +126,7 @@ namespace Fiber.UI
                         {
                             context.OnItemSelected(_id);
                             isPressed.Value = false;
+                            isOpen.Value = !isOpen.Value;
                         }
                     });
                     return null;
@@ -164,36 +166,51 @@ namespace Fiber.UI
                     return theme.DesignTokens[role].Background.Default.Get();
                 }, isHovered, isPressed, context.SelectedItemId, theme);
 
+                var iconUnicode = CreateComputedSignal((isOpen) =>
+                {
+                    return (isOpen ? '\uf078' : '\uf054').ToString();
+                }, isOpen);
+
 
                 var fontAwesome = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
 
-                return F.View(
-                    _ref: _ref,
-                    style: new Style(
-                        backgroundColor: backgroundColor,
-                        display: DisplayStyle.Flex,
-                        flexDirection: FlexDirection.Row,
-                        fontSize: 10,
-                        alignItems: Align.Center,
-                        justifyContent: Justify.SpaceBetween,
-                        paddingLeft: 4,
-                        paddingTop: 4,
-                        paddingRight: 4,
-                        paddingBottom: 4,
-                        width: new Length(100, LengthUnit.Percent)
-                    ),
-                    pickingMode: PickingMode.Position,
-                    children: F.Children(
-                        F.Text(
-                            text: _label,
-                            style: new Style(color: color)
+                return F.Fragment(F.Children(
+                    F.View(
+                        _ref: _ref,
+                        style: new Style(
+                            backgroundColor: backgroundColor,
+                            display: DisplayStyle.Flex,
+                            flexDirection: FlexDirection.Row,
+                            fontSize: 10,
+                            alignItems: Align.Center,
+                            justifyContent: Justify.SpaceBetween,
+                            paddingLeft: 4,
+                            paddingTop: 4,
+                            paddingRight: 4,
+                            paddingBottom: 4,
+                            width: new Length(100, LengthUnit.Percent)
                         ),
-                        F.Text(
-                            text: '\uf054'.ToString(),
-                            style: new Style(color: color, unityFont: fontAwesome, unityFontDefinition: StyleKeyword.None)
+                        pickingMode: PickingMode.Position,
+                        children: F.Children(
+                            F.Text(
+                                text: _label,
+                                style: new Style(color: color)
+                            ),
+                            F.Visible(
+                                when: new StaticSignal<bool>(children != null),
+                                children: F.Children(
+                                    F.Text(
+                                        text: iconUnicode,
+                                        style: new Style(color: color, unityFont: fontAwesome, unityFontDefinition: StyleKeyword.None)
+                                    )
+                            ))
                         )
+                    ),
+                    F.Active(
+                        when: isOpen,
+                        children: children
                     )
-                );
+                ));
             }
         }
     }

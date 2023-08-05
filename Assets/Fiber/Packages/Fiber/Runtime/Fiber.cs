@@ -1882,23 +1882,10 @@ namespace Fiber
                     _fiberNode = fiberNode;
                 }
 
-                private FiberNode GetNextDirectNativeNodeChild(FiberNode fiberNode)
-                {
-                    var candidate = fiberNode;
-                    while (candidate != null && candidate != _fiberNode)
-                    {
-                        if (candidate.NativeNode != null)
-                        {
-                            return candidate;
-                        }
-                        candidate = candidate.Sibling;
-                    }
-                    return null;
-                }
                 protected override void Run(bool visible)
                 {
                     // Get all direct native node children
-                    for (var withNativeNode = _fiberNode.NextWithNativeNode();
+                    for (var withNativeNode = _fiberNode.NextWithNativeNode(root: _fiberNode, skipChildren: false);
                         withNativeNode != null;
                         // We don't skip children since that is needed in order to properly 
                         // hide ui elements. See SetVisible() in Fiber.UIElements.cs on why we can't just disable the UIDocument GameObject.
