@@ -503,6 +503,7 @@ namespace Fiber.UIElements
     public class VisualElementNativeNode : NativeNode
     {
         public virtual VisualElement Instance { get; private set; }
+        private bool IsVisible_SetByFiber { get; set; }
         #region styles
         private WorkLoopSignalProp<Style> _styleWorkLoopItem;
         private Style _lastStyleFromSignal;
@@ -930,18 +931,54 @@ namespace Fiber.UIElements
             }
         }
 
-        private readonly string _hiddenClassName = "fiber-ui-elements--hidden";
         public override void SetVisible(bool visible)
         {
-            var hasHiddenClassName = Instance.ClassListContains(_hiddenClassName);
-            if (visible && hasHiddenClassName)
+            IsVisible_SetByFiber = visible;
+            UpdateDisplayStyle();
+        }
+
+        private void UpdateDisplayStyle()
+        {
+            var currentStyle = GetCurrentDisplayStyle();
+            if (Instance.style.display != currentStyle)
             {
-                Instance.RemoveFromClassList(_hiddenClassName);
+                Instance.style.display = currentStyle;
             }
-            else if (!visible && !hasHiddenClassName)
+        }
+
+        private StyleEnum<DisplayStyle> GetCurrentDisplayStyle()
+        {
+            // Visibility set from Fiber always take precedence
+            if (!IsVisible_SetByFiber)
             {
-                Instance.AddToClassList(_hiddenClassName);
+                return DisplayStyle.None;
             }
+
+            // Handle if the style prop is a signal
+            if (_styleWorkLoopItem.IsSignal)
+            {
+                var style = _styleWorkLoopItem.Get();
+                if (!style.Display.IsEmpty)
+                {
+                    return style.Display.Get();
+                }
+                else
+                {
+                    return StyleKeyword.Initial;
+                }
+            }
+            // Handle if the style prop is a value (with individual values / signals as its props)
+            else if (_styleWorkLoopItem.IsValue)
+            {
+                if (_displayWorkLoopItem.WorkLoopSignalProp.IsEmpty)
+                {
+                    return StyleKeyword.Initial;
+                }
+                return _displayWorkLoopItem.Get();
+            }
+
+            // The style prop is empty
+            return StyleKeyword.Initial;
         }
 
         public override void AddChild(FiberNode node, int index)
@@ -1220,13 +1257,9 @@ namespace Fiber.UIElements
                     Instance.style.borderTopColor = StyleKeyword.Initial;
                 }
 
-                if (!style.Display.IsEmpty)
+                if (!style.Display.IsEmpty || !_lastStyleFromSignal.Display.IsEmpty)
                 {
-                    Instance.style.display = style.Display.Get();
-                }
-                else if (!_lastStyleFromSignal.Display.IsEmpty)
-                {
-                    Instance.style.display = StyleKeyword.Initial;
+                    UpdateDisplayStyle();
                 }
 
                 if (!style.FlexShrink.IsEmpty)
@@ -1479,7 +1512,7 @@ namespace Fiber.UIElements
                 }
                 if (_displayWorkLoopItem.Check())
                 {
-                    Instance.style.display = _displayWorkLoopItem.Get();
+                    UpdateDisplayStyle();
                 }
                 if (_flexShrinkWorkLoopItem.Check())
                 {
@@ -1587,19 +1620,16 @@ namespace Fiber.UIElements
     public class UIDocumentNativeNode : GameObjectNativeNode
     {
         private readonly UIDocument _uiDocument;
-        private readonly StyleSheet _baseStyleSheet;
         private WorkLoopSignalProp<float> _sortingOrderWorkLoopItem;
 
         public UIDocumentNativeNode(
             UIDocumentComponent component,
             UIDocument uiDocument,
             GameObjectsRendererExtension rendererExtension,
-            StyleSheet baseStyleSheet,
             PanelSettings defaultPanelSettings
         ) : base(component, uiDocument.gameObject, rendererExtension)
         {
             _uiDocument = uiDocument;
-            _baseStyleSheet = baseStyleSheet;
 
             uiDocument.panelSettings = component.PanelSettings ?? defaultPanelSettings;
             if (!component.SortingOrder.IsEmpty)
@@ -1613,7 +1643,7 @@ namespace Fiber.UIElements
         {
             // Don't set UIDocument to inactive, since that will destroy the root visual element.
             // See this thread for more info: https://forum.unity.com/threads/does-uidocument-clear-contents-when-disabled.1097659/
-            VisibilitySetFromFiber = true;
+            IsVisible_SetByFiber = true;
             UpdateVisibility();
         }
 
@@ -1621,7 +1651,6 @@ namespace Fiber.UIElements
         {
             if (node.NativeNode is VisualElementNativeNode visualElementChildNode)
             {
-                visualElementChildNode.Instance.styleSheets.Add(_baseStyleSheet);
                 _uiDocument.rootVisualElement.Insert(index, visualElementChildNode.Instance);
                 return;
             }
@@ -1674,7 +1703,6 @@ namespace Fiber.UIElements
     public class UIElementsRendererExtension : GameObjectsRendererExtension
     {
         public PanelSettings DefaultPanelSettings { get; private set; }
-        private StyleSheet _baseStyleSheet; // A base style sheet that is used by the Fiber UI Elements renderer to hide / show elements.
 
         public UIElementsRendererExtension(
             PanelSettings defaultPanelSettings = null
@@ -1682,7 +1710,6 @@ namespace Fiber.UIElements
         : base()
         {
             DefaultPanelSettings = defaultPanelSettings;
-            _baseStyleSheet = Resources.Load<StyleSheet>("FiberUIElementsStyles");
         }
 
         public override NativeNode CreateNativeNode(FiberNode fiberNode)
@@ -1696,7 +1723,7 @@ namespace Fiber.UIElements
                 {
                     uiDocument = gameObject.AddComponent<UIDocument>();
                 }
-                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this, _baseStyleSheet, DefaultPanelSettings);
+                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this, DefaultPanelSettings);
             }
             else if (virtualNode is ScrollViewComponent scrollViewComponent)
             {

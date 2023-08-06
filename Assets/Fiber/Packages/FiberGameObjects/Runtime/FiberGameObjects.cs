@@ -113,7 +113,7 @@ namespace Fiber.GameObjects
         private WorkLoopSignalProp<bool> _activeWorkLoopItem;
         private WorkLoopSignalProp<Vector3> _positionWorkLoopItem;
         private WorkLoopSignalProp<Vector3> _localScaleWorkLoopItem;
-        protected bool VisibilitySetFromFiber { get; set; }
+        protected bool IsVisible_SetByFiber { get; set; }
 
         public GameObjectNativeNode(GameObjectComponent virtualNode, GameObject instance, GameObjectsRendererExtension rendererExtension)
         {
@@ -151,13 +151,13 @@ namespace Fiber.GameObjects
 
         public override void SetVisible(bool visible)
         {
-            VisibilitySetFromFiber = visible;
+            IsVisible_SetByFiber = visible;
             UpdateVisibility();
         }
 
         protected void UpdateVisibility()
         {
-            Instance.SetActive(VisibilitySetFromFiber && _activeWorkLoopItem.Get());
+            Instance.SetActive(IsVisible_SetByFiber && _activeWorkLoopItem.Get());
         }
 
         public override void AddChild(FiberNode node, int index)

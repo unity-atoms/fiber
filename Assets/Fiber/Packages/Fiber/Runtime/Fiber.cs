@@ -71,7 +71,7 @@ namespace Fiber
         public WorkLoopSignalProp(SignalProp<T> signalProp)
         {
             _signalProp = signalProp;
-            _dirtyBit = signalProp.IsSignal ? signalProp.Signal.DirtyBit : default(byte);
+            _dirtyBit = signalProp.IsSignal ? signalProp.Signal.DirtyBit : default;
         }
 
         public bool Check()
@@ -1103,18 +1103,6 @@ namespace Fiber
 
             return current;
         }
-
-        public FiberNode NextWithNativeNode(FiberNode root = null, bool skipChildren = false)
-        {
-            FiberNode current = this;
-            do
-            {
-                current = current.NextNode(root, skipChildren);
-            }
-            while (current != null && current.NativeNode == null);
-
-            return current;
-        }
     }
 
     public abstract class RendererExtension
@@ -1884,15 +1872,15 @@ namespace Fiber
 
                 protected override void Run(bool visible)
                 {
-                    // Get all direct native node children
-                    for (var withNativeNode = _fiberNode.NextWithNativeNode(root: _fiberNode, skipChildren: false);
-                        withNativeNode != null;
-                        // We don't skip children since that is needed in order to properly 
-                        // hide ui elements. See SetVisible() in Fiber.UIElements.cs on why we can't just disable the UIDocument GameObject.
-                        withNativeNode = withNativeNode.NextWithNativeNode(root: _fiberNode, skipChildren: false)
-                    )
+                    // Iterate all decedents up to the point that a child is a VisibleComponent
+                    var node = _fiberNode.Child;
+                    while (node != null && node != _fiberNode)
                     {
-                        withNativeNode.NativeNode.SetVisible(visible);
+                        node.NativeNode?.SetVisible(visible);
+
+                        var isChildVisibleComponent = node.Child != null && node.Child.VirtualNode is VisibleComponent;
+                        var isCurrentVisibleComponent = node.VirtualNode is VisibleComponent; // Could be true if a Sibling is a VisibleComponent
+                        node = node.NextNode(root: _fiberNode, skipChildren: isChildVisibleComponent || isCurrentVisibleComponent);
                     }
                 }
                 public override void Cleanup() { }
