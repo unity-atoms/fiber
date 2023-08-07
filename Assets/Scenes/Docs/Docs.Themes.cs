@@ -26,19 +26,34 @@ public static class DocsThemes
         {
             { "neutral", new(
                 background: new(
-                    @default: "#3F3F3F",
-                    selected: "#505050",
-                    hovered: "#505050",
-                    pressed: "#313131"
+                    @default: "#242424",
+                    selected: "#333333",
+                    hovered: "#333333",
+                    pressed: "#222222"
                 ),
                 border: new(
-                    @default: "#2B2B2B"
+                    @default: "#222222"
                 ),
                 text: new(
                     @default: "#FFFFFF",
                     selected: "#25C281"
                 )
-            ) }
+            ) },
+            { "deepNeutral", new(
+                background: new(
+                    @default: "#1A1A1A",
+                    selected: "#2C2C2C",
+                    hovered: "#2C2C2C",
+                    pressed: "#0F0F0F"
+                ),
+                border: new(
+                    @default: "#0F0F0F"
+                ),
+                text: new(
+                    @default: "#FFFFFF",
+                    selected: "#25C281"
+                )
+            ) },
         }
     );
 
@@ -57,9 +72,25 @@ public static class DocsThemes
                     @default: "#E0E0E0"
                 ),
                 text: new(
-                    @default: "#000000"
+                    @default: "#000000",
+                    selected: "#25C281"
                 )
-            ) }
+            ) },
+            { "deepNeutral", new(
+                background: new(
+                    @default: "#D2D2D2",
+                    selected: "#E4E4E4",
+                    hovered: "#E4E4E4",
+                    pressed: "#BEBEBE"
+                ),
+                border: new(
+                    @default: "#BEBEBE"
+                ),
+                text: new(
+                    @default: "#000000",
+                    selected: "#25C281"
+                )
+            ) },
         }
     );
 }

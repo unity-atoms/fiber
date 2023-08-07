@@ -36,33 +36,69 @@ public class DocsFiberRoot : MonoBehaviour
         public override VirtualNode Render()
         {
             var theme = C<ThemeStore>().Get();
-            var role = "neutral";
+            var neutral = "neutral";
+            var deepNeutral = "deepNeutral";
 
             return F.View(
                 style: new Style(
-                    minWidth: 100,
-                    maxWidth: 240,
-                    width: new Length(25, LengthUnit.Percent),
+                    display: DisplayStyle.Flex,
                     height: new Length(100, LengthUnit.Percent),
-                    backgroundColor: theme.DesignTokens[role].Background.Default,
-                    borderRightColor: theme.DesignTokens[role].Border.Default,
-                    borderRightWidth: 1
+                    width: new Length(100, LengthUnit.Percent),
+                    alignItems: Align.Stretch,
+                    flexDirection: FlexDirection.Row
                 ),
-                children: F.Children(new TreeViewComponent.Container(
-                    role: role,
-                    children: F.Children(
-                        new TreeViewComponent.Item(id: "1", label: $"Item 1"),
-                        new TreeViewComponent.Item(id: "2", label: $"Item 2", children: F.Children(
-                            new TreeViewComponent.Item(id: "2.1", label: $"Item 2.1"),
-                            new TreeViewComponent.Item(id: "2.2", label: $"Item 2.2", children: F.Children(
-                                new TreeViewComponent.Item(id: "2.2.1", label: $"Item 2.2.1 Item 2.2.1 Item 2.2.1"),
-                                new TreeViewComponent.Item(id: "2.2.2", label: $"Item 2.2.2")
-                            )),
-                            new TreeViewComponent.Item(id: "2.3", label: $"Item 2.3")
-                        )),
-                        new TreeViewComponent.Item(id: "3", label: $"Item 3")
+                children: F.Children(
+                    F.View(
+                        style: new Style(
+                            minWidth: 100,
+                            maxWidth: 240,
+                            width: new Length(25, LengthUnit.Percent),
+                            height: new Length(100, LengthUnit.Percent),
+                            backgroundColor: theme.DesignTokens[deepNeutral].Background.Default,
+                            borderRightColor: theme.DesignTokens[deepNeutral].Border.Default,
+                            borderRightWidth: 1,
+                            flexShrink: 0,
+                            flexGrow: 0
+                        ),
+                        children: F.Children(new TreeViewComponent.Container(
+                            role: deepNeutral,
+                            children: F.Children(
+                                new TreeViewComponent.Item(id: "1", label: $"Item 1"),
+                                new TreeViewComponent.Item(id: "2", label: $"Item 2", children: F.Children(
+                                    new TreeViewComponent.Item(id: "2.1", label: $"Item 2.1"),
+                                    new TreeViewComponent.Item(id: "2.2", label: $"Item 2.2", children: F.Children(
+                                        new TreeViewComponent.Item(id: "2.2.1", label: $"Item 2.2.1 Item 2.2.1 Item 2.2.1"),
+                                        new TreeViewComponent.Item(id: "2.2.2", label: $"Item 2.2.2")
+                                    )),
+                                    new TreeViewComponent.Item(id: "2.3", label: $"Item 2.3")
+                                )),
+                                new TreeViewComponent.Item(id: "3", label: $"Item 3")
+                            )
+                        ))
+                    ),
+                    F.View(
+                        style: new Style(
+                            backgroundColor: theme.DesignTokens[neutral].Background.Default,
+                            minHeight: new Length(100, LengthUnit.Percent),
+                            flexShrink: 1,
+                            flexGrow: 1,
+                            minWidth: new Length(100, LengthUnit.Pixel)
+                        ),
+                        children: F.Children(
+                            F.Text(
+                                style: new Style(
+                                    color: theme.DesignTokens[neutral].Text.Default,
+                                    fontSize: 36,
+                                    paddingLeft: 18,
+                                    paddingTop: 18,
+                                    paddingRight: 18,
+                                    paddingBottom: 18
+                                ),
+                                text: "Content"
+                            )
+                        )
                     )
-                ))
+                )
             );
         }
     }
