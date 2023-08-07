@@ -634,7 +634,7 @@ namespace Fiber
                 }
             }
 
-            var newContext = new Context<C>(default(C));
+            var newContext = new Context<C>(default);
             _contexts.Add(newContext);
             return newContext;
         }

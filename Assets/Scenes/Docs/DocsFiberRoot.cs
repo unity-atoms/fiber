@@ -35,7 +35,10 @@ public class DocsFiberRoot : MonoBehaviour
                                 new TreeView.Item(id: "1", label: $"Item 1"),
                                 new TreeView.Item(id: "2", label: $"Item 2", children: F.Children(
                                     new TreeView.Item(id: "2.1", label: $"Item 2.1"),
-                                    new TreeView.Item(id: "2.2", label: $"Item 2.2"),
+                                    new TreeView.Item(id: "2.2", label: $"Item 2.2", children: F.Children(
+                                        new TreeView.Item(id: "2.2.1", label: $"Item 2.2.1 Item 2.2.1 Item 2.2.1"),
+                                        new TreeView.Item(id: "2.2.2", label: $"Item 2.2.2")
+                                    )),
                                     new TreeView.Item(id: "2.3", label: $"Item 2.3")
                                 )),
                                 new TreeView.Item(id: "3", label: $"Item 3")

@@ -56,24 +56,39 @@ namespace Fiber.UI
                         F.RoleProvider(
                             role: _role,
                             children: F.Children(
-                                F.View(
-                                    style: new Style(
-                                        flexShrink: 0,
-                                        backgroundColor: theme.DesignTokens[role].Background.Default,
-                                        borderRightColor: theme.DesignTokens[role].Border.Default,
-                                        borderRightWidth: 1,
-                                        minWidth: 100,
-                                        maxWidth: 240,
-                                        width: new Length(25, LengthUnit.Percent),
-                                        minHeight: 20,
-                                        height: StyleKeyword.Auto
-                                    ),
-                                    children: children
+                                F.ContextProvider(
+                                    value: new TreeViewIndentiationContext(level: 0),
+                                    children: F.Children(
+                                        F.View(
+                                            style: new Style(
+                                                flexShrink: 0,
+                                                backgroundColor: theme.DesignTokens[role].Background.Default,
+                                                borderRightColor: theme.DesignTokens[role].Border.Default,
+                                                borderRightWidth: 1,
+                                                minWidth: 100,
+                                                maxWidth: 240,
+                                                width: new Length(25, LengthUnit.Percent),
+                                                minHeight: 20,
+                                                height: StyleKeyword.Auto
+                                            ),
+                                            children: children
+                                        )
+                                    )
                                 )
                             )
                         )
                     )
                 );
+            }
+        }
+
+        public class TreeViewIndentiationContext
+        {
+            public int Level;
+
+            public TreeViewIndentiationContext(int level)
+            {
+                Level = level;
             }
         }
 
@@ -104,6 +119,7 @@ namespace Fiber.UI
                 var isPressed = new Signal<bool>(false);
                 var isOpen = new Signal<bool>(false);
                 var context = F.GetContext<TreeViewContext>();
+                var identationLevel = F.GetContext<TreeViewIndentiationContext>().Level;
 
                 CreateEffect(() =>
                 {
@@ -184,7 +200,7 @@ namespace Fiber.UI
                             fontSize: 16,
                             alignItems: Align.Center,
                             justifyContent: Justify.SpaceBetween,
-                            paddingLeft: 12,
+                            paddingLeft: 12 + identationLevel * 8,
                             paddingTop: 12,
                             paddingRight: 12,
                             paddingBottom: 12,
@@ -208,7 +224,14 @@ namespace Fiber.UI
                     ),
                     F.Active(
                         when: isOpen,
-                        children: children
+                        children: F.Children(
+                            F.ContextProvider(
+                                value: new TreeViewIndentiationContext(level: identationLevel + 1),
+                                children: F.Children(
+                                    F.View(children: children)
+                                )
+                            )
+                        )
                     )
                 ));
             }
