@@ -553,6 +553,10 @@ namespace Fiber.UIElements
         private WorkLoopTimeValuesProp _transitionDelayWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDurationWorkLoopItem;
         private WorkLoopEasingFunctionsProp _transitionTimingFunctionWorkLoopItem;
+        private WorkLoopStyleTransformOriginProp _transformOriginWorkLoopItem;
+        private WorkLoopStyleTranslateProp _translateWorkLoopItem;
+        private WorkLoopStyleScaleProp _scaleWorkLoopItem;
+        private WorkLoopStyleRotateProp _rotateWorkLoopItem;
 
         #endregion
         private WorkLoopSignalProp<string> _nameWorkLoopItem;
@@ -939,6 +943,38 @@ namespace Fiber.UIElements
                     if (isStyleValue)
                     {
                         _transitionTimingFunctionWorkLoopItem = new(style.TransitionTimingFunction);
+                    }
+                }
+                if (!style.TransformOrigin.IsEmpty)
+                {
+                    Instance.style.transformOrigin = style.TransformOrigin.Get();
+                    if (isStyleValue)
+                    {
+                        _transformOriginWorkLoopItem = new(style.TransformOrigin);
+                    }
+                }
+                if (!style.Translate.IsEmpty)
+                {
+                    Instance.style.translate = style.Translate.Get();
+                    if (isStyleValue)
+                    {
+                        _translateWorkLoopItem = new(style.Translate);
+                    }
+                }
+                if (!style.Scale.IsEmpty)
+                {
+                    Instance.style.scale = style.Scale.Get();
+                    if (isStyleValue)
+                    {
+                        _scaleWorkLoopItem = new(style.Scale);
+                    }
+                }
+                if (!style.Rotate.IsEmpty)
+                {
+                    Instance.style.rotate = style.Rotate.Get();
+                    if (isStyleValue)
+                    {
+                        _rotateWorkLoopItem = new(style.Rotate);
                     }
                 }
             }
@@ -1479,6 +1515,42 @@ namespace Fiber.UIElements
                     Instance.style.transitionTimingFunction = StyleKeyword.Initial;
                 }
 
+                if (!style.TransformOrigin.IsEmpty)
+                {
+                    Instance.style.transformOrigin = style.TransformOrigin.Get();
+                }
+                else if (!_lastStyleFromSignal.TransformOrigin.IsEmpty)
+                {
+                    Instance.style.transformOrigin = StyleKeyword.Initial;
+                }
+
+                if (!style.Translate.IsEmpty)
+                {
+                    Instance.style.translate = style.Translate.Get();
+                }
+                else if (!_lastStyleFromSignal.Translate.IsEmpty)
+                {
+                    Instance.style.translate = StyleKeyword.Initial;
+                }
+
+                if (!style.Scale.IsEmpty)
+                {
+                    Instance.style.scale = style.Scale.Get();
+                }
+                else if (!_lastStyleFromSignal.Scale.IsEmpty)
+                {
+                    Instance.style.scale = StyleKeyword.Initial;
+                }
+
+                if (!style.Rotate.IsEmpty)
+                {
+                    Instance.style.rotate = style.Rotate.Get();
+                }
+                else if (!_lastStyleFromSignal.Rotate.IsEmpty)
+                {
+                    Instance.style.rotate = StyleKeyword.Initial;
+                }
+
                 _lastStyleFromSignal = style;
             }
             else if (_styleWorkLoopItem.IsValue)
@@ -1666,6 +1738,22 @@ namespace Fiber.UIElements
                 if (_transitionTimingFunctionWorkLoopItem.Check())
                 {
                     Instance.style.transitionTimingFunction = _transitionTimingFunctionWorkLoopItem.Get();
+                }
+                if (_transformOriginWorkLoopItem.Check())
+                {
+                    Instance.style.transformOrigin = _transformOriginWorkLoopItem.Get();
+                }
+                if (_translateWorkLoopItem.Check())
+                {
+                    Instance.style.translate = _translateWorkLoopItem.Get();
+                }
+                if (_scaleWorkLoopItem.Check())
+                {
+                    Instance.style.scale = _scaleWorkLoopItem.Get();
+                }
+                if (_rotateWorkLoopItem.Check())
+                {
+                    Instance.style.rotate = _rotateWorkLoopItem.Get();
                 }
             }
             if (_nameWorkLoopItem.Check())

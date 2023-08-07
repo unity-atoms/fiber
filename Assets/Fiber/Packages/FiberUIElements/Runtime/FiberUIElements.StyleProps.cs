@@ -640,6 +640,194 @@ namespace Fiber.UIElements
         public StyleList<EasingFunction> Get() => WorkLoopSignalProp.Get();
     }
 
+    public struct StyleTransformOriginProp
+    {
+        public SignalProp<StyleTransformOrigin> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public StyleTransformOriginProp(StyleTransformOrigin value)
+        {
+            SignalProp = value;
+        }
+
+        public StyleTransformOriginProp(BaseSignal<StyleTransformOrigin> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator StyleTransformOriginProp(TransformOrigin value)
+        {
+            return new StyleTransformOriginProp(value);
+        }
+
+        public static implicit operator StyleTransformOriginProp(StyleKeyword keyword)
+        {
+            return new StyleTransformOriginProp(keyword);
+        }
+
+        public static implicit operator StyleTransformOriginProp(BaseSignal<StyleTransformOrigin> signal)
+        {
+            return new StyleTransformOriginProp(signal);
+        }
+
+        public StyleTransformOrigin Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopStyleTransformOriginProp
+    {
+        public WorkLoopSignalProp<StyleTransformOrigin> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopStyleTransformOriginProp(StyleTransformOriginProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleTransformOrigin Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct StyleTranslateProp
+    {
+        public SignalProp<StyleTranslate> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public StyleTranslateProp(StyleTranslate value)
+        {
+            SignalProp = value;
+        }
+
+        public StyleTranslateProp(BaseSignal<StyleTranslate> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator StyleTranslateProp(Translate value)
+        {
+            return new StyleTranslateProp(value);
+        }
+
+        public static implicit operator StyleTranslateProp(StyleKeyword keyword)
+        {
+            return new StyleTranslateProp(keyword);
+        }
+
+        public static implicit operator StyleTranslateProp(BaseSignal<StyleTranslate> signal)
+        {
+            return new StyleTranslateProp(signal);
+        }
+
+        public StyleTranslate Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopStyleTranslateProp
+    {
+        public WorkLoopSignalProp<StyleTranslate> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopStyleTranslateProp(StyleTranslateProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleTranslate Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct StyleScaleProp
+    {
+        public SignalProp<StyleScale> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public StyleScaleProp(StyleScale value)
+        {
+            SignalProp = value;
+        }
+
+        public StyleScaleProp(BaseSignal<StyleScale> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator StyleScaleProp(Scale value)
+        {
+            return new StyleScaleProp(value);
+        }
+
+        public static implicit operator StyleScaleProp(StyleKeyword keyword)
+        {
+            return new StyleScaleProp(keyword);
+        }
+
+        public static implicit operator StyleScaleProp(BaseSignal<StyleScale> signal)
+        {
+            return new StyleScaleProp(signal);
+        }
+
+        public StyleScale Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopStyleScaleProp
+    {
+        public WorkLoopSignalProp<StyleScale> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopStyleScaleProp(StyleScaleProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleScale Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct StyleRotateProp
+    {
+        public SignalProp<StyleRotate> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public StyleRotateProp(StyleRotate value)
+        {
+            SignalProp = value;
+        }
+
+        public StyleRotateProp(BaseSignal<StyleRotate> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator StyleRotateProp(Rotate value)
+        {
+            return new StyleRotateProp(value);
+        }
+
+        public static implicit operator StyleRotateProp(StyleKeyword keyword)
+        {
+            return new StyleRotateProp(keyword);
+        }
+
+        public static implicit operator StyleRotateProp(BaseSignal<StyleRotate> signal)
+        {
+            return new StyleRotateProp(signal);
+        }
+
+        public StyleRotate Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopStyleRotateProp
+    {
+        public WorkLoopSignalProp<StyleRotate> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopStyleRotateProp(StyleRotateProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleRotate Get() => WorkLoopSignalProp.Get();
+    }
+
     public struct Style
     {
         public PositionProp Position { get; private set; }
@@ -688,6 +876,10 @@ namespace Fiber.UIElements
         public TimeValuesProp TransitionDelay { get; private set; }
         public TimeValuesProp TransitionDuration { get; private set; }
         public EasingFunctionsProp TransitionTimingFunction { get; private set; }
+        public StyleTransformOriginProp TransformOrigin { get; private set; }
+        public StyleTranslateProp Translate { get; private set; }
+        public StyleScaleProp Scale { get; private set; }
+        public StyleRotateProp Rotate { get; private set; }
 
         public Style(
             PositionProp position = new(),
@@ -735,7 +927,11 @@ namespace Fiber.UIElements
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
-            EasingFunctionsProp transitionTimingFunction = new()
+            EasingFunctionsProp transitionTimingFunction = new(),
+            StyleTransformOriginProp transformOrigin = new(),
+            StyleTranslateProp translate = new(),
+            StyleScaleProp scale = new(),
+            StyleRotateProp rotate = new()
         )
         {
             Position = position;
@@ -784,6 +980,10 @@ namespace Fiber.UIElements
             TransitionDelay = transitionDelay;
             TransitionDuration = transitionDuration;
             TransitionTimingFunction = transitionTimingFunction;
+            TransformOrigin = transformOrigin;
+            Translate = translate;
+            Scale = scale;
+            Rotate = rotate;
         }
     }
 }
