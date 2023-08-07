@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Signals;
 using UnityEngine;
@@ -498,6 +499,147 @@ namespace Fiber.UIElements
         public StyleFontDefinition Get() => WorkLoopSignalProp.Get();
     }
 
+    public struct StylePropertyNamesProp
+    {
+        public SignalProp<StyleList<StylePropertyName>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public StylePropertyNamesProp(StyleList<StylePropertyName> value)
+        {
+            SignalProp = value;
+        }
+
+        public StylePropertyNamesProp(BaseSignal<StyleList<StylePropertyName>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator StylePropertyNamesProp(List<StylePropertyName> value)
+        {
+            return new StylePropertyNamesProp(value);
+        }
+
+        public static implicit operator StylePropertyNamesProp(StyleKeyword keyword)
+        {
+            return new StylePropertyNamesProp(keyword);
+        }
+
+        public static implicit operator StylePropertyNamesProp(BaseSignal<StyleList<StylePropertyName>> signal)
+        {
+            return new StylePropertyNamesProp(signal);
+        }
+
+        public StyleList<StylePropertyName> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopStylePropertyNamesProp
+    {
+        public WorkLoopSignalProp<StyleList<StylePropertyName>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopStylePropertyNamesProp(StylePropertyNamesProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleList<StylePropertyName> Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct TimeValuesProp
+    {
+        public SignalProp<StyleList<TimeValue>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public TimeValuesProp(StyleList<TimeValue> value)
+        {
+            SignalProp = value;
+        }
+
+        public TimeValuesProp(BaseSignal<StyleList<TimeValue>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator TimeValuesProp(List<TimeValue> value)
+        {
+            return new TimeValuesProp(value);
+        }
+
+        public static implicit operator TimeValuesProp(StyleKeyword keyword)
+        {
+            return new TimeValuesProp(keyword);
+        }
+
+        public static implicit operator TimeValuesProp(BaseSignal<StyleList<TimeValue>> signal)
+        {
+            return new TimeValuesProp(signal);
+        }
+
+        public StyleList<TimeValue> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopTimeValuesProp
+    {
+        public WorkLoopSignalProp<StyleList<TimeValue>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopTimeValuesProp(TimeValuesProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleList<TimeValue> Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct EasingFunctionsProp
+    {
+        public SignalProp<StyleList<EasingFunction>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public EasingFunctionsProp(StyleList<EasingFunction> value)
+        {
+            SignalProp = value;
+        }
+
+        public EasingFunctionsProp(BaseSignal<StyleList<EasingFunction>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator EasingFunctionsProp(List<EasingFunction> value)
+        {
+            return new EasingFunctionsProp(value);
+        }
+
+        public static implicit operator EasingFunctionsProp(StyleKeyword keyword)
+        {
+            return new EasingFunctionsProp(keyword);
+        }
+
+        public static implicit operator EasingFunctionsProp(BaseSignal<StyleList<EasingFunction>> signal)
+        {
+            return new EasingFunctionsProp(signal);
+        }
+
+        public StyleList<EasingFunction> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopEasingFunctionsProp
+    {
+        public WorkLoopSignalProp<StyleList<EasingFunction>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopEasingFunctionsProp(EasingFunctionsProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleList<EasingFunction> Get() => WorkLoopSignalProp.Get();
+    }
+
     public struct Style
     {
         public PositionProp Position { get; private set; }
@@ -542,6 +684,10 @@ namespace Fiber.UIElements
         public StyleLengthProp FontSize { get; private set; }
         public StyleFontProp UnityFont { get; private set; }
         public StyleFontDefinitionProp UnityFontDefinition { get; private set; }
+        public StylePropertyNamesProp TransitionProperty { get; private set; }
+        public TimeValuesProp TransitionDelay { get; private set; }
+        public TimeValuesProp TransitionDuration { get; private set; }
+        public EasingFunctionsProp TransitionTimingFunction { get; private set; }
 
         public Style(
             PositionProp position = new(),
@@ -585,7 +731,11 @@ namespace Fiber.UIElements
             StyleColorProp color = new(),
             StyleLengthProp fontSize = new(),
             StyleFontProp unityFont = new(),
-            StyleFontDefinitionProp unityFontDefinition = new()
+            StyleFontDefinitionProp unityFontDefinition = new(),
+            StylePropertyNamesProp transitionProperty = new(),
+            TimeValuesProp transitionDelay = new(),
+            TimeValuesProp transitionDuration = new(),
+            EasingFunctionsProp transitionTimingFunction = new()
         )
         {
             Position = position;
@@ -630,6 +780,10 @@ namespace Fiber.UIElements
             FontSize = fontSize;
             UnityFont = unityFont;
             UnityFontDefinition = unityFontDefinition;
+            TransitionProperty = transitionProperty;
+            TransitionDelay = transitionDelay;
+            TransitionDuration = transitionDuration;
+            TransitionTimingFunction = transitionTimingFunction;
         }
     }
 }

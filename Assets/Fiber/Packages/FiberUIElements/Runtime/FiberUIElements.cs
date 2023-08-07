@@ -549,6 +549,11 @@ namespace Fiber.UIElements
         private WorkLoopStyleLengthProp _fontSizeWorkLoopItem;
         private WorkLoopStyleFontProp _unityFontWorkLoopItem;
         private WorkLoopStyleFontDefinitionProp _unityFontDefinitionWorkLoopItem;
+        private WorkLoopStylePropertyNamesProp _transitionPropertyWorkLoopItem;
+        private WorkLoopTimeValuesProp _transitionDelayWorkLoopItem;
+        private WorkLoopTimeValuesProp _transitionDurationWorkLoopItem;
+        private WorkLoopEasingFunctionsProp _transitionTimingFunctionWorkLoopItem;
+
         #endregion
         private WorkLoopSignalProp<string> _nameWorkLoopItem;
         private WorkLoopSignalProp<PickingMode> _pickingModeWorkLoopItem;
@@ -902,6 +907,38 @@ namespace Fiber.UIElements
                     if (isStyleValue)
                     {
                         _unityFontDefinitionWorkLoopItem = new(style.UnityFontDefinition);
+                    }
+                }
+                if (!style.TransitionProperty.IsEmpty)
+                {
+                    Instance.style.transitionProperty = style.TransitionProperty.Get();
+                    if (isStyleValue)
+                    {
+                        _transitionPropertyWorkLoopItem = new(style.TransitionProperty);
+                    }
+                }
+                if (!style.TransitionDelay.IsEmpty)
+                {
+                    Instance.style.transitionDelay = style.TransitionDelay.Get();
+                    if (isStyleValue)
+                    {
+                        _transitionDelayWorkLoopItem = new(style.TransitionDelay);
+                    }
+                }
+                if (!style.TransitionDuration.IsEmpty)
+                {
+                    Instance.style.transitionDuration = style.TransitionDuration.Get();
+                    if (isStyleValue)
+                    {
+                        _transitionDurationWorkLoopItem = new(style.TransitionDuration);
+                    }
+                }
+                if (!style.TransitionTimingFunction.IsEmpty)
+                {
+                    Instance.style.transitionTimingFunction = style.TransitionTimingFunction.Get();
+                    if (isStyleValue)
+                    {
+                        _transitionTimingFunctionWorkLoopItem = new(style.TransitionTimingFunction);
                     }
                 }
             }
@@ -1406,6 +1443,42 @@ namespace Fiber.UIElements
                     Instance.style.unityFontDefinition = StyleKeyword.Initial;
                 }
 
+                if (!style.TransitionProperty.IsEmpty)
+                {
+                    Instance.style.transitionProperty = style.TransitionProperty.Get();
+                }
+                else if (!_lastStyleFromSignal.TransitionProperty.IsEmpty)
+                {
+                    Instance.style.transitionProperty = StyleKeyword.Initial;
+                }
+
+                if (!style.TransitionDelay.IsEmpty)
+                {
+                    Instance.style.transitionDelay = style.TransitionDelay.Get();
+                }
+                else if (!_lastStyleFromSignal.TransitionDelay.IsEmpty)
+                {
+                    Instance.style.transitionDelay = StyleKeyword.Initial;
+                }
+
+                if (!style.TransitionDuration.IsEmpty)
+                {
+                    Instance.style.transitionDuration = style.TransitionDuration.Get();
+                }
+                else if (!_lastStyleFromSignal.TransitionDuration.IsEmpty)
+                {
+                    Instance.style.transitionDuration = StyleKeyword.Initial;
+                }
+
+                if (!style.TransitionTimingFunction.IsEmpty)
+                {
+                    Instance.style.transitionTimingFunction = style.TransitionTimingFunction.Get();
+                }
+                else if (!_lastStyleFromSignal.TransitionTimingFunction.IsEmpty)
+                {
+                    Instance.style.transitionTimingFunction = StyleKeyword.Initial;
+                }
+
                 _lastStyleFromSignal = style;
             }
             else if (_styleWorkLoopItem.IsValue)
@@ -1577,6 +1650,22 @@ namespace Fiber.UIElements
                 if (_unityFontDefinitionWorkLoopItem.Check())
                 {
                     Instance.style.unityFontDefinition = _unityFontDefinitionWorkLoopItem.Get();
+                }
+                if (_transitionPropertyWorkLoopItem.Check())
+                {
+                    Instance.style.transitionProperty = _transitionPropertyWorkLoopItem.Get();
+                }
+                if (_transitionDelayWorkLoopItem.Check())
+                {
+                    Instance.style.transitionDelay = _transitionDelayWorkLoopItem.Get();
+                }
+                if (_transitionDurationWorkLoopItem.Check())
+                {
+                    Instance.style.transitionDuration = _transitionDurationWorkLoopItem.Get();
+                }
+                if (_transitionTimingFunctionWorkLoopItem.Check())
+                {
+                    Instance.style.transitionTimingFunction = _transitionTimingFunctionWorkLoopItem.Get();
                 }
             }
             if (_nameWorkLoopItem.Check())
