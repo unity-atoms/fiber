@@ -8,7 +8,7 @@ using Signals;
 
 namespace Fiber.UI
 {
-    public static class TreeView
+    public static class TreeViewComponent
     {
         private class TreeViewContext
         {
@@ -59,20 +59,7 @@ namespace Fiber.UI
                                 F.ContextProvider(
                                     value: new TreeViewIndentiationContext(level: 0),
                                     children: F.Children(
-                                        F.View(
-                                            style: new Style(
-                                                flexShrink: 0,
-                                                backgroundColor: theme.DesignTokens[role].Background.Default,
-                                                borderRightColor: theme.DesignTokens[role].Border.Default,
-                                                borderRightWidth: 1,
-                                                minWidth: 100,
-                                                maxWidth: 240,
-                                                width: new Length(25, LengthUnit.Percent),
-                                                minHeight: 20,
-                                                height: StyleKeyword.Auto
-                                            ),
-                                            children: children
-                                        )
+                                        F.View(children: children)
                                     )
                                 )
                             )
@@ -201,9 +188,9 @@ namespace Fiber.UI
                             alignItems: Align.Center,
                             justifyContent: Justify.SpaceBetween,
                             paddingLeft: 12 + identationLevel * 8,
-                            paddingTop: 12,
+                            paddingTop: 6,
                             paddingRight: 12,
-                            paddingBottom: 12,
+                            paddingBottom: 6,
                             width: new Length(100, LengthUnit.Percent)
                         ),
                         pickingMode: PickingMode.Position,

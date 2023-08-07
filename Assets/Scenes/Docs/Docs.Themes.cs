@@ -28,14 +28,15 @@ public static class DocsThemes
                 background: new(
                     @default: "#3F3F3F",
                     selected: "#505050",
-                    hovered: "#626262",
+                    hovered: "#505050",
                     pressed: "#313131"
                 ),
                 border: new(
                     @default: "#2B2B2B"
                 ),
                 text: new(
-                    @default: "#FFFFFF"
+                    @default: "#FFFFFF",
+                    selected: "#25C281"
                 )
             ) }
         }
