@@ -8,6 +8,41 @@ using Signals;
 
 namespace Fiber.UI
 {
+    public static partial class BaseComponentExtensions
+    {
+        public static TreeViewComponent.Container TreeViewContainer(
+            this BaseComponent component,
+                List<VirtualNode> children,
+                Action<string> onItemIdSelected,
+                BaseSignal<string> selectedItemId,
+                string role = Constants.INHERIT_ROLE
+        )
+        {
+            return new TreeViewComponent.Container(
+                children: children,
+                onItemIdSelected: onItemIdSelected,
+                selectedItemId: selectedItemId,
+                role: role
+            );
+        }
+
+        public static TreeViewComponent.Item TreeViewItem(
+            this BaseComponent component,
+                SignalProp<string> label,
+                string id,
+                List<VirtualNode> children = null,
+                string role = Constants.INHERIT_ROLE
+        )
+        {
+            return new TreeViewComponent.Item(
+                label: label,
+                id: id,
+                children: children,
+                role: role
+            );
+        }
+    }
+
     public static class TreeViewComponent
     {
         private class IndentiationLevelContext

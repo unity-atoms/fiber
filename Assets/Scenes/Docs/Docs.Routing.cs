@@ -66,7 +66,7 @@ public static class DocsRouting
                             flexShrink: 0,
                             flexGrow: 0
                         ),
-                        children: F.Children(new TreeViewComponent.Container(
+                        children: F.Children(F.TreeViewContainer(
                             role: DocsThemes.ROLES.DEEP_NEUTRAL,
                             selectedItemId: selectedItemId,
                             onItemIdSelected: (string id) =>
@@ -74,8 +74,8 @@ public static class DocsRouting
                                 router.Navigate(id);
                             },
                             children: F.Children(
-                                new TreeViewComponent.Item(id: ROUTES.INTRODUCTION, label: $"Introduction"),
-                                new TreeViewComponent.Item(id: ROUTES.INSTALLATION, label: $"Installation")
+                                F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
+                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation")
                             )
                         ))
                     ),
