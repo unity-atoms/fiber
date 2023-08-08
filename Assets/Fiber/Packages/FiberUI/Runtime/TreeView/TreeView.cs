@@ -10,46 +10,57 @@ namespace Fiber.UI
 {
     public static class TreeViewComponent
     {
-        private class TreeViewContext
+        private class IndentiationLevelContext
         {
-            public Signal<string> SelectedItemId;
+            public int IndentiationLeve;
+
+            public IndentiationLevelContext(int indentiationLeve)
+            {
+                IndentiationLeve = indentiationLeve;
+            }
+        }
+
+        private class SelectedItemIdContext
+        {
+            public BaseSignal<string> SelectedItemId;
             public Action<string> OnItemSelected;
 
-            public TreeViewContext(Signal<string> selectedItemId, Action<string> onItemSelected)
+            public SelectedItemIdContext(BaseSignal<string> selectedItemId, Action<string> onItemIdSelected)
             {
                 SelectedItemId = selectedItemId;
-                OnItemSelected = onItemSelected;
+                OnItemSelected = onItemIdSelected;
             }
         }
 
         public class Container : BaseComponent
         {
-            private Action<string> _onItemSelected;
-            private string _role;
+            private readonly Action<string> _onItemIdSelected;
+            private readonly BaseSignal<string> _selectedItemId;
+            private readonly string _role;
 
             public Container(
                 List<VirtualNode> children,
-                Action<string> onItemSelected = null,
+                Action<string> onItemIdSelected,
+                BaseSignal<string> selectedItemId,
                 string role = Constants.INHERIT_ROLE
             ) : base(children)
             {
                 _role = role;
-                _onItemSelected = onItemSelected;
+                _onItemIdSelected = onItemIdSelected;
+                _selectedItemId = selectedItemId;
             }
 
             public override VirtualNode Render()
             {
                 var theme = C<ThemeStore>().Get();
                 var role = F.GetRole(_role);
-                var selectedItemId = new Signal<string>(null);
 
                 return F.ContextProvider(
-                    value: new TreeViewContext(
-                        selectedItemId: selectedItemId,
-                        onItemSelected: (string id) =>
+                    value: new SelectedItemIdContext(
+                        selectedItemId: _selectedItemId,
+                        onItemIdSelected: (string id) =>
                         {
-                            selectedItemId.Value = id;
-                            _onItemSelected?.Invoke(id);
+                            _onItemIdSelected.Invoke(id);
                         }
                     ),
                     children: F.Children(
@@ -57,7 +68,7 @@ namespace Fiber.UI
                             role: _role,
                             children: F.Children(
                                 F.ContextProvider(
-                                    value: new TreeViewIndentiationContext(level: 0),
+                                    value: new IndentiationLevelContext(indentiationLeve: 0),
                                     children: F.Children(
                                         F.View(children: children)
                                     )
@@ -66,16 +77,6 @@ namespace Fiber.UI
                         )
                     )
                 );
-            }
-        }
-
-        public class TreeViewIndentiationContext
-        {
-            public int Level;
-
-            public TreeViewIndentiationContext(int level)
-            {
-                Level = level;
             }
         }
 
@@ -105,8 +106,8 @@ namespace Fiber.UI
                 var isHovered = new Signal<bool>(false);
                 var isPressed = new Signal<bool>(false);
                 var isOpen = new Signal<bool>(false);
-                var context = F.GetContext<TreeViewContext>();
-                var identationLevel = F.GetContext<TreeViewIndentiationContext>().Level;
+                var context = F.GetContext<SelectedItemIdContext>();
+                var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLeve;
 
                 CreateEffect(() =>
                 {
@@ -213,7 +214,7 @@ namespace Fiber.UI
                         when: isOpen,
                         children: F.Children(
                             F.ContextProvider(
-                                value: new TreeViewIndentiationContext(level: identationLevel + 1),
+                                value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
                                 children: F.Children(
                                     F.View(children: children)
                                 )

@@ -38,6 +38,7 @@ public class DocsFiberRoot : MonoBehaviour
             var theme = C<ThemeStore>().Get();
             var neutral = "neutral";
             var deepNeutral = "deepNeutral";
+            var selectedItemId = new Signal<string>("1");
 
             return F.View(
                 style: new Style(
@@ -62,6 +63,11 @@ public class DocsFiberRoot : MonoBehaviour
                         ),
                         children: F.Children(new TreeViewComponent.Container(
                             role: deepNeutral,
+                            selectedItemId: selectedItemId,
+                            onItemIdSelected: (string id) =>
+                            {
+                                selectedItemId.Value = id;
+                            },
                             children: F.Children(
                                 new TreeViewComponent.Item(id: "1", label: $"Item 1"),
                                 new TreeViewComponent.Item(id: "2", label: $"Item 2", children: F.Children(
