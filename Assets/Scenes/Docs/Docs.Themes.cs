@@ -5,6 +5,12 @@ using Fiber;
 
 public static class DocsThemes
 {
+    public static class ROLES
+    {
+        public const string NEUTRAL = "neutral";
+        public const string DEEP_NEUTRAL = "deepNeutral";
+    }
+
     public class Provider : BaseComponent
     {
         public Provider(List<VirtualNode> children) : base(children) { }
@@ -21,10 +27,10 @@ public static class DocsThemes
     }
 
     public static readonly Theme DARK_THEME = new Theme(
-        fallbackRole: "neutral",
+        fallbackRole: ROLES.NEUTRAL,
         new()
         {
-            { "neutral", new(
+            { ROLES.NEUTRAL, new(
                 background: new(
                     @default: "#242424",
                     selected: "#333333",
@@ -39,7 +45,7 @@ public static class DocsThemes
                     selected: "#25C281"
                 )
             ) },
-            { "deepNeutral", new(
+            { ROLES.DEEP_NEUTRAL, new(
                 background: new(
                     @default: "#1A1A1A",
                     selected: "#2C2C2C",
@@ -58,10 +64,10 @@ public static class DocsThemes
     );
 
     public static readonly Theme LIGHT_THEME = new Theme(
-        fallbackRole: "neutral",
+        fallbackRole: ROLES.NEUTRAL,
         new()
         {
-            { "neutral", new(
+            { ROLES.NEUTRAL, new(
                 background: new(
                     @default: "#FFFFFF",
                     selected: "#D2D2D2",
@@ -76,7 +82,7 @@ public static class DocsThemes
                     selected: "#25C281"
                 )
             ) },
-            { "deepNeutral", new(
+            { ROLES.DEEP_NEUTRAL, new(
                 background: new(
                     @default: "#D2D2D2",
                     selected: "#E4E4E4",

@@ -37,8 +37,6 @@ public static class DocsRouting
         public override VirtualNode Render()
         {
             var theme = C<ThemeStore>().Get();
-            var neutral = "neutral";
-            var deepNeutral = "deepNeutral";
 
             var router = C<Router>();
             var selectedItemId = F.CreateComputedSignal((router) =>
@@ -62,14 +60,14 @@ public static class DocsRouting
                             maxWidth: 240,
                             width: new Length(25, LengthUnit.Percent),
                             height: new Length(100, LengthUnit.Percent),
-                            backgroundColor: theme.DesignTokens[deepNeutral].Background.Default,
-                            borderRightColor: theme.DesignTokens[deepNeutral].Border.Default,
+                            backgroundColor: theme.DesignTokens[DocsThemes.ROLES.DEEP_NEUTRAL].Background.Default,
+                            borderRightColor: theme.DesignTokens[DocsThemes.ROLES.DEEP_NEUTRAL].Border.Default,
                             borderRightWidth: 1,
                             flexShrink: 0,
                             flexGrow: 0
                         ),
                         children: F.Children(new TreeViewComponent.Container(
-                            role: deepNeutral,
+                            role: DocsThemes.ROLES.DEEP_NEUTRAL,
                             selectedItemId: selectedItemId,
                             onItemIdSelected: (string id) =>
                             {
@@ -83,7 +81,7 @@ public static class DocsRouting
                     ),
                     F.View(
                         style: new Style(
-                            backgroundColor: theme.DesignTokens[neutral].Background.Default,
+                            backgroundColor: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Background.Default,
                             minHeight: new Length(100, LengthUnit.Percent),
                             flexShrink: 1,
                             flexGrow: 1,
@@ -96,7 +94,7 @@ public static class DocsRouting
         }
     }
 
-    public static RouteDefinition ROUTER_TREE = new RouteDefinition(
+    public static readonly RouteDefinition ROUTER_TREE = new RouteDefinition(
         id: ROUTES.ROOT,
         isLayoutRoute: true,
         component: new SimpleRouteComponent(new RootComponent()),
@@ -124,7 +122,7 @@ public static class DocsRouting
             return F.Text(
                 text: "Introduction",
                 style: new Style(
-                    color: theme.DesignTokens["neutral"].Text.Default,
+                    color: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Text.Default,
                     fontSize: 36,
                     paddingLeft: 18,
                     paddingTop: 18,
@@ -144,7 +142,7 @@ public static class DocsRouting
             return F.Text(
                 text: "Installation",
                 style: new Style(
-                    color: theme.DesignTokens["neutral"].Text.Default,
+                    color: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Text.Default,
                     fontSize: 36,
                     paddingLeft: 18,
                     paddingTop: 18,
