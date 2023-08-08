@@ -11,6 +11,36 @@ public static class DocsThemes
         public const string DEEP_NEUTRAL = "deepNeutral";
     }
 
+    public static class COLOR_PALETTE
+    {
+        public const string GRAY_0 = "#000000";
+        public const string GRAY_7 = "#111111";
+        public const string GRAY_13 = "#222222";
+        public const string GRAY_20 = "#333333";
+        public const string GRAY_27 = "#444444";
+        public const string GRAY_33 = "#555555";
+        public const string GRAY_40 = "#666666";
+        public const string GRAY_47 = "#777777";
+        public const string GRAY_53 = "#888888";
+        public const string GRAY_60 = "#999999";
+        public const string GRAY_67 = "#aaaaaa";
+        public const string GRAY_73 = "#bbbbbb";
+        public const string GRAY_80 = "#cccccc";
+        public const string GRAY_87 = "#dddddd";
+        public const string GRAY_93 = "#eeeeee";
+        public const string GRAY_100 = "#ffffff";
+
+        public const string LIGHT_BLUE_31 = "#01579B";
+        public const string LIGHT_BLUE_37 = "#0277BD";
+        public const string LIGHT_BLUE_41 = "#0288D1";
+        public const string LIGHT_BLUE_45 = "#039BE5";
+        public const string LIGHT_BLUE_48 = "#03A9F4";
+        public const string LIGHT_BLUE_64 = "#4FC3F7";
+        public const string LIGHT_BLUE_74 = "#81D4FA";
+        public const string LIGHT_BLUE_85 = "#B3E5FC";
+        public const string LIGHT_BLUE_94 = "#E1F5FE";
+    }
+
     public class Provider : BaseComponent
     {
         public Provider(List<VirtualNode> children) : base(children) { }
@@ -32,32 +62,32 @@ public static class DocsThemes
         {
             { ROLES.NEUTRAL, new(
                 background: new(
-                    @default: "#242424",
-                    selected: "#333333",
-                    hovered: "#333333",
-                    pressed: "#222222"
+                    @default: COLOR_PALETTE.GRAY_13,
+                    selected: COLOR_PALETTE.GRAY_20,
+                    hovered: COLOR_PALETTE.GRAY_20,
+                    pressed: COLOR_PALETTE.GRAY_7
                 ),
                 border: new(
-                    @default: "#222222"
+                    @default: COLOR_PALETTE.GRAY_7
                 ),
                 text: new(
-                    @default: "#FFFFFF",
-                    selected: "#25C281"
+                    @default: COLOR_PALETTE.GRAY_100,
+                    selected: COLOR_PALETTE.LIGHT_BLUE_48
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(
                 background: new(
-                    @default: "#1A1A1A",
-                    selected: "#2C2C2C",
-                    hovered: "#2C2C2C",
-                    pressed: "#0F0F0F"
+                    @default: COLOR_PALETTE.GRAY_7,
+                    selected: COLOR_PALETTE.GRAY_13,
+                    hovered: COLOR_PALETTE.GRAY_13,
+                    pressed: COLOR_PALETTE.GRAY_0
                 ),
                 border: new(
-                    @default: "#0F0F0F"
+                    @default: COLOR_PALETTE.GRAY_0
                 ),
                 text: new(
-                    @default: "#FFFFFF",
-                    selected: "#25C281"
+                    @default: COLOR_PALETTE.GRAY_100,
+                    selected: COLOR_PALETTE.LIGHT_BLUE_48
                 )
             ) },
         }
@@ -69,32 +99,34 @@ public static class DocsThemes
         {
             { ROLES.NEUTRAL, new(
                 background: new(
-                    @default: "#FFFFFF",
-                    selected: "#D2D2D2",
-                    hovered: "#D2D2D2",
-                    pressed: "#BEBEBE"
+                    @default: COLOR_PALETTE.GRAY_100,
+                    selected: COLOR_PALETTE.GRAY_93,
+                    hovered: COLOR_PALETTE.GRAY_93,
+                    pressed: COLOR_PALETTE.GRAY_87
                 ),
                 border: new(
-                    @default: "#E0E0E0"
+                    @default: COLOR_PALETTE.GRAY_87
                 ),
                 text: new(
-                    @default: "#000000",
-                    selected: "#25C281"
+                    @default: COLOR_PALETTE.GRAY_0,
+                    selected: COLOR_PALETTE.LIGHT_BLUE_37,
+                    hovered: COLOR_PALETTE.LIGHT_BLUE_37
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(
                 background: new(
-                    @default: "#D2D2D2",
-                    selected: "#E4E4E4",
-                    hovered: "#E4E4E4",
-                    pressed: "#BEBEBE"
+                    @default: COLOR_PALETTE.GRAY_93,
+                    selected: COLOR_PALETTE.GRAY_87,
+                    hovered: COLOR_PALETTE.GRAY_87,
+                    pressed: COLOR_PALETTE.GRAY_80
                 ),
                 border: new(
-                    @default: "#BEBEBE"
+                    @default: COLOR_PALETTE.GRAY_80
                 ),
                 text: new(
-                    @default: "#000000",
-                    selected: "#25C281"
+                    @default: COLOR_PALETTE.GRAY_0,
+                    selected: COLOR_PALETTE.LIGHT_BLUE_37,
+                    hovered: COLOR_PALETTE.LIGHT_BLUE_37
                 )
             ) },
         }

@@ -124,10 +124,10 @@ public static class DocsRouting
                 style: new Style(
                     color: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Text.Default,
                     fontSize: 36,
-                    paddingLeft: 18,
-                    paddingTop: 18,
-                    paddingRight: 18,
-                    paddingBottom: 18
+                    paddingLeft: 28,
+                    paddingTop: 12,
+                    paddingRight: 12,
+                    paddingBottom: 28
                 )
             );
         }
@@ -144,10 +144,10 @@ public static class DocsRouting
                 style: new Style(
                     color: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Text.Default,
                     fontSize: 36,
-                    paddingLeft: 18,
-                    paddingTop: 18,
-                    paddingRight: 18,
-                    paddingBottom: 18
+                    paddingLeft: 28,
+                    paddingTop: 12,
+                    paddingRight: 12,
+                    paddingBottom: 28
                 )
             );
         }
