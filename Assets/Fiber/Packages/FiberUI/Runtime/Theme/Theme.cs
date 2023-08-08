@@ -10,23 +10,31 @@ namespace Fiber.UI
     public class Theme : BaseSignal<Theme>
     {
         public string FallbackRole;
-        public TokenCollection DesignTokens;
+        public ColorTokenCollection Color;
+        private SpacingTokens _spacing;
         // TODO: public ComponentTokens...
 
         public Theme(
             string fallbackRole,
-            TokenCollection designTokens
+            ColorTokenCollection colors,
+            int spacingBaseline = 4
         )
         {
             FallbackRole = fallbackRole;
-            DesignTokens = designTokens;
-            designTokens.RegisterParent(this);
+            Color = colors;
+            colors.RegisterParent(this);
+            _spacing = new SpacingTokens(spacingBaseline);
         }
 
         public override Theme Get() => this;
         public override bool IsDirty(byte otherDirtyBit)
         {
             return DirtyBit != otherDirtyBit;
+        }
+
+        public int Spacing(int multiplier)
+        {
+            return _spacing.Get(multiplier);
         }
     }
 }

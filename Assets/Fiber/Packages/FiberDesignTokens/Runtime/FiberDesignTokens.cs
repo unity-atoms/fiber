@@ -5,7 +5,22 @@ using UnityEngine;
 
 namespace Fiber.DesignTokens
 {
-    public class TokenCollection : SignalDictionary<string, Role> { }
+    public class SpacingTokens
+    {
+        public int Baseline;
+
+        public SpacingTokens(int baseline = 4)
+        {
+            Baseline = baseline;
+        }
+
+        public int Get(int multiplier)
+        {
+            return Baseline * multiplier;
+        }
+    }
+
+    public class ColorTokenCollection : SignalDictionary<string, Role> { }
 
     public struct ColorToken
     {

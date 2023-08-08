@@ -24,7 +24,7 @@ namespace Fiber.UI
                 }
             }
 
-            return theme.DesignTokens.ContainsKey(role) ? role : theme.FallbackRole;
+            return theme.Color.ContainsKey(role) ? role : theme.FallbackRole;
         }
 
         public static RoleProvider RoleProvider(

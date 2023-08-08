@@ -173,36 +173,36 @@ namespace Fiber.UI
 
                 var color = CreateComputedSignal((isHovered, isPressed, selectedItemId, theme) =>
                 {
-                    if (isPressed && theme.DesignTokens[role].Text.Pressed.Get().keyword != StyleKeyword.Null)
+                    if (isPressed && theme.Color[role].Text.Pressed.Get().keyword != StyleKeyword.Null)
                     {
-                        return theme.DesignTokens[role].Text.Pressed.Get();
+                        return theme.Color[role].Text.Pressed.Get();
                     }
-                    else if (isHovered && theme.DesignTokens[role].Text.Hovered.Get().keyword != StyleKeyword.Null)
+                    else if (isHovered && theme.Color[role].Text.Hovered.Get().keyword != StyleKeyword.Null)
                     {
-                        return theme.DesignTokens[role].Text.Hovered.Get();
+                        return theme.Color[role].Text.Hovered.Get();
                     }
-                    else if (selectedItemId == _id && theme.DesignTokens[role].Text.Selected.Get().keyword != StyleKeyword.Null)
+                    else if (selectedItemId == _id && theme.Color[role].Text.Selected.Get().keyword != StyleKeyword.Null)
                     {
-                        return theme.DesignTokens[role].Text.Selected.Get();
+                        return theme.Color[role].Text.Selected.Get();
                     }
-                    return theme.DesignTokens[role].Text.Default.Get();
+                    return theme.Color[role].Text.Default.Get();
                 }, isHovered, isPressed, context.SelectedItemId, theme);
 
                 var backgroundColor = CreateComputedSignal((isHovered, isPressed, selectedItemId, theme) =>
                 {
-                    if (isPressed && theme.DesignTokens[role].Background.Pressed.Get().keyword != StyleKeyword.Null)
+                    if (isPressed && theme.Color[role].Background.Pressed.Get().keyword != StyleKeyword.Null)
                     {
-                        return theme.DesignTokens[role].Background.Pressed.Get();
+                        return theme.Color[role].Background.Pressed.Get();
                     }
-                    else if (isHovered && theme.DesignTokens[role].Background.Hovered.Get().keyword != StyleKeyword.Null)
+                    else if (isHovered && theme.Color[role].Background.Hovered.Get().keyword != StyleKeyword.Null)
                     {
-                        return theme.DesignTokens[role].Background.Hovered.Get();
+                        return theme.Color[role].Background.Hovered.Get();
                     }
-                    else if (selectedItemId == _id && theme.DesignTokens[role].Background.Selected.Get().keyword != StyleKeyword.Null)
+                    else if (selectedItemId == _id && theme.Color[role].Background.Selected.Get().keyword != StyleKeyword.Null)
                     {
-                        return theme.DesignTokens[role].Background.Selected.Get();
+                        return theme.Color[role].Background.Selected.Get();
                     }
-                    return theme.DesignTokens[role].Background.Default.Get();
+                    return theme.Color[role].Background.Default.Get();
                 }, isHovered, isPressed, context.SelectedItemId, theme);
 
                 var iconUnicode = CreateComputedSignal((isOpen) =>
@@ -220,20 +220,19 @@ namespace Fiber.UI
                             backgroundColor: backgroundColor,
                             display: DisplayStyle.Flex,
                             flexDirection: FlexDirection.Row,
-                            fontSize: 16,
                             alignItems: Align.Center,
                             justifyContent: Justify.SpaceBetween,
-                            paddingLeft: 12 + identationLevel * 8,
-                            paddingTop: 6,
-                            paddingRight: 12,
-                            paddingBottom: 6,
+                            paddingLeft: theme.Spacing(3) + identationLevel * theme.Spacing(2),
+                            paddingTop: theme.Spacing(2),
+                            paddingRight: theme.Spacing(3),
+                            paddingBottom: theme.Spacing(2),
                             width: new Length(100, LengthUnit.Percent)
                         ),
                         pickingMode: PickingMode.Position,
                         children: F.Children(
                             F.Text(
                                 text: _label,
-                                style: new Style(color: color)
+                                style: new Style(color: color, fontSize: 16)
                             ),
                             F.Visible(
                                 when: new StaticSignal<bool>(children != null),

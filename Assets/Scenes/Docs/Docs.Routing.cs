@@ -60,8 +60,8 @@ public static class DocsRouting
                             maxWidth: 240,
                             width: new Length(25, LengthUnit.Percent),
                             height: new Length(100, LengthUnit.Percent),
-                            backgroundColor: theme.DesignTokens[DocsThemes.ROLES.DEEP_NEUTRAL].Background.Default,
-                            borderRightColor: theme.DesignTokens[DocsThemes.ROLES.DEEP_NEUTRAL].Border.Default,
+                            backgroundColor: theme.Color[DocsThemes.ROLES.DEEP_NEUTRAL].Background.Default,
+                            borderRightColor: theme.Color[DocsThemes.ROLES.DEEP_NEUTRAL].Border.Default,
                             borderRightWidth: 1,
                             flexShrink: 0,
                             flexGrow: 0
@@ -81,7 +81,7 @@ public static class DocsRouting
                     ),
                     F.View(
                         style: new Style(
-                            backgroundColor: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Background.Default,
+                            backgroundColor: theme.Color[DocsThemes.ROLES.NEUTRAL].Background.Default,
                             minHeight: new Length(100, LengthUnit.Percent),
                             flexShrink: 1,
                             flexGrow: 1,
@@ -122,12 +122,12 @@ public static class DocsRouting
             return F.Text(
                 text: "Introduction",
                 style: new Style(
-                    color: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Text.Default,
+                    color: theme.Color[DocsThemes.ROLES.NEUTRAL].Text.Default,
                     fontSize: 36,
-                    paddingLeft: 28,
-                    paddingTop: 12,
-                    paddingRight: 12,
-                    paddingBottom: 28
+                    paddingLeft: theme.Spacing(7),
+                    paddingTop: theme.Spacing(2),
+                    paddingRight: theme.Spacing(7),
+                    paddingBottom: theme.Spacing(2)
                 )
             );
         }
@@ -142,12 +142,12 @@ public static class DocsRouting
             return F.Text(
                 text: "Installation",
                 style: new Style(
-                    color: theme.DesignTokens[DocsThemes.ROLES.NEUTRAL].Text.Default,
+                    color: theme.Color[DocsThemes.ROLES.NEUTRAL].Text.Default,
                     fontSize: 36,
-                    paddingLeft: 28,
-                    paddingTop: 12,
-                    paddingRight: 12,
-                    paddingBottom: 28
+                    paddingLeft: theme.Spacing(7),
+                    paddingTop: theme.Spacing(2),
+                    paddingRight: theme.Spacing(7),
+                    paddingBottom: theme.Spacing(2)
                 )
             );
         }
