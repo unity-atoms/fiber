@@ -549,6 +549,7 @@ namespace Fiber.UIElements
         private WorkLoopStyleLengthProp _fontSizeWorkLoopItem;
         private WorkLoopStyleFontProp _unityFontWorkLoopItem;
         private WorkLoopStyleFontDefinitionProp _unityFontDefinitionWorkLoopItem;
+        private WorkLoopFontStyleProp _unityFontStyleWorkLoopItem;
         private WorkLoopStylePropertyNamesProp _transitionPropertyWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDelayWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDurationWorkLoopItem;
@@ -911,6 +912,14 @@ namespace Fiber.UIElements
                     if (isStyleValue)
                     {
                         _unityFontDefinitionWorkLoopItem = new(style.UnityFontDefinition);
+                    }
+                }
+                if (!style.UnityFontStyle.IsEmpty)
+                {
+                    Instance.style.unityFontStyleAndWeight = style.UnityFontStyle.Get();
+                    if (isStyleValue)
+                    {
+                        _unityFontStyleWorkLoopItem = new(style.UnityFontStyle);
                     }
                 }
                 if (!style.TransitionProperty.IsEmpty)
@@ -1479,6 +1488,15 @@ namespace Fiber.UIElements
                     Instance.style.unityFontDefinition = StyleKeyword.Initial;
                 }
 
+                if (!style.UnityFontStyle.IsEmpty)
+                {
+                    Instance.style.unityFontStyleAndWeight = style.UnityFontStyle.Get();
+                }
+                else if (!_lastStyleFromSignal.UnityFontStyle.IsEmpty)
+                {
+                    Instance.style.unityFontStyleAndWeight = StyleKeyword.Initial;
+                }
+
                 if (!style.TransitionProperty.IsEmpty)
                 {
                     Instance.style.transitionProperty = style.TransitionProperty.Get();
@@ -1722,6 +1740,10 @@ namespace Fiber.UIElements
                 if (_unityFontDefinitionWorkLoopItem.Check())
                 {
                     Instance.style.unityFontDefinition = _unityFontDefinitionWorkLoopItem.Get();
+                }
+                if (_unityFontStyleWorkLoopItem.Check())
+                {
+                    Instance.style.unityFontStyleAndWeight = _unityFontStyleWorkLoopItem.Get();
                 }
                 if (_transitionPropertyWorkLoopItem.Check())
                 {

@@ -5,6 +5,35 @@ using UnityEngine;
 
 namespace Fiber.DesignTokens
 {
+    public class TypographyTokensCollection : SignalDictionary<string, TypographyTokens> { }
+
+    public class TypographyTokens : BaseSignal<TypographyTokens>
+    {
+        public Signal<StyleFont> Font;
+        public Signal<StyleLength> FontSize;
+        public Signal<StyleEnum<FontStyle>> FontStyle;
+
+        public TypographyTokens(
+            Font font,
+            int fontSize,
+            FontStyle fontStyle
+        )
+        {
+            Font = new(new(font));
+            Font.RegisterParent(this);
+            FontSize = new(fontSize);
+            FontSize.RegisterParent(this);
+            FontStyle = new(fontStyle);
+            FontStyle.RegisterParent(this);
+        }
+
+        public override TypographyTokens Get() => this;
+        public override bool IsDirty(byte otherDirtyBit)
+        {
+            return DirtyBit != otherDirtyBit;
+        }
+    }
+
     public class SpacingTokens
     {
         public int Baseline;

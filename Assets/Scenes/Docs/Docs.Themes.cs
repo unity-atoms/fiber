@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Fiber.DesignTokens;
 using Fiber.UI;
 using Fiber;
+using UnityEngine;
 
 public static class DocsThemes
 {
@@ -56,9 +57,19 @@ public static class DocsThemes
         }
     }
 
+    public static class TYPOGRAPHY_TYPES
+    {
+        public const string H1 = "h1";
+        public const string H2 = "h2";
+        public const string H3 = "h3";
+        public const string SUBTITLE1 = "subtitle1";
+        public const string BODY1 = "body1";
+        public const string BUTTON = "button1";
+    }
+
     public static readonly Theme DARK_THEME = new Theme(
         fallbackRole: ROLES.NEUTRAL,
-        new()
+        color: new()
         {
             { ROLES.NEUTRAL, new(
                 background: new(
@@ -89,6 +100,19 @@ public static class DocsThemes
                     @default: COLOR_PALETTE.GRAY_100,
                     selected: COLOR_PALETTE.LIGHT_BLUE_48
                 )
+            ) },
+        },
+        typography: new()
+        {
+            { TYPOGRAPHY_TYPES.H1, new TypographyTokens(
+                font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
+                fontSize: 50,
+                fontStyle: FontStyle.Bold
+            ) },
+            { TYPOGRAPHY_TYPES.BODY1, new TypographyTokens(
+                font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
+                fontSize: 16,
+                fontStyle: FontStyle.Normal
             ) },
         }
     );
@@ -128,6 +152,19 @@ public static class DocsThemes
                     selected: COLOR_PALETTE.LIGHT_BLUE_37,
                     hovered: COLOR_PALETTE.LIGHT_BLUE_37
                 )
+            ) },
+        },
+        typography: new()
+        {
+            { TYPOGRAPHY_TYPES.H1, new TypographyTokens(
+                font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
+                fontSize: 50,
+                fontStyle: FontStyle.Bold
+            ) },
+            { TYPOGRAPHY_TYPES.BODY1, new TypographyTokens(
+                font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
+                fontSize: 16,
+                fontStyle: FontStyle.Normal
             ) },
         }
     );

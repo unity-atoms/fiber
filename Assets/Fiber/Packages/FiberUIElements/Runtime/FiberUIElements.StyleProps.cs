@@ -499,6 +499,53 @@ namespace Fiber.UIElements
         public StyleFontDefinition Get() => WorkLoopSignalProp.Get();
     }
 
+    public struct FontStyleProp
+    {
+        public SignalProp<StyleEnum<FontStyle>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public FontStyleProp(StyleEnum<FontStyle> value)
+        {
+            SignalProp = value;
+        }
+
+        public FontStyleProp(BaseSignal<StyleEnum<FontStyle>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator FontStyleProp(FontStyle value)
+        {
+            return new FontStyleProp(value);
+        }
+
+        public static implicit operator FontStyleProp(StyleKeyword keyword)
+        {
+            return new FontStyleProp(keyword);
+        }
+
+        public static implicit operator FontStyleProp(BaseSignal<StyleEnum<FontStyle>> signal)
+        {
+            return new FontStyleProp(signal);
+        }
+
+        public StyleEnum<FontStyle> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopFontStyleProp
+    {
+        public WorkLoopSignalProp<StyleEnum<FontStyle>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopFontStyleProp(FontStyleProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleEnum<FontStyle> Get() => WorkLoopSignalProp.Get();
+    }
+
     public struct StylePropertyNamesProp
     {
         public SignalProp<StyleList<StylePropertyName>> SignalProp { get; private set; }
@@ -872,6 +919,7 @@ namespace Fiber.UIElements
         public StyleLengthProp FontSize { get; private set; }
         public StyleFontProp UnityFont { get; private set; }
         public StyleFontDefinitionProp UnityFontDefinition { get; private set; }
+        public FontStyleProp UnityFontStyle { get; private set; }
         public StylePropertyNamesProp TransitionProperty { get; private set; }
         public TimeValuesProp TransitionDelay { get; private set; }
         public TimeValuesProp TransitionDuration { get; private set; }
@@ -924,6 +972,7 @@ namespace Fiber.UIElements
             StyleLengthProp fontSize = new(),
             StyleFontProp unityFont = new(),
             StyleFontDefinitionProp unityFontDefinition = new(),
+            FontStyleProp unityFontStyle = new(),
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
@@ -976,6 +1025,7 @@ namespace Fiber.UIElements
             FontSize = fontSize;
             UnityFont = unityFont;
             UnityFontDefinition = unityFontDefinition;
+            UnityFontStyle = unityFontStyle;
             TransitionProperty = transitionProperty;
             TransitionDelay = transitionDelay;
             TransitionDuration = transitionDuration;

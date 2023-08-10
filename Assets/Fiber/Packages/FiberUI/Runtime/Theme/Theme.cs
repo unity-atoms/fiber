@@ -11,18 +11,20 @@ namespace Fiber.UI
     {
         public string FallbackRole;
         public ColorTokenCollection Color;
-        private SpacingTokens _spacing;
-        // TODO: public ComponentTokens...
+        public TypographyTokensCollection Typography;
+        private readonly SpacingTokens _spacing;
 
         public Theme(
             string fallbackRole,
-            ColorTokenCollection colors,
+            ColorTokenCollection color,
+            TypographyTokensCollection typography,
             int spacingBaseline = 4
         )
         {
             FallbackRole = fallbackRole;
-            Color = colors;
-            colors.RegisterParent(this);
+            Color = color;
+            color.RegisterParent(this);
+            Typography = typography;
             _spacing = new SpacingTokens(spacingBaseline);
         }
 

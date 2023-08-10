@@ -119,16 +119,17 @@ public static class DocsRouting
         {
             var theme = C<ThemeStore>().Get();
 
-            return F.Text(
+            return new TypographyComponent(
                 text: "Introduction",
-                style: new Style(
-                    color: theme.Color[DocsThemes.ROLES.NEUTRAL].Text.Default,
-                    fontSize: 36,
-                    paddingLeft: theme.Spacing(7),
-                    paddingTop: theme.Spacing(2),
-                    paddingRight: theme.Spacing(7),
-                    paddingBottom: theme.Spacing(2)
-                )
+                type: "h1"
+            // style: new Style(
+            //     color: theme.Color[DocsThemes.ROLES.NEUTRAL].Text.Default,
+            //     fontSize: 36,
+            //     paddingLeft: theme.Spacing(7),
+            //     paddingTop: theme.Spacing(2),
+            //     paddingRight: theme.Spacing(7),
+            //     paddingBottom: theme.Spacing(2)
+            // )
             );
         }
     }
