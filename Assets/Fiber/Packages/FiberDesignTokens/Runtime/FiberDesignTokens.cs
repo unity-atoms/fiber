@@ -36,6 +36,8 @@ namespace Fiber.DesignTokens
 
     public class SpacingTokens
     {
+        // OPEN POINT: Will probably never change so keeping
+        // it as a regular primitive and not a signal
         public int Baseline;
 
         public SpacingTokens(int baseline = 4)
@@ -93,8 +95,11 @@ namespace Fiber.DesignTokens
         )
         {
             Background = background ?? new();
+            Background.RegisterParent(this);
             Border = border ?? new();
+            Border.RegisterParent(this);
             Text = text ?? new();
+            Text.RegisterParent(this);
         }
 
         public override Role Get() => this;
@@ -148,11 +153,17 @@ namespace Fiber.DesignTokens
         )
         {
             Default = new Signal<T>(@default ?? default, this);
+            Default.RegisterParent(this);
             Selected = new Signal<T>(selected ?? default, this);
+            Selected.RegisterParent(this);
             Focused = new Signal<T>(focused ?? default, this);
+            Focused.RegisterParent(this);
             Hovered = new Signal<T>(hovered ?? default, this);
+            Hovered.RegisterParent(this);
             Pressed = new Signal<T>(pressed ?? default, this);
+            Pressed.RegisterParent(this);
             Disabled = new Signal<T>(disabled ?? default, this);
+            Disabled.RegisterParent(this);
         }
 
         public override Modifiers<T> Get() => this;
