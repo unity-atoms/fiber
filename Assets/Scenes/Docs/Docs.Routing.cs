@@ -117,9 +117,9 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            var theme = C<ThemeStore>().Get();
+            var themeStore = C<ThemeStore>();
 
-            return new TypographyComponent(
+            return F.Typography(
                 text: "Introduction",
                 type: "h1"
             // style: new Style(
@@ -138,18 +138,19 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            var theme = C<ThemeStore>().Get();
+            var themeStore = C<ThemeStore>();
 
-            return F.Text(
+            return F.Typography(
                 text: "Installation",
-                style: new Style(
-                    color: theme.Color[DocsThemes.ROLES.NEUTRAL].Text.Default,
-                    fontSize: 36,
-                    paddingLeft: theme.Spacing(7),
-                    paddingTop: theme.Spacing(2),
-                    paddingRight: theme.Spacing(7),
-                    paddingBottom: theme.Spacing(2)
-                )
+                type: "h1"
+            // style: new Style(
+            //     color: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Text),
+            //     fontSize: 36,
+            //     paddingLeft: themeStore.Spacing(7),
+            //     paddingTop: themeStore.Spacing(2),
+            //     paddingRight: themeStore.Spacing(7),
+            //     paddingBottom: themeStore.Spacing(2)
+            // )
             );
         }
     }

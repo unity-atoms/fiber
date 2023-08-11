@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
+using Fiber.DesignTokens;
 using Signals;
 
 namespace Fiber.UI
@@ -29,7 +30,7 @@ namespace Fiber.UI
     }
     public class TypographyComponent : BaseComponent
     {
-        private string _type;
+        private readonly string _type;
         private SignalProp<string> _text;
         private readonly string _role;
         private readonly string _variant;
@@ -49,16 +50,16 @@ namespace Fiber.UI
 
         public override VirtualNode Render()
         {
-            var theme = C<ThemeStore>().Get();
+            var themeStore = C<ThemeStore>();
             var role = F.GetRole(_role);
 
             return F.Text(
                 text: _text,
                 style: new Style(
-                    unityFont: theme.Typography[_type].Font,
-                    fontSize: theme.Typography[_type].FontSize,
-                    unityFontStyle: theme.Typography[_type].FontStyle,
-                    color: theme.Color[role].Text.Default
+                    unityFont: themeStore.Font(_type),
+                    fontSize: themeStore.FontSize(_type),
+                    unityFontStyle: themeStore.FontStyle(_type),
+                    color: themeStore.Color(role, ElementType.Text, _variant)
                 )
             );
         }

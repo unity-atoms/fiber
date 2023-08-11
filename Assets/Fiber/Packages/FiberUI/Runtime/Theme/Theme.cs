@@ -12,7 +12,7 @@ namespace Fiber.UI
         public string FallbackRole;
         public ColorTokenCollection Color;
         public TypographyTokensCollection Typography;
-        private readonly SpacingTokens _spacing;
+        public SpacingTokens Spacing;
 
         public Theme(
             string fallbackRole,
@@ -23,9 +23,11 @@ namespace Fiber.UI
         {
             FallbackRole = fallbackRole;
             Color = color;
-            color.RegisterParent(this);
+            Color.RegisterParent(this);
             Typography = typography;
-            _spacing = new SpacingTokens(spacingBaseline);
+            Typography.RegisterParent(this);
+            Spacing = new SpacingTokens(spacingBaseline);
+            Spacing.RegisterParent(this);
         }
 
         public override Theme Get() => this;
@@ -34,9 +36,12 @@ namespace Fiber.UI
             return DirtyBit != otherDirtyBit;
         }
 
-        public int Spacing(int multiplier)
+        public ColorModifiers GetColorModifiers(string role, ElementType elementType, string variant = null)
         {
-            return _spacing.Get(multiplier);
+            role = Color.ContainsKey(role) ? role : FallbackRole;
+            var element = Color[role].GetElement(elementType);
+            var colorModifiers = variant != null && element.Variants.ContainsKey(variant) ? element.Variants[variant] : element;
+            return colorModifiers;
         }
     }
 }

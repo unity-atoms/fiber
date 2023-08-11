@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
+using Fiber.DesignTokens;
 using Signals;
 
 namespace Fiber.UI
@@ -138,10 +139,11 @@ namespace Fiber.UI
                 var _ref = new Ref<VisualElement>();
                 var themeStore = C<ThemeStore>();
                 var role = F.GetRole(_role);
+                var context = F.GetContext<SelectedItemIdContext>();
                 var isHovered = new Signal<bool>(false);
                 var isPressed = new Signal<bool>(false);
+                var isSelected = F.CreateComputedSignal<string, bool>((selectedItemId) => selectedItemId == _id, context.SelectedItemId);
                 var isOpen = new Signal<bool>(false);
-                var context = F.GetContext<SelectedItemIdContext>();
                 var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLeve;
 
                 CreateEffect(() =>
@@ -171,39 +173,8 @@ namespace Fiber.UI
                     return null;
                 });
 
-                var color = CreateComputedSignal((isHovered, isPressed, selectedItemId, theme) =>
-                {
-                    if (isPressed && theme.Color[role].Text.Pressed.Get().keyword != StyleKeyword.Null)
-                    {
-                        return theme.Color[role].Text.Pressed.Get();
-                    }
-                    else if (isHovered && theme.Color[role].Text.Hovered.Get().keyword != StyleKeyword.Null)
-                    {
-                        return theme.Color[role].Text.Hovered.Get();
-                    }
-                    else if (selectedItemId == _id && theme.Color[role].Text.Selected.Get().keyword != StyleKeyword.Null)
-                    {
-                        return theme.Color[role].Text.Selected.Get();
-                    }
-                    return theme.Color[role].Text.Default.Get();
-                }, isHovered, isPressed, context.SelectedItemId, themeStore);
-
-                var backgroundColor = CreateComputedSignal((isHovered, isPressed, selectedItemId, theme) =>
-                {
-                    if (isPressed && theme.Color[role].Background.Pressed.Get().keyword != StyleKeyword.Null)
-                    {
-                        return theme.Color[role].Background.Pressed.Get();
-                    }
-                    else if (isHovered && theme.Color[role].Background.Hovered.Get().keyword != StyleKeyword.Null)
-                    {
-                        return theme.Color[role].Background.Hovered.Get();
-                    }
-                    else if (selectedItemId == _id && theme.Color[role].Background.Selected.Get().keyword != StyleKeyword.Null)
-                    {
-                        return theme.Color[role].Background.Selected.Get();
-                    }
-                    return theme.Color[role].Background.Default.Get();
-                }, isHovered, isPressed, context.SelectedItemId, themeStore);
+                var color = themeStore.Color(role, ElementType.Text, isPressed, isHovered, isSelected);
+                var backgroundColor = themeStore.Color(role, ElementType.Background, isPressed, isHovered, isSelected);
 
                 var iconUnicode = CreateComputedSignal((isOpen) =>
                 {
@@ -222,10 +193,10 @@ namespace Fiber.UI
                             flexDirection: FlexDirection.Row,
                             alignItems: Align.Center,
                             justifyContent: Justify.SpaceBetween,
-                            paddingLeft: themeStore.Get().Spacing(3) + identationLevel * themeStore.Get().Spacing(2),
-                            paddingTop: themeStore.Get().Spacing(2),
-                            paddingRight: themeStore.Get().Spacing(3),
-                            paddingBottom: themeStore.Get().Spacing(2),
+                            paddingLeft: themeStore.Spacing(3 + identationLevel * 2),
+                            paddingTop: themeStore.Spacing(2),
+                            paddingRight: themeStore.Spacing(3),
+                            paddingBottom: themeStore.Spacing(2),
                             width: new Length(100, LengthUnit.Percent)
                         ),
                         pickingMode: PickingMode.Position,

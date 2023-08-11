@@ -34,20 +34,20 @@ namespace Fiber.DesignTokens
         }
     }
 
-    public class SpacingTokens
+    public class SpacingTokens : BaseSignal<SpacingTokens>
     {
-        // OPEN POINT: Will probably never change so keeping
-        // it as a regular primitive and not a signal
-        public int Baseline;
+        public Signal<int> Baseline;
 
         public SpacingTokens(int baseline = 4)
         {
-            Baseline = baseline;
+            Baseline = new(baseline);
+            Baseline.RegisterParent(this);
         }
 
-        public int Get(int multiplier)
+        public override SpacingTokens Get() => this;
+        public override bool IsDirty(byte otherDirtyBit)
         {
-            return Baseline * multiplier;
+            return DirtyBit != otherDirtyBit;
         }
     }
 
@@ -82,6 +82,13 @@ namespace Fiber.DesignTokens
         }
     }
 
+    public enum ElementType
+    {
+        Background = 0,
+        Border = 1,
+        Text = 2,
+    }
+
     public class Role : BaseSignal<Role>
     {
         public Element Background;
@@ -106,6 +113,17 @@ namespace Fiber.DesignTokens
         public override bool IsDirty(byte otherDirtyBit)
         {
             return DirtyBit != otherDirtyBit;
+        }
+
+        public Element GetElement(ElementType elementType)
+        {
+            return elementType switch
+            {
+                ElementType.Background => Background,
+                ElementType.Border => Border,
+                ElementType.Text => Text,
+                _ => null,
+            };
         }
     }
 
