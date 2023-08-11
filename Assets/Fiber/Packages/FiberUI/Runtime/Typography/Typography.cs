@@ -9,6 +9,24 @@ using Signals;
 
 namespace Fiber.UI
 {
+    public static partial class BaseComponentExtensions
+    {
+        public static TypographyComponent Typography(
+            this BaseComponent component,
+                string type,
+                SignalProp<string> text = new(),
+                string role = Constants.INHERIT_ROLE,
+                string variant = null
+        )
+        {
+            return new TypographyComponent(
+                type: type,
+                text: text,
+                role: role,
+                variant: variant
+            );
+        }
+    }
     public class TypographyComponent : BaseComponent
     {
         private string _type;

@@ -136,7 +136,7 @@ namespace Fiber.UI
             public override VirtualNode Render()
             {
                 var _ref = new Ref<VisualElement>();
-                var theme = C<ThemeStore>().Get();
+                var themeStore = C<ThemeStore>();
                 var role = F.GetRole(_role);
                 var isHovered = new Signal<bool>(false);
                 var isPressed = new Signal<bool>(false);
@@ -186,7 +186,7 @@ namespace Fiber.UI
                         return theme.Color[role].Text.Selected.Get();
                     }
                     return theme.Color[role].Text.Default.Get();
-                }, isHovered, isPressed, context.SelectedItemId, theme);
+                }, isHovered, isPressed, context.SelectedItemId, themeStore);
 
                 var backgroundColor = CreateComputedSignal((isHovered, isPressed, selectedItemId, theme) =>
                 {
@@ -203,7 +203,7 @@ namespace Fiber.UI
                         return theme.Color[role].Background.Selected.Get();
                     }
                     return theme.Color[role].Background.Default.Get();
-                }, isHovered, isPressed, context.SelectedItemId, theme);
+                }, isHovered, isPressed, context.SelectedItemId, themeStore);
 
                 var iconUnicode = CreateComputedSignal((isOpen) =>
                 {
@@ -222,10 +222,10 @@ namespace Fiber.UI
                             flexDirection: FlexDirection.Row,
                             alignItems: Align.Center,
                             justifyContent: Justify.SpaceBetween,
-                            paddingLeft: theme.Spacing(3) + identationLevel * theme.Spacing(2),
-                            paddingTop: theme.Spacing(2),
-                            paddingRight: theme.Spacing(3),
-                            paddingBottom: theme.Spacing(2),
+                            paddingLeft: themeStore.Get().Spacing(3) + identationLevel * themeStore.Get().Spacing(2),
+                            paddingTop: themeStore.Get().Spacing(2),
+                            paddingRight: themeStore.Get().Spacing(3),
+                            paddingBottom: themeStore.Get().Spacing(2),
                             width: new Length(100, LengthUnit.Percent)
                         ),
                         pickingMode: PickingMode.Position,

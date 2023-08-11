@@ -29,12 +29,6 @@ namespace Fiber.UI
         ) : base(theme)
         {
         }
-
-        // TODO: Interactive background signal
-        // public BaseSignal<StyleColor> BackgroundSignal(string role, string variant = null)
-        // {
-
-        // }
     }
 
     public class ThemeProvider : BaseComponent
