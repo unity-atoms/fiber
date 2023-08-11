@@ -74,8 +74,11 @@ public static class DocsRouting
                                 router.Navigate(id);
                             },
                             children: F.Children(
-                                F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
-                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation")
+                                F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction", typographyType: DocsThemes.TYPOGRAPHY_TYPES.SUBTITLE2),
+                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation", typographyType: DocsThemes.TYPOGRAPHY_TYPES.SUBTITLE2)
+                            // F.TreeViewItem(id: "Test", label: $"Test", children: F.Children(
+                            //     F.TreeViewItem(id: "Test2", label: $"Test 2")
+                            // ))
                             )
                         ))
                     ),
@@ -121,15 +124,13 @@ public static class DocsRouting
 
             return F.Typography(
                 text: "Introduction",
-                type: "h1"
-            // style: new Style(
-            //     color: theme.Color[DocsThemes.ROLES.NEUTRAL].Text.Default,
-            //     fontSize: 36,
-            //     paddingLeft: theme.Spacing(7),
-            //     paddingTop: theme.Spacing(2),
-            //     paddingRight: theme.Spacing(7),
-            //     paddingBottom: theme.Spacing(2)
-            // )
+                type: "h1",
+                style: new Style(
+                    paddingLeft: themeStore.Spacing(7),
+                    paddingTop: themeStore.Spacing(2),
+                    paddingRight: themeStore.Spacing(7),
+                    paddingBottom: themeStore.Spacing(2)
+                )
             );
         }
     }
@@ -142,15 +143,13 @@ public static class DocsRouting
 
             return F.Typography(
                 text: "Installation",
-                type: "h1"
-            // style: new Style(
-            //     color: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Text),
-            //     fontSize: 36,
-            //     paddingLeft: themeStore.Spacing(7),
-            //     paddingTop: themeStore.Spacing(2),
-            //     paddingRight: themeStore.Spacing(7),
-            //     paddingBottom: themeStore.Spacing(2)
-            // )
+                type: "h1",
+                style: new Style(
+                    paddingLeft: themeStore.Spacing(7),
+                    paddingTop: themeStore.Spacing(2),
+                    paddingRight: themeStore.Spacing(7),
+                    paddingBottom: themeStore.Spacing(2)
+                )
             );
         }
     }

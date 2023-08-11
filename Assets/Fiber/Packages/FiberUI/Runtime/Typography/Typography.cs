@@ -17,14 +17,16 @@ namespace Fiber.UI
                 string type,
                 SignalProp<string> text = new(),
                 string role = Constants.INHERIT_ROLE,
-                string variant = null
+                string variant = null,
+                Style style = new()
         )
         {
             return new TypographyComponent(
                 type: type,
                 text: text,
                 role: role,
-                variant: variant
+                variant: variant,
+                style: style
             );
         }
     }
@@ -34,18 +36,21 @@ namespace Fiber.UI
         private SignalProp<string> _text;
         private readonly string _role;
         private readonly string _variant;
+        private readonly Style _style;
 
         public TypographyComponent(
             string type,
             SignalProp<string> text = new(),
             string role = Constants.INHERIT_ROLE,
-            string variant = null
+            string variant = null,
+            Style style = new()
         )
         {
             _type = type;
             _text = text;
             _role = role;
             _variant = variant;
+            _style = style;
         }
 
         public override VirtualNode Render()
@@ -56,6 +61,7 @@ namespace Fiber.UI
             return F.Text(
                 text: _text,
                 style: new Style(
+                    mergedStyle: _style,
                     unityFont: themeStore.Font(_type),
                     fontSize: themeStore.FontSize(_type),
                     unityFontStyle: themeStore.FontStyle(_type),

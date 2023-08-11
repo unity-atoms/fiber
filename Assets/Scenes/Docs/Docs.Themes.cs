@@ -72,17 +72,17 @@ public static class DocsThemes
     {
         { TYPOGRAPHY_TYPES.H1, new TypographyTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
-            fontSize: 50,
-            fontStyle: FontStyle.Bold
+            fontSize: 40,
+            fontStyle: FontStyle.Normal
         ) },
         { TYPOGRAPHY_TYPES.BODY1, new TypographyTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
-            fontSize: 16,
+            fontSize: 14,
             fontStyle: FontStyle.Normal
         ) },
         { TYPOGRAPHY_TYPES.SUBTITLE2, new TypographyTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
-            fontSize: 20,
+            fontSize: 14,
             fontStyle: FontStyle.Normal
         ) },
     };

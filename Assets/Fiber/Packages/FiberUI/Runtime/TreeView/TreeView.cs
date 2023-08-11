@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -31,6 +30,7 @@ namespace Fiber.UI
             this BaseComponent component,
                 SignalProp<string> label,
                 string id,
+                string typographyType,
                 List<VirtualNode> children = null,
                 string role = Constants.INHERIT_ROLE
         )
@@ -38,6 +38,7 @@ namespace Fiber.UI
             return new TreeViewComponent.Item(
                 label: label,
                 id: id,
+                typographyType: typographyType,
                 children: children,
                 role: role
             );
@@ -119,18 +120,21 @@ namespace Fiber.UI
         public class Item : BaseComponent
         {
             private SignalProp<string> _label;
-            private readonly string _role;
             private readonly string _id;
+            private readonly string _typographyType;
+            private readonly string _role;
 
             public Item(
                 SignalProp<string> label,
                 string id,
+                string typographyType,
                 List<VirtualNode> children = null,
                 string role = Constants.INHERIT_ROLE
             ) : base(children)
             {
                 _label = label;
                 _id = id;
+                _typographyType = typographyType;
                 _role = role;
             }
 
@@ -201,9 +205,10 @@ namespace Fiber.UI
                         ),
                         pickingMode: PickingMode.Position,
                         children: F.Children(
-                            F.Text(
+                            F.Typography(
                                 text: _label,
-                                style: new Style(color: color, fontSize: 16)
+                                type: _typographyType,
+                                style: new Style(color: color)
                             ),
                             F.Visible(
                                 when: new StaticSignal<bool>(children != null),
