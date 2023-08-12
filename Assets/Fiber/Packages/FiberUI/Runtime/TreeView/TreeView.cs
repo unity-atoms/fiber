@@ -30,7 +30,6 @@ namespace Fiber.UI
             this BaseComponent component,
                 SignalProp<string> label,
                 string id,
-                string typographyType,
                 List<VirtualNode> children = null,
                 string role = Constants.INHERIT_ROLE
         )
@@ -38,7 +37,6 @@ namespace Fiber.UI
             return new TreeViewComponent.Item(
                 label: label,
                 id: id,
-                typographyType: typographyType,
                 children: children,
                 role: role
             );
@@ -121,20 +119,17 @@ namespace Fiber.UI
         {
             private SignalProp<string> _label;
             private readonly string _id;
-            private readonly string _typographyType;
             private readonly string _role;
 
             public Item(
                 SignalProp<string> label,
                 string id,
-                string typographyType,
                 List<VirtualNode> children = null,
                 string role = Constants.INHERIT_ROLE
             ) : base(children)
             {
                 _label = label;
                 _id = id;
-                _typographyType = typographyType;
                 _role = role;
             }
 
@@ -207,7 +202,7 @@ namespace Fiber.UI
                         children: F.Children(
                             F.Typography(
                                 text: _label,
-                                type: _typographyType,
+                                type: TypographyType.Subtitle2,
                                 style: new Style(color: color)
                             ),
                             F.Visible(

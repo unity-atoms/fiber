@@ -99,8 +99,8 @@ namespace Fiber.UI
             return signal;
         }
 
-        private readonly Dictionary<string, BaseSignal<StyleFont>> _fontSignalsCache;
-        public BaseSignal<StyleFont> Font(string typographyType)
+        private readonly Dictionary<TypographyType, BaseSignal<StyleFont>> _fontSignalsCache;
+        public BaseSignal<StyleFont> Font(TypographyType typographyType)
         {
             if (_fontSignalsCache.ContainsKey(typographyType))
             {
@@ -109,16 +109,16 @@ namespace Fiber.UI
 
             var signal = new InlineComputedSignal<Theme, StyleFont>((theme) =>
             {
-                var typography = theme.Typography[typographyType].Get();
-                return typography.Font.Get();
+                var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                return typographyTokens.Font.Get();
             }, Value);
             _fontSignalsCache.Add(typographyType, signal);
 
             return signal;
         }
 
-        private readonly Dictionary<string, BaseSignal<StyleLength>> _fontSizeSignalsCache;
-        public BaseSignal<StyleLength> FontSize(string typographyType)
+        private readonly Dictionary<TypographyType, BaseSignal<StyleLength>> _fontSizeSignalsCache;
+        public BaseSignal<StyleLength> FontSize(TypographyType typographyType)
         {
             if (_fontSizeSignalsCache.ContainsKey(typographyType))
             {
@@ -127,16 +127,16 @@ namespace Fiber.UI
 
             var signal = new InlineComputedSignal<Theme, StyleLength>((theme) =>
             {
-                var typography = theme.Typography[typographyType].Get();
-                return typography.FontSize.Get();
+                var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                return typographyTokens.FontSize.Get();
             }, Value);
             _fontSizeSignalsCache.Add(typographyType, signal);
 
             return signal;
         }
 
-        private readonly Dictionary<string, BaseSignal<StyleEnum<FontStyle>>> _fontStyleSignalsCache;
-        public BaseSignal<StyleEnum<FontStyle>> FontStyle(string typographyType)
+        private readonly Dictionary<TypographyType, BaseSignal<StyleEnum<FontStyle>>> _fontStyleSignalsCache;
+        public BaseSignal<StyleEnum<FontStyle>> FontStyle(TypographyType typographyType)
         {
             if (_fontStyleSignalsCache.ContainsKey(typographyType))
             {
@@ -145,8 +145,8 @@ namespace Fiber.UI
 
             var signal = new InlineComputedSignal<Theme, StyleEnum<FontStyle>>((theme) =>
             {
-                var typography = theme.Typography[typographyType].Get();
-                return typography.FontStyle.Get();
+                var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                return typographyTokens.FontStyle.Get();
             }, Value);
             _fontStyleSignalsCache.Add(typographyType, signal);
 

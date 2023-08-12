@@ -11,13 +11,13 @@ namespace Fiber.UI
     {
         public string FallbackRole;
         public ColorTokenCollection Color;
-        public TypographyTokensCollection Typography;
+        public TypographyTokens Typography;
         public SpacingTokens Spacing;
 
         public Theme(
             string fallbackRole,
             ColorTokenCollection color,
-            TypographyTokensCollection typography,
+            TypographyTokens typography,
             int spacingBaseline = 4
         )
         {

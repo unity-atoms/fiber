@@ -5,6 +5,7 @@ using Fiber;
 using Fiber.UIElements;
 using Fiber.Router;
 using Fiber.UI;
+using Fiber.DesignTokens;
 using Signals;
 
 public static class DocsRouting
@@ -74,8 +75,8 @@ public static class DocsRouting
                                 router.Navigate(id);
                             },
                             children: F.Children(
-                                F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction", typographyType: DocsThemes.TYPOGRAPHY_TYPES.SUBTITLE2),
-                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation", typographyType: DocsThemes.TYPOGRAPHY_TYPES.SUBTITLE2)
+                                F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
+                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation")
                             // F.TreeViewItem(id: "Test", label: $"Test", children: F.Children(
                             //     F.TreeViewItem(id: "Test2", label: $"Test 2")
                             // ))
@@ -124,7 +125,7 @@ public static class DocsRouting
 
             return F.Typography(
                 text: "Introduction",
-                type: "h1",
+                type: TypographyType.Heading1,
                 style: new Style(
                     paddingLeft: themeStore.Spacing(7),
                     paddingTop: themeStore.Spacing(2),
@@ -143,7 +144,7 @@ public static class DocsRouting
 
             return F.Typography(
                 text: "Installation",
-                type: "h1",
+                type: TypographyType.Heading1,
                 style: new Style(
                     paddingLeft: themeStore.Spacing(7),
                     paddingTop: themeStore.Spacing(2),

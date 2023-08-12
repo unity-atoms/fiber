@@ -14,7 +14,7 @@ namespace Fiber.UI
     {
         public static TypographyComponent Typography(
             this BaseComponent component,
-                string type,
+                TypographyType type,
                 SignalProp<string> text = new(),
                 string role = Constants.INHERIT_ROLE,
                 string variant = null,
@@ -32,14 +32,14 @@ namespace Fiber.UI
     }
     public class TypographyComponent : BaseComponent
     {
-        private readonly string _type;
+        private readonly TypographyType _type;
         private SignalProp<string> _text;
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
 
         public TypographyComponent(
-            string type,
+            TypographyType type,
             SignalProp<string> text = new(),
             string role = Constants.INHERIT_ROLE,
             string variant = null,

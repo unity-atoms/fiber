@@ -57,35 +57,23 @@ public static class DocsThemes
         }
     }
 
-    public static class TYPOGRAPHY_TYPES
-    {
-        public const string H1 = "h1";
-        public const string H2 = "h2";
-        public const string H3 = "h3";
-        public const string SUBTITLE1 = "subtitle1";
-        public const string SUBTITLE2 = "subtitle2";
-        public const string BODY1 = "body1";
-        public const string BUTTON = "button1";
-    }
-
-    public static readonly TypographyTokensCollection TYPOGRAPHY_TOKENS = new()
-    {
-        { TYPOGRAPHY_TYPES.H1, new TypographyTokens(
+    public static readonly TypographyTokens TYPOGRAPHY_TOKENS = new(
+        heading1: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
             fontSize: 40,
             fontStyle: FontStyle.Normal
-        ) },
-        { TYPOGRAPHY_TYPES.BODY1, new TypographyTokens(
+        ),
+        body1: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
             fontSize: 14,
             fontStyle: FontStyle.Normal
-        ) },
-        { TYPOGRAPHY_TYPES.SUBTITLE2, new TypographyTokens(
+        ),
+        subtitle2: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
             fontSize: 14,
             fontStyle: FontStyle.Normal
-        ) },
-    };
+        )
+    );
 
     public static readonly Theme DARK_THEME = new Theme(
         fallbackRole: ROLES.NEUTRAL,
