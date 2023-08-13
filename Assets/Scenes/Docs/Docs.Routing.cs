@@ -18,6 +18,9 @@ public static class DocsRouting
         // Path routes
         public const string INTRODUCTION = "introduction";
         public const string INSTALLATION = "installation";
+        public const string PACKAGES = "packages";
+        public const string ROUTER = "router";
+        public const string UI = "ui";
     }
 
     public class RootComponent : BaseComponent
@@ -76,10 +79,11 @@ public static class DocsRouting
                             },
                             children: F.Children(
                                 F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
-                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation")
-                            // F.TreeViewItem(id: "Test", label: $"Test", children: F.Children(
-                            //     F.TreeViewItem(id: "Test2", label: $"Test 2")
-                            // ))
+                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation"),
+                                F.TreeViewItem(id: ROUTES.PACKAGES, label: $"Packages", children: F.Children(
+                                    F.TreeViewItem(id: ROUTES.ROUTER, label: $"Router"),
+                                    F.TreeViewItem(id: ROUTES.UI, label: $"UI")
+                                ))
                             )
                         ))
                     ),
@@ -107,24 +111,45 @@ public static class DocsRouting
             new RouteDefinition(
                 id: ROUTES.INTRODUCTION,
                 isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new IntroductionComponent())
+                component: new SimpleRouteComponent(component: new HeadingComponent("Introduction"))
             ),
             new RouteDefinition(
                 id: ROUTES.INSTALLATION,
                 isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new InstallationComponent())
+                component: new SimpleRouteComponent(component: new HeadingComponent("Installation"))
+            ),
+            new RouteDefinition(
+                id: ROUTES.PACKAGES,
+                isLayoutRoute: false,
+                component: new SimpleRouteComponent(component: new HeadingComponent("Packages"))
+            ),
+            new RouteDefinition(
+                id: ROUTES.ROUTER,
+                isLayoutRoute: false,
+                component: new SimpleRouteComponent(component: new HeadingComponent("Router"))
+            ),
+            new RouteDefinition(
+                id: ROUTES.UI,
+                isLayoutRoute: false,
+                component: new SimpleRouteComponent(component: new HeadingComponent("UI"))
             ),
         }
     );
 
-    public class IntroductionComponent : BaseComponent
+    public class HeadingComponent : BaseComponent
     {
+        private readonly string _text;
+        public HeadingComponent(string text)
+        {
+            _text = text;
+        }
+
         public override VirtualNode Render()
         {
             var themeStore = C<ThemeStore>();
 
             return F.Typography(
-                text: "Introduction",
+                text: _text,
                 type: TypographyType.Heading1,
                 style: new Style(
                     paddingLeft: themeStore.Spacing(7),
