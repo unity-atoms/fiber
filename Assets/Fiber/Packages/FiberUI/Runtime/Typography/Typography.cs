@@ -56,13 +56,14 @@ namespace Fiber.UI
         public override VirtualNode Render()
         {
             var themeStore = C<ThemeStore>();
-            var role = F.GetRole(_role);
+            var role = F.ResolveRole(_role);
 
             return F.Text(
                 text: _text,
                 style: new Style(
                     mergedStyle: _style,
                     unityFont: themeStore.Font(_type),
+                    unityFontDefinition: StyleKeyword.None,
                     fontSize: themeStore.FontSize(_type),
                     unityFontStyle: themeStore.FontStyle(_type),
                     color: themeStore.Color(role, ElementType.Text, _variant)

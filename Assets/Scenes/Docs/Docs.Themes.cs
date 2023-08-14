@@ -59,17 +59,22 @@ public static class DocsThemes
 
     public static readonly TypographyTokens TYPOGRAPHY_TOKENS = new(
         heading1: new TypographyTypeTokens(
-            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 40,
-            fontStyle: FontStyle.Normal
+            fontStyle: FontStyle.Bold
+        ),
+        heading3: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
+            fontSize: 20,
+            fontStyle: FontStyle.Bold
         ),
         body1: new TypographyTypeTokens(
-            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 14,
             fontStyle: FontStyle.Normal
         ),
         subtitle2: new TypographyTypeTokens(
-            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont.ttf"),
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 14,
             fontStyle: FontStyle.Normal
         )

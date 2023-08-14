@@ -479,6 +479,11 @@ namespace Fiber.UIElements
             return new StyleFontDefinitionProp(keyword);
         }
 
+        public static implicit operator StyleFontDefinitionProp(FontDefinition font)
+        {
+            return new StyleFontDefinitionProp(font);
+        }
+
         public static implicit operator StyleFontDefinitionProp(BaseSignal<StyleFontDefinition> signal)
         {
             return new StyleFontDefinitionProp(signal);
@@ -920,6 +925,7 @@ namespace Fiber.UIElements
         public StyleFontProp UnityFont { get; private set; }
         public StyleFontDefinitionProp UnityFontDefinition { get; private set; }
         public FontStyleProp UnityFontStyle { get; private set; }
+        public StyleLengthProp UnityParagraphSpacing { get; private set; }
         public StylePropertyNamesProp TransitionProperty { get; private set; }
         public TimeValuesProp TransitionDelay { get; private set; }
         public TimeValuesProp TransitionDuration { get; private set; }
@@ -973,6 +979,7 @@ namespace Fiber.UIElements
             StyleFontProp unityFont = new(),
             StyleFontDefinitionProp unityFontDefinition = new(),
             FontStyleProp unityFontStyle = new(),
+            StyleLengthProp unityParagraphSpacing = new(),
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
@@ -1026,6 +1033,7 @@ namespace Fiber.UIElements
             UnityFont = unityFont;
             UnityFontDefinition = unityFontDefinition;
             UnityFontStyle = unityFontStyle;
+            UnityParagraphSpacing = unityParagraphSpacing;
             TransitionProperty = transitionProperty;
             TransitionDelay = transitionDelay;
             TransitionDuration = transitionDuration;
@@ -1081,6 +1089,7 @@ namespace Fiber.UIElements
             StyleFontProp unityFont = new(),
             StyleFontDefinitionProp unityFontDefinition = new(),
             FontStyleProp unityFontStyle = new(),
+            StyleLengthProp unityParagraphSpacing = new(),
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
@@ -1134,6 +1143,7 @@ namespace Fiber.UIElements
             UnityFont = mergedStyle.UnityFont.IsEmpty ? unityFont : mergedStyle.UnityFont;
             UnityFontDefinition = mergedStyle.UnityFontDefinition.IsEmpty ? unityFontDefinition : mergedStyle.UnityFontDefinition;
             UnityFontStyle = mergedStyle.UnityFontStyle.IsEmpty ? unityFontStyle : mergedStyle.UnityFontStyle;
+            UnityParagraphSpacing = mergedStyle.UnityParagraphSpacing.IsEmpty ? unityParagraphSpacing : mergedStyle.UnityParagraphSpacing;
             TransitionProperty = mergedStyle.TransitionProperty.IsEmpty ? transitionProperty : mergedStyle.TransitionProperty;
             TransitionDelay = mergedStyle.TransitionDelay.IsEmpty ? transitionDelay : mergedStyle.TransitionDelay;
             TransitionDuration = mergedStyle.TransitionDuration.IsEmpty ? transitionDuration : mergedStyle.TransitionDuration;

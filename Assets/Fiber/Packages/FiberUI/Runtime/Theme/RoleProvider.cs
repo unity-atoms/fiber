@@ -9,7 +9,7 @@ namespace Fiber.UI
 {
     public static partial class BaseComponentExtensions
     {
-        public static string GetRole(this BaseComponent component, string role)
+        public static string ResolveRole(this BaseComponent component, string role)
         {
             var theme = component.C<ThemeStore>().Get();
             if (role == Constants.INHERIT_ROLE)

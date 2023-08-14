@@ -550,6 +550,7 @@ namespace Fiber.UIElements
         private WorkLoopStyleFontProp _unityFontWorkLoopItem;
         private WorkLoopStyleFontDefinitionProp _unityFontDefinitionWorkLoopItem;
         private WorkLoopFontStyleProp _unityFontStyleWorkLoopItem;
+        private WorkLoopStyleLengthProp _unityParagraphSpacingWorkLoopItem;
         private WorkLoopStylePropertyNamesProp _transitionPropertyWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDelayWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDurationWorkLoopItem;
@@ -920,6 +921,14 @@ namespace Fiber.UIElements
                     if (isStyleValue)
                     {
                         _unityFontStyleWorkLoopItem = new(style.UnityFontStyle);
+                    }
+                }
+                if (!style.UnityParagraphSpacing.IsEmpty)
+                {
+                    Instance.style.unityParagraphSpacing = style.UnityParagraphSpacing.Get();
+                    if (isStyleValue)
+                    {
+                        _unityParagraphSpacingWorkLoopItem = new(style.UnityParagraphSpacing);
                     }
                 }
                 if (!style.TransitionProperty.IsEmpty)
@@ -1497,6 +1506,15 @@ namespace Fiber.UIElements
                     Instance.style.unityFontStyleAndWeight = StyleKeyword.Initial;
                 }
 
+                if (!style.UnityParagraphSpacing.IsEmpty)
+                {
+                    Instance.style.unityParagraphSpacing = style.UnityParagraphSpacing.Get();
+                }
+                else if (!_lastStyleFromSignal.UnityParagraphSpacing.IsEmpty)
+                {
+                    Instance.style.unityParagraphSpacing = StyleKeyword.Initial;
+                }
+
                 if (!style.TransitionProperty.IsEmpty)
                 {
                     Instance.style.transitionProperty = style.TransitionProperty.Get();
@@ -1744,6 +1762,10 @@ namespace Fiber.UIElements
                 if (_unityFontStyleWorkLoopItem.Check())
                 {
                     Instance.style.unityFontStyleAndWeight = _unityFontStyleWorkLoopItem.Get();
+                }
+                if (_unityParagraphSpacingWorkLoopItem.Check())
+                {
+                    Instance.style.unityParagraphSpacing = _unityParagraphSpacingWorkLoopItem.Get();
                 }
                 if (_transitionPropertyWorkLoopItem.Check())
                 {

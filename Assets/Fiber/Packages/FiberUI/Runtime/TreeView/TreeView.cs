@@ -88,7 +88,7 @@ namespace Fiber.UI
             public override VirtualNode Render()
             {
                 var theme = C<ThemeStore>().Get();
-                var role = F.GetRole(_role);
+                var role = F.ResolveRole(_role);
 
                 return F.ContextProvider(
                     value: new SelectedItemIdContext(
@@ -137,7 +137,7 @@ namespace Fiber.UI
             {
                 var _ref = new Ref<VisualElement>();
                 var themeStore = C<ThemeStore>();
-                var role = F.GetRole(_role);
+                var role = F.ResolveRole(_role);
                 var context = F.GetContext<SelectedItemIdContext>();
                 var isHovered = new Signal<bool>(false);
                 var isPressed = new Signal<bool>(false);

@@ -40,7 +40,7 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            var theme = C<ThemeStore>().Get();
+            var themeStore = C<ThemeStore>();
 
             var router = C<Router>();
             var selectedItemId = F.CreateComputedSignal((router) =>
@@ -49,53 +49,74 @@ public static class DocsRouting
                 return route?.Id;
             }, router);
 
+            var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
+            var deepBorderColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Border);
+
+
             return F.View(
                 style: new Style(
                     display: DisplayStyle.Flex,
                     height: new Length(100, LengthUnit.Percent),
                     width: new Length(100, LengthUnit.Percent),
-                    alignItems: Align.Stretch,
-                    flexDirection: FlexDirection.Row
+                    flexDirection: FlexDirection.Column
                 ),
                 children: F.Children(
+                    new DocsHeaderComponent(),
                     F.View(
                         style: new Style(
-                            minWidth: 100,
-                            maxWidth: 240,
-                            width: new Length(25, LengthUnit.Percent),
-                            height: new Length(100, LengthUnit.Percent),
-                            backgroundColor: theme.Color[DocsThemes.ROLES.DEEP_NEUTRAL].Background.Default,
-                            borderRightColor: theme.Color[DocsThemes.ROLES.DEEP_NEUTRAL].Border.Default,
-                            borderRightWidth: 1,
-                            flexShrink: 0,
-                            flexGrow: 0
-                        ),
-                        children: F.Children(F.TreeViewContainer(
-                            role: DocsThemes.ROLES.DEEP_NEUTRAL,
-                            selectedItemId: selectedItemId,
-                            onItemIdSelected: (string id) =>
-                            {
-                                router.Navigate(id);
-                            },
-                            children: F.Children(
-                                F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
-                                F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation"),
-                                F.TreeViewItem(id: ROUTES.PACKAGES, label: $"Packages", children: F.Children(
-                                    F.TreeViewItem(id: ROUTES.ROUTER, label: $"Router"),
-                                    F.TreeViewItem(id: ROUTES.UI, label: $"UI")
-                                ))
-                            )
-                        ))
-                    ),
-                    F.View(
-                        style: new Style(
-                            backgroundColor: theme.Color[DocsThemes.ROLES.NEUTRAL].Background.Default,
-                            minHeight: new Length(100, LengthUnit.Percent),
-                            flexShrink: 1,
+                            display: DisplayStyle.Flex,
+                            alignItems: Align.Stretch,
+                            flexDirection: FlexDirection.Row,
                             flexGrow: 1,
-                            minWidth: new Length(100, LengthUnit.Pixel)
+                            flexShrink: 1
                         ),
-                        children: F.Children(F.Outlet())
+                        children: F.Children(
+                            F.View(
+                                style: new Style(
+                                    minWidth: 100,
+                                    maxWidth: 240,
+                                    width: new Length(25, LengthUnit.Percent),
+                                    height: new Length(100, LengthUnit.Percent),
+                                    backgroundColor: themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background),
+                                    borderRightColor: deepBorderColor,
+                                    borderTopColor: deepBorderColor,
+                                    borderBottomColor: deepBorderColor,
+                                    borderRightWidth: 1,
+                                    borderTopWidth: 1,
+                                    borderBottomWidth: 1,
+                                    flexShrink: 0,
+                                    flexGrow: 0
+                                ),
+                                children: F.Children(F.TreeViewContainer(
+                                    role: DocsThemes.ROLES.DEEP_NEUTRAL,
+                                    selectedItemId: selectedItemId,
+                                    onItemIdSelected: (string id) =>
+                                    {
+                                        router.Navigate(id);
+                                    },
+                                    children: F.Children(
+                                        F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
+                                        F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation"),
+                                        F.TreeViewItem(id: ROUTES.PACKAGES, label: $"Packages", children: F.Children(
+                                            F.TreeViewItem(id: ROUTES.ROUTER, label: $"Router"),
+                                            F.TreeViewItem(id: ROUTES.UI, label: $"UI")
+                                        ))
+                                    )
+                                ))
+                            ),
+                            F.View(
+                                style: new Style(
+                                    backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
+                                    minHeight: new Length(100, LengthUnit.Percent),
+                                    flexShrink: 1,
+                                    flexGrow: 1,
+                                    minWidth: new Length(100, LengthUnit.Pixel),
+                                    paddingLeft: themeStore.Spacing(7),
+                                    paddingRight: themeStore.Spacing(7)
+                                ),
+                                children: F.Children(F.Outlet())
+                            )
+                        )
                     )
                 )
             );
@@ -111,7 +132,7 @@ public static class DocsRouting
             new RouteDefinition(
                 id: ROUTES.INTRODUCTION,
                 isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new HeadingComponent("Introduction"))
+                component: new SimpleRouteComponent(component: new DocsIntroductionPageComponent())
             ),
             new RouteDefinition(
                 id: ROUTES.INSTALLATION,
@@ -152,29 +173,8 @@ public static class DocsRouting
                 text: _text,
                 type: TypographyType.Heading1,
                 style: new Style(
-                    paddingLeft: themeStore.Spacing(7),
-                    paddingTop: themeStore.Spacing(2),
-                    paddingRight: themeStore.Spacing(7),
-                    paddingBottom: themeStore.Spacing(2)
-                )
-            );
-        }
-    }
-
-    public class InstallationComponent : BaseComponent
-    {
-        public override VirtualNode Render()
-        {
-            var themeStore = C<ThemeStore>();
-
-            return F.Typography(
-                text: "Installation",
-                type: TypographyType.Heading1,
-                style: new Style(
-                    paddingLeft: themeStore.Spacing(7),
-                    paddingTop: themeStore.Spacing(2),
-                    paddingRight: themeStore.Spacing(7),
-                    paddingBottom: themeStore.Spacing(2)
+                    marginTop: themeStore.Spacing(3),
+                    marginBottom: themeStore.Spacing(3)
                 )
             );
         }
