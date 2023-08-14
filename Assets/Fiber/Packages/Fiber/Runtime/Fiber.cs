@@ -53,6 +53,7 @@ namespace Fiber
             bool runOnMount
         );
         public void CreateUpdateEffect(Action<float> onUpdate);
+        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, BaseSignal<T1> signal1
         );
@@ -595,6 +596,7 @@ namespace Fiber
             Api.CreateEffect(effect, signal1, signal2, signal3, runOnMount);
         }
         public void CreateUpdateEffect(Action<float> onUpdate) => Api.CreateUpdateEffect(onUpdate);
+        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp) => Api.WrapSignalProp<T>(signalProp);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, BaseSignal<T1> signal1
         ) => Api.CreateComputedSignal<T1, RT>(compute, signal1);
@@ -1643,6 +1645,20 @@ namespace Fiber
                     MonoBehaviourHelper.RemoveOnUpdateHandler(subId);
                 };
             });
+        }
+
+        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp)
+        {
+            if (signalProp.IsValue)
+            {
+                return new StaticSignal<T>(signalProp.Value);
+            }
+            else if (signalProp.IsSignal)
+            {
+                return signalProp.Signal;
+            }
+
+            throw new Exception($"Trying to wrap empty signal prop");
         }
 
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(

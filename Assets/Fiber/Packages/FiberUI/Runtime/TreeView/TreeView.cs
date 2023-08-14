@@ -175,13 +175,7 @@ namespace Fiber.UI
                 var color = themeStore.Color(role, ElementType.Text, isPressed, isHovered, isSelected);
                 var backgroundColor = themeStore.Color(role, ElementType.Background, isPressed, isHovered, isSelected);
 
-                var iconUnicode = CreateComputedSignal((isOpen) =>
-                {
-                    return (isOpen ? '\uf078' : '\uf054').ToString();
-                }, isOpen);
-
-
-                var fontAwesome = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
+                var iconType = CreateComputedSignal((isOpen) => isOpen ? "chevron-down" : "chevron-right", isOpen);
 
                 return F.Fragment(F.Children(
                     F.View(
@@ -208,11 +202,9 @@ namespace Fiber.UI
                             F.Visible(
                                 when: new StaticSignal<bool>(children != null),
                                 children: F.Children(
-                                    F.Text(
-                                        text: iconUnicode,
-                                        style: new Style(color: color, unityFont: fontAwesome, unityFontDefinition: StyleKeyword.None)
-                                    )
-                            ))
+                                    F.Icon(type: iconType)
+                                )
+                            )
                         )
                     ),
                     F.Active(

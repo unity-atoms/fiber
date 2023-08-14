@@ -20,7 +20,7 @@ public class DocsHeaderComponent : BaseComponent
                     display: DisplayStyle.Flex,
                     flexDirection: FlexDirection.Row,
                     alignItems: Align.Center,
-                    justifyContent: Justify.FlexStart,
+                    justifyContent: Justify.SpaceBetween,
                     paddingLeft: themeStore.Spacing(4),
                     paddingRight: themeStore.Spacing(4),
                     width: new Length(100, LengthUnit.Percent),
@@ -30,7 +30,8 @@ public class DocsHeaderComponent : BaseComponent
                     F.Typography(
                         text: "fiber",
                         type: TypographyType.Heading3
-                    )
+                    ),
+                    F.Icon(type: "sun")
                 )
             )
         ));

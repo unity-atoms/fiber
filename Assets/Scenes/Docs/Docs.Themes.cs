@@ -70,12 +70,12 @@ public static class DocsThemes
         ),
         body1: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
-            fontSize: 14,
+            fontSize: 12,
             fontStyle: FontStyle.Normal
         ),
         subtitle2: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
-            fontSize: 14,
+            fontSize: 12,
             fontStyle: FontStyle.Normal
         )
     );
