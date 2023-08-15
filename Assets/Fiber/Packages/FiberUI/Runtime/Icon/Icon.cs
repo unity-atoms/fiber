@@ -15,14 +15,16 @@ namespace Fiber.UI
             SignalProp<string> type,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
-            Style style = new()
+            Style style = new(),
+            Ref<TextElement> forwardRef = null
         )
         {
             return new IconComponent(
                 type: type,
                 role: role,
                 variant: variant,
-                style: style
+                style: style,
+                forwardRef: forwardRef
             );
         }
     }
@@ -33,18 +35,21 @@ namespace Fiber.UI
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
+        private readonly Ref<TextElement> _forwardRef;
 
         public IconComponent(
             SignalProp<string> type,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
-            Style style = new()
+            Style style = new(),
+            Ref<TextElement> forwardRef = null
         )
         {
             _type = type;
             _role = role;
             _variant = variant;
             _style = style;
+            _forwardRef = forwardRef;
         }
         public override VirtualNode Render()
         {
@@ -69,6 +74,7 @@ namespace Fiber.UI
             }, typeSignal);
 
             return F.Text(
+                _ref: _forwardRef,
                 text: iconUnicode,
                 style: new Style(
                     mergedStyle: _style,

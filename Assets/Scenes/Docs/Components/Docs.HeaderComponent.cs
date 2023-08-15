@@ -13,6 +13,7 @@ public class DocsHeaderComponent : BaseComponent
     public override VirtualNode Render()
     {
         var themeStore = C<ThemeStore>();
+        var iconType = new Signal<string>("sun");
 
         return F.Header(children: F.Children(
             F.View(
@@ -31,7 +32,19 @@ public class DocsHeaderComponent : BaseComponent
                         text: "fiber",
                         type: TypographyType.Heading3
                     ),
-                    F.Icon(type: "sun")
+                    F.IconButton(type: iconType, onPress: () =>
+                    {
+                        if (themeStore.Value == DocsThemes.LIGHT_THEME)
+                        {
+                            themeStore.Value = DocsThemes.DARK_THEME;
+                            iconType.Value = "moon";
+                        }
+                        else
+                        {
+                            themeStore.Value = DocsThemes.LIGHT_THEME;
+                            iconType.Value = "sun";
+                        }
+                    })
                 )
             )
         ));

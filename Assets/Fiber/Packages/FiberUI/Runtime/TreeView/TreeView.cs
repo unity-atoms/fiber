@@ -135,51 +135,27 @@ namespace Fiber.UI
 
             public override VirtualNode Render()
             {
-                var _ref = new Ref<VisualElement>();
                 var themeStore = C<ThemeStore>();
                 var role = F.ResolveRole(_role);
                 var context = F.GetContext<SelectedItemIdContext>();
-                var isHovered = new Signal<bool>(false);
-                var isPressed = new Signal<bool>(false);
                 var isSelected = F.CreateComputedSignal<string, bool>((selectedItemId) => selectedItemId == _id, context.SelectedItemId);
                 var isOpen = new Signal<bool>(false);
                 var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLeve;
 
-                CreateEffect(() =>
+                var interactiveRef = F.CreateInteractiveRef<VisualElement>(isDisabled: null, onPress: () =>
                 {
-                    _ref.Current.RegisterCallback<MouseEnterEvent>(evt =>
-                    {
-                        isHovered.Value = true;
-                    });
-                    _ref.Current.RegisterCallback<MouseLeaveEvent>(evt =>
-                    {
-                        isHovered.Value = false;
-                        isPressed.Value = false;
-                    });
-                    _ref.Current.RegisterCallback<PointerDownEvent>(evt =>
-                    {
-                        isPressed.Value = true;
-                    });
-                    _ref.Current.RegisterCallback<PointerUpEvent>(evt =>
-                    {
-                        if (isPressed.Value)
-                        {
-                            context.OnItemSelected(_id);
-                            isPressed.Value = false;
-                            isOpen.Value = !isOpen.Value;
-                        }
-                    });
-                    return null;
+                    context.OnItemSelected(_id);
+                    isOpen.Value = !isOpen.Value;
                 });
 
-                var color = themeStore.Color(role, ElementType.Text, isPressed, isHovered, isSelected);
-                var backgroundColor = themeStore.Color(role, ElementType.Background, isPressed, isHovered, isSelected);
+                var color = themeStore.Color(role, ElementType.Text, interactiveRef.IsPressed, interactiveRef.IsHovered, isSelected);
+                var backgroundColor = themeStore.Color(role, ElementType.Background, interactiveRef.IsPressed, interactiveRef.IsHovered, isSelected);
 
                 var iconType = CreateComputedSignal((isOpen) => isOpen ? "chevron-down" : "chevron-right", isOpen);
 
                 return F.Fragment(F.Children(
                     F.View(
-                        _ref: _ref,
+                        _ref: interactiveRef,
                         style: new Style(
                             backgroundColor: backgroundColor,
                             display: DisplayStyle.Flex,

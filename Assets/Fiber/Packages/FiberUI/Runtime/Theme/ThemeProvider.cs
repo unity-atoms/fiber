@@ -46,7 +46,7 @@ namespace Fiber.UI
                 return _spacingSignalsCache[multiplier];
             }
 
-            var spacingSignal = new InlineComputedSignal<int, StyleLength>((baseline) => baseline * multiplier, Value.Spacing.Baseline);
+            var spacingSignal = new InlineComputedSignal<Theme, StyleLength>((theme) => theme.Spacing.Baseline.Value * multiplier, this);
             _spacingSignalsCache.Add(multiplier, spacingSignal);
             return spacingSignal;
         }
@@ -99,7 +99,7 @@ namespace Fiber.UI
             {
                 var colorModifiers = theme.GetColorModifiers(role, elementType, variant);
                 return colorModifiers.Default.Get();
-            }, Value);
+            }, this);
             _nonInteractiveColorSignalsCache.Add((role, elementType, variant), signal);
 
             return signal;
@@ -110,7 +110,7 @@ namespace Fiber.UI
             ElementType elementType,
             BaseSignal<bool> isPressed,
             BaseSignal<bool> isHovered,
-            BaseSignal<bool> isSelected,
+            BaseSignal<bool> isSelected = null,
             string variant = null
         )
         {
@@ -130,7 +130,7 @@ namespace Fiber.UI
                     return colorModifiers.Selected.Get();
                 }
                 return colorModifiers.Default.Get();
-            }, Value, isPressed, isHovered, isSelected);
+            }, this, isPressed, isHovered, isSelected ?? new StaticSignal<bool>(false));
 
             return signal;
         }
@@ -147,7 +147,7 @@ namespace Fiber.UI
             {
                 var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
                 return typographyTokens.Font.Get();
-            }, Value);
+            }, this);
             _fontSignalsCache.Add(typographyType, signal);
 
             return signal;
@@ -165,7 +165,7 @@ namespace Fiber.UI
             {
                 var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
                 return typographyTokens.FontSize.Get();
-            }, Value);
+            }, this);
             _fontSizeSignalsCache.Add(typographyType, signal);
 
             return signal;
@@ -183,7 +183,7 @@ namespace Fiber.UI
             {
                 var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
                 return typographyTokens.FontStyle.Get();
-            }, Value);
+            }, this);
             _fontStyleSignalsCache.Add(typographyType, signal);
 
             return signal;
