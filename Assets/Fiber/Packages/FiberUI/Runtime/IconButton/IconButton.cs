@@ -78,7 +78,15 @@ namespace Fiber.UI
                 style: new Style(
                     mergedStyle: _style,
                     color: color,
-                    backgroundColor: backgroundColor
+                    backgroundColor: backgroundColor,
+                    paddingLeft: themeStore.Spacing(2),
+                    paddingRight: themeStore.Spacing(2),
+                    paddingTop: themeStore.Spacing(2),
+                    paddingBottom: themeStore.Spacing(2),
+                    borderTopRightRadius: new Length(50, LengthUnit.Percent),
+                    borderTopLeftRadius: new Length(50, LengthUnit.Percent),
+                    borderBottomRightRadius: new Length(50, LengthUnit.Percent),
+                    borderBottomLeftRadius: new Length(50, LengthUnit.Percent)
                 )
             );
         }

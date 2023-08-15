@@ -37,12 +37,12 @@ public class DocsHeaderComponent : BaseComponent
                         if (themeStore.Value == DocsThemes.LIGHT_THEME)
                         {
                             themeStore.Value = DocsThemes.DARK_THEME;
-                            iconType.Value = "moon";
+                            iconType.Value = "sun";
                         }
                         else
                         {
                             themeStore.Value = DocsThemes.LIGHT_THEME;
-                            iconType.Value = "sun";
+                            iconType.Value = "moon";
                         }
                     })
                 )

@@ -51,42 +51,6 @@ namespace Fiber.UI
             return spacingSignal;
         }
 
-        public Style PaddingLarge()
-        {
-            return new Style(
-                paddingLeft: Spacing(7),
-                paddingTop: Spacing(7),
-                paddingRight: Spacing(7),
-                paddingBottom: Spacing(7)
-            );
-        }
-
-        public Style MarginLarge()
-        {
-            return new Style(
-                marginLeft: Spacing(7),
-                marginTop: Spacing(7),
-                marginRight: Spacing(7),
-                marginBottom: Spacing(7)
-            );
-        }
-
-        public Style MarginYLarge()
-        {
-            return new Style(
-                marginTop: Spacing(7),
-                marginBottom: Spacing(7)
-            );
-        }
-
-        public Style MarginYMedium()
-        {
-            return new Style(
-                marginTop: Spacing(4),
-                marginBottom: Spacing(4)
-            );
-        }
-
         private readonly Dictionary<ValueTuple<string, ElementType, string>, BaseSignal<StyleColor>> _nonInteractiveColorSignalsCache;
         public BaseSignal<StyleColor> Color(string role, ElementType elementType, string variant = null)
         {
