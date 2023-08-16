@@ -83,6 +83,15 @@ namespace Fiber.UI
         );
         public CreateTreeViewItemDelegate CreateTreeViewItem { get; private set; }
 
+        // TreeView Item group component
+        public delegate BaseComponent CreateTreeViewItemGroupDelegate(
+            List<VirtualNode> children,
+            int identationLevel,
+            string role,
+            BaseSignal<bool> isOpen
+        );
+        public CreateTreeViewItemGroupDelegate CreateTreeViewItemGroup { get; private set; }
+
         // Typography component
         public delegate BaseComponent CreateTypographyDelegate(
             TypographyType type,

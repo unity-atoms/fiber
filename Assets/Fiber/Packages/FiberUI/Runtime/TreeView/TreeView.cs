@@ -192,7 +192,12 @@ namespace Fiber.UI
                         children: F.Children(
                             F.ContextProvider(
                                 value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
-                                children: children
+                                children: F.Children(new VisualItemGroup(
+                                    children: children,
+                                    identationLevel: identationLevel + 1,
+                                    role: _role,
+                                    isOpen: isOpen
+                                ))
                             )
                         )
                     )
@@ -200,6 +205,40 @@ namespace Fiber.UI
             }
         }
 
+        private class VisualItemGroup : BaseComponent
+        {
+            private readonly int _identationLevel;
+            private readonly string _role;
+            private readonly BaseSignal<bool> _isOpen;
+
+            public VisualItemGroup(
+                List<VirtualNode> children,
+                int identationLevel,
+                string role,
+                BaseSignal<bool> isOpen
+            ) : base(children)
+            {
+                _identationLevel = identationLevel;
+                _role = role;
+                _isOpen = isOpen;
+            }
+            public override VirtualNode Render()
+            {
+                var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+                if (overrideVisualComponents?.CreateTreeViewItemGroup != null)
+                {
+                    return overrideVisualComponents.CreateTreeViewItemGroup(
+                        children: children,
+                        identationLevel: _identationLevel,
+                        role: _role,
+                        isOpen: _isOpen
+                    );
+                }
+
+                return F.View(children: children);
+            }
+
+        }
         private class VisualItem : BaseComponent
         {
             private readonly SignalProp<string> _label;
