@@ -53,6 +53,18 @@ namespace Fiber.UI
         }
         public override VirtualNode Render()
         {
+            var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+            if (overrideVisualComponents?.CreateIcon != null)
+            {
+                return overrideVisualComponents.CreateIcon(
+                    type: _type,
+                    role: _role,
+                    variant: _variant,
+                    style: _style,
+                    forwardRef: _forwardRef
+                );
+            }
+
             var themeStore = C<ThemeStore>();
             var role = F.ResolveRole(_role);
             var color = themeStore.Color(role, ElementType.Text, _variant);

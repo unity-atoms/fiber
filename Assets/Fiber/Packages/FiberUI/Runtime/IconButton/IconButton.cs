@@ -14,8 +14,7 @@ namespace Fiber.UI
             Action onPress,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
-            Style style = new(),
-            Ref<TextElement> forwardRef = null
+            Style style = new()
         )
         {
             return new IconButtonComponent(
@@ -52,9 +51,23 @@ namespace Fiber.UI
         }
         public override VirtualNode Render()
         {
+            var interactiveRef = F.CreateInteractiveRef<TextElement>(isDisabled: null, onPress: _onPress);
+
+            var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+            if (overrideVisualComponents?.CreateIconButton != null)
+            {
+                return overrideVisualComponents.CreateIconButton(
+                    type: _type,
+                    onPress: _onPress,
+                    interactiveRef: interactiveRef,
+                    role: _role,
+                    variant: _variant,
+                    style: _style
+                );
+            }
+
             var themeStore = C<ThemeStore>();
             var role = F.ResolveRole(_role);
-            var interactiveRef = F.CreateInteractiveRef<TextElement>(isDisabled: null, onPress: _onPress);
             var color = themeStore.Color(
                 role: role,
                 elementType: ElementType.Text,

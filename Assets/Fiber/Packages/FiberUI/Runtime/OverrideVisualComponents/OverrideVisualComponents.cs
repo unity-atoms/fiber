@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
+using Signals;
 
 namespace Fiber.UI
 {
@@ -38,8 +40,25 @@ namespace Fiber.UI
         public CreateHeaderItemGroupDelegate CreateHeaderItemGroup { get; private set; }
 
         // Icon component
+        public delegate BaseComponent CreateIconDelegate(
+            SignalProp<string> type,
+            string role = Constants.INHERIT_ROLE,
+            string variant = null,
+            Style style = new(),
+            Ref<TextElement> forwardRef = null
+        );
+        public CreateIconDelegate CreateIcon { get; private set; }
 
         // Icon button component
+        public delegate BaseComponent CreateIconButtonDelegate(
+            SignalProp<string> type,
+            Action onPress,
+            InteractiveRef<TextElement> interactiveRef,
+            string role = Constants.INHERIT_ROLE,
+            string variant = null,
+            Style style = new()
+        );
+        public CreateIconButtonDelegate CreateIconButton { get; private set; }
 
         // TreeView component
 
@@ -47,11 +66,15 @@ namespace Fiber.UI
 
         public OverrideVisualComponents(
             CreateHeaderContainerDelegate createHeaderContainer = null,
-            CreateHeaderItemGroupDelegate createHeaderItemGroup = null
+            CreateHeaderItemGroupDelegate createHeaderItemGroup = null,
+            CreateIconDelegate createIcon = null,
+            CreateIconButtonDelegate createIconButton = null
         )
         {
             CreateHeaderContainer = createHeaderContainer;
             CreateHeaderItemGroup = createHeaderItemGroup;
+            CreateIcon = createIcon;
+            CreateIconButton = createIconButton;
         }
     }
 
