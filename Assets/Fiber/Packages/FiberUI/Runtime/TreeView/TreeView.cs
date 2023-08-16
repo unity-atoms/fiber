@@ -166,10 +166,8 @@ namespace Fiber.UI
 
             public override VirtualNode Render()
             {
-                var themeStore = C<ThemeStore>();
-                var role = F.ResolveRole(_role);
                 var context = F.GetContext<SelectedItemIdContext>();
-                var isSelected = F.CreateComputedSignal<string, bool>((selectedItemId) => selectedItemId == _id, context.SelectedItemId);
+                var isSelected = F.CreateComputedSignal((selectedItemId) => selectedItemId == _id, context.SelectedItemId);
                 var isOpen = new Signal<bool>(false);
                 var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLeve;
 
@@ -179,40 +177,15 @@ namespace Fiber.UI
                     isOpen.Value = !isOpen.Value;
                 });
 
-                var color = themeStore.Color(role, ElementType.Text, interactiveElement.IsPressed, interactiveElement.IsHovered, isSelected);
-                var backgroundColor = themeStore.Color(role, ElementType.Background, interactiveElement.IsPressed, interactiveElement.IsHovered, isSelected);
-
-                var iconType = CreateComputedSignal((isOpen) => isOpen ? "chevron-down" : "chevron-right", isOpen);
-
                 return F.Fragment(F.Children(
-                    F.View(
-                        _ref: interactiveElement.Ref,
-                        style: new Style(
-                            backgroundColor: backgroundColor,
-                            display: DisplayStyle.Flex,
-                            flexDirection: FlexDirection.Row,
-                            alignItems: Align.Center,
-                            justifyContent: Justify.SpaceBetween,
-                            paddingLeft: themeStore.Spacing(3 + identationLevel * 2),
-                            paddingTop: themeStore.Spacing(2),
-                            paddingRight: themeStore.Spacing(3),
-                            paddingBottom: themeStore.Spacing(2),
-                            width: new Length(100, LengthUnit.Percent)
-                        ),
-                        pickingMode: PickingMode.Position,
-                        children: F.Children(
-                            F.Typography(
-                                text: _label,
-                                type: TypographyType.Subtitle2,
-                                style: new Style(color: color)
-                            ),
-                            F.Visible(
-                                when: new StaticSignal<bool>(children != null),
-                                children: F.Children(
-                                    F.Icon(type: iconType)
-                                )
-                            )
-                        )
+                    new VisualItem(
+                        label: _label,
+                        identationLevel: identationLevel,
+                        role: _role,
+                        hasSubItems: children != null && children.Count > 0,
+                        interactiveElement: interactiveElement,
+                        isSelected: isSelected,
+                        isOpen: isOpen
                     ),
                     F.Active(
                         when: isOpen,
@@ -224,6 +197,88 @@ namespace Fiber.UI
                         )
                     )
                 ));
+            }
+        }
+
+        private class VisualItem : BaseComponent
+        {
+            private readonly SignalProp<string> _label;
+            private readonly int _identationLevel;
+            private readonly string _role;
+            private readonly bool _hasSubItems;
+            private readonly InteractiveElement _interactiveElement;
+            private readonly BaseSignal<bool> _isSelected;
+            private readonly BaseSignal<bool> _isOpen;
+
+            public VisualItem(
+                SignalProp<string> label,
+                int identationLevel,
+                string role,
+                bool hasSubItems,
+                InteractiveElement interactiveElement,
+                BaseSignal<bool> isSelected,
+                BaseSignal<bool> isOpen
+            ) : base()
+            {
+                _label = label;
+                _identationLevel = identationLevel;
+                _role = role;
+                _hasSubItems = hasSubItems;
+                _interactiveElement = interactiveElement;
+                _isSelected = isSelected;
+                _isOpen = isOpen;
+            }
+            public override VirtualNode Render()
+            {
+                var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+                if (overrideVisualComponents?.CreateTreeViewItem != null)
+                {
+                    return overrideVisualComponents.CreateTreeViewItem(
+                        label: _label,
+                        identationLevel: _identationLevel,
+                        role: _role,
+                        hasSubItems: _hasSubItems,
+                        interactiveElement: _interactiveElement,
+                        isSelected: _isSelected,
+                        isOpen: _isOpen
+                    );
+                }
+
+                var themeStore = C<ThemeStore>();
+                var role = F.ResolveRole(_role);
+
+                var color = themeStore.Color(role, ElementType.Text, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
+                var backgroundColor = themeStore.Color(role, ElementType.Background, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
+
+                var iconType = CreateComputedSignal((isOpen) => isOpen ? "chevron-down" : "chevron-right", _isOpen);
+
+                return F.View(
+                    _ref: _interactiveElement.Ref,
+                    style: new Style(
+                        backgroundColor: backgroundColor,
+                        display: DisplayStyle.Flex,
+                        flexDirection: FlexDirection.Row,
+                        alignItems: Align.Center,
+                        justifyContent: Justify.SpaceBetween,
+                        paddingLeft: themeStore.Spacing(3 + _identationLevel * 2),
+                        paddingTop: themeStore.Spacing(2),
+                        paddingRight: themeStore.Spacing(3),
+                        paddingBottom: themeStore.Spacing(2),
+                        width: new Length(100, LengthUnit.Percent)
+                    ),
+                    pickingMode: PickingMode.Position,
+                    children: F.Children(
+                        F.Typography(
+                            text: _label,
+                            type: TypographyType.Subtitle2,
+                            style: new Style(color: color)
+                        ),
+                        F.Visible(
+                            when: new StaticSignal<bool>(_hasSubItems),
+                            children: F.Children(F.Icon(type: iconType))
+                        )
+                    )
+                );
             }
         }
     }

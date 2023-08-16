@@ -72,6 +72,16 @@ namespace Fiber.UI
 
 
         // TreeView Item component
+        public delegate BaseComponent CreateTreeViewItemDelegate(
+            SignalProp<string> label,
+            int identationLevel,
+            string role,
+            bool hasSubItems,
+            InteractiveElement interactiveElement,
+            BaseSignal<bool> isSelected,
+            BaseSignal<bool> isOpen
+        );
+        public CreateTreeViewItemDelegate CreateTreeViewItem { get; private set; }
 
         // Typography component
         public delegate BaseComponent CreateTypographyDelegate(
@@ -90,6 +100,7 @@ namespace Fiber.UI
             CreateIconDelegate createIcon = null,
             CreateIconButtonDelegate createIconButton = null,
             CreateTreeViewContainerDelegate createTreeViewContainer = null,
+            CreateTreeViewItemDelegate createTreeViewItem = null,
             CreateTypographyDelegate createTypography = null
         )
         {
@@ -98,6 +109,7 @@ namespace Fiber.UI
             CreateIcon = createIcon;
             CreateIconButton = createIconButton;
             CreateTreeViewContainer = createTreeViewContainer;
+            CreateTreeViewItem = createTreeViewItem;
             CreateTypography = createTypography;
         }
     }
