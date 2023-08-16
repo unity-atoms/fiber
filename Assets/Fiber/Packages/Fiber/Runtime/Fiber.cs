@@ -34,7 +34,7 @@ namespace Fiber
         public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children);
         public VirtualNode ContextProvider<C>(List<VirtualNode> children);
         public T GetGlobal<T>();
-        public C GetContext<C>(FiberNode node);
+        public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public NativeNode GetParentNativeNode();
         public void CreateEffect(BaseEffect effect);
         public void CreateEffect(Func<Action> effect);
@@ -92,7 +92,7 @@ namespace Fiber
 
     public interface IEffectAPI
     {
-        public C GetContext<C>(FiberNode node);
+        public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public T GetGlobal<T>();
     }
 
@@ -101,8 +101,8 @@ namespace Fiber
         public IEffectAPI Api { private get; set; }
         public FiberNode FiberNode { private get; set; }
 
-        public C GetContext<C>() => Api.GetContext<C>(FiberNode);
-        public C C<C>() => GetContext<C>();
+        public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
+        public C C<C>(bool throwIfNotFound = true) => GetContext<C>(throwIfNotFound: throwIfNotFound);
         public T GetGlobal<T>() => Api.GetGlobal<T>();
         public T G<T>() => GetGlobal<T>();
 
@@ -567,8 +567,8 @@ namespace Fiber
         public VirtualNode ContextProvider<C>(List<VirtualNode> children) => Api.ContextProvider<C>(children);
         public T GetGlobal<T>() => Api.GetGlobal<T>();
         public T G<T>() => Api.GetGlobal<T>();
-        public C GetContext<C>() => Api.GetContext<C>(FiberNode);
-        public C C<C>() => GetContext<C>();
+        public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
+        public C C<C>(bool throwIfNotFound = true) => GetContext<C>(throwIfNotFound: throwIfNotFound);
         public NativeNode GetParentNativeNode() => Api.GetParentNativeNode();
         public void CreateEffect(BaseEffect effect) => Api.CreateEffect(effect);
         public void CreateEffect(Func<Action> effect) => Api.CreateEffect(effect);
@@ -1558,7 +1558,7 @@ namespace Fiber
             return _contextsAPI.GetContext<C>().ContextProvider(children);
         }
 
-        public C GetContext<C>(FiberNode node)
+        public C GetContext<C>(FiberNode node, bool throwIfNotFound = true)
         {
             var fiberNode = node;
 
@@ -1569,6 +1569,10 @@ namespace Fiber
 
             if (fiberNode == null)
             {
+                if (!throwIfNotFound)
+                {
+                    return default;
+                }
                 throw new Exception($"No context provider of type {typeof(C)} found.");
             }
             return ((ContextProvider<C>)fiberNode.VirtualNode).Value;

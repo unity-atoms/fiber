@@ -58,6 +58,17 @@ namespace Fiber.UI
 
         public override VirtualNode Render()
         {
+            var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+            if (overrideVisualComponents?.CreateHeaderContainer != null)
+            {
+                return overrideVisualComponents.CreateHeaderContainer(
+                    children: children,
+                    role: _role,
+                    variant: _variant,
+                    style: _style
+                );
+            }
+
             var themeStore = C<ThemeStore>();
             var role = F.ResolveRole(_role);
 
@@ -103,6 +114,16 @@ namespace Fiber.UI
 
         public override VirtualNode Render()
         {
+            var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+            if (overrideVisualComponents?.CreateHeaderItemGroup != null)
+            {
+                return overrideVisualComponents.CreateHeaderItemGroup(
+                    children: children,
+                    justifyContent: _justifyContent,
+                    style: _style
+                );
+            }
+
             return F.View(
                 children: children,
                 style: new Style(
