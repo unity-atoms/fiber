@@ -142,20 +142,20 @@ namespace Fiber.UI
                 var isOpen = new Signal<bool>(false);
                 var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLeve;
 
-                var interactiveRef = F.CreateInteractiveRef(isDisabled: null, onPress: () =>
+                var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: () =>
                 {
                     context.OnItemSelected(_id);
                     isOpen.Value = !isOpen.Value;
                 });
 
-                var color = themeStore.Color(role, ElementType.Text, interactiveRef.IsPressed, interactiveRef.IsHovered, isSelected);
-                var backgroundColor = themeStore.Color(role, ElementType.Background, interactiveRef.IsPressed, interactiveRef.IsHovered, isSelected);
+                var color = themeStore.Color(role, ElementType.Text, interactiveElement.IsPressed, interactiveElement.IsHovered, isSelected);
+                var backgroundColor = themeStore.Color(role, ElementType.Background, interactiveElement.IsPressed, interactiveElement.IsHovered, isSelected);
 
                 var iconType = CreateComputedSignal((isOpen) => isOpen ? "chevron-down" : "chevron-right", isOpen);
 
                 return F.Fragment(F.Children(
                     F.View(
-                        _ref: interactiveRef,
+                        _ref: interactiveElement.Ref,
                         style: new Style(
                             backgroundColor: backgroundColor,
                             display: DisplayStyle.Flex,

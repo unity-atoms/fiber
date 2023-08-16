@@ -6,36 +6,38 @@ namespace Fiber.UI
 {
     public static partial class BaseComponentExtensions
     {
-        public static InteractiveRef CreateInteractiveRef(
+        public static InteractiveElement CreateInteractiveElement(
             this BaseComponent component,
+             Ref<VisualElement> _ref = null,
             BaseSignal<bool> isDisabled = null,
             Action onPress = null
         )
         {
-            var interactiveRef = new InteractiveRef(
+            var interactiveElement = new InteractiveElement(
+                _ref: _ref,
                 isDisabled: isDisabled
             );
 
             component.CreateEffect(() =>
             {
-                interactiveRef.Current.RegisterCallback<MouseEnterEvent>(evt =>
+                interactiveElement.Ref.Current.RegisterCallback<MouseEnterEvent>(evt =>
                 {
-                    interactiveRef.IsHovered.Value = true;
+                    interactiveElement.IsHovered.Value = true;
                 });
-                interactiveRef.Current.RegisterCallback<MouseLeaveEvent>(evt =>
+                interactiveElement.Ref.Current.RegisterCallback<MouseLeaveEvent>(evt =>
                 {
-                    interactiveRef.IsHovered.Value = false;
-                    interactiveRef.IsPressed.Value = false;
+                    interactiveElement.IsHovered.Value = false;
+                    interactiveElement.IsPressed.Value = false;
                 });
-                interactiveRef.Current.RegisterCallback<PointerDownEvent>(evt =>
+                interactiveElement.Ref.Current.RegisterCallback<PointerDownEvent>(evt =>
                 {
-                    interactiveRef.IsPressed.Value = true;
+                    interactiveElement.IsPressed.Value = true;
                 });
-                interactiveRef.Current.RegisterCallback<PointerUpEvent>(evt =>
+                interactiveElement.Ref.Current.RegisterCallback<PointerUpEvent>(evt =>
                 {
-                    if (interactiveRef.IsPressed.Value)
+                    if (interactiveElement.IsPressed.Value)
                     {
-                        interactiveRef.IsPressed.Value = false;
+                        interactiveElement.IsPressed.Value = false;
                         if (onPress != null && (isDisabled == null || !isDisabled.Get()))
                         {
                             onPress();
@@ -45,21 +47,24 @@ namespace Fiber.UI
                 return null;
             });
 
-            return interactiveRef;
+            return interactiveElement;
         }
     }
 
-    public class InteractiveRef : Ref<VisualElement>
+    public class InteractiveElement
     {
+        public Ref<VisualElement> Ref { get; private set; }
         public Signal<bool> IsHovered { get; private set; }
         public Signal<bool> IsPressed { get; private set; }
         // IsDisabled will most likely be derived from external state, but can be handled interanlly
         public BaseSignal<bool> IsDisabled { get; private set; }
 
-        public InteractiveRef(
+        public InteractiveElement(
+            Ref<VisualElement> _ref = null,
             BaseSignal<bool> isDisabled = null
         )
         {
+            Ref = _ref ?? new Ref<VisualElement>();
             IsHovered = new Signal<bool>();
             IsPressed = new Signal<bool>();
             IsDisabled = isDisabled;

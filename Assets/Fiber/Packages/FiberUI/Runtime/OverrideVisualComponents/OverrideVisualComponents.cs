@@ -53,10 +53,11 @@ namespace Fiber.UI
         public delegate BaseComponent CreateIconButtonDelegate(
             SignalProp<string> type,
             Action onPress,
-            InteractiveRef interactiveRef,
+            InteractiveElement interactiveRef,
             string role,
             string variant,
-            Style style
+            Style style,
+            Ref<VisualElement> forwardRef
         );
         public CreateIconButtonDelegate CreateIconButton { get; private set; }
 

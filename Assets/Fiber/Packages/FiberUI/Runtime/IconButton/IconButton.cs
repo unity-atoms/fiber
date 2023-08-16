@@ -14,7 +14,8 @@ namespace Fiber.UI
             Action onPress,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
-            Style style = new()
+            Style style = new(),
+            Ref<VisualElement> forwardRef = null
         )
         {
             return new IconButtonComponent(
@@ -22,7 +23,8 @@ namespace Fiber.UI
                 onPress: onPress,
                 role: role,
                 variant: variant,
-                style: style
+                style: style,
+                forwardRef: forwardRef
             );
         }
     }
@@ -34,13 +36,15 @@ namespace Fiber.UI
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
+        private readonly Ref<VisualElement> _forwardRef;
 
         public IconButtonComponent(
             SignalProp<string> type,
             Action onPress,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
-            Style style = new()
+            Style style = new(),
+            Ref<VisualElement> forwardRef = null
         )
         {
             _type = type;
@@ -48,10 +52,11 @@ namespace Fiber.UI
             _role = role;
             _variant = variant;
             _style = style;
+            _forwardRef = forwardRef;
         }
         public override VirtualNode Render()
         {
-            var interactiveRef = F.CreateInteractiveRef(isDisabled: null, onPress: _onPress);
+            var interactiveElement = F.CreateInteractiveElement(_ref: _forwardRef, isDisabled: null, onPress: _onPress);
 
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateIconButton != null)
@@ -59,10 +64,11 @@ namespace Fiber.UI
                 return overrideVisualComponents.CreateIconButton(
                     type: _type,
                     onPress: _onPress,
-                    interactiveRef: interactiveRef,
+                    interactiveRef: interactiveElement,
                     role: _role,
                     variant: _variant,
-                    style: _style
+                    style: _style,
+                    forwardRef: _forwardRef
                 );
             }
 
@@ -71,22 +77,22 @@ namespace Fiber.UI
             var color = themeStore.Color(
                 role: role,
                 elementType: ElementType.Text,
-                isPressed: interactiveRef.IsPressed,
-                isHovered: interactiveRef.IsHovered,
+                isPressed: interactiveElement.IsPressed,
+                isHovered: interactiveElement.IsHovered,
                 isSelected: null,
                 variant: _variant
             );
             var backgroundColor = themeStore.Color(
                 role: role,
                 elementType: ElementType.Background,
-                isPressed: interactiveRef.IsPressed,
-                isHovered: interactiveRef.IsHovered,
+                isPressed: interactiveElement.IsPressed,
+                isHovered: interactiveElement.IsHovered,
                 isSelected: null,
                 variant: _variant
             );
 
             return F.Icon(
-                forwardRef: interactiveRef,
+                forwardRef: interactiveElement.Ref,
                 type: _type,
                 style: new Style(
                     mergedStyle: _style,
