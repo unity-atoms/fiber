@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
 using Fiber.DesignTokens;
@@ -15,14 +14,16 @@ namespace Fiber.UI
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
                 BaseSignal<string> selectedItemId,
-                string role = Constants.INHERIT_ROLE
+                string role = Constants.INHERIT_ROLE,
+                Ref<VisualElement> forwardRef = null
         )
         {
             return new TreeViewComponent.Container(
                 children: children,
                 onItemIdSelected: onItemIdSelected,
                 selectedItemId: selectedItemId,
-                role: role
+                role: role,
+                forwardRef: forwardRef
             );
         }
 
@@ -72,24 +73,24 @@ namespace Fiber.UI
             private readonly Action<string> _onItemIdSelected;
             private readonly BaseSignal<string> _selectedItemId;
             private readonly string _role;
+            private readonly Ref<VisualElement> _forwardRef;
 
             public Container(
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
                 BaseSignal<string> selectedItemId,
-                string role = Constants.INHERIT_ROLE
+                string role = Constants.INHERIT_ROLE,
+                Ref<VisualElement> forwardRef = null
             ) : base(children)
             {
                 _role = role;
                 _onItemIdSelected = onItemIdSelected;
                 _selectedItemId = selectedItemId;
+                _forwardRef = forwardRef;
             }
 
             public override VirtualNode Render()
             {
-                var theme = C<ThemeStore>().Get();
-                var role = F.ResolveRole(_role);
-
                 return F.ContextProvider(
                     value: new SelectedItemIdContext(
                         selectedItemId: _selectedItemId,
@@ -105,13 +106,43 @@ namespace Fiber.UI
                                 F.ContextProvider(
                                     value: new IndentiationLevelContext(indentiationLeve: 0),
                                     children: F.Children(
-                                        F.View(children: children)
+                                        new VisualContainer(children: children, role: _role, forwardRef: _forwardRef)
                                     )
                                 )
                             )
                         )
                     )
                 );
+            }
+        }
+
+        private class VisualContainer : BaseComponent
+        {
+            private readonly string _role;
+            private readonly Ref<VisualElement> _forwardRef;
+
+            public VisualContainer(
+                List<VirtualNode> children,
+                string role = Constants.INHERIT_ROLE,
+                Ref<VisualElement> forwardRef = null
+            ) : base(children)
+            {
+                _role = role;
+                _forwardRef = forwardRef;
+            }
+            public override VirtualNode Render()
+            {
+                var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+                if (overrideVisualComponents?.CreateTreeViewContainer != null)
+                {
+                    return overrideVisualComponents.CreateTreeViewContainer(
+                        children: children,
+                        role: _role,
+                        forwardRef: _forwardRef
+                    );
+                }
+
+                return F.View(_ref: _forwardRef, children: children);
             }
         }
 
@@ -188,9 +219,7 @@ namespace Fiber.UI
                         children: F.Children(
                             F.ContextProvider(
                                 value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
-                                children: F.Children(
-                                    F.View(children: children)
-                                )
+                                children: children
                             )
                         )
                     )

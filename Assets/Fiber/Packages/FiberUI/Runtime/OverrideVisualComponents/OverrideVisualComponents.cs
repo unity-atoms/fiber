@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
+using Fiber.DesignTokens;
 using Signals;
 
 namespace Fiber.UI
@@ -61,21 +62,43 @@ namespace Fiber.UI
         );
         public CreateIconButtonDelegate CreateIconButton { get; private set; }
 
-        // TreeView component
+        // TreeView Container component
+        public delegate BaseComponent CreateTreeViewContainerDelegate(
+            List<VirtualNode> children,
+            string role,
+            Ref<VisualElement> forwardRef
+        );
+        public CreateTreeViewContainerDelegate CreateTreeViewContainer { get; private set; }
+
+
+        // TreeView Item component
 
         // Typography component
+        public delegate BaseComponent CreateTypographyDelegate(
+            TypographyType type,
+            SignalProp<string> text,
+            string role,
+            string variant,
+            Style style,
+            Ref<VisualElement> forwardRef
+        );
+        public CreateTypographyDelegate CreateTypography { get; private set; }
 
         public OverrideVisualComponents(
             CreateHeaderContainerDelegate createHeaderContainer = null,
             CreateHeaderItemGroupDelegate createHeaderItemGroup = null,
             CreateIconDelegate createIcon = null,
-            CreateIconButtonDelegate createIconButton = null
+            CreateIconButtonDelegate createIconButton = null,
+            CreateTreeViewContainerDelegate createTreeViewContainer = null,
+            CreateTypographyDelegate createTypography = null
         )
         {
             CreateHeaderContainer = createHeaderContainer;
             CreateHeaderItemGroup = createHeaderItemGroup;
             CreateIcon = createIcon;
             CreateIconButton = createIconButton;
+            CreateTreeViewContainer = createTreeViewContainer;
+            CreateTypography = createTypography;
         }
     }
 

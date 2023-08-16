@@ -14,11 +14,12 @@ namespace Fiber.UI
     {
         public static TypographyComponent Typography(
             this BaseComponent component,
-                TypographyType type,
-                SignalProp<string> text = new(),
-                string role = Constants.INHERIT_ROLE,
-                string variant = null,
-                Style style = new()
+            TypographyType type,
+            SignalProp<string> text = new(),
+            string role = Constants.INHERIT_ROLE,
+            string variant = null,
+            Style style = new(),
+            Ref<VisualElement> forwardRef = null
         )
         {
             return new TypographyComponent(
@@ -26,7 +27,8 @@ namespace Fiber.UI
                 text: text,
                 role: role,
                 variant: variant,
-                style: style
+                style: style,
+                forwardRef: forwardRef
             );
         }
     }
@@ -37,13 +39,15 @@ namespace Fiber.UI
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
+        private readonly Ref<VisualElement> _forwardRef;
 
         public TypographyComponent(
             TypographyType type,
             SignalProp<string> text = new(),
             string role = Constants.INHERIT_ROLE,
             string variant = null,
-            Style style = new()
+            Style style = new(),
+            Ref<VisualElement> forwardRef = null
         )
         {
             _type = type;
@@ -51,14 +55,29 @@ namespace Fiber.UI
             _role = role;
             _variant = variant;
             _style = style;
+            _forwardRef = forwardRef;
         }
 
         public override VirtualNode Render()
         {
+            var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+            if (overrideVisualComponents?.CreateTypography != null)
+            {
+                return overrideVisualComponents.CreateTypography(
+                    type: _type,
+                    text: _text,
+                    role: _role,
+                    variant: _variant,
+                    style: _style,
+                    forwardRef: _forwardRef
+                );
+            }
+
             var themeStore = C<ThemeStore>();
             var role = F.ResolveRole(_role);
 
             return F.Text(
+                _ref: _forwardRef,
                 text: _text,
                 style: new Style(
                     mergedStyle: _style,
