@@ -27,25 +27,25 @@ namespace Fiber.UI
         public delegate BaseComponent CreateHeaderContainerDelegate(
             List<VirtualNode> children,
             string role,
-            string variant = null,
-            Style style = new()
+            string variant,
+            Style style
         );
         public CreateHeaderContainerDelegate CreateHeaderContainer { get; private set; }
 
         public delegate BaseComponent CreateHeaderItemGroupDelegate(
             List<VirtualNode> children,
-            Justify justifyContent = Justify.FlexStart,
-            Style style = new()
+            Justify justifyContent,
+            Style style
         );
         public CreateHeaderItemGroupDelegate CreateHeaderItemGroup { get; private set; }
 
         // Icon component
         public delegate BaseComponent CreateIconDelegate(
             SignalProp<string> type,
-            string role = Constants.INHERIT_ROLE,
-            string variant = null,
-            Style style = new(),
-            Ref<TextElement> forwardRef = null
+            string role,
+            string variant,
+            Style style,
+            Ref<TextElement> forwardRef
         );
         public CreateIconDelegate CreateIcon { get; private set; }
 
@@ -54,9 +54,9 @@ namespace Fiber.UI
             SignalProp<string> type,
             Action onPress,
             InteractiveRef<TextElement> interactiveRef,
-            string role = Constants.INHERIT_ROLE,
-            string variant = null,
-            Style style = new()
+            string role,
+            string variant,
+            Style style
         );
         public CreateIconButtonDelegate CreateIconButton { get; private set; }
 
