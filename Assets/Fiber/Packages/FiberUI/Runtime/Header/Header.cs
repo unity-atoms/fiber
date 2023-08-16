@@ -22,6 +22,20 @@ namespace Fiber.UI
                 style: style
             );
         }
+
+        public static HeaderItemGroupComponent HeaderItemGroup(
+            this BaseComponent component,
+            List<VirtualNode> children,
+            Justify justifyContent = Justify.FlexStart,
+            Style style = new()
+        )
+        {
+            return new HeaderItemGroupComponent(
+                children: children,
+                justifyContent: justifyContent,
+                style: style
+            );
+        }
     }
 
     public class HeaderComponent : BaseComponent
@@ -56,11 +70,49 @@ namespace Fiber.UI
                             mergedStyle: _style,
                             width: new Length(100, LengthUnit.Percent),
                             height: themeStore.Spacing(13),
+                            paddingLeft: themeStore.Spacing(4),
+                            paddingRight: themeStore.Spacing(4),
+                            backgroundColor: themeStore.Color(role, ElementType.Background, _variant),
+                            display: DisplayStyle.Flex,
                             flexGrow: 0,
                             flexShrink: 0,
-                            backgroundColor: themeStore.Color(role, ElementType.Background, _variant)
+                            flexDirection: FlexDirection.Row,
+                            alignItems: Align.Center,
+                            justifyContent: Justify.SpaceBetween
                         )
                     )
+                )
+            );
+        }
+    }
+
+    public class HeaderItemGroupComponent : BaseComponent
+    {
+        private readonly Style _style;
+        private readonly Justify _justifyContent;
+
+        public HeaderItemGroupComponent(
+            List<VirtualNode> children,
+            Justify justifyContent = Justify.FlexStart,
+            Style style = new()
+        ) : base(children)
+        {
+            _justifyContent = justifyContent;
+            _style = style;
+        }
+
+        public override VirtualNode Render()
+        {
+            return F.View(
+                children: children,
+                style: new Style(
+                    mergedStyle: _style,
+                    display: DisplayStyle.Flex,
+                    flexGrow: 1,
+                    flexShrink: 1,
+                    flexDirection: FlexDirection.Row,
+                    alignItems: Align.Center,
+                    justifyContent: _justifyContent
                 )
             );
         }

@@ -16,37 +16,27 @@ public class DocsHeaderComponent : BaseComponent
         var iconType = new Signal<string>("sun");
 
         return F.Header(children: F.Children(
-            F.View(
-                style: new Style(
-                    display: DisplayStyle.Flex,
-                    flexDirection: FlexDirection.Row,
-                    alignItems: Align.Center,
-                    justifyContent: Justify.SpaceBetween,
-                    paddingLeft: themeStore.Spacing(4),
-                    paddingRight: themeStore.Spacing(4),
-                    width: new Length(100, LengthUnit.Percent),
-                    height: new Length(100, LengthUnit.Percent)
-                ),
-                children: F.Children(
-                    F.Typography(
-                        text: "fiber",
-                        type: TypographyType.Heading3
-                    ),
-                    F.IconButton(type: iconType, onPress: () =>
-                    {
-                        if (themeStore.Value == DocsThemes.LIGHT_THEME)
-                        {
-                            themeStore.Value = DocsThemes.DARK_THEME;
-                            iconType.Value = "sun";
-                        }
-                        else
-                        {
-                            themeStore.Value = DocsThemes.LIGHT_THEME;
-                            iconType.Value = "moon";
-                        }
-                    })
+            F.HeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
+                F.Typography(
+                    text: "fiber",
+                    type: TypographyType.Heading3
                 )
-            )
+            )),
+            F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
+                F.IconButton(type: iconType, onPress: () =>
+                {
+                    if (themeStore.Value == DocsThemes.LIGHT_THEME)
+                    {
+                        themeStore.Value = DocsThemes.DARK_THEME;
+                        iconType.Value = "sun";
+                    }
+                    else
+                    {
+                        themeStore.Value = DocsThemes.LIGHT_THEME;
+                        iconType.Value = "moon";
+                    }
+                })
+            ))
         ));
     }
 }
