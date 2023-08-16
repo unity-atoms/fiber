@@ -51,7 +51,7 @@ namespace Fiber.UI
         }
         public override VirtualNode Render()
         {
-            var interactiveRef = F.CreateInteractiveRef<TextElement>(isDisabled: null, onPress: _onPress);
+            var interactiveRef = F.CreateInteractiveRef(isDisabled: null, onPress: _onPress);
 
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateIconButton != null)

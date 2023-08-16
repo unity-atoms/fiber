@@ -6,13 +6,13 @@ namespace Fiber.UI
 {
     public static partial class BaseComponentExtensions
     {
-        public static InteractiveRef<T> CreateInteractiveRef<T>(
+        public static InteractiveRef CreateInteractiveRef(
             this BaseComponent component,
             BaseSignal<bool> isDisabled = null,
             Action onPress = null
-        ) where T : VisualElement
+        )
         {
-            var interactiveRef = new InteractiveRef<T>(
+            var interactiveRef = new InteractiveRef(
                 isDisabled: isDisabled
             );
 
@@ -49,7 +49,7 @@ namespace Fiber.UI
         }
     }
 
-    public class InteractiveRef<T> : Ref<T>
+    public class InteractiveRef : Ref<VisualElement>
     {
         public Signal<bool> IsHovered { get; private set; }
         public Signal<bool> IsPressed { get; private set; }

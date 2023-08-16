@@ -70,8 +70,10 @@ namespace Fiber.UIElements
             SignalProp<string> name = new(),
             SignalProp<PickingMode> pickingMode = new(),
             EventCallback<ClickEvent> onClick = null,
-            Ref<ScrollView> _ref = null,
-            Action<ScrollView> onCreateRef = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
+            Ref<ScrollView> scrollRef = null,
+            Action<ScrollView> onCreateScrollRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         )
@@ -83,6 +85,8 @@ namespace Fiber.UIElements
                 onClick: onClick,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
+                scrollRef: scrollRef,
+                onCreateScrollRef: onCreateScrollRef,
                 className: className,
                 children: children
             );
@@ -95,9 +99,11 @@ namespace Fiber.UIElements
             SignalProp<PickingMode> pickingMode = new(),
             SignalProp<string> text = new(),
             EventCallback<ClickEvent> onClick = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
             EventCallback<KeyDownEvent> onKeyDown = null,
-            Ref<Button> _ref = null,
-            Action<Button> onCreateRef = null,
+            Ref<Button> buttonRef = null,
+            Action<Button> onCreateButtonRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         )
@@ -108,9 +114,11 @@ namespace Fiber.UIElements
                 pickingMode: pickingMode,
                 text: text,
                 onClick: onClick,
-                onKeyDown: onKeyDown,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
+                onKeyDown: onKeyDown,
+                buttonRef: buttonRef,
+                onCreateButtonRef: onCreateButtonRef,
                 className: className,
                 children: children
             );
@@ -123,8 +131,10 @@ namespace Fiber.UIElements
             SignalProp<PickingMode> pickingMode = new(),
             SignalProp<string> text = new(),
             EventCallback<ClickEvent> onClick = null,
-            Ref<TextElement> _ref = null,
-            Action<TextElement> onCreateRef = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
+            Ref<TextElement> textRef = null,
+            Action<TextElement> onCreateTextRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         )
@@ -137,6 +147,8 @@ namespace Fiber.UIElements
                 onClick: onClick,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
+                textRef: textRef,
+                onCreateTextRef: onCreateTextRef,
                 className: className,
                 children: children
             );
@@ -150,9 +162,11 @@ namespace Fiber.UIElements
             SignalProp<string> value = new(),
             EventCallback<ChangeEvent<string>> onChange = null,
             EventCallback<ClickEvent> onClick = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
             EventCallback<KeyDownEvent> onKeyDown = null,
-            Ref<TextField> _ref = null,
-            Action<TextField> onCreateRef = null,
+            Ref<TextField> textFieldRef = null,
+            Action<TextField> onCreateTextFieldRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         )
@@ -164,9 +178,11 @@ namespace Fiber.UIElements
                 value: value,
                 onChange: onChange,
                 onClick: onClick,
-                onKeyDown: onKeyDown,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
+                onKeyDown: onKeyDown,
+                textFieldRef: textFieldRef,
+                onCreateTextFieldRef: onCreateTextFieldRef,
                 className: className,
                 children: children
             );
@@ -234,16 +250,18 @@ namespace Fiber.UIElements
 
     public class ScrollViewComponent : ViewComponent
     {
-        public new Ref<ScrollView> Ref { get; set; }
-        public new Action<ScrollView> OnCreateRef { get; set; }
+        public Ref<ScrollView> ScrollRef { get; set; }
+        public Action<ScrollView> OnCreateScrollRef { get; set; }
 
         public ScrollViewComponent(
             SignalProp<Style> style = new(),
             SignalProp<string> name = new(),
             SignalProp<PickingMode> pickingMode = new(),
             EventCallback<ClickEvent> onClick = null,
-            Ref<ScrollView> _ref = null,
-            Action<ScrollView> onCreateRef = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
+            Ref<ScrollView> scrollRef = null,
+            Action<ScrollView> onCreateScrollRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         ) : base(
@@ -251,20 +269,22 @@ namespace Fiber.UIElements
                 name: name,
                 pickingMode: !pickingMode.IsEmpty ? pickingMode : UnityEngine.UIElements.PickingMode.Position,
                 onClick: onClick,
+                _ref: _ref,
+                onCreateRef: onCreateRef,
                 className: className,
                 children: children
             )
         {
-            Ref = _ref;
-            OnCreateRef = onCreateRef;
+            ScrollRef = scrollRef;
+            OnCreateScrollRef = onCreateScrollRef;
         }
     }
 
     public class ButtonComponent : ViewComponent
     {
         public SignalProp<string> Text { get; private set; }
-        public new Ref<Button> Ref { get; private set; }
-        public new Action<Button> OnCreateRef { get; private set; }
+        public Ref<Button> ButtonRef { get; private set; }
+        public Action<Button> OnCreateButtonRef { get; private set; }
         public EventCallback<KeyDownEvent> OnKeyDown { get; private set; }
 
         public ButtonComponent(
@@ -273,9 +293,11 @@ namespace Fiber.UIElements
             SignalProp<PickingMode> pickingMode = new(),
             SignalProp<string> text = new(),
             EventCallback<ClickEvent> onClick = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
             EventCallback<KeyDownEvent> onKeyDown = null,
-            Ref<Button> _ref = null,
-            Action<Button> onCreateRef = null,
+            Ref<Button> buttonRef = null,
+            Action<Button> onCreateButtonRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         ) : base(
@@ -283,13 +305,15 @@ namespace Fiber.UIElements
                 name: name,
                 pickingMode: !pickingMode.IsEmpty ? pickingMode : UnityEngine.UIElements.PickingMode.Position,
                 onClick: onClick,
+                _ref: _ref,
+                onCreateRef: onCreateRef,
                 className: className,
                 children: children
             )
         {
             Text = text;
-            Ref = _ref;
-            OnCreateRef = onCreateRef;
+            ButtonRef = buttonRef;
+            OnCreateButtonRef = onCreateButtonRef;
             OnKeyDown = onKeyDown;
         }
     }
@@ -297,8 +321,8 @@ namespace Fiber.UIElements
     public class TextComponent : ViewComponent
     {
         public SignalProp<string> Text { get; set; }
-        public new Ref<TextElement> Ref { get; set; }
-        public new Action<TextElement> OnCreateRef { get; set; }
+        public Ref<TextElement> TextRef { get; set; }
+        public Action<TextElement> OnCreateTextRef { get; set; }
 
         public TextComponent(
             SignalProp<Style> style = new(),
@@ -306,8 +330,10 @@ namespace Fiber.UIElements
             SignalProp<PickingMode> pickingMode = new(),
             SignalProp<string> text = new(),
             EventCallback<ClickEvent> onClick = null,
-            Ref<TextElement> _ref = null,
-            Action<TextElement> onCreateRef = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
+            Ref<TextElement> textRef = null,
+            Action<TextElement> onCreateTextRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         ) : base(
@@ -315,13 +341,15 @@ namespace Fiber.UIElements
                 name: name,
                 pickingMode: !pickingMode.IsEmpty ? pickingMode : UnityEngine.UIElements.PickingMode.Position,
                 onClick: onClick,
+                _ref: _ref,
+                onCreateRef: onCreateRef,
                 className: className,
                 children: children
             )
         {
             Text = text;
-            Ref = _ref;
-            OnCreateRef = onCreateRef;
+            TextRef = textRef;
+            OnCreateTextRef = onCreateTextRef;
         }
     }
 
@@ -330,8 +358,8 @@ namespace Fiber.UIElements
         public SignalProp<string> Value { get; set; }
         public EventCallback<ChangeEvent<string>> OnChange { get; set; }
         public EventCallback<KeyDownEvent> OnKeyDown { get; set; }
-        public new Ref<TextField> Ref { get; set; }
-        public new Action<TextField> OnCreateRef { get; set; }
+        public Ref<TextField> TextFieldRef { get; set; }
+        public Action<TextField> OnCreateTextFieldRef { get; set; }
 
         public TextFieldComponent(
             SignalProp<Style> style = new(),
@@ -340,9 +368,11 @@ namespace Fiber.UIElements
             SignalProp<string> value = new(),
             EventCallback<ChangeEvent<string>> onChange = null,
             EventCallback<ClickEvent> onClick = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
             EventCallback<KeyDownEvent> onKeyDown = null,
-            Ref<TextField> _ref = null,
-            Action<TextField> onCreateRef = null,
+            Ref<TextField> textFieldRef = null,
+            Action<TextField> onCreateTextFieldRef = null,
             SignalProp<List<string>> className = new(),
             List<VirtualNode> children = null
         ) : base(
@@ -350,6 +380,8 @@ namespace Fiber.UIElements
                 name: name,
                 pickingMode: !pickingMode.IsEmpty ? pickingMode : UnityEngine.UIElements.PickingMode.Position,
                 onClick: onClick,
+                _ref: _ref,
+                onCreateRef: onCreateRef,
                 className: className,
                 children: children
             )
@@ -357,8 +389,8 @@ namespace Fiber.UIElements
             Value = value;
             OnChange = onChange;
             OnKeyDown = onKeyDown;
-            Ref = _ref;
-            OnCreateRef = onCreateRef;
+            TextFieldRef = textFieldRef;
+            OnCreateTextFieldRef = onCreateTextFieldRef;
         }
     }
 
@@ -401,8 +433,8 @@ namespace Fiber.UIElements
         {
             TextFieldElementInstance = instance;
 
-            if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            if (virtualNode.OnCreateRef != null) virtualNode.OnCreateRef(instance);
+            if (virtualNode.TextFieldRef != null) virtualNode.TextFieldRef.Current = instance;
+            if (virtualNode.OnCreateTextFieldRef != null) virtualNode.OnCreateTextFieldRef(instance);
             if (!virtualNode.Value.IsEmpty)
             {
                 TextFieldElementInstance.value = virtualNode.Value.Get();
@@ -437,8 +469,8 @@ namespace Fiber.UIElements
         {
             TextElementInstance = instance;
 
-            if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            virtualNode.OnCreateRef?.Invoke(instance);
+            if (virtualNode.TextRef != null) virtualNode.TextRef.Current = instance;
+            virtualNode.OnCreateTextRef?.Invoke(instance);
             if (!virtualNode.Text.IsEmpty)
             {
                 TextElementInstance.text = virtualNode.Text.Get();
@@ -477,8 +509,8 @@ namespace Fiber.UIElements
         {
             ButtonInstance = instance;
 
-            if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            if (virtualNode.OnCreateRef != null) virtualNode.OnCreateRef(instance);
+            if (virtualNode.ButtonRef != null) virtualNode.ButtonRef.Current = instance;
+            if (virtualNode.OnCreateButtonRef != null) virtualNode.OnCreateButtonRef(instance);
             if (!virtualNode.Text.IsEmpty)
             {
                 ButtonInstance.text = virtualNode.Text.Get();

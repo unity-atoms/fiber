@@ -45,7 +45,7 @@ namespace Fiber.UI
             string role,
             string variant,
             Style style,
-            Ref<TextElement> forwardRef
+            Ref<VisualElement> forwardRef
         );
         public CreateIconDelegate CreateIcon { get; private set; }
 
@@ -53,7 +53,7 @@ namespace Fiber.UI
         public delegate BaseComponent CreateIconButtonDelegate(
             SignalProp<string> type,
             Action onPress,
-            InteractiveRef<TextElement> interactiveRef,
+            InteractiveRef interactiveRef,
             string role,
             string variant,
             Style style

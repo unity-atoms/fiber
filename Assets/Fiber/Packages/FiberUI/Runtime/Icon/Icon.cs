@@ -16,7 +16,7 @@ namespace Fiber.UI
             string role = Constants.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
-            Ref<TextElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null
         )
         {
             return new IconComponent(
@@ -35,14 +35,14 @@ namespace Fiber.UI
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
-        private readonly Ref<TextElement> _forwardRef;
+        private readonly Ref<VisualElement> _forwardRef;
 
         public IconComponent(
             SignalProp<string> type,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
-            Ref<TextElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null
         )
         {
             _type = type;

@@ -142,7 +142,7 @@ namespace Fiber.UI
                 var isOpen = new Signal<bool>(false);
                 var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLeve;
 
-                var interactiveRef = F.CreateInteractiveRef<VisualElement>(isDisabled: null, onPress: () =>
+                var interactiveRef = F.CreateInteractiveRef(isDisabled: null, onPress: () =>
                 {
                     context.OnItemSelected(_id);
                     isOpen.Value = !isOpen.Value;

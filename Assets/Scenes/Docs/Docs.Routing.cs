@@ -23,16 +23,42 @@ public static class DocsRouting
         public const string UI = "ui";
     }
 
+    // TODO: Remove. For testing purposes only
+    private class IconOverrideComponent : BaseComponent
+    {
+        private readonly Ref<VisualElement> _forwardRef;
+        public IconOverrideComponent(
+            Ref<VisualElement> forwardRef
+        )
+        {
+            _forwardRef = forwardRef;
+        }
+
+        public override VirtualNode Render()
+        {
+            return F.Text(_ref: _forwardRef, style: new Style(
+                height: 20,
+                width: 20,
+                backgroundColor: Color.red
+            ));
+        }
+    }
+
     public class RootComponent : BaseComponent
     {
         public override VirtualNode Render()
         {
-            return new DocsThemes.Provider(children: F.Children(
-                F.UIDocument(
-                    name: "DocsRootDocument",
-                    children: F.Children(new MainLayoutComponent())
-                )
-            ));
+            return F.OverrideVisualComponentsProvider(
+                overrideVisualComponents: new OverrideVisualComponents(),
+                children: F.Children(new DocsThemes.Provider(
+                    children: F.Children(
+                        F.UIDocument(
+                            name: "DocsRootDocument",
+                            children: F.Children(new MainLayoutComponent())
+                        )
+                    )
+                ))
+            );
         }
     }
 
