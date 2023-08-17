@@ -68,10 +68,12 @@ namespace Fiber.UI
             var themeStore = C<ThemeStore>();
             var role = F.ResolveRole(_role);
             var color = themeStore.Color(role, ElementType.Text, _variant);
-            var fontAwesome = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
+            var fontAwesomeSolid = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
+            var fontAwesomeBrands = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-brands");
 
             var iconNameSignal = F.WrapSignalProp(_iconName);
             var iconUnicode = CreateComputedSignal((iconName) => FontAwesomeUtils.IconNameToUnicode(iconName), iconNameSignal);
+            var font = CreateComputedSignal((iconName) => FontAwesomeUtils.IsBrandsIcon(iconName) ? new StyleFont(fontAwesomeBrands) : new StyleFont(fontAwesomeSolid), iconNameSignal);
 
             return F.Text(
                 _ref: _forwardRef,
@@ -79,9 +81,10 @@ namespace Fiber.UI
                 style: new Style(
                     mergedStyle: _style,
                     color: color,
-                    unityFont: fontAwesome,
+                    unityFont: font,
                     unityFontDefinition: StyleKeyword.None,
-                    fontSize: 12
+                    unityTextAlign: TextAnchor.MiddleCenter,
+                    fontSize: themeStore.Spacing(3)
                 )
             );
         }

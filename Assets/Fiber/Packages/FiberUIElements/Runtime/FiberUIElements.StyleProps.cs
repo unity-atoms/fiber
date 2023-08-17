@@ -880,6 +880,48 @@ namespace Fiber.UIElements
         public StyleRotate Get() => WorkLoopSignalProp.Get();
     }
 
+    public struct TextAnchorProp
+    {
+        public SignalProp<StyleEnum<TextAnchor>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public TextAnchorProp(StyleEnum<TextAnchor> value)
+        {
+            SignalProp = value;
+        }
+
+        public TextAnchorProp(BaseSignal<StyleEnum<TextAnchor>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator TextAnchorProp(TextAnchor value)
+        {
+            return new TextAnchorProp(value);
+        }
+
+        public static implicit operator TextAnchorProp(StyleKeyword keyword)
+        {
+            return new TextAnchorProp(keyword);
+        }
+
+        public StyleEnum<TextAnchor> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopTextAnchorProp
+    {
+        public WorkLoopSignalProp<StyleEnum<TextAnchor>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopTextAnchorProp(TextAnchorProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleEnum<TextAnchor> Get() => WorkLoopSignalProp.Get();
+    }
+
     public struct Style
     {
         public PositionProp Position { get; private set; }
@@ -926,6 +968,7 @@ namespace Fiber.UIElements
         public StyleFontDefinitionProp UnityFontDefinition { get; private set; }
         public FontStyleProp UnityFontStyle { get; private set; }
         public StyleLengthProp UnityParagraphSpacing { get; private set; }
+        public TextAnchorProp UnityTextAlign { get; private set; }
         public StylePropertyNamesProp TransitionProperty { get; private set; }
         public TimeValuesProp TransitionDelay { get; private set; }
         public TimeValuesProp TransitionDuration { get; private set; }
@@ -980,6 +1023,7 @@ namespace Fiber.UIElements
             StyleFontDefinitionProp unityFontDefinition = new(),
             FontStyleProp unityFontStyle = new(),
             StyleLengthProp unityParagraphSpacing = new(),
+            TextAnchorProp unityTextAlign = new(),
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
@@ -1034,6 +1078,7 @@ namespace Fiber.UIElements
             UnityFontDefinition = unityFontDefinition;
             UnityFontStyle = unityFontStyle;
             UnityParagraphSpacing = unityParagraphSpacing;
+            UnityTextAlign = unityTextAlign;
             TransitionProperty = transitionProperty;
             TransitionDelay = transitionDelay;
             TransitionDuration = transitionDuration;
@@ -1090,6 +1135,7 @@ namespace Fiber.UIElements
             StyleFontDefinitionProp unityFontDefinition = new(),
             FontStyleProp unityFontStyle = new(),
             StyleLengthProp unityParagraphSpacing = new(),
+            TextAnchorProp unityTextAlign = new(),
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
@@ -1144,6 +1190,7 @@ namespace Fiber.UIElements
             UnityFontDefinition = mergedStyle.UnityFontDefinition.IsEmpty ? unityFontDefinition : mergedStyle.UnityFontDefinition;
             UnityFontStyle = mergedStyle.UnityFontStyle.IsEmpty ? unityFontStyle : mergedStyle.UnityFontStyle;
             UnityParagraphSpacing = mergedStyle.UnityParagraphSpacing.IsEmpty ? unityParagraphSpacing : mergedStyle.UnityParagraphSpacing;
+            UnityTextAlign = mergedStyle.UnityTextAlign.IsEmpty ? unityTextAlign : mergedStyle.UnityTextAlign;
             TransitionProperty = mergedStyle.TransitionProperty.IsEmpty ? transitionProperty : mergedStyle.TransitionProperty;
             TransitionDelay = mergedStyle.TransitionDelay.IsEmpty ? transitionDelay : mergedStyle.TransitionDelay;
             TransitionDuration = mergedStyle.TransitionDuration.IsEmpty ? transitionDuration : mergedStyle.TransitionDuration;

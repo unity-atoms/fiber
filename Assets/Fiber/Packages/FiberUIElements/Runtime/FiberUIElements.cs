@@ -583,6 +583,7 @@ namespace Fiber.UIElements
         private WorkLoopStyleFontDefinitionProp _unityFontDefinitionWorkLoopItem;
         private WorkLoopFontStyleProp _unityFontStyleWorkLoopItem;
         private WorkLoopStyleLengthProp _unityParagraphSpacingWorkLoopItem;
+        private WorkLoopTextAnchorProp _unityTextAlignWorkLoopItem;
         private WorkLoopStylePropertyNamesProp _transitionPropertyWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDelayWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDurationWorkLoopItem;
@@ -961,6 +962,14 @@ namespace Fiber.UIElements
                     if (isStyleValue)
                     {
                         _unityParagraphSpacingWorkLoopItem = new(style.UnityParagraphSpacing);
+                    }
+                }
+                if (!style.UnityTextAlign.IsEmpty)
+                {
+                    Instance.style.unityTextAlign = style.UnityTextAlign.Get();
+                    if (isStyleValue)
+                    {
+                        _unityTextAlignWorkLoopItem = new(style.UnityTextAlign);
                     }
                 }
                 if (!style.TransitionProperty.IsEmpty)
@@ -1547,6 +1556,15 @@ namespace Fiber.UIElements
                     Instance.style.unityParagraphSpacing = StyleKeyword.Initial;
                 }
 
+                if (!style.UnityTextAlign.IsEmpty)
+                {
+                    Instance.style.unityTextAlign = style.UnityTextAlign.Get();
+                }
+                else if (!_lastStyleFromSignal.UnityTextAlign.IsEmpty)
+                {
+                    Instance.style.unityTextAlign = StyleKeyword.Initial;
+                }
+
                 if (!style.TransitionProperty.IsEmpty)
                 {
                     Instance.style.transitionProperty = style.TransitionProperty.Get();
@@ -1798,6 +1816,10 @@ namespace Fiber.UIElements
                 if (_unityParagraphSpacingWorkLoopItem.Check())
                 {
                     Instance.style.unityParagraphSpacing = _unityParagraphSpacingWorkLoopItem.Get();
+                }
+                if (_unityTextAlignWorkLoopItem.Check())
+                {
+                    Instance.style.unityTextAlign = _unityTextAlignWorkLoopItem.Get();
                 }
                 if (_transitionPropertyWorkLoopItem.Check())
                 {

@@ -23,6 +23,8 @@ public class DocsHeaderComponent : BaseComponent
                 )
             )),
             F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
+                F.IconButton(iconName: "github", onPress: () => { }),
+                F.IconButton(iconName: "discord", onPress: () => { }),
                 F.IconButton(iconName: iconName, onPress: () =>
                 {
                     if (themeStore.Value == DocsThemes.LIGHT_THEME)
