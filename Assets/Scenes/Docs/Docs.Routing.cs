@@ -75,6 +75,18 @@ public static class DocsRouting
                 return route?.Id;
             }, router);
 
+            var expandedItemIds = new ShallowSignalList<string>();
+            F.CreateEffect((router) =>
+            {
+                expandedItemIds.Clear();
+                for (var i = 0; i < router.RouteStack.Count; ++i)
+                {
+                    var route = router.RouteStack[i];
+                    expandedItemIds.Add(route.Id);
+                }
+                return null;
+            }, router);
+
             var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
             var deepBorderColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Border);
 
@@ -120,6 +132,7 @@ public static class DocsRouting
                                     {
                                         router.Navigate(id);
                                     },
+                                    expandedItemIds: expandedItemIds,
                                     children: F.Children(
                                         F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
                                         F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation"),
@@ -168,17 +181,20 @@ public static class DocsRouting
             new RouteDefinition(
                 id: ROUTES.PACKAGES,
                 isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new HeadingComponent("Packages"))
-            ),
-            new RouteDefinition(
-                id: ROUTES.ROUTER,
-                isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new HeadingComponent("Router"))
-            ),
-            new RouteDefinition(
-                id: ROUTES.UI,
-                isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new HeadingComponent("UI"))
+                component: new SimpleRouteComponent(component: new DocsPackagesPageComponent()),
+                children: new List<RouteDefinition>()
+                {
+                    new RouteDefinition(
+                        id: ROUTES.ROUTER,
+                        isLayoutRoute: false,
+                        component: new SimpleRouteComponent(component: new HeadingComponent("Router"))
+                    ),
+                    new RouteDefinition(
+                        id: ROUTES.UI,
+                        isLayoutRoute: false,
+                        component: new SimpleRouteComponent(component: new HeadingComponent("UI"))
+                    ),
+                }
             ),
         }
     );

@@ -14,6 +14,7 @@ namespace Fiber.UI
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
                 BaseSignal<string> selectedItemId,
+                ShallowSignalList<string> expandedItemIds,
                 string role = Constants.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
         )
@@ -22,6 +23,7 @@ namespace Fiber.UI
                 children: children,
                 onItemIdSelected: onItemIdSelected,
                 selectedItemId: selectedItemId,
+                expandedItemIds: expandedItemIds,
                 role: role,
                 forwardRef: forwardRef
             );
@@ -48,23 +50,29 @@ namespace Fiber.UI
     {
         private class IndentiationLevelContext
         {
-            public int IndentiationLeve;
+            public int IndentiationLevel;
 
             public IndentiationLevelContext(int indentiationLeve)
             {
-                IndentiationLeve = indentiationLeve;
+                IndentiationLevel = indentiationLeve;
             }
         }
 
-        private class SelectedItemIdContext
+        private class TreeViewStateContext
         {
             public BaseSignal<string> SelectedItemId;
             public Action<string> OnItemSelected;
+            public ShallowSignalList<string> ExapndedItemIds;
 
-            public SelectedItemIdContext(BaseSignal<string> selectedItemId, Action<string> onItemIdSelected)
+            public TreeViewStateContext(
+                BaseSignal<string> selectedItemId,
+                Action<string> onItemIdSelected,
+                ShallowSignalList<string> expandedItemIds
+            )
             {
                 SelectedItemId = selectedItemId;
                 OnItemSelected = onItemIdSelected;
+                ExapndedItemIds = expandedItemIds;
             }
         }
 
@@ -72,6 +80,7 @@ namespace Fiber.UI
         {
             private readonly Action<string> _onItemIdSelected;
             private readonly BaseSignal<string> _selectedItemId;
+            private readonly ShallowSignalList<string> _expandedItemIds;
             private readonly string _role;
             private readonly Ref<VisualElement> _forwardRef;
 
@@ -79,6 +88,7 @@ namespace Fiber.UI
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
                 BaseSignal<string> selectedItemId,
+                ShallowSignalList<string> expandedItemIds,
                 string role = Constants.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
@@ -86,18 +96,20 @@ namespace Fiber.UI
                 _role = role;
                 _onItemIdSelected = onItemIdSelected;
                 _selectedItemId = selectedItemId;
+                _expandedItemIds = expandedItemIds;
                 _forwardRef = forwardRef;
             }
 
             public override VirtualNode Render()
             {
                 return F.ContextProvider(
-                    value: new SelectedItemIdContext(
+                    value: new TreeViewStateContext(
                         selectedItemId: _selectedItemId,
                         onItemIdSelected: (string id) =>
                         {
                             _onItemIdSelected.Invoke(id);
-                        }
+                        },
+                        expandedItemIds: _expandedItemIds
                     ),
                     children: F.Children(
                         F.RoleProvider(
@@ -166,15 +178,14 @@ namespace Fiber.UI
 
             public override VirtualNode Render()
             {
-                var context = F.GetContext<SelectedItemIdContext>();
-                var isSelected = F.CreateComputedSignal((selectedItemId) => selectedItemId == _id, context.SelectedItemId);
-                var isOpen = new Signal<bool>(false);
-                var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLeve;
+                var treeViewStateContext = F.GetContext<TreeViewStateContext>();
+                var isSelected = F.CreateComputedSignal((selectedItemId) => selectedItemId == _id, treeViewStateContext.SelectedItemId);
+                var isExpanded = F.CreateComputedSignal((expandedItemIds) => expandedItemIds.Contains(_id), treeViewStateContext.ExapndedItemIds);
+                var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLevel;
 
                 var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: () =>
                 {
-                    context.OnItemSelected(_id);
-                    isOpen.Value = !isOpen.Value;
+                    treeViewStateContext.OnItemSelected(_id);
                 });
 
                 return F.Fragment(F.Children(
@@ -185,10 +196,10 @@ namespace Fiber.UI
                         hasSubItems: children != null && children.Count > 0,
                         interactiveElement: interactiveElement,
                         isSelected: isSelected,
-                        isOpen: isOpen
+                        isExpanded: isExpanded
                     ),
                     F.Active(
-                        when: isOpen,
+                        when: isExpanded,
                         children: F.Children(
                             F.ContextProvider(
                                 value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
@@ -196,7 +207,7 @@ namespace Fiber.UI
                                     children: children,
                                     identationLevel: identationLevel + 1,
                                     role: _role,
-                                    isOpen: isOpen
+                                    isExpanded: isExpanded
                                 ))
                             )
                         )
@@ -209,18 +220,18 @@ namespace Fiber.UI
         {
             private readonly int _identationLevel;
             private readonly string _role;
-            private readonly BaseSignal<bool> _isOpen;
+            private readonly BaseSignal<bool> _isExpanded;
 
             public VisualItemGroup(
                 List<VirtualNode> children,
                 int identationLevel,
                 string role,
-                BaseSignal<bool> isOpen
+                BaseSignal<bool> isExpanded
             ) : base(children)
             {
                 _identationLevel = identationLevel;
                 _role = role;
-                _isOpen = isOpen;
+                _isExpanded = isExpanded;
             }
             public override VirtualNode Render()
             {
@@ -231,7 +242,7 @@ namespace Fiber.UI
                         children: children,
                         identationLevel: _identationLevel,
                         role: _role,
-                        isOpen: _isOpen
+                        isExpanded: _isExpanded
                     );
                 }
 
@@ -247,7 +258,7 @@ namespace Fiber.UI
             private readonly bool _hasSubItems;
             private readonly InteractiveElement _interactiveElement;
             private readonly BaseSignal<bool> _isSelected;
-            private readonly BaseSignal<bool> _isOpen;
+            private readonly BaseSignal<bool> _isExpanded;
 
             public VisualItem(
                 SignalProp<string> label,
@@ -256,7 +267,7 @@ namespace Fiber.UI
                 bool hasSubItems,
                 InteractiveElement interactiveElement,
                 BaseSignal<bool> isSelected,
-                BaseSignal<bool> isOpen
+                BaseSignal<bool> isExpanded
             ) : base()
             {
                 _label = label;
@@ -265,7 +276,7 @@ namespace Fiber.UI
                 _hasSubItems = hasSubItems;
                 _interactiveElement = interactiveElement;
                 _isSelected = isSelected;
-                _isOpen = isOpen;
+                _isExpanded = isExpanded;
             }
             public override VirtualNode Render()
             {
@@ -279,7 +290,7 @@ namespace Fiber.UI
                         hasSubItems: _hasSubItems,
                         interactiveElement: _interactiveElement,
                         isSelected: _isSelected,
-                        isOpen: _isOpen
+                        isExpanded: _isExpanded
                     );
                 }
 
@@ -289,7 +300,7 @@ namespace Fiber.UI
                 var color = themeStore.Color(role, ElementType.Text, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
                 var backgroundColor = themeStore.Color(role, ElementType.Background, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
 
-                var iconType = CreateComputedSignal((isOpen) => isOpen ? "chevron-down" : "chevron-right", _isOpen);
+                var iconType = CreateComputedSignal((isExpanded) => isExpanded ? "chevron-down" : "chevron-right", _isExpanded);
 
                 return F.View(
                     _ref: _interactiveElement.Ref,

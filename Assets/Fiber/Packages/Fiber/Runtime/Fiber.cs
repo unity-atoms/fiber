@@ -2220,6 +2220,7 @@ namespace Fiber
                         _fiberNode.Child = childFiberNode;
                         _renderQueue.Enqueue(childFiberNode);
                     }
+                    _lastRenderedIndexRef.Current = -1;
                 }
                 public override void Cleanup() { }
             }

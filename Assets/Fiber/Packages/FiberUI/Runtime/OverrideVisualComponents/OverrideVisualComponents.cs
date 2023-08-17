@@ -79,7 +79,7 @@ namespace Fiber.UI
             bool hasSubItems,
             InteractiveElement interactiveElement,
             BaseSignal<bool> isSelected,
-            BaseSignal<bool> isOpen
+            BaseSignal<bool> isExpanded
         );
         public CreateTreeViewItemDelegate CreateTreeViewItem { get; private set; }
 
@@ -88,7 +88,7 @@ namespace Fiber.UI
             List<VirtualNode> children,
             int identationLevel,
             string role,
-            BaseSignal<bool> isOpen
+            BaseSignal<bool> isExpanded
         );
         public CreateTreeViewItemGroupDelegate CreateTreeViewItemGroup { get; private set; }
 
