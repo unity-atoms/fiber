@@ -300,7 +300,7 @@ namespace Fiber.UI
                 var color = themeStore.Color(role, ElementType.Text, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
                 var backgroundColor = themeStore.Color(role, ElementType.Background, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
 
-                var iconType = CreateComputedSignal((isExpanded) => isExpanded ? "chevron-down" : "chevron-right", _isExpanded);
+                var iconName = CreateComputedSignal((isExpanded) => isExpanded ? "chevron-down" : "chevron-right", _isExpanded);
 
                 return F.View(
                     _ref: _interactiveElement.Ref,
@@ -325,7 +325,7 @@ namespace Fiber.UI
                         ),
                         F.Visible(
                             when: new StaticSignal<bool>(_hasSubItems),
-                            children: F.Children(F.Icon(type: iconType))
+                            children: F.Children(F.Icon(iconName: iconName))
                         )
                     )
                 );

@@ -12,7 +12,7 @@ namespace Fiber.UI
     {
         public static IconComponent Icon(
             this BaseComponent component,
-            SignalProp<string> type,
+            SignalProp<string> iconName,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
@@ -20,7 +20,7 @@ namespace Fiber.UI
         )
         {
             return new IconComponent(
-                type: type,
+                iconName: iconName,
                 role: role,
                 variant: variant,
                 style: style,
@@ -31,21 +31,21 @@ namespace Fiber.UI
 
     public class IconComponent : BaseComponent
     {
-        private readonly SignalProp<string> _type;
+        private readonly SignalProp<string> _iconName;
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
 
         public IconComponent(
-            SignalProp<string> type,
+            SignalProp<string> iconName,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
             Ref<VisualElement> forwardRef = null
         )
         {
-            _type = type;
+            _iconName = iconName;
             _role = role;
             _variant = variant;
             _style = style;
@@ -57,7 +57,7 @@ namespace Fiber.UI
             if (overrideVisualComponents?.CreateIcon != null)
             {
                 return overrideVisualComponents.CreateIcon(
-                    type: _type,
+                    iconName: _iconName,
                     role: _role,
                     variant: _variant,
                     style: _style,
@@ -70,20 +70,8 @@ namespace Fiber.UI
             var color = themeStore.Color(role, ElementType.Text, _variant);
             var fontAwesome = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
 
-            var typeSignal = F.WrapSignalProp(_type);
-            var iconUnicode = CreateComputedSignal((type) =>
-            {
-                return type switch
-                {
-                    "chevron-up" => '\uf077'.ToString(),
-                    "chevron-right" => '\uf054'.ToString(),
-                    "chevron-down" => '\uf078'.ToString(),
-                    "chevron-left" => '\uf053'.ToString(),
-                    "moon" => '\uf186'.ToString(),
-                    "sun" => '\uf185'.ToString(),
-                    _ => null,
-                };
-            }, typeSignal);
+            var iconNameSignal = F.WrapSignalProp(_iconName);
+            var iconUnicode = CreateComputedSignal((iconName) => FontAwesomeUtils.IconNameToUnicode(iconName), iconNameSignal);
 
             return F.Text(
                 _ref: _forwardRef,

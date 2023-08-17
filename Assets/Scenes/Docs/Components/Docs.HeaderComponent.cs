@@ -13,7 +13,7 @@ public class DocsHeaderComponent : BaseComponent
     public override VirtualNode Render()
     {
         var themeStore = C<ThemeStore>();
-        var iconType = new Signal<string>("sun");
+        var iconName = new Signal<string>("sun");
 
         return F.Header(children: F.Children(
             F.HeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
@@ -23,17 +23,17 @@ public class DocsHeaderComponent : BaseComponent
                 )
             )),
             F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
-                F.IconButton(type: iconType, onPress: () =>
+                F.IconButton(iconName: iconName, onPress: () =>
                 {
                     if (themeStore.Value == DocsThemes.LIGHT_THEME)
                     {
                         themeStore.Value = DocsThemes.DARK_THEME;
-                        iconType.Value = "sun";
+                        iconName.Value = "sun";
                     }
                     else
                     {
                         themeStore.Value = DocsThemes.LIGHT_THEME;
-                        iconType.Value = "moon";
+                        iconName.Value = "moon";
                     }
                 })
             ))

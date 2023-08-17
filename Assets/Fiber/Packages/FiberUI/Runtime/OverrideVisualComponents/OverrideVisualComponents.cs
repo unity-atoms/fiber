@@ -42,7 +42,7 @@ namespace Fiber.UI
 
         // Icon component
         public delegate BaseComponent CreateIconDelegate(
-            SignalProp<string> type,
+            SignalProp<string> iconName,
             string role,
             string variant,
             Style style,
@@ -52,7 +52,7 @@ namespace Fiber.UI
 
         // Icon button component
         public delegate BaseComponent CreateIconButtonDelegate(
-            SignalProp<string> type,
+            SignalProp<string> iconName,
             Action onPress,
             InteractiveElement interactiveRef,
             string role,

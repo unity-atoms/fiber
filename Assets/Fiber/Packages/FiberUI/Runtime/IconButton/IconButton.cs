@@ -10,7 +10,7 @@ namespace Fiber.UI
     {
         public static IconButtonComponent IconButton(
             this BaseComponent component,
-            SignalProp<string> type,
+            SignalProp<string> iconName,
             Action onPress,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
@@ -19,7 +19,7 @@ namespace Fiber.UI
         )
         {
             return new IconButtonComponent(
-                type: type,
+                iconName: iconName,
                 onPress: onPress,
                 role: role,
                 variant: variant,
@@ -31,7 +31,7 @@ namespace Fiber.UI
 
     public class IconButtonComponent : BaseComponent
     {
-        private readonly SignalProp<string> _type;
+        private readonly SignalProp<string> _iconName;
         private readonly Action _onPress;
         private readonly string _role;
         private readonly string _variant;
@@ -39,7 +39,7 @@ namespace Fiber.UI
         private readonly Ref<VisualElement> _forwardRef;
 
         public IconButtonComponent(
-            SignalProp<string> type,
+            SignalProp<string> iconName,
             Action onPress,
             string role = Constants.INHERIT_ROLE,
             string variant = null,
@@ -47,7 +47,7 @@ namespace Fiber.UI
             Ref<VisualElement> forwardRef = null
         )
         {
-            _type = type;
+            _iconName = iconName;
             _onPress = onPress;
             _role = role;
             _variant = variant;
@@ -62,7 +62,7 @@ namespace Fiber.UI
             if (overrideVisualComponents?.CreateIconButton != null)
             {
                 return overrideVisualComponents.CreateIconButton(
-                    type: _type,
+                    iconName: _iconName,
                     onPress: _onPress,
                     interactiveRef: interactiveElement,
                     role: _role,
@@ -93,7 +93,7 @@ namespace Fiber.UI
 
             return F.Icon(
                 forwardRef: interactiveElement.Ref,
-                type: _type,
+                iconName: _iconName,
                 style: new Style(
                     mergedStyle: _style,
                     color: color,
