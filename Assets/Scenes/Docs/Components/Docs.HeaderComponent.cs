@@ -23,9 +23,15 @@ public class DocsHeaderComponent : BaseComponent
                 )
             )),
             F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
-                F.IconButton(iconName: "github", onPress: () => { }),
-                F.IconButton(iconName: "discord", onPress: () => { }),
-                F.IconButton(iconName: iconName, onPress: () =>
+                F.IconButton(variant: "github", iconName: "github", onPress: () =>
+                {
+                    Application.OpenURL("https://github.com/unity-atoms/fiber");
+                }),
+                F.IconButton(variant: "discord", iconName: "discord", onPress: () =>
+                {
+                    Application.OpenURL("https://discord.gg/Jw2hRhEB");
+                }),
+                F.IconButton(variant: "sun", iconName: iconName, onPress: () =>
                 {
                     if (themeStore.Value == DocsThemes.LIGHT_THEME)
                     {

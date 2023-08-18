@@ -96,7 +96,25 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: COLOR_PALETTE.GRAY_100,
-                    selected: COLOR_PALETTE.LIGHT_BLUE_48
+                    selected: COLOR_PALETTE.LIGHT_BLUE_48,
+                    variants: new ()
+                    {
+                        { "discord", new(
+                            @default: COLOR_PALETTE.GRAY_100,
+                            selected: "#5865F2",
+                            hovered: "#5865F2"
+                        ) },
+                        { "github", new(
+                            @default: COLOR_PALETTE.GRAY_100,
+                            selected: "#FECEF1",
+                            hovered: "#FECEF1"
+                        ) },
+                        { "sun", new(
+                            @default: COLOR_PALETTE.GRAY_100,
+                            selected: "#F09D51",
+                            hovered: "#F09D51"
+                        ) },
+                    }
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(
