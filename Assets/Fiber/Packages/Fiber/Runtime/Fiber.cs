@@ -6,94 +6,6 @@ using Signals;
 
 namespace Fiber
 {
-    // A struct that wraps either a value or a signal
-    public struct SignalProp<T>
-    {
-        public T Value;
-        public BaseSignal<T> Signal;
-
-        private enum SignalPropType { Empty = 0, Value = 1, Signal = 2 }
-        private SignalPropType Type;
-        public bool IsEmpty { get => Type == SignalPropType.Empty; }
-        public bool IsValue { get => Type == SignalPropType.Value; }
-        public bool IsSignal { get => Type == SignalPropType.Signal; }
-
-        public SignalProp(T value)
-        {
-            Value = value;
-            Signal = null;
-            Type = SignalPropType.Value;
-        }
-
-        public SignalProp(BaseSignal<T> signal)
-        {
-            Value = default(T);
-            Signal = signal;
-            Type = SignalPropType.Signal;
-        }
-
-        public static implicit operator SignalProp<T>(T value)
-        {
-            return new SignalProp<T>(value);
-        }
-
-        public static implicit operator SignalProp<T>(BaseSignal<T> signal)
-        {
-            return new SignalProp<T>(signal);
-        }
-
-        public T Get()
-        {
-            if (Type == SignalPropType.Signal)
-            {
-                return Signal.Get();
-            }
-            else if (Type == SignalPropType.Value)
-            {
-                return Value;
-            }
-            else
-            {
-                throw new Exception($"SignalProp<{typeof(T)}> is empty");
-            }
-        }
-    }
-
-    // Struct used by nodes in work loop when updating properties via signals
-    public struct WorkLoopSignalProp<T>
-    {
-        private SignalProp<T> _signalProp;
-        private byte _dirtyBit;
-        public bool IsEmpty { get => _signalProp.IsEmpty; }
-        public bool IsValue { get => _signalProp.IsValue; }
-        public bool IsSignal { get => _signalProp.IsSignal; }
-
-        public WorkLoopSignalProp(SignalProp<T> signalProp)
-        {
-            _signalProp = signalProp;
-            _dirtyBit = signalProp.IsSignal ? signalProp.Signal.DirtyBit : default(byte);
-        }
-
-        public bool Check()
-        {
-            if (_signalProp.IsSignal)
-            {
-                _signalProp.Signal.Get(); // Needs to be called to update dirty bit
-                if (_dirtyBit != _signalProp.Signal.DirtyBit)
-                {
-                    _dirtyBit = _signalProp.Signal.DirtyBit;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public T Get()
-        {
-            return _signalProp.Get();
-        }
-    }
-
     public class Ref<T>
     {
         public T Current { get; set; }
@@ -122,7 +34,7 @@ namespace Fiber
         public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children);
         public VirtualNode ContextProvider<C>(List<VirtualNode> children);
         public T GetGlobal<T>();
-        public C GetContext<C>(FiberNode node);
+        public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public NativeNode GetParentNativeNode();
         public void CreateEffect(BaseEffect effect);
         public void CreateEffect(Func<Action> effect);
@@ -141,6 +53,7 @@ namespace Fiber
             bool runOnMount
         );
         public void CreateUpdateEffect(Action<float> onUpdate);
+        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, BaseSignal<T1> signal1
         );
@@ -179,7 +92,7 @@ namespace Fiber
 
     public interface IEffectAPI
     {
-        public C GetContext<C>(FiberNode node);
+        public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public T GetGlobal<T>();
     }
 
@@ -188,8 +101,8 @@ namespace Fiber
         public IEffectAPI Api { private get; set; }
         public FiberNode FiberNode { private get; set; }
 
-        public C GetContext<C>() => Api.GetContext<C>(FiberNode);
-        public C C<C>() => GetContext<C>();
+        public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
+        public C C<C>(bool throwIfNotFound = true) => GetContext<C>(throwIfNotFound: throwIfNotFound);
         public T GetGlobal<T>() => Api.GetGlobal<T>();
         public T G<T>() => GetGlobal<T>();
 
@@ -634,7 +547,7 @@ namespace Fiber
                 }
             }
 
-            var newContext = new Context<C>(default(C));
+            var newContext = new Context<C>(default);
             _contexts.Add(newContext);
             return newContext;
         }
@@ -654,8 +567,8 @@ namespace Fiber
         public VirtualNode ContextProvider<C>(List<VirtualNode> children) => Api.ContextProvider<C>(children);
         public T GetGlobal<T>() => Api.GetGlobal<T>();
         public T G<T>() => Api.GetGlobal<T>();
-        public C GetContext<C>() => Api.GetContext<C>(FiberNode);
-        public C C<C>() => GetContext<C>();
+        public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
+        public C C<C>(bool throwIfNotFound = true) => GetContext<C>(throwIfNotFound: throwIfNotFound);
         public NativeNode GetParentNativeNode() => Api.GetParentNativeNode();
         public void CreateEffect(BaseEffect effect) => Api.CreateEffect(effect);
         public void CreateEffect(Func<Action> effect) => Api.CreateEffect(effect);
@@ -683,6 +596,7 @@ namespace Fiber
             Api.CreateEffect(effect, signal1, signal2, signal3, runOnMount);
         }
         public void CreateUpdateEffect(Action<float> onUpdate) => Api.CreateUpdateEffect(onUpdate);
+        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp) => Api.WrapSignalProp<T>(signalProp);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, BaseSignal<T1> signal1
         ) => Api.CreateComputedSignal<T1, RT>(compute, signal1);
@@ -1103,18 +1017,6 @@ namespace Fiber
 
             return current;
         }
-
-        public FiberNode NextWithNativeNode(FiberNode root = null, bool skipChildren = false)
-        {
-            FiberNode current = this;
-            do
-            {
-                current = current.NextNode(root, skipChildren);
-            }
-            while (current != null && current.NativeNode == null);
-
-            return current;
-        }
     }
 
     public abstract class RendererExtension
@@ -1215,7 +1117,7 @@ namespace Fiber
             StartAutoWorkLoop();
         }
 
-        public void Unmount()
+        public void Unmount(bool immediatelyExecuteRemainingWork = true)
         {
             if (_root == null || _isUnmountingRoot)
             {
@@ -1226,6 +1128,11 @@ namespace Fiber
             _isUnmountingRoot = true;
             _root.Phase = FiberNodePhase.RemovedFromVirtualTree;
             _operationsQueue.Enqueue(new UnmountOperation(null, _root));
+
+            if (immediatelyExecuteRemainingWork)
+            {
+                WorkLoop(immediatelyExecuteRemainingWork: true);
+            }
         }
 
         void StartAutoWorkLoop()
@@ -1253,7 +1160,7 @@ namespace Fiber
 
         private Stopwatch _stopWatch = new Stopwatch();
         private FiberNode _currentWorkLoopNode = null;
-        public void WorkLoop()
+        public void WorkLoop(bool immediatelyExecuteRemainingWork = false)
         {
             _stopWatch.Restart();
 
@@ -1291,7 +1198,7 @@ namespace Fiber
                 {
                     break;
                 }
-            } while (_stopWatch.ElapsedMilliseconds < _workLoopTimeBudgetMs);
+            } while (_stopWatch.ElapsedMilliseconds < _workLoopTimeBudgetMs || immediatelyExecuteRemainingWork);
 
             _stopWatch.Stop();
         }
@@ -1651,7 +1558,7 @@ namespace Fiber
             return _contextsAPI.GetContext<C>().ContextProvider(children);
         }
 
-        public C GetContext<C>(FiberNode node)
+        public C GetContext<C>(FiberNode node, bool throwIfNotFound = true)
         {
             var fiberNode = node;
 
@@ -1662,6 +1569,10 @@ namespace Fiber
 
             if (fiberNode == null)
             {
+                if (!throwIfNotFound)
+                {
+                    return default;
+                }
                 throw new Exception($"No context provider of type {typeof(C)} found.");
             }
             return ((ContextProvider<C>)fiberNode.VirtualNode).Value;
@@ -1738,6 +1649,20 @@ namespace Fiber
                     MonoBehaviourHelper.RemoveOnUpdateHandler(subId);
                 };
             });
+        }
+
+        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp)
+        {
+            if (signalProp.IsValue)
+            {
+                return new StaticSignal<T>(signalProp.Value);
+            }
+            else if (signalProp.IsSignal)
+            {
+                return signalProp.Signal;
+            }
+
+            throw new Exception($"Trying to wrap empty signal prop");
         }
 
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
@@ -1877,30 +1802,17 @@ namespace Fiber
                     _fiberNode = fiberNode;
                 }
 
-                private FiberNode GetNextDirectNativeNodeChild(FiberNode fiberNode)
-                {
-                    var candidate = fiberNode;
-                    while (candidate != null && candidate != _fiberNode)
-                    {
-                        if (candidate.NativeNode != null)
-                        {
-                            return candidate;
-                        }
-                        candidate = candidate.Sibling;
-                    }
-                    return null;
-                }
                 protected override void Run(bool visible)
                 {
-                    // Get all direct native node children
-                    for (var withNativeNode = _fiberNode.NextWithNativeNode();
-                        withNativeNode != null;
-                        // We don't skip children since that is needed in order to properly 
-                        // hide ui elements. See SetVisible() in Fiber.UIElements.cs on why we can't just disable the UIDocument GameObject.
-                        withNativeNode = withNativeNode.NextWithNativeNode(root: _fiberNode, skipChildren: false)
-                    )
+                    // Iterate all decedents up to the point that a child is a VisibleComponent
+                    var node = _fiberNode.Child;
+                    while (node != null && node != _fiberNode)
                     {
-                        withNativeNode.NativeNode.SetVisible(visible);
+                        node.NativeNode?.SetVisible(visible);
+
+                        var isChildVisibleComponent = node.Child != null && node.Child.VirtualNode is VisibleComponent;
+                        var isCurrentVisibleComponent = node.VirtualNode is VisibleComponent; // Could be true if a Sibling is a VisibleComponent
+                        node = node.NextNode(root: _fiberNode, skipChildren: isChildVisibleComponent || isCurrentVisibleComponent);
                     }
                 }
                 public override void Cleanup() { }
@@ -2308,6 +2220,7 @@ namespace Fiber
                         _fiberNode.Child = childFiberNode;
                         _renderQueue.Enqueue(childFiberNode);
                     }
+                    _lastRenderedIndexRef.Current = -1;
                 }
                 public override void Cleanup() { }
             }

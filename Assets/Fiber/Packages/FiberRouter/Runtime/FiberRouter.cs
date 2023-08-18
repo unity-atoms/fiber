@@ -8,11 +8,10 @@ namespace Fiber.Router
     {
         public static RouterProvider RouterProvider(
             this BaseComponent component,
-            RouteDefinition routerTree,
-            Router router = null
+            Router router
         )
         {
-            return new RouterProvider(routerTree, router);
+            return new RouterProvider(router);
         }
 
         public static OutletComponent Outlet(this BaseComponent component)
@@ -131,12 +130,12 @@ namespace Fiber.Router
             }
         }
 
-        private RouteDefinition _routerTree;
+        public RouteDefinition RouterTree { get; private set; }
         public SignalList<Route> RouteStack { get; private set; }
 
         public Router(RouteDefinition routerTree, BaseSignal parent = null)
         {
-            _routerTree = routerTree;
+            RouterTree = routerTree;
             RouteStack = new(5, this);
             if (parent != null)
             {
@@ -187,7 +186,7 @@ namespace Fiber.Router
 
         private RouteDefinition GetRouteDefinition(string id)
         {
-            return GetRouteDefinitionRecursively(id, _routerTree);
+            return GetRouteDefinitionRecursively(id, RouterTree);
         }
 
         private RouteDefinition GetRouteDefinitionRecursively(string id, RouteDefinition currentDefinition)
@@ -212,7 +211,7 @@ namespace Fiber.Router
         private void PushIntermediateLayoutRoutes(string id)
         {
             var peekedRouteDefinition = PeekRouteDefinition();
-            var startingRouteDefinition = peekedRouteDefinition ?? _routerTree;
+            var startingRouteDefinition = peekedRouteDefinition ?? RouterTree;
 
             PushIntermediateLayoutRoutesRecursively(id, peekedRouteDefinition, RouteStack.Count, startingRouteDefinition);
         }
@@ -248,7 +247,7 @@ namespace Fiber.Router
 
         private Router PushRoute(string path)
         {
-            var topOfStackDefinition = PeekRouteDefinition() ?? _routerTree;
+            var topOfStackDefinition = PeekRouteDefinition() ?? RouterTree;
             if (!topOfStackDefinition.HasNoneLayoutRouteDecedent(path))
             {
                 throw new Exception($"Route {path} is not a decedent of {topOfStackDefinition.Id}");
@@ -646,15 +645,15 @@ namespace Fiber.Router
         private int _currentStackIndex;
 
 
-        public RouterProvider(RouteDefinition routerTree, Router router = null) : base()
+        public RouterProvider(Router router) : base()
         {
-            if (!routerTree.IsLayoutRoute)
+            if (!router.RouterTree.IsLayoutRoute)
             {
                 throw new ArgumentException("The root route must be a layout route.");
             }
 
-            _routeDefinition = routerTree;
-            _router = router ?? new Router(routerTree);
+            _routeDefinition = router.RouterTree;
+            _router = router;
             _currentStackIndex = 0;
         }
 
@@ -685,19 +684,26 @@ namespace Fiber.Router
 
         private class IsMatchSignal : ComputedSignal<Router.Route, bool>
         {
-            private string _id;
-            public IsMatchSignal(string id, RouteAtCurrentIndexSignal routeAtCurrentIndexSignal) : base(routeAtCurrentIndexSignal)
+            private readonly RouteDefinition _routeDefinition;
+            private readonly int _currentStackIndex;
+            public IsMatchSignal(RouteDefinition routeDefinition, int currentStackIndex, RouteAtCurrentIndexSignal routeAtCurrentIndexSignal) : base(routeAtCurrentIndexSignal)
             {
-                _id = id;
+                _routeDefinition = routeDefinition;
+                _currentStackIndex = currentStackIndex;
             }
             protected override bool Compute(Router.Route routeAtCurrentIndex)
             {
-                if (routeAtCurrentIndex == null)
+                // Special case for the root layout route
+                if (_currentStackIndex == 0 && _routeDefinition.IsLayoutRoute)
+                {
+                    return true;
+                }
+                else if (routeAtCurrentIndex == null)
                 {
                     return false;
                 }
 
-                return _id == routeAtCurrentIndex.Id;
+                return _routeDefinition.Id == routeAtCurrentIndex.Id;
             }
         }
         private class ShowModalSignal : ComputedSignal<Router.Route, bool, bool>
@@ -731,7 +737,7 @@ namespace Fiber.Router
         {
             // Render component
             var routeSignal = new RouteAtCurrentIndexSignal(_router, _currentStackIndex);
-            var isMatchSignal = new IsMatchSignal(_routeDefinition.Id, routeSignal);
+            var isMatchSignal = new IsMatchSignal(_routeDefinition, _currentStackIndex, routeSignal);
             var children = Children(
                 _routeDefinition.Render(routeSignal, isMatchSignal)
             );
