@@ -19,18 +19,49 @@ namespace Signals
                 {
                     _parent.DirtyBit = (byte)(_parent.DirtyBit + 1);
                 }
+                else if (_parents != null)
+                {
+                    for (var i = 0; i < _parents.Count; ++i)
+                    {
+                        _parents[i].DirtyBit = (byte)(_parents[i].DirtyBit + 1);
+                    }
+                }
             }
         }
 
         protected BaseSignal _parent;
+        protected List<BaseSignal> _parents;
         public void RegisterParent(BaseSignal parent)
         {
-            _parent = parent;
+            if (_parents != null)
+            {
+                _parents.Add(parent);
+            }
+            else if (_parent != null)
+            {
+                _parents = new()
+                {
+                    _parent,
+                    parent
+                };
+                _parent = null;
+            }
+            else
+            {
+                _parent = parent;
+            }
         }
 
-        public void UnregisterParent()
+        public void UnregisterParent(BaseSignal parent)
         {
-            _parent = null;
+            if (_parents != null)
+            {
+                _parents.Remove(parent);
+            }
+            else if (_parent == parent)
+            {
+                _parent = null;
+            }
         }
 
         public abstract bool IsDirty(byte otherDirtyBit);
@@ -58,7 +89,7 @@ namespace Signals
         {
             if (_wrappedSignal != null)
             {
-                _wrappedSignal.UnregisterParent();
+                _wrappedSignal.UnregisterParent(this);
             }
         }
 
@@ -144,7 +175,7 @@ namespace Signals
             {
                 if (_value != null)
                 {
-                    _value.UnregisterParent();
+                    _value.UnregisterParent(this);
                 }
                 _value = value;
                 if (_value != null)
@@ -360,7 +391,7 @@ namespace Signals
                 var oldItem = _list[i];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent();
+                    oldItem.UnregisterParent(this);
                 }
 
                 _list[i] = value;
@@ -413,7 +444,7 @@ namespace Signals
 
             if (item != null)
             {
-                item.UnregisterParent();
+                item.UnregisterParent(this);
             }
             return result;
         }
@@ -425,7 +456,7 @@ namespace Signals
             DirtyBit++;
             if (item != null)
             {
-                item.UnregisterParent();
+                item.UnregisterParent(this);
             }
         }
 
@@ -433,7 +464,7 @@ namespace Signals
         {
             for (var i = 0; i < _list.Count; i++)
             {
-                _list[i].UnregisterParent();
+                _list[i].UnregisterParent(this);
             }
             _list.Clear();
             DirtyBit++;
@@ -602,7 +633,7 @@ namespace Signals
                 var oldItem = _dict[key];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent();
+                    oldItem.UnregisterParent(this);
                 }
 
                 _dict[key] = value;
@@ -646,7 +677,7 @@ namespace Signals
             DirtyBit++;
             if (value != null)
             {
-                value.UnregisterParent();
+                value.UnregisterParent(this);
             }
             return value;
         }
@@ -664,7 +695,7 @@ namespace Signals
         {
             foreach (var kvp in _dict)
             {
-                kvp.Value.UnregisterParent();
+                kvp.Value.UnregisterParent(this);
             }
 
             _dict.Clear();
@@ -739,7 +770,7 @@ namespace Signals
                 var oldItem = _dict[key];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent();
+                    oldItem.UnregisterParent(this);
                 }
 
                 _dict[key] = value;
@@ -786,7 +817,7 @@ namespace Signals
             DirtyBit++;
             if (value != null)
             {
-                value.UnregisterParent();
+                value.UnregisterParent(this);
             }
             return value;
         }
@@ -804,7 +835,7 @@ namespace Signals
         {
             foreach (var kvp in _dict)
             {
-                kvp.Value.UnregisterParent();
+                kvp.Value.UnregisterParent(this);
             }
 
             _dict.Clear();

@@ -139,12 +139,13 @@ namespace Fiber.Router
             RouteStack = new(5, this);
             if (parent != null)
             {
+                _parent = parent;
                 RegisterParent(parent);
             }
         }
         ~Router()
         {
-            UnregisterParent();
+            UnregisterParent(_parent);
         }
 
         public Router Navigate(string path)
