@@ -614,318 +614,530 @@ namespace Fiber.UIElements
                 if (!style.Position.IsEmpty)
                 {
                     Instance.style.position = style.Position.Get();
+                    if (style.Position.IsSignal)
+                    {
+                        style.Position.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _positionWorkLoopItem = new(style.Position);
 
                 if (!style.Right.IsEmpty)
                 {
                     Instance.style.right = style.Right.Get();
+                    if (style.Right.IsSignal)
+                    {
+                        style.Right.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _rightWorkLoopItem = new(style.Right);
 
                 if (!style.Bottom.IsEmpty)
                 {
                     Instance.style.bottom = style.Bottom.Get();
+                    if (style.Bottom.IsSignal)
+                    {
+                        style.Bottom.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _bottomWorkLoopItem = new(style.Bottom);
 
                 if (!style.Left.IsEmpty)
                 {
                     Instance.style.left = style.Left.Get();
+                    if (style.Left.IsSignal)
+                    {
+                        style.Left.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _leftWorkLoopItem = new(style.Left);
 
                 if (!style.Top.IsEmpty)
                 {
                     Instance.style.top = style.Top.Get();
+                    if (style.Top.IsSignal)
+                    {
+                        style.Top.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _topWorkLoopItem = new(style.Top);
 
                 if (!style.PaddingRight.IsEmpty)
                 {
                     Instance.style.paddingRight = style.PaddingRight.Get();
+                    if (style.PaddingRight.IsSignal)
+                    {
+                        style.PaddingRight.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _paddingRightWorkLoopItem = new(style.PaddingRight);
 
                 if (!style.PaddingBottom.IsEmpty)
                 {
                     Instance.style.paddingBottom = style.PaddingBottom.Get();
+                    if (style.PaddingBottom.IsSignal)
+                    {
+                        style.PaddingBottom.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _paddingBottomWorkLoopItem = new(style.PaddingBottom);
 
                 if (!style.PaddingLeft.IsEmpty)
                 {
                     Instance.style.paddingLeft = style.PaddingLeft.Get();
+                    if (style.PaddingLeft.IsSignal)
+                    {
+                        style.PaddingLeft.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _paddingLeftWorkLoopItem = new(style.PaddingLeft);
 
                 if (!style.PaddingTop.IsEmpty)
                 {
                     Instance.style.paddingTop = style.PaddingTop.Get();
+                    if (style.PaddingTop.IsSignal)
+                    {
+                        style.PaddingTop.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _paddingTopWorkLoopItem = new(style.PaddingTop);
 
                 if (!style.MarginRight.IsEmpty)
                 {
                     Instance.style.marginRight = style.MarginRight.Get();
+                    if (style.MarginRight.IsSignal)
+                    {
+                        style.MarginRight.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _marginRightWorkLoopItem = new(style.MarginRight);
 
                 if (!style.MarginBottom.IsEmpty)
                 {
                     Instance.style.marginBottom = style.MarginBottom.Get();
+                    if (style.MarginBottom.IsSignal)
+                    {
+                        style.MarginBottom.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _marginBottomWorkLoopItem = new(style.MarginBottom);
 
                 if (!style.MarginLeft.IsEmpty)
                 {
                     Instance.style.marginLeft = style.MarginLeft.Get();
+                    if (style.MarginLeft.IsSignal)
+                    {
+                        style.MarginLeft.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _marginLeftWorkLoopItem = new(style.MarginLeft);
 
                 if (!style.MarginTop.IsEmpty)
                 {
                     Instance.style.marginTop = style.MarginTop.Get();
+                    if (style.MarginTop.IsSignal)
+                    {
+                        style.MarginTop.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _marginTopWorkLoopItem = new(style.MarginTop);
 
                 if (!style.BorderTopRightRadius.IsEmpty)
                 {
                     Instance.style.borderTopRightRadius = style.BorderTopRightRadius.Get();
+                    if (style.BorderTopRightRadius.IsSignal)
+                    {
+                        style.BorderTopRightRadius.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderTopRightRadiusWorkLoopItem = new(style.BorderTopRightRadius);
 
                 if (!style.BorderTopLeftRadius.IsEmpty)
                 {
                     Instance.style.borderTopLeftRadius = style.BorderTopLeftRadius.Get();
+                    if (style.BorderTopLeftRadius.IsSignal)
+                    {
+                        style.BorderTopLeftRadius.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderTopLeftRadiusWorkLoopItem = new(style.BorderTopLeftRadius);
 
                 if (!style.BorderBottomRightRadius.IsEmpty)
                 {
                     Instance.style.borderBottomRightRadius = style.BorderBottomRightRadius.Get();
+                    if (style.BorderBottomRightRadius.IsSignal)
+                    {
+                        style.BorderBottomRightRadius.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderBottomRightRadiusWorkLoopItem = new(style.BorderBottomRightRadius);
 
                 if (!style.BorderBottomLeftRadius.IsEmpty)
                 {
                     Instance.style.borderBottomLeftRadius = style.BorderBottomLeftRadius.Get();
+                    if (style.BorderBottomLeftRadius.IsSignal)
+                    {
+                        style.BorderBottomLeftRadius.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderBottomLeftRadiusWorkLoopItem = new(style.BorderBottomLeftRadius);
 
                 if (!style.BorderRightWidth.IsEmpty)
                 {
                     Instance.style.borderRightWidth = style.BorderRightWidth.Get();
+                    if (style.BorderRightWidth.IsSignal)
+                    {
+                        style.BorderRightWidth.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderRightWidthWorkLoopItem = new(style.BorderRightWidth);
 
                 if (!style.BorderBottomWidth.IsEmpty)
                 {
                     Instance.style.borderBottomWidth = style.BorderBottomWidth.Get();
+                    if (style.BorderBottomWidth.IsSignal)
+                    {
+                        style.BorderBottomWidth.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderBottomWidthWorkLoopItem = new(style.BorderBottomWidth);
 
                 if (!style.BorderLeftWidth.IsEmpty)
                 {
                     Instance.style.borderLeftWidth = style.BorderLeftWidth.Get();
+                    if (style.BorderLeftWidth.IsSignal)
+                    {
+                        style.BorderLeftWidth.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderLeftWidthWorkLoopItem = new(style.BorderLeftWidth);
 
                 if (!style.BorderTopWidth.IsEmpty)
                 {
                     Instance.style.borderTopWidth = style.BorderTopWidth.Get();
+                    if (style.BorderTopWidth.IsSignal)
+                    {
+                        style.BorderTopWidth.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderTopWidthWorkLoopItem = new(style.BorderTopWidth);
 
                 if (!style.BorderRightColor.IsEmpty)
                 {
                     Instance.style.borderRightColor = style.BorderRightColor.Get();
+                    if (style.BorderRightColor.IsSignal)
+                    {
+                        style.BorderRightColor.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderRightColorWorkLoopItem = new(style.BorderRightColor);
 
                 if (!style.BorderBottomColor.IsEmpty)
                 {
                     Instance.style.borderBottomColor = style.BorderBottomColor.Get();
+                    if (style.BorderBottomColor.IsSignal)
+                    {
+                        style.BorderBottomColor.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderBottomColorWorkLoopItem = new(style.BorderBottomColor);
 
                 if (!style.BorderLeftColor.IsEmpty)
                 {
                     Instance.style.borderLeftColor = style.BorderLeftColor.Get();
+                    if (style.BorderLeftColor.IsSignal)
+                    {
+                        style.BorderLeftColor.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderLeftColorWorkLoopItem = new(style.BorderLeftColor);
 
                 if (!style.BorderTopColor.IsEmpty)
                 {
                     Instance.style.borderTopColor = style.BorderTopColor.Get();
+                    if (style.BorderTopColor.IsSignal)
+                    {
+                        style.BorderTopColor.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _borderTopColorWorkLoopItem = new(style.BorderTopColor);
 
                 if (!style.Display.IsEmpty)
                 {
                     Instance.style.display = style.Display.Get();
+                    if (style.Display.IsSignal)
+                    {
+                        style.Display.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _displayWorkLoopItem = new(style.Display);
 
                 if (!style.FlexShrink.IsEmpty)
                 {
                     Instance.style.flexShrink = style.FlexShrink.Get();
+                    if (style.FlexShrink.IsSignal)
+                    {
+                        style.FlexShrink.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _flexShrinkWorkLoopItem = new(style.FlexShrink);
 
                 if (!style.FlexGrow.IsEmpty)
                 {
                     Instance.style.flexGrow = style.FlexGrow.Get();
+                    if (style.FlexGrow.IsSignal)
+                    {
+                        style.FlexGrow.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _flexGrowWorkLoopItem = new(style.FlexGrow);
 
                 if (!style.FlexDirection.IsEmpty)
                 {
                     Instance.style.flexDirection = style.FlexDirection.Get();
+                    if (style.FlexDirection.IsSignal)
+                    {
+                        style.FlexDirection.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _flexDirectionWorkLoopItem = new(style.FlexDirection);
 
                 if (!style.JustifyContent.IsEmpty)
                 {
                     Instance.style.justifyContent = style.JustifyContent.Get();
+                    if (style.JustifyContent.IsSignal)
+                    {
+                        style.JustifyContent.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _justifyContentWorkLoopItem = new(style.JustifyContent);
 
                 if (!style.AlignItems.IsEmpty)
                 {
                     Instance.style.alignItems = style.AlignItems.Get();
+                    if (style.AlignItems.IsSignal)
+                    {
+                        style.AlignItems.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _alignItemsWorkLoopItem = new(style.AlignItems);
 
                 if (!style.Width.IsEmpty)
                 {
                     Instance.style.width = style.Width.Get();
+                    if (style.Width.IsSignal)
+                    {
+                        style.Width.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _widthWorkLoopItem = new(style.Width);
 
                 if (!style.MaxWidth.IsEmpty)
                 {
                     Instance.style.maxWidth = style.MaxWidth.Get();
+                    if (style.MaxWidth.IsSignal)
+                    {
+                        style.MaxWidth.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _maxWidthWorkLoopItem = new(style.MaxWidth);
 
                 if (!style.MinWidth.IsEmpty)
                 {
                     Instance.style.minWidth = style.MinWidth.Get();
+                    if (style.MinWidth.IsSignal)
+                    {
+                        style.MinWidth.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _minWidthWorkLoopItem = new(style.MinWidth);
 
                 if (!style.Height.IsEmpty)
                 {
                     Instance.style.height = style.Height.Get();
+                    if (style.Height.IsSignal)
+                    {
+                        style.Height.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _heightWorkLoopItem = new(style.Height);
 
                 if (!style.MaxHeight.IsEmpty)
                 {
                     Instance.style.maxHeight = style.MaxHeight.Get();
+                    if (style.MaxHeight.IsSignal)
+                    {
+                        style.MaxHeight.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _maxHeightWorkLoopItem = new(style.MaxHeight);
 
                 if (!style.MinHeight.IsEmpty)
                 {
                     Instance.style.minHeight = style.MinHeight.Get();
+                    if (style.MinHeight.IsSignal)
+                    {
+                        style.MinHeight.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _minHeightWorkLoopItem = new(style.MinHeight);
 
                 if (!style.BackgroundColor.IsEmpty)
                 {
                     Instance.style.backgroundColor = style.BackgroundColor.Get();
+                    if (style.BackgroundColor.IsSignal)
+                    {
+                        style.BackgroundColor.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _backgroundColorWorkLoopItem = new(style.BackgroundColor);
 
                 if (!style.Color.IsEmpty)
                 {
                     Instance.style.color = style.Color.Get();
+                    if (style.Color.IsSignal)
+                    {
+                        style.Color.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _colorWorkLoopItem = new(style.Color);
 
                 if (!style.FontSize.IsEmpty)
                 {
                     Instance.style.fontSize = style.FontSize.Get();
+                    if (style.FontSize.IsSignal)
+                    {
+                        style.FontSize.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _fontSizeWorkLoopItem = new(style.FontSize);
 
                 if (!style.UnityFont.IsEmpty)
                 {
                     Instance.style.unityFont = style.UnityFont.Get();
+                    if (style.UnityFont.IsSignal)
+                    {
+                        style.UnityFont.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _unityFontWorkLoopItem = new(style.UnityFont);
 
                 if (!style.UnityFontDefinition.IsEmpty)
                 {
                     Instance.style.unityFontDefinition = style.UnityFontDefinition.Get();
+                    if (style.UnityFontDefinition.IsSignal)
+                    {
+                        style.UnityFontDefinition.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _unityFontDefinitionWorkLoopItem = new(style.UnityFontDefinition);
 
                 if (!style.UnityFontStyle.IsEmpty)
                 {
                     Instance.style.unityFontStyleAndWeight = style.UnityFontStyle.Get();
+                    if (style.UnityFontStyle.IsSignal)
+                    {
+                        style.UnityFontStyle.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _unityFontStyleWorkLoopItem = new(style.UnityFontStyle);
 
                 if (!style.UnityParagraphSpacing.IsEmpty)
                 {
                     Instance.style.unityParagraphSpacing = style.UnityParagraphSpacing.Get();
+                    if (style.UnityParagraphSpacing.IsSignal)
+                    {
+                        style.UnityParagraphSpacing.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _unityParagraphSpacingWorkLoopItem = new(style.UnityParagraphSpacing);
 
                 if (!style.UnityTextAlign.IsEmpty)
                 {
                     Instance.style.unityTextAlign = style.UnityTextAlign.Get();
+                    if (style.UnityTextAlign.IsSignal)
+                    {
+                        style.UnityTextAlign.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _unityTextAlignWorkLoopItem = new(style.UnityTextAlign);
 
                 if (!style.TransitionProperty.IsEmpty)
                 {
                     Instance.style.transitionProperty = style.TransitionProperty.Get();
+                    if (style.TransitionProperty.IsSignal)
+                    {
+                        style.TransitionProperty.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _transitionPropertyWorkLoopItem = new(style.TransitionProperty);
 
                 if (!style.TransitionDelay.IsEmpty)
                 {
                     Instance.style.transitionDelay = style.TransitionDelay.Get();
+                    if (style.TransitionDelay.IsSignal)
+                    {
+                        style.TransitionDelay.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _transitionDelayWorkLoopItem = new(style.TransitionDelay);
 
                 if (!style.TransitionDuration.IsEmpty)
                 {
                     Instance.style.transitionDuration = style.TransitionDuration.Get();
+                    if (style.TransitionDuration.IsSignal)
+                    {
+                        style.TransitionDuration.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _transitionDurationWorkLoopItem = new(style.TransitionDuration);
 
                 if (!style.TransitionTimingFunction.IsEmpty)
                 {
                     Instance.style.transitionTimingFunction = style.TransitionTimingFunction.Get();
+                    if (style.TransitionTimingFunction.IsSignal)
+                    {
+                        style.TransitionTimingFunction.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _transitionTimingFunctionWorkLoopItem = new(style.TransitionTimingFunction);
 
                 if (!style.TransformOrigin.IsEmpty)
                 {
                     Instance.style.transformOrigin = style.TransformOrigin.Get();
+                    if (style.TransformOrigin.IsSignal)
+                    {
+                        style.TransformOrigin.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _transformOriginWorkLoopItem = new(style.TransformOrigin);
 
                 if (!style.Translate.IsEmpty)
                 {
                     Instance.style.translate = style.Translate.Get();
+                    if (style.Translate.IsSignal)
+                    {
+                        style.Translate.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _translateWorkLoopItem = new(style.Translate);
 
                 if (!style.Scale.IsEmpty)
                 {
                     Instance.style.scale = style.Scale.Get();
+                    if (style.Scale.IsSignal)
+                    {
+                        style.Scale.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _scaleWorkLoopItem = new(style.Scale);
 
                 if (!style.Rotate.IsEmpty)
                 {
                     Instance.style.rotate = style.Rotate.Get();
+                    if (style.Rotate.IsSignal)
+                    {
+                        style.Rotate.SignalProp.Signal.RegisterParent(this);
+                    }
                 }
                 _rotateWorkLoopItem = new(style.Rotate);
 
@@ -1112,7 +1324,10 @@ namespace Fiber.UIElements
 
                 var style = _styleWorkLoopItem.Get();
 
-                // Position
+                // OPEN POINT: We are currently not handling cleaning up signals that are no longer used when
+                // the style itself is a signal and a prop goes from being a signal to a regular value
+
+                // Position - Update instance value
                 if (style.Position.IsSignal)
                 {
                     if (_positionWorkLoopItem.Check())
@@ -1132,7 +1347,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.position = StyleKeyword.Initial;
                 }
-                // Right
+                // Position - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Position.SignalProp.Signal != style.Position.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Position.IsSignal)
+                        {
+                            _lastStyleFromSignal.Position.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Position.IsSignal)
+                        {
+                            style.Position.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Right - Update instance value
                 if (style.Right.IsSignal)
                 {
                     if (_rightWorkLoopItem.Check())
@@ -1152,7 +1383,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.right = StyleKeyword.Initial;
                 }
-                // Bottom
+                // Right - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Right.SignalProp.Signal != style.Right.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Right.IsSignal)
+                        {
+                            _lastStyleFromSignal.Right.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Right.IsSignal)
+                        {
+                            style.Right.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Bottom - Update instance value
                 if (style.Bottom.IsSignal)
                 {
                     if (_bottomWorkLoopItem.Check())
@@ -1172,7 +1419,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.bottom = StyleKeyword.Initial;
                 }
-                // Left
+                // Bottom - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Bottom.SignalProp.Signal != style.Bottom.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Bottom.IsSignal)
+                        {
+                            _lastStyleFromSignal.Bottom.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Bottom.IsSignal)
+                        {
+                            style.Bottom.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Left - Update instance value
                 if (style.Left.IsSignal)
                 {
                     if (_leftWorkLoopItem.Check())
@@ -1192,7 +1455,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.left = StyleKeyword.Initial;
                 }
-                // Top
+                // Left - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Left.SignalProp.Signal != style.Left.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Left.IsSignal)
+                        {
+                            _lastStyleFromSignal.Left.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Left.IsSignal)
+                        {
+                            style.Left.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Top - Update instance value
                 if (style.Top.IsSignal)
                 {
                     if (_topWorkLoopItem.Check())
@@ -1212,7 +1491,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.top = StyleKeyword.Initial;
                 }
-                // PaddingRight
+                // Top - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Top.SignalProp.Signal != style.Top.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Top.IsSignal)
+                        {
+                            _lastStyleFromSignal.Top.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Top.IsSignal)
+                        {
+                            style.Top.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // PaddingRight - Update instance value
                 if (style.PaddingRight.IsSignal)
                 {
                     if (_paddingRightWorkLoopItem.Check())
@@ -1232,7 +1527,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.paddingRight = StyleKeyword.Initial;
                 }
-                // PaddingBottom
+                // PaddingRight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.PaddingRight.SignalProp.Signal != style.PaddingRight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingRight.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingRight.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.PaddingRight.IsSignal)
+                        {
+                            style.PaddingRight.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // PaddingBottom - Update instance value
                 if (style.PaddingBottom.IsSignal)
                 {
                     if (_paddingBottomWorkLoopItem.Check())
@@ -1252,7 +1563,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.paddingBottom = StyleKeyword.Initial;
                 }
-                // PaddingLeft
+                // PaddingBottom - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.PaddingBottom.SignalProp.Signal != style.PaddingBottom.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingBottom.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingBottom.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.PaddingBottom.IsSignal)
+                        {
+                            style.PaddingBottom.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // PaddingLeft - Update instance value
                 if (style.PaddingLeft.IsSignal)
                 {
                     if (_paddingLeftWorkLoopItem.Check())
@@ -1272,7 +1599,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.paddingLeft = StyleKeyword.Initial;
                 }
-                // PaddingTop
+                // PaddingLeft - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.PaddingLeft.SignalProp.Signal != style.PaddingLeft.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingLeft.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingLeft.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.PaddingLeft.IsSignal)
+                        {
+                            style.PaddingLeft.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // PaddingTop - Update instance value
                 if (style.PaddingTop.IsSignal)
                 {
                     if (_paddingTopWorkLoopItem.Check())
@@ -1292,7 +1635,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.paddingTop = StyleKeyword.Initial;
                 }
-                // MarginRight
+                // PaddingTop - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.PaddingTop.SignalProp.Signal != style.PaddingTop.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingTop.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingTop.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.PaddingTop.IsSignal)
+                        {
+                            style.PaddingTop.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MarginRight - Update instance value
                 if (style.MarginRight.IsSignal)
                 {
                     if (_marginRightWorkLoopItem.Check())
@@ -1312,7 +1671,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.marginRight = StyleKeyword.Initial;
                 }
-                // MarginBottom
+                // MarginRight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MarginRight.SignalProp.Signal != style.MarginRight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginRight.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginRight.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MarginRight.IsSignal)
+                        {
+                            style.MarginRight.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MarginBottom - Update instance value
                 if (style.MarginBottom.IsSignal)
                 {
                     if (_marginBottomWorkLoopItem.Check())
@@ -1332,7 +1707,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.marginBottom = StyleKeyword.Initial;
                 }
-                // MarginLeft
+                // MarginBottom - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MarginBottom.SignalProp.Signal != style.MarginBottom.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginBottom.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginBottom.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MarginBottom.IsSignal)
+                        {
+                            style.MarginBottom.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MarginLeft - Update instance value
                 if (style.MarginLeft.IsSignal)
                 {
                     if (_marginLeftWorkLoopItem.Check())
@@ -1352,7 +1743,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.marginLeft = StyleKeyword.Initial;
                 }
-                // MarginTop
+                // MarginLeft - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MarginLeft.SignalProp.Signal != style.MarginLeft.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginLeft.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginLeft.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MarginLeft.IsSignal)
+                        {
+                            style.MarginLeft.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MarginTop - Update instance value
                 if (style.MarginTop.IsSignal)
                 {
                     if (_marginTopWorkLoopItem.Check())
@@ -1372,7 +1779,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.marginTop = StyleKeyword.Initial;
                 }
-                // BorderTopRightRadius
+                // MarginTop - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MarginTop.SignalProp.Signal != style.MarginTop.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginTop.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginTop.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MarginTop.IsSignal)
+                        {
+                            style.MarginTop.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderTopRightRadius - Update instance value
                 if (style.BorderTopRightRadius.IsSignal)
                 {
                     if (_borderTopRightRadiusWorkLoopItem.Check())
@@ -1392,7 +1815,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderTopRightRadius = StyleKeyword.Initial;
                 }
-                // BorderTopLeftRadius
+                // BorderTopRightRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderTopRightRadius.SignalProp.Signal != style.BorderTopRightRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopRightRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopRightRadius.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderTopRightRadius.IsSignal)
+                        {
+                            style.BorderTopRightRadius.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderTopLeftRadius - Update instance value
                 if (style.BorderTopLeftRadius.IsSignal)
                 {
                     if (_borderTopLeftRadiusWorkLoopItem.Check())
@@ -1412,7 +1851,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderTopLeftRadius = StyleKeyword.Initial;
                 }
-                // BorderBottomRightRadius
+                // BorderTopLeftRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderTopLeftRadius.SignalProp.Signal != style.BorderTopLeftRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopLeftRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopLeftRadius.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderTopLeftRadius.IsSignal)
+                        {
+                            style.BorderTopLeftRadius.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderBottomRightRadius - Update instance value
                 if (style.BorderBottomRightRadius.IsSignal)
                 {
                     if (_borderBottomRightRadiusWorkLoopItem.Check())
@@ -1432,7 +1887,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderBottomRightRadius = StyleKeyword.Initial;
                 }
-                // BorderBottomLeftRadius
+                // BorderBottomRightRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderBottomRightRadius.SignalProp.Signal != style.BorderBottomRightRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomRightRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomRightRadius.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderBottomRightRadius.IsSignal)
+                        {
+                            style.BorderBottomRightRadius.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderBottomLeftRadius - Update instance value
                 if (style.BorderBottomLeftRadius.IsSignal)
                 {
                     if (_borderBottomLeftRadiusWorkLoopItem.Check())
@@ -1452,7 +1923,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderBottomLeftRadius = StyleKeyword.Initial;
                 }
-                // BorderRightWidth
+                // BorderBottomLeftRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderBottomLeftRadius.SignalProp.Signal != style.BorderBottomLeftRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomLeftRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomLeftRadius.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderBottomLeftRadius.IsSignal)
+                        {
+                            style.BorderBottomLeftRadius.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderRightWidth - Update instance value
                 if (style.BorderRightWidth.IsSignal)
                 {
                     if (_borderRightWidthWorkLoopItem.Check())
@@ -1472,7 +1959,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderRightWidth = StyleKeyword.Initial;
                 }
-                // BorderBottomWidth
+                // BorderRightWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderRightWidth.SignalProp.Signal != style.BorderRightWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderRightWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderRightWidth.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderRightWidth.IsSignal)
+                        {
+                            style.BorderRightWidth.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderBottomWidth - Update instance value
                 if (style.BorderBottomWidth.IsSignal)
                 {
                     if (_borderBottomWidthWorkLoopItem.Check())
@@ -1492,7 +1995,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderBottomWidth = StyleKeyword.Initial;
                 }
-                // BorderLeftWidth
+                // BorderBottomWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderBottomWidth.SignalProp.Signal != style.BorderBottomWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomWidth.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderBottomWidth.IsSignal)
+                        {
+                            style.BorderBottomWidth.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderLeftWidth - Update instance value
                 if (style.BorderLeftWidth.IsSignal)
                 {
                     if (_borderLeftWidthWorkLoopItem.Check())
@@ -1512,7 +2031,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderLeftWidth = StyleKeyword.Initial;
                 }
-                // BorderTopWidth
+                // BorderLeftWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderLeftWidth.SignalProp.Signal != style.BorderLeftWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderLeftWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderLeftWidth.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderLeftWidth.IsSignal)
+                        {
+                            style.BorderLeftWidth.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderTopWidth - Update instance value
                 if (style.BorderTopWidth.IsSignal)
                 {
                     if (_borderTopWidthWorkLoopItem.Check())
@@ -1532,7 +2067,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderTopWidth = StyleKeyword.Initial;
                 }
-                // BorderRightColor
+                // BorderTopWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderTopWidth.SignalProp.Signal != style.BorderTopWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopWidth.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderTopWidth.IsSignal)
+                        {
+                            style.BorderTopWidth.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderRightColor - Update instance value
                 if (style.BorderRightColor.IsSignal)
                 {
                     if (_borderRightColorWorkLoopItem.Check())
@@ -1552,7 +2103,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderRightColor = StyleKeyword.Initial;
                 }
-                // BorderBottomColor
+                // BorderRightColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderRightColor.SignalProp.Signal != style.BorderRightColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderRightColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderRightColor.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderRightColor.IsSignal)
+                        {
+                            style.BorderRightColor.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderBottomColor - Update instance value
                 if (style.BorderBottomColor.IsSignal)
                 {
                     if (_borderBottomColorWorkLoopItem.Check())
@@ -1572,7 +2139,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderBottomColor = StyleKeyword.Initial;
                 }
-                // BorderLeftColor
+                // BorderBottomColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderBottomColor.SignalProp.Signal != style.BorderBottomColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomColor.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderBottomColor.IsSignal)
+                        {
+                            style.BorderBottomColor.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderLeftColor - Update instance value
                 if (style.BorderLeftColor.IsSignal)
                 {
                     if (_borderLeftColorWorkLoopItem.Check())
@@ -1592,7 +2175,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderLeftColor = StyleKeyword.Initial;
                 }
-                // BorderTopColor
+                // BorderLeftColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderLeftColor.SignalProp.Signal != style.BorderLeftColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderLeftColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderLeftColor.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderLeftColor.IsSignal)
+                        {
+                            style.BorderLeftColor.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BorderTopColor - Update instance value
                 if (style.BorderTopColor.IsSignal)
                 {
                     if (_borderTopColorWorkLoopItem.Check())
@@ -1612,9 +2211,41 @@ namespace Fiber.UIElements
                 {
                     Instance.style.borderTopColor = StyleKeyword.Initial;
                 }
-                // Display
+                // BorderTopColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BorderTopColor.SignalProp.Signal != style.BorderTopColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopColor.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BorderTopColor.IsSignal)
+                        {
+                            style.BorderTopColor.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Display - Update instance value
                 UpdateDisplayStyle();
-                // FlexShrink
+                // Display - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Display.SignalProp.Signal != style.Display.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Display.IsSignal)
+                        {
+                            _lastStyleFromSignal.Display.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Display.IsSignal)
+                        {
+                            style.Display.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // FlexShrink - Update instance value
                 if (style.FlexShrink.IsSignal)
                 {
                     if (_flexShrinkWorkLoopItem.Check())
@@ -1634,7 +2265,22 @@ namespace Fiber.UIElements
                 {
                     Instance.style.flexShrink = StyleKeyword.Initial;
                 }
-                // FlexGrow
+                // FlexShrink - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.FlexShrink.SignalProp.Signal != style.FlexShrink.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FlexShrink.IsSignal)
+                        {
+                            _lastStyleFromSignal.FlexShrink.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.FlexShrink.IsSignal)
+                        {
+                            style.FlexShrink.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+                // FlexGrow - Update instance value
                 if (style.FlexGrow.IsSignal)
                 {
                     if (_flexGrowWorkLoopItem.Check())
@@ -1654,7 +2300,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.flexGrow = StyleKeyword.Initial;
                 }
-                // FlexDirection
+                // FlexGrow - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.FlexGrow.SignalProp.Signal != style.FlexGrow.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FlexGrow.IsSignal)
+                        {
+                            _lastStyleFromSignal.FlexGrow.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.FlexGrow.IsSignal)
+                        {
+                            style.FlexGrow.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // FlexDirection - Update instance value
                 if (style.FlexDirection.IsSignal)
                 {
                     if (_flexDirectionWorkLoopItem.Check())
@@ -1674,7 +2336,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.flexDirection = StyleKeyword.Initial;
                 }
-                // JustifyContent
+                // FlexDirection - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.FlexDirection.SignalProp.Signal != style.FlexDirection.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FlexDirection.IsSignal)
+                        {
+                            _lastStyleFromSignal.FlexDirection.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.FlexDirection.IsSignal)
+                        {
+                            style.FlexDirection.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // JustifyContent - Update instance value
                 if (style.JustifyContent.IsSignal)
                 {
                     if (_justifyContentWorkLoopItem.Check())
@@ -1694,7 +2372,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.justifyContent = StyleKeyword.Initial;
                 }
-                // AlignItems
+                // JustifyContent - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.JustifyContent.SignalProp.Signal != style.JustifyContent.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.JustifyContent.IsSignal)
+                        {
+                            _lastStyleFromSignal.JustifyContent.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.JustifyContent.IsSignal)
+                        {
+                            style.JustifyContent.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // AlignItems - Update instance value
                 if (style.AlignItems.IsSignal)
                 {
                     if (_alignItemsWorkLoopItem.Check())
@@ -1714,7 +2408,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.alignItems = StyleKeyword.Initial;
                 }
-                // Width
+                // AlignItems - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.AlignItems.SignalProp.Signal != style.AlignItems.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.AlignItems.IsSignal)
+                        {
+                            _lastStyleFromSignal.AlignItems.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.AlignItems.IsSignal)
+                        {
+                            style.AlignItems.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Width - Update instance value
                 if (style.Width.IsSignal)
                 {
                     if (_widthWorkLoopItem.Check())
@@ -1734,7 +2444,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.width = StyleKeyword.Initial;
                 }
-                // MaxWidth
+                // Width - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Width.SignalProp.Signal != style.Width.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Width.IsSignal)
+                        {
+                            _lastStyleFromSignal.Width.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Width.IsSignal)
+                        {
+                            style.Width.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MaxWidth - Update instance value
                 if (style.MaxWidth.IsSignal)
                 {
                     if (_maxWidthWorkLoopItem.Check())
@@ -1754,7 +2480,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.maxWidth = StyleKeyword.Initial;
                 }
-                // MinWidth
+                // MaxWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MaxWidth.SignalProp.Signal != style.MaxWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MaxWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.MaxWidth.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MaxWidth.IsSignal)
+                        {
+                            style.MaxWidth.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MinWidth - Update instance value
                 if (style.MinWidth.IsSignal)
                 {
                     if (_minWidthWorkLoopItem.Check())
@@ -1774,7 +2516,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.minWidth = StyleKeyword.Initial;
                 }
-                // Height
+                // MinWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MinWidth.SignalProp.Signal != style.MinWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MinWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.MinWidth.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MinWidth.IsSignal)
+                        {
+                            style.MinWidth.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Height - Update instance value
                 if (style.Height.IsSignal)
                 {
                     if (_heightWorkLoopItem.Check())
@@ -1794,7 +2552,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.height = StyleKeyword.Initial;
                 }
-                // MaxHeight
+                // Height - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Height.SignalProp.Signal != style.Height.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Height.IsSignal)
+                        {
+                            _lastStyleFromSignal.Height.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Height.IsSignal)
+                        {
+                            style.Height.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MaxHeight - Update instance value
                 if (style.MaxHeight.IsSignal)
                 {
                     if (_maxHeightWorkLoopItem.Check())
@@ -1814,7 +2588,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.maxHeight = StyleKeyword.Initial;
                 }
-                // MinHeight
+                // MaxHeight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MaxHeight.SignalProp.Signal != style.MaxHeight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MaxHeight.IsSignal)
+                        {
+                            _lastStyleFromSignal.MaxHeight.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MaxHeight.IsSignal)
+                        {
+                            style.MaxHeight.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // MinHeight - Update instance value
                 if (style.MinHeight.IsSignal)
                 {
                     if (_minHeightWorkLoopItem.Check())
@@ -1834,7 +2624,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.minHeight = StyleKeyword.Initial;
                 }
-                // BackgroundColor
+                // MinHeight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.MinHeight.SignalProp.Signal != style.MinHeight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MinHeight.IsSignal)
+                        {
+                            _lastStyleFromSignal.MinHeight.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.MinHeight.IsSignal)
+                        {
+                            style.MinHeight.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // BackgroundColor - Update instance value
                 if (style.BackgroundColor.IsSignal)
                 {
                     if (_backgroundColorWorkLoopItem.Check())
@@ -1854,7 +2660,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.backgroundColor = StyleKeyword.Initial;
                 }
-                // Color
+                // BackgroundColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.BackgroundColor.SignalProp.Signal != style.BackgroundColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BackgroundColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BackgroundColor.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.BackgroundColor.IsSignal)
+                        {
+                            style.BackgroundColor.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Color - Update instance value
                 if (style.Color.IsSignal)
                 {
                     if (_colorWorkLoopItem.Check())
@@ -1874,7 +2696,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.color = StyleKeyword.Initial;
                 }
-                // FontSize
+                // Color - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Color.SignalProp.Signal != style.Color.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Color.IsSignal)
+                        {
+                            _lastStyleFromSignal.Color.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Color.IsSignal)
+                        {
+                            style.Color.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // FontSize - Update instance value
                 if (style.FontSize.IsSignal)
                 {
                     if (_fontSizeWorkLoopItem.Check())
@@ -1894,7 +2732,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.fontSize = StyleKeyword.Initial;
                 }
-                // UnityFont
+                // FontSize - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.FontSize.SignalProp.Signal != style.FontSize.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FontSize.IsSignal)
+                        {
+                            _lastStyleFromSignal.FontSize.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.FontSize.IsSignal)
+                        {
+                            style.FontSize.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // UnityFont - Update instance value
                 if (style.UnityFont.IsSignal)
                 {
                     if (_unityFontWorkLoopItem.Check())
@@ -1914,7 +2768,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.unityFont = StyleKeyword.Initial;
                 }
-                // UnityFontDefinition
+                // UnityFont - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.UnityFont.SignalProp.Signal != style.UnityFont.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityFont.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityFont.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.UnityFont.IsSignal)
+                        {
+                            style.UnityFont.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // UnityFontDefinition - Update instance value
                 if (style.UnityFontDefinition.IsSignal)
                 {
                     if (_unityFontDefinitionWorkLoopItem.Check())
@@ -1934,7 +2804,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.unityFontDefinition = StyleKeyword.Initial;
                 }
-                // UnityFontStyle
+                // UnityFontDefinition - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.UnityFontDefinition.SignalProp.Signal != style.UnityFontDefinition.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityFontDefinition.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityFontDefinition.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.UnityFontDefinition.IsSignal)
+                        {
+                            style.UnityFontDefinition.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // UnityFontStyle - Update instance value
                 if (style.UnityFontStyle.IsSignal)
                 {
                     if (_unityFontStyleWorkLoopItem.Check())
@@ -1954,7 +2840,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.unityFontStyleAndWeight = StyleKeyword.Initial;
                 }
-                // UnityParagraphSpacing
+                // UnityFontStyle - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.UnityFontStyle.SignalProp.Signal != style.UnityFontStyle.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityFontStyle.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityFontStyle.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.UnityFontStyle.IsSignal)
+                        {
+                            style.UnityFontStyle.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // UnityParagraphSpacing - Update instance value
                 if (style.UnityParagraphSpacing.IsSignal)
                 {
                     if (_unityParagraphSpacingWorkLoopItem.Check())
@@ -1974,7 +2876,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.unityParagraphSpacing = StyleKeyword.Initial;
                 }
-                // UnityTextAlign
+                // UnityParagraphSpacing - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.UnityParagraphSpacing.SignalProp.Signal != style.UnityParagraphSpacing.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityParagraphSpacing.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityParagraphSpacing.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.UnityParagraphSpacing.IsSignal)
+                        {
+                            style.UnityParagraphSpacing.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // UnityTextAlign - Update instance value
                 if (style.UnityTextAlign.IsSignal)
                 {
                     if (_unityTextAlignWorkLoopItem.Check())
@@ -1994,7 +2912,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.unityTextAlign = StyleKeyword.Initial;
                 }
-                // TransitionProperty
+                // UnityTextAlign - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.UnityTextAlign.SignalProp.Signal != style.UnityTextAlign.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityTextAlign.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityTextAlign.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.UnityTextAlign.IsSignal)
+                        {
+                            style.UnityTextAlign.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // TransitionProperty - Update instance value
                 if (style.TransitionProperty.IsSignal)
                 {
                     if (_transitionPropertyWorkLoopItem.Check())
@@ -2014,7 +2948,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.transitionProperty = StyleKeyword.Initial;
                 }
-                // TransitionDelay
+                // TransitionProperty - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.TransitionProperty.SignalProp.Signal != style.TransitionProperty.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionProperty.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionProperty.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.TransitionProperty.IsSignal)
+                        {
+                            style.TransitionProperty.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // TransitionDelay - Update instance value
                 if (style.TransitionDelay.IsSignal)
                 {
                     if (_transitionDelayWorkLoopItem.Check())
@@ -2034,7 +2984,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.transitionDelay = StyleKeyword.Initial;
                 }
-                // TransitionDuration
+                // TransitionDelay - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.TransitionDelay.SignalProp.Signal != style.TransitionDelay.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionDelay.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionDelay.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.TransitionDelay.IsSignal)
+                        {
+                            style.TransitionDelay.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // TransitionDuration - Update instance value
                 if (style.TransitionDuration.IsSignal)
                 {
                     if (_transitionDurationWorkLoopItem.Check())
@@ -2054,7 +3020,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.transitionDuration = StyleKeyword.Initial;
                 }
-                // TransitionTimingFunction
+                // TransitionDuration - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.TransitionDuration.SignalProp.Signal != style.TransitionDuration.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionDuration.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionDuration.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.TransitionDuration.IsSignal)
+                        {
+                            style.TransitionDuration.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // TransitionTimingFunction - Update instance value
                 if (style.TransitionTimingFunction.IsSignal)
                 {
                     if (_transitionTimingFunctionWorkLoopItem.Check())
@@ -2074,7 +3056,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.transitionTimingFunction = StyleKeyword.Initial;
                 }
-                // TransformOrigin
+                // TransitionTimingFunction - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.TransitionTimingFunction.SignalProp.Signal != style.TransitionTimingFunction.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionTimingFunction.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionTimingFunction.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.TransitionTimingFunction.IsSignal)
+                        {
+                            style.TransitionTimingFunction.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // TransformOrigin - Update instance value
                 if (style.TransformOrigin.IsSignal)
                 {
                     if (_transformOriginWorkLoopItem.Check())
@@ -2094,7 +3092,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.transformOrigin = StyleKeyword.Initial;
                 }
-                // Translate
+                // TransformOrigin - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.TransformOrigin.SignalProp.Signal != style.TransformOrigin.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransformOrigin.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransformOrigin.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.TransformOrigin.IsSignal)
+                        {
+                            style.TransformOrigin.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Translate - Update instance value
                 if (style.Translate.IsSignal)
                 {
                     if (_translateWorkLoopItem.Check())
@@ -2114,7 +3128,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.translate = StyleKeyword.Initial;
                 }
-                // Scale
+                // Translate - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Translate.SignalProp.Signal != style.Translate.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Translate.IsSignal)
+                        {
+                            _lastStyleFromSignal.Translate.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Translate.IsSignal)
+                        {
+                            style.Translate.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Scale - Update instance value
                 if (style.Scale.IsSignal)
                 {
                     if (_scaleWorkLoopItem.Check())
@@ -2134,7 +3164,23 @@ namespace Fiber.UIElements
                 {
                     Instance.style.scale = StyleKeyword.Initial;
                 }
-                // Rotate
+                // Scale - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Scale.SignalProp.Signal != style.Scale.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Scale.IsSignal)
+                        {
+                            _lastStyleFromSignal.Scale.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Scale.IsSignal)
+                        {
+                            style.Scale.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
+                // Rotate - Update instance value
                 if (style.Rotate.IsSignal)
                 {
                     if (_rotateWorkLoopItem.Check())
@@ -2154,6 +3200,22 @@ namespace Fiber.UIElements
                 {
                     Instance.style.rotate = StyleKeyword.Initial;
                 }
+                // Rotate - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Rotate.SignalProp.Signal != style.Rotate.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Rotate.IsSignal)
+                        {
+                            _lastStyleFromSignal.Rotate.SignalProp.Signal.UnregisterParent(this);
+                        }
+                        if (style.Rotate.IsSignal)
+                        {
+                            style.Rotate.SignalProp.Signal.RegisterParent(this);
+                        }
+                    }
+                }
+
 
 
                 _lastStyleFromSignal = style;

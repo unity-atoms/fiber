@@ -20,7 +20,7 @@ namespace Fiber
         }
     }
 
-    public abstract class NativeNode
+    public abstract class NativeNode : BaseSignal
     {
         public abstract void AddChild(FiberNode node, int index);
         public abstract void RemoveChild(FiberNode node);
