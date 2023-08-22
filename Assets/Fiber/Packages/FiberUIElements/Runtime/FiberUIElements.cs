@@ -438,6 +438,10 @@ namespace Fiber.UIElements
             if (!virtualNode.Value.IsEmpty)
             {
                 TextFieldElementInstance.value = virtualNode.Value.Get();
+                if (virtualNode.Value.IsSignal)
+                {
+                    virtualNode.Value.Signal.RegisterParent(this);
+                }
                 _valueWorkLoopItem = new(virtualNode.Value);
             }
             if (virtualNode.OnChange != null)
@@ -474,6 +478,10 @@ namespace Fiber.UIElements
             if (!virtualNode.Text.IsEmpty)
             {
                 TextElementInstance.text = virtualNode.Text.Get();
+                if (virtualNode.Text.IsSignal)
+                {
+                    virtualNode.Text.Signal.RegisterParent(this);
+                }
                 _textWorkLoopItem = new(virtualNode.Text);
             }
         }
@@ -515,6 +523,10 @@ namespace Fiber.UIElements
             {
                 ButtonInstance.text = virtualNode.Text.Get();
                 _textWorkLoopItem = new(virtualNode.Text);
+                if (virtualNode.Text.IsSignal)
+                {
+                    virtualNode.Text.Signal.RegisterParent(this);
+                }
             }
             if (virtualNode.OnKeyDown != null)
             {
@@ -1145,14 +1157,25 @@ namespace Fiber.UIElements
             if (!virtualNode.Name.IsEmpty)
             {
                 instance.name = virtualNode.Name.Get();
+                if (virtualNode.Name.IsSignal)
+                {
+                    virtualNode.Name.Signal.RegisterParent(this);
+                }
                 _nameWorkLoopItem = new(virtualNode.Name);
             }
             if (!virtualNode.PickingMode.IsEmpty)
             {
                 instance.pickingMode = virtualNode.PickingMode.Get();
+                if (virtualNode.PickingMode.IsSignal)
+                {
+                    virtualNode.PickingMode.Signal.RegisterParent(this);
+                }
                 _pickingModeWorkLoopItem = new(virtualNode.PickingMode);
             }
-            if (virtualNode.OnClick != null) instance.RegisterCallback<ClickEvent>(virtualNode.OnClick);
+            if (virtualNode.OnClick != null)
+            {
+                instance.RegisterCallback<ClickEvent>(virtualNode.OnClick);
+            }
 
             if (!virtualNode.ClassName.IsEmpty)
             {
@@ -1163,6 +1186,10 @@ namespace Fiber.UIElements
                     var name = names[i];
                     _previousClassNameList.Add(name);
                     Instance.AddToClassList(name);
+                }
+                if (virtualNode.ClassName.IsSignal)
+                {
+                    virtualNode.ClassName.Signal.RegisterParent(this);
                 }
                 _classNameWorkLoopItem = new(virtualNode.ClassName);
             }
@@ -3217,7 +3244,6 @@ namespace Fiber.UIElements
                 }
 
 
-
                 _lastStyleFromSignal = style;
             }
         }
@@ -3225,6 +3251,7 @@ namespace Fiber.UIElements
         public override void WorkLoop()
         {
             UpdateStyle();
+
             if (_nameWorkLoopItem.Check())
             {
                 Instance.name = _nameWorkLoopItem.Get();
