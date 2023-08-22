@@ -140,12 +140,12 @@ namespace Fiber.Router
             if (parent != null)
             {
                 _parent = parent;
-                RegisterParent(parent);
+                RegisterDependentSignal(parent);
             }
         }
         ~Router()
         {
-            UnregisterParent(_parent);
+            UnregisterDependentSignal(_parent);
         }
 
         public Router Navigate(string path)

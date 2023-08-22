@@ -38,31 +38,31 @@ namespace Fiber.DesignTokens
         )
         {
             Heading1 = heading1;
-            Heading1?.RegisterParent(this);
+            Heading1?.RegisterDependentSignal(this);
             Heading2 = heading2;
-            Heading2?.RegisterParent(this);
+            Heading2?.RegisterDependentSignal(this);
             Heading3 = heading3;
-            Heading3?.RegisterParent(this);
+            Heading3?.RegisterDependentSignal(this);
             Heading4 = heading4;
-            Heading4?.RegisterParent(this);
+            Heading4?.RegisterDependentSignal(this);
             Heading5 = heading5;
-            Heading5?.RegisterParent(this);
+            Heading5?.RegisterDependentSignal(this);
             Heading6 = heading6;
-            Heading6?.RegisterParent(this);
+            Heading6?.RegisterDependentSignal(this);
             Subtitle1 = subtitle1;
-            Subtitle1?.RegisterParent(this);
+            Subtitle1?.RegisterDependentSignal(this);
             Subtitle2 = subtitle2;
-            Subtitle2?.RegisterParent(this);
+            Subtitle2?.RegisterDependentSignal(this);
             Body1 = body1;
-            Body1?.RegisterParent(this);
+            Body1?.RegisterDependentSignal(this);
             Body2 = body2;
-            Body2?.RegisterParent(this);
+            Body2?.RegisterDependentSignal(this);
             Button = button;
-            Button?.RegisterParent(this);
+            Button?.RegisterDependentSignal(this);
             Caption = caption;
-            Caption?.RegisterParent(this);
+            Caption?.RegisterDependentSignal(this);
             Overline = overline;
-            Overline?.RegisterParent(this);
+            Overline?.RegisterDependentSignal(this);
         }
 
         public override TypographyTokens Get() => this;
@@ -123,11 +123,11 @@ namespace Fiber.DesignTokens
         )
         {
             Font = new(new(font));
-            Font.RegisterParent(this);
+            Font.RegisterDependentSignal(this);
             FontSize = new(fontSize);
-            FontSize.RegisterParent(this);
+            FontSize.RegisterDependentSignal(this);
             FontStyle = new(fontStyle);
-            FontStyle.RegisterParent(this);
+            FontStyle.RegisterDependentSignal(this);
         }
 
         public override TypographyTypeTokens Get() => this;
@@ -144,7 +144,7 @@ namespace Fiber.DesignTokens
         public SpacingTokens(int baseline = 4)
         {
             Baseline = new(baseline);
-            Baseline.RegisterParent(this);
+            Baseline.RegisterDependentSignal(this);
         }
 
         public override SpacingTokens Get() => this;
@@ -205,11 +205,11 @@ namespace Fiber.DesignTokens
         )
         {
             Background = background ?? new();
-            Background.RegisterParent(this);
+            Background.RegisterDependentSignal(this);
             Border = border ?? new();
-            Border.RegisterParent(this);
+            Border.RegisterDependentSignal(this);
             Text = text ?? new();
-            Text.RegisterParent(this);
+            Text.RegisterDependentSignal(this);
         }
 
         public override Role Get() => this;
@@ -274,17 +274,17 @@ namespace Fiber.DesignTokens
         )
         {
             Default = new Signal<T>(@default ?? default, this);
-            Default.RegisterParent(this);
+            Default.RegisterDependentSignal(this);
             Selected = new Signal<T>(selected ?? default, this);
-            Selected.RegisterParent(this);
+            Selected.RegisterDependentSignal(this);
             Focused = new Signal<T>(focused ?? default, this);
-            Focused.RegisterParent(this);
+            Focused.RegisterDependentSignal(this);
             Hovered = new Signal<T>(hovered ?? default, this);
-            Hovered.RegisterParent(this);
+            Hovered.RegisterDependentSignal(this);
             Pressed = new Signal<T>(pressed ?? default, this);
-            Pressed.RegisterParent(this);
+            Pressed.RegisterDependentSignal(this);
             Disabled = new Signal<T>(disabled ?? default, this);
-            Disabled.RegisterParent(this);
+            Disabled.RegisterDependentSignal(this);
         }
 
         public override Modifiers<T> Get() => this;

@@ -126,7 +126,7 @@ namespace Fiber.GameObjects
                 Instance.name = virtualNode.Name.Get();
                 if (virtualNode.Name.IsSignal)
                 {
-                    virtualNode.Name.Signal.RegisterParent(this);
+                    virtualNode.Name.Signal.RegisterDependentSignal(this);
                 }
                 _nameWorkLoopItem = new(virtualNode.Name);
             }
@@ -135,7 +135,7 @@ namespace Fiber.GameObjects
                 // Don't set active here since it will be handled by Fiber when calling SetVisible()
                 if (virtualNode.Active.IsSignal)
                 {
-                    virtualNode.Active.Signal.RegisterParent(this);
+                    virtualNode.Active.Signal.RegisterDependentSignal(this);
                 }
                 _activeWorkLoopItem = new(virtualNode.Active);
             }
@@ -144,7 +144,7 @@ namespace Fiber.GameObjects
                 Instance.transform.position = virtualNode.Position.Get();
                 if (virtualNode.Position.IsSignal)
                 {
-                    virtualNode.Position.Signal.RegisterParent(this);
+                    virtualNode.Position.Signal.RegisterDependentSignal(this);
                 }
                 _positionWorkLoopItem = new(virtualNode.Position);
             }
@@ -153,7 +153,7 @@ namespace Fiber.GameObjects
                 Instance.transform.localScale = virtualNode.LocalScale.Get();
                 if (virtualNode.LocalScale.IsSignal)
                 {
-                    virtualNode.LocalScale.Signal.RegisterParent(this);
+                    virtualNode.LocalScale.Signal.RegisterDependentSignal(this);
                 }
                 _localScaleWorkLoopItem = new(virtualNode.LocalScale);
             }
@@ -252,19 +252,19 @@ namespace Fiber.GameObjects
         {
             if (_nameWorkLoopItem.IsSignal)
             {
-                _nameWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+                _nameWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
             }
             if (_activeWorkLoopItem.IsSignal)
             {
-                _activeWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+                _activeWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
             }
             if (_positionWorkLoopItem.IsSignal)
             {
-                _positionWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+                _positionWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
             }
             if (_localScaleWorkLoopItem.IsSignal)
             {
-                _localScaleWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+                _localScaleWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
             }
         }
     }

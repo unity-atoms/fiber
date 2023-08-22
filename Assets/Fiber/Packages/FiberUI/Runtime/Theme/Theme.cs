@@ -23,11 +23,11 @@ namespace Fiber.UI
         {
             FallbackRole = fallbackRole;
             Color = color;
-            Color.RegisterParent(this);
+            Color.RegisterDependentSignal(this);
             Typography = typography;
-            Typography.RegisterParent(this);
+            Typography.RegisterDependentSignal(this);
             Spacing = new SpacingTokens(spacingBaseline);
-            Spacing.RegisterParent(this);
+            Spacing.RegisterDependentSignal(this);
         }
 
         public override Theme Get() => this;

@@ -19,52 +19,63 @@ namespace Signals
                 {
                     _parent.DirtyBit = (byte)(_parent.DirtyBit + 1);
                 }
-                else if (_parents != null)
+                else if (_dependentSignals != null)
                 {
-                    for (var i = 0; i < _parents.Count; ++i)
+                    if (_dependentSignals is List<BaseSignal> listOfDependentSignals)
                     {
-                        _parents[i].DirtyBit = (byte)(_parents[i].DirtyBit + 1);
+                        for (var i = 0; i < listOfDependentSignals.Count; ++i)
+                        {
+                            listOfDependentSignals[i].DirtyBit = (byte)(listOfDependentSignals[i].DirtyBit + 1);
+                        }
+                    }
+                    else
+                    {
+                        var signal = (BaseSignal)_dependentSignals;
+                        signal.DirtyBit = (byte)(signal.DirtyBit + 1);
                     }
                 }
             }
         }
 
         protected BaseSignal _parent;
-        protected List<BaseSignal> _parents;
-        public void RegisterParent(BaseSignal parent)
+        protected object _dependentSignals;
+        public void RegisterDependentSignal(BaseSignal signal)
         {
-            if (_parents != null)
+            if (_dependentSignals is List<BaseSignal> listOfDependentSignals)
             {
-                _parents.Add(parent);
+                listOfDependentSignals.Add(signal);
             }
-            else if (_parent != null)
+            else if (_dependentSignals is BaseSignal)
             {
-                _parents = new()
+                _dependentSignals = new List<BaseSignal>()
                 {
-                    _parent,
-                    parent
+                    (BaseSignal)_dependentSignals,
+                    signal
                 };
-                _parent = null;
             }
             else
             {
-                _parent = parent;
+                _dependentSignals = signal;
             }
         }
 
-        public void UnregisterParent(BaseSignal parent)
+        public void UnregisterDependentSignal(BaseSignal signal)
         {
-            if (_parents != null)
+            if (_dependentSignals is List<BaseSignal> listOfDependentSignals)
             {
-                _parents.Remove(parent);
+                listOfDependentSignals.Remove(signal);
             }
-            else if (_parent == parent)
+            else
             {
-                _parent = null;
+                _dependentSignals = null;
             }
         }
 
-        public abstract bool IsDirty(byte otherDirtyBit);
+        // TODO: Remove virtual...
+        public virtual bool IsDirty(byte otherDirtyBit)
+        {
+            return DirtyBit != otherDirtyBit;
+        }
     }
 
     [Serializable]
@@ -82,14 +93,14 @@ namespace Signals
             _wrappedSignal = wrappedSignal;
             if (_wrappedSignal != null)
             {
-                _wrappedSignal.RegisterParent(this);
+                _wrappedSignal.RegisterDependentSignal(this);
             }
         }
         ~NullableSignal()
         {
             if (_wrappedSignal != null)
             {
-                _wrappedSignal.UnregisterParent(this);
+                _wrappedSignal.UnregisterDependentSignal(this);
             }
         }
 
@@ -175,12 +186,12 @@ namespace Signals
             {
                 if (_value != null)
                 {
-                    _value.UnregisterParent(this);
+                    _value.UnregisterDependentSignal(this);
                 }
                 _value = value;
                 if (_value != null)
                 {
-                    _value.RegisterParent(this);
+                    _value.RegisterDependentSignal(this);
                 }
                 DirtyBit = (byte)(DirtyBit + 1);
             }
@@ -191,7 +202,7 @@ namespace Signals
             _value = value;
             if (_value != null)
             {
-                _value.RegisterParent(this);
+                _value.RegisterDependentSignal(this);
             }
             _dirtyBit = 0;
             _parent = parent;
@@ -249,13 +260,13 @@ namespace Signals
         public ShallowSignalList(BaseSignal parent = null)
         {
             _list = new(DEFAULT_CAPACITY);
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public ShallowSignalList(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
         {
             _list = new(capacity);
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public ShallowSignalList(IList<T> source, BaseSignal parent = null)
@@ -265,7 +276,7 @@ namespace Signals
             {
                 _list.Add(source[i]);
             }
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public virtual T this[int i]
@@ -365,7 +376,7 @@ namespace Signals
         public SignalList(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
         {
             _list = new(capacity);
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public SignalList(IList<T> source, BaseSignal parent = null)
@@ -376,10 +387,10 @@ namespace Signals
                 _list.Add(source[i]);
                 if (source[i] != null)
                 {
-                    source[i].RegisterParent(this);
+                    source[i].RegisterDependentSignal(this);
                 }
             }
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
 
@@ -391,13 +402,13 @@ namespace Signals
                 var oldItem = _list[i];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent(this);
+                    oldItem.UnregisterDependentSignal(this);
                 }
 
                 _list[i] = value;
                 if (_list[i] != null)
                 {
-                    _list[i].RegisterParent(this);
+                    _list[i].RegisterDependentSignal(this);
                 }
             }
         }
@@ -412,7 +423,7 @@ namespace Signals
             for (var i = 0; i < source.Count; ++i)
             {
                 _list.Add(source[i]);
-                source[i].RegisterParent(this);
+                source[i].RegisterDependentSignal(this);
             }
             DirtyBit++;
         }
@@ -423,7 +434,7 @@ namespace Signals
             DirtyBit++;
             if (item != null)
             {
-                item.RegisterParent(this);
+                item.RegisterDependentSignal(this);
             }
         }
 
@@ -433,7 +444,7 @@ namespace Signals
             DirtyBit++;
             if (item != null)
             {
-                item.RegisterParent(this);
+                item.RegisterDependentSignal(this);
             }
         }
 
@@ -444,7 +455,7 @@ namespace Signals
 
             if (item != null)
             {
-                item.UnregisterParent(this);
+                item.UnregisterDependentSignal(this);
             }
             return result;
         }
@@ -456,7 +467,7 @@ namespace Signals
             DirtyBit++;
             if (item != null)
             {
-                item.UnregisterParent(this);
+                item.UnregisterDependentSignal(this);
             }
         }
 
@@ -464,7 +475,7 @@ namespace Signals
         {
             for (var i = 0; i < _list.Count; i++)
             {
-                _list[i].UnregisterParent(this);
+                _list[i].UnregisterDependentSignal(this);
             }
             _list.Clear();
             DirtyBit++;
@@ -518,13 +529,13 @@ namespace Signals
         public ShallowSignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
         {
             _dict = new(capacity);
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public ShallowSignalDictionary(IDictionary<K, V> source, BaseSignal parent = null)
         {
             _dict = new(source);
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public V this[K key]
@@ -608,7 +619,7 @@ namespace Signals
         public SignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
         {
             _dict = new(capacity);
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public SignalDictionary(IDictionary<K, V> source, BaseSignal parent = null)
@@ -619,10 +630,10 @@ namespace Signals
                 _dict.Add(kvp.Key, kvp.Value);
                 if (kvp.Value != null)
                 {
-                    kvp.Value.RegisterParent(this);
+                    kvp.Value.RegisterDependentSignal(this);
                 }
             }
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public V this[K key]
@@ -633,13 +644,13 @@ namespace Signals
                 var oldItem = _dict[key];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent(this);
+                    oldItem.UnregisterDependentSignal(this);
                 }
 
                 _dict[key] = value;
                 if (_dict[key] != null)
                 {
-                    _dict[key].RegisterParent(this);
+                    _dict[key].RegisterDependentSignal(this);
                 }
 
                 DirtyBit++;
@@ -651,7 +662,7 @@ namespace Signals
             foreach (var kvp in source)
             {
                 _dict.Add(kvp.Key, kvp.Value);
-                kvp.Value.RegisterParent(this);
+                kvp.Value.RegisterDependentSignal(this);
             }
             DirtyBit++;
         }
@@ -664,7 +675,7 @@ namespace Signals
 
             if (value != null)
             {
-                value.RegisterParent(this);
+                value.RegisterDependentSignal(this);
             }
 
             return value;
@@ -677,7 +688,7 @@ namespace Signals
             DirtyBit++;
             if (value != null)
             {
-                value.UnregisterParent(this);
+                value.UnregisterDependentSignal(this);
             }
             return value;
         }
@@ -695,7 +706,7 @@ namespace Signals
         {
             foreach (var kvp in _dict)
             {
-                kvp.Value.UnregisterParent(this);
+                kvp.Value.UnregisterDependentSignal(this);
             }
 
             _dict.Clear();
@@ -738,7 +749,7 @@ namespace Signals
         {
             _dict = new(capacity);
             _list = new(capacity);
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public IndexedSignalDictionary(IDictionary<K, V> source, BaseSignal parent = null)
@@ -751,10 +762,10 @@ namespace Signals
                 _list.Add(kvp.Value);
                 if (kvp.Value != null)
                 {
-                    kvp.Value.RegisterParent(this);
+                    kvp.Value.RegisterDependentSignal(this);
                 }
             }
-            RegisterParent(parent);
+            RegisterDependentSignal(parent);
         }
 
         public V this[int i]
@@ -770,13 +781,13 @@ namespace Signals
                 var oldItem = _dict[key];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent(this);
+                    oldItem.UnregisterDependentSignal(this);
                 }
 
                 _dict[key] = value;
                 if (_dict[key] != null)
                 {
-                    _dict[key].RegisterParent(this);
+                    _dict[key].RegisterDependentSignal(this);
                 }
 
                 DirtyBit++;
@@ -788,7 +799,7 @@ namespace Signals
             foreach (var kvp in source)
             {
                 _dict.Add(kvp.Key, kvp.Value);
-                kvp.Value.RegisterParent(this);
+                kvp.Value.RegisterDependentSignal(this);
             }
             _list.AddRange(source.Values);
             DirtyBit++;
@@ -803,7 +814,7 @@ namespace Signals
 
             if (value != null)
             {
-                value.RegisterParent(this);
+                value.RegisterDependentSignal(this);
             }
 
             return value;
@@ -817,7 +828,7 @@ namespace Signals
             DirtyBit++;
             if (value != null)
             {
-                value.UnregisterParent(this);
+                value.UnregisterDependentSignal(this);
             }
             return value;
         }
@@ -835,7 +846,7 @@ namespace Signals
         {
             foreach (var kvp in _dict)
             {
-                kvp.Value.UnregisterParent(this);
+                kvp.Value.UnregisterDependentSignal(this);
             }
 
             _dict.Clear();
