@@ -26,6 +26,7 @@ namespace Fiber
         public abstract void RemoveChild(FiberNode node);
         public abstract void MoveChild(FiberNode node, int index);
         public abstract void WorkLoop();
+        public abstract void Cleanup();
         public abstract void SetVisible(bool visible);
     }
 
@@ -1474,6 +1475,7 @@ namespace Fiber
         void CleanupNode(FiberNode fiberNode)
         {
             fiberNode.CleanupEffects();
+            fiberNode?.NativeNode?.Cleanup();
 
             var child = fiberNode.Child;
             while (child != null)

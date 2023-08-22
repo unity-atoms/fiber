@@ -462,6 +462,16 @@ namespace Fiber.UIElements
                 TextFieldElementInstance.value = _valueWorkLoopItem.Get();
             }
         }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_valueWorkLoopItem.IsSignal)
+            {
+                _valueWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+        }
     }
 
     public class TextElementNativeNode : VisualElementNativeNode
@@ -492,6 +502,16 @@ namespace Fiber.UIElements
             if (_textWorkLoopItem.Check())
             {
                 TextElementInstance.text = _textWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_textWorkLoopItem.IsSignal)
+            {
+                _textWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
             }
         }
     }
@@ -540,6 +560,16 @@ namespace Fiber.UIElements
             if (_textWorkLoopItem.Check())
             {
                 ButtonInstance.text = _textWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_textWorkLoopItem.IsSignal)
+            {
+                _textWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
             }
         }
     }
@@ -620,6 +650,10 @@ namespace Fiber.UIElements
             if (!virtualNode.Style.IsEmpty)
             {
                 _styleWorkLoopItem = new(virtualNode.Style);
+                if (virtualNode.Style.IsSignal)
+                {
+                    virtualNode.Style.Signal.RegisterParent(this);
+                }
                 var style = virtualNode.Style.Get();
                 _lastStyleFromSignal = style;
 
@@ -3288,6 +3322,240 @@ namespace Fiber.UIElements
                 }
             }
         }
+
+        public override void Cleanup()
+        {
+            // start style
+            if (_styleWorkLoopItem.IsSignal)
+            {
+                _styleWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_positionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _positionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_rightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _rightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_bottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _bottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_leftWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _leftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_topWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _topWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_paddingRightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_paddingBottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_paddingLeftWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_paddingTopWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_marginRightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_marginBottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_marginLeftWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_marginTopWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderTopRightRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderTopLeftRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderBottomRightRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderBottomLeftRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderRightWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderRightWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderBottomWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderLeftWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderLeftWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderTopWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderRightColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderRightColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderBottomColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderLeftColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderLeftColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_borderTopColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_displayWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _displayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_flexShrinkWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _flexShrinkWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_flexGrowWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _flexGrowWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_flexDirectionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _flexDirectionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_justifyContentWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _justifyContentWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_alignItemsWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _alignItemsWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_widthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _widthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_maxWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _maxWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_minWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _minWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_heightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _heightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_maxHeightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _maxHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_minHeightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _minHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_backgroundColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _backgroundColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_colorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _colorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_fontSizeWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _fontSizeWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_unityFontWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityFontWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_unityFontDefinitionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityFontDefinitionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_unityFontStyleWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityFontStyleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_unityParagraphSpacingWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityParagraphSpacingWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_unityTextAlignWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityTextAlignWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_transitionPropertyWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionPropertyWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_transitionDelayWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionDelayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_transitionDurationWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionDurationWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_transitionTimingFunctionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionTimingFunctionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_transformOriginWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transformOriginWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_translateWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _translateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_scaleWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _scaleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_rotateWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _rotateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterParent(this);
+            }
+            // end style
+            if (_nameWorkLoopItem.IsSignal)
+            {
+                _nameWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_pickingModeWorkLoopItem.IsSignal)
+            {
+                _pickingModeWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_classNameWorkLoopItem.IsSignal)
+            {
+                _classNameWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+        }
     }
 
     public class UIDocumentNativeNode : GameObjectNativeNode
@@ -3308,6 +3576,10 @@ namespace Fiber.UIElements
             if (!component.SortingOrder.IsEmpty)
             {
                 uiDocument.sortingOrder = component.SortingOrder.Get();
+                if (component.SortingOrder.IsSignal)
+                {
+                    component.SortingOrder.Signal.RegisterParent(this);
+                }
                 _sortingOrderWorkLoopItem = new(component.SortingOrder);
             }
         }
@@ -3369,6 +3641,16 @@ namespace Fiber.UIElements
             if (_sortingOrderWorkLoopItem.Check())
             {
                 _uiDocument.sortingOrder = _sortingOrderWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_sortingOrderWorkLoopItem.IsSignal)
+            {
+                _sortingOrderWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
             }
         }
     }

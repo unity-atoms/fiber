@@ -63,6 +63,7 @@ namespace Signals
         public bool IsEmpty { get => _signalProp.IsEmpty; }
         public bool IsValue { get => _signalProp.IsValue; }
         public bool IsSignal { get => _signalProp.IsSignal; }
+        public SignalProp<T> SignalProp { get => _signalProp; }
 
         public WorkLoopSignalProp(SignalProp<T> signalProp)
         {

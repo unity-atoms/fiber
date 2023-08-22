@@ -247,6 +247,26 @@ namespace Fiber.GameObjects
                 Instance.transform.localScale = _localScaleWorkLoopItem.Get();
             }
         }
+
+        public override void Cleanup()
+        {
+            if (_nameWorkLoopItem.IsSignal)
+            {
+                _nameWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_activeWorkLoopItem.IsSignal)
+            {
+                _activeWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_positionWorkLoopItem.IsSignal)
+            {
+                _positionWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+            if (_localScaleWorkLoopItem.IsSignal)
+            {
+                _localScaleWorkLoopItem.SignalProp.Signal.UnregisterParent(this);
+            }
+        }
     }
 
     public class GameObjectsRendererExtension : RendererExtension
