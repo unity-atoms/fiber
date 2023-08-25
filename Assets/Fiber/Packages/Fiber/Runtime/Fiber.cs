@@ -25,9 +25,11 @@ namespace Fiber
         public abstract void AddChild(FiberNode node, int index);
         public abstract void RemoveChild(FiberNode node);
         public abstract void MoveChild(FiberNode node, int index);
-        public abstract void WorkLoop();
+        public abstract void Update();
         public abstract void Cleanup();
         public abstract void SetVisible(bool visible);
+        protected override sealed void OnNotifySignalUpdate() { }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public interface IComponentAPI
@@ -97,7 +99,7 @@ namespace Fiber
         public T GetGlobal<T>();
     }
 
-    public abstract class BaseEffect
+    public abstract class BaseEffect : BaseSignal
     {
         public IEffectAPI Api { private get; set; }
         public FiberNode FiberNode { private get; set; }
@@ -109,6 +111,8 @@ namespace Fiber
 
         public abstract void RunIfDirty();
         public abstract void Cleanup();
+        protected override sealed void OnNotifySignalUpdate() { }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public abstract class Effect : BaseEffect
@@ -133,12 +137,12 @@ namespace Fiber
 
     public abstract class DynamicEffect<T> : BaseEffect
     {
-        private DynamicSignals<T> _dynamicSignals;
+        private DynamicDependencies<T> _dynamicSignals;
         bool _hasRun = false;
 
         public DynamicEffect(IList<BaseSignal<T>> signals, bool runOnMount = true)
         {
-            _dynamicSignals = new DynamicSignals<T>(signals, runOnMount);
+            _dynamicSignals = new DynamicDependencies<T>(this, signals, runOnMount);
         }
 
         public sealed override void RunIfDirty()
@@ -154,7 +158,7 @@ namespace Fiber
             }
         }
 
-        protected abstract void Run(DynamicSignals<T> signals);
+        protected abstract void Run(DynamicDependencies<T> signals);
     }
 
     public abstract class Effect<T1> : BaseEffect
@@ -170,6 +174,12 @@ namespace Fiber
         {
             _signal1 = signal1;
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
+            _signal1.RegisterDependent(this);
+        }
+
+        ~Effect()
+        {
+            _signal1?.UnregisterDependent(this);
         }
 
         public sealed override void RunIfDirty()
@@ -209,6 +219,14 @@ namespace Fiber
             _signal2 = signal2;
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
             _lastDirtyBit2 = (byte)(signal2.DirtyBit - (runOnMount ? 1 : 0));
+            _signal1.RegisterDependent(this);
+            _signal2.RegisterDependent(this);
+        }
+
+        ~Effect()
+        {
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
         }
 
         public sealed override void RunIfDirty()
@@ -254,6 +272,16 @@ namespace Fiber
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
             _lastDirtyBit2 = (byte)(signal2.DirtyBit - (runOnMount ? 1 : 0));
             _lastDirtyBit3 = (byte)(signal3.DirtyBit - (runOnMount ? 1 : 0));
+            _signal1.RegisterDependent(this);
+            _signal2.RegisterDependent(this);
+            _signal3.RegisterDependent(this);
+        }
+
+        ~Effect()
+        {
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
+            _signal3?.UnregisterDependent(this);
         }
 
         public sealed override void RunIfDirty()
@@ -778,7 +806,7 @@ namespace Fiber
         Unmounted = 4
     }
 
-    public class FiberNode
+    public class FiberNode : BaseSignal
     {
         public int Id { get; set; } // Unique id for this node. Not used directly in Fiber, but used by other renderers, for example Fiber.GameObjects.
         private static IntIdGenerator _idGenerator = new IntIdGenerator();
@@ -797,14 +825,17 @@ namespace Fiber
         public bool IsEnabled { get; set; } = true;
 
         private List<BaseEffect> _effects = new List<BaseEffect>();
+        private Renderer _renderer;
 
         public FiberNode(
+            Renderer renderer,
             NativeNode nativeNode,
             VirtualNode virtualNode,
             FiberNode parent,
             FiberNode sibling
         )
         {
+            _renderer = renderer;
             Id = _idGenerator.NextId();
             NativeNode = nativeNode;
             VirtualNode = virtualNode;
@@ -817,6 +848,17 @@ namespace Fiber
         public void PushEffect(BaseEffect effect)
         {
             _effects.Add(effect);
+            effect.RegisterDependent(this);
+        }
+
+        public void Update()
+        {
+            RunEffects();
+
+            if (NativeNode != null)
+            {
+                NativeNode.Update();
+            }
         }
 
         public void RunEffects()
@@ -838,6 +880,7 @@ namespace Fiber
             for (var i = 0; i < effectsCount; ++i)
             {
                 _effects[i].Cleanup();
+                _effects[i].UnregisterDependent(this);
             }
         }
 
@@ -969,16 +1012,6 @@ namespace Fiber
             return false;
         }
 
-        public void WorkLoop()
-        {
-            if (NativeNode != null)
-            {
-                NativeNode.WorkLoop();
-            }
-
-            RunEffects();
-        }
-
         // Get the next node in the virtual tree (traversing depth first)
         // In order to travers the tree you can do the following: 
         // for (var current = root; current != null; current = current.NextNode()) { .... }
@@ -1018,6 +1051,12 @@ namespace Fiber
 
             return current;
         }
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _renderer.AddFiberNodeToUpdateQueue(this);
+        }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public abstract class RendererExtension
@@ -1032,6 +1071,7 @@ namespace Fiber
 
         private Queue<FiberNode> _renderQueue;
         private MixedQueue _operationsQueue;
+        private Queue<FiberNode> _fiberNodesToUpdate;
         protected List<RendererExtension> _rendererExtensions;
         private Dictionary<Type, object> _globals;
         private ContextsAPI _contextsAPI;
@@ -1088,6 +1128,7 @@ namespace Fiber
         {
             _renderQueue = new();
             _operationsQueue = new();
+            _fiberNodesToUpdate = new();
             _globals = globals ?? new();
             _rendererExtensions = rendererExtensions;
             _contextsAPI = new();
@@ -1109,6 +1150,7 @@ namespace Fiber
             }
 
             _root = new FiberNode(
+                renderer: this,
                 nativeNode: nativeNodeRoot,
                 virtualNode: virtualNode,
                 parent: null,
@@ -1160,16 +1202,9 @@ namespace Fiber
         }
 
         private Stopwatch _stopWatch = new Stopwatch();
-        private FiberNode _currentWorkLoopNode = null;
         public void WorkLoop(bool immediatelyExecuteRemainingWork = false)
         {
             _stopWatch.Restart();
-
-            // Reset the current work loop node to the root
-            if (_currentWorkLoopNode == null)
-            {
-                _currentWorkLoopNode = _root;
-            }
 
             do
             {
@@ -1190,10 +1225,10 @@ namespace Fiber
                     // - Move -> Moves the node in the virtual tree as well as in the native tree.
                     CommitNextOperation();
                 }
-                else if (_currentWorkLoopNode != null)
+                else if (_fiberNodesToUpdate.Count > 0)
                 {
-                    _currentWorkLoopNode.WorkLoop();
-                    _currentWorkLoopNode = _currentWorkLoopNode.NextEnabledNode();
+                    var fiberNode = _fiberNodesToUpdate.Dequeue();
+                    fiberNode.Update();
                 }
                 else
                 {
@@ -1223,6 +1258,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: this,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1235,12 +1271,12 @@ namespace Fiber
             else if (fiberNode.VirtualNode is EnableComponent enableComponent)
             {
                 var children = enableComponent.Render(fiberNode);
-                RenderChildren(fiberNode, children, _renderQueue);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is VisibleComponent visibleComponent)
             {
                 var children = visibleComponent.Render(fiberNode);
-                RenderChildren(fiberNode, children, _renderQueue);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is ActiveComponent activeComponent)
             {
@@ -1248,6 +1284,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: this,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1260,7 +1297,7 @@ namespace Fiber
             else if (fiberNode.VirtualNode is MountComponent mountComponent)
             {
                 var children = mountComponent.Render(fiberNode);
-                RenderChildren(fiberNode, children, _renderQueue);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is BaseForComponent forComponent)
             {
@@ -1275,6 +1312,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: this,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1290,16 +1328,17 @@ namespace Fiber
                 fiberNode.NativeNode = CreateNativeNode(fiberNode);
                 if (fiberNode.NativeNode != null)
                 {
+                    fiberNode.NativeNode.RegisterDependent(fiberNode);
                     fiberNode.NativeNode.SetVisible(false);
                 }
-                RenderChildren(fiberNode, fiberNode.VirtualNode.children, _renderQueue);
+                RenderChildren(this, fiberNode, fiberNode.VirtualNode.children, _renderQueue);
             }
 
             fiberNode.Phase = FiberNodePhase.Rendered;
             _operationsQueue.Enqueue(new MountOperation(node: fiberNode));
         }
 
-        public static void RenderChildren(FiberNode fiberNode, List<VirtualNode> children, Queue<FiberNode> renderQueue)
+        public static void RenderChildren(Renderer renderer, FiberNode fiberNode, List<VirtualNode> children, Queue<FiberNode> renderQueue)
         {
             FiberNode previousChildFiberNode = null;
             for (var i = 0; children != null && i < children.Count; ++i)
@@ -1308,6 +1347,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: renderer,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1325,6 +1365,11 @@ namespace Fiber
                     renderQueue.Enqueue(childFiberNode);
                 }
             }
+        }
+
+        public void AddFiberNodeToUpdateQueue(FiberNode fiberNode)
+        {
+            _fiberNodesToUpdate.Enqueue(fiberNode);
         }
 
         private bool IsVisible(FiberNode fiberNode)
@@ -1599,17 +1644,21 @@ namespace Fiber
 
         public void CreateEffect(Func<Action> effect)
         {
-            var inlineEffect = new InlineEffect(effect);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect(effect)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
         public void CreateEffect<T1>(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount)
         {
-            var inlineEffect = new InlineEffect<T1>(effect, signal1, runOnMount);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect<T1>(effect, signal1, runOnMount)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
@@ -1620,9 +1669,11 @@ namespace Fiber
             bool runOnMount
         )
         {
-            var inlineEffect = new InlineEffect<T1, T2>(effect, signal1, signal2, runOnMount);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect<T1, T2>(effect, signal1, signal2, runOnMount)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
@@ -1634,9 +1685,11 @@ namespace Fiber
             bool runOnMount
         )
         {
-            var inlineEffect = new InlineEffect<T1, T2, T3>(effect, signal1, signal2, signal3, runOnMount);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect<T1, T2, T3>(effect, signal1, signal2, signal3, runOnMount)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
@@ -1856,7 +1909,7 @@ namespace Fiber
 
         public VirtualNode Mount(BaseSignal<bool> whenSignal, List<VirtualNode> children)
         {
-            return new MountComponent(whenSignal, children, _renderQueue, _operationsQueue);
+            return new MountComponent(whenSignal, children, _renderQueue, _operationsQueue, this);
         }
 
         private class MountComponent : VirtualNode
@@ -1864,23 +1917,27 @@ namespace Fiber
             private readonly BaseSignal<bool> _whenSignal;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
+            private readonly Renderer _renderer;
 
             public MountComponent(
                 BaseSignal<bool> whenSignal,
                 List<VirtualNode> children,
                 Queue<FiberNode> renderQueue,
-                MixedQueue operationsQueue
+                MixedQueue operationsQueue,
+                Renderer renderer
             ) : base(children)
             {
                 _whenSignal = whenSignal;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
+                _renderer = renderer;
             }
 
             private class MountEffect : Effect<bool>
             {
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
+                private readonly Renderer _renderer;
                 private readonly FiberNode _mountFiberNode;
                 private readonly List<VirtualNode> _children;
                 private bool _valueLastTime;
@@ -1890,6 +1947,7 @@ namespace Fiber
                     List<VirtualNode> children,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
+                    Renderer renderer,
                     FiberNode mountFiberNode
                 )
                     : base(whenSignal, runOnMount: false)
@@ -1897,6 +1955,7 @@ namespace Fiber
                     _children = children;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
+                    _renderer = renderer;
                     _mountFiberNode = mountFiberNode;
                     _valueLastTime = whenSignal.Get();
                 }
@@ -1909,7 +1968,7 @@ namespace Fiber
 
                     if (mount)
                     {
-                        Renderer.RenderChildren(_mountFiberNode, _children, _renderQueue);
+                        RenderChildren(_renderer, _mountFiberNode, _children, _renderQueue);
                     }
                     else
                     {
@@ -1926,7 +1985,7 @@ namespace Fiber
 
             public List<VirtualNode> Render(FiberNode mountFiberNode)
             {
-                mountFiberNode.PushEffect(new MountEffect(_whenSignal, children, _renderQueue, _operationsQueue, mountFiberNode));
+                mountFiberNode.PushEffect(new MountEffect(_whenSignal, children, _renderQueue, _operationsQueue, _renderer, mountFiberNode));
                 return _whenSignal.Get() ? children : null;
             }
         }
@@ -1938,7 +1997,7 @@ namespace Fiber
             where SignalType : BaseSignal<SignalReturnType>
             where SignalReturnType : IList<ItemType>
         {
-            return new ForComponent<ItemType, SignalType, SignalReturnType, KeyType>(each, children, _renderQueue, _operationsQueue);
+            return new ForComponent<ItemType, SignalType, SignalReturnType, KeyType>(each, children, _renderQueue, _operationsQueue, this);
         }
 
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
@@ -1956,6 +2015,7 @@ namespace Fiber
             private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
+            private readonly Renderer _renderer;
             private readonly Dictionary<KeyType, int> _currentKeyToIdMap;
             private readonly Dictionary<int, KeyType> _currentIdToKeyMap;
 
@@ -1963,13 +2023,15 @@ namespace Fiber
                 SignalType eachSignal,
                 Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
                 Queue<FiberNode> renderQueue,
-                MixedQueue operationsQueue
+                MixedQueue operationsQueue,
+                Renderer renderer
             ) : base()
             {
                 _eachSignal = eachSignal;
                 _children = children;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
+                _renderer = renderer;
 
                 _currentKeyToIdMap = new();
                 _currentIdToKeyMap = new();
@@ -1980,6 +2042,7 @@ namespace Fiber
                 private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
+                private readonly Renderer _renderer;
                 private readonly FiberNode _fiberNode;
                 private readonly Dictionary<KeyType, int> _currentKeyToIdMap;
                 private readonly Dictionary<int, KeyType> _currentIdToKeyMap;
@@ -1990,6 +2053,7 @@ namespace Fiber
                     Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
+                    Renderer renderer,
                     FiberNode fiberNode,
                     Dictionary<KeyType, int> currentKeyToIdMap,
                     Dictionary<int, KeyType> currentIdToKeyMap
@@ -1999,6 +2063,7 @@ namespace Fiber
                     _children = children;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
+                    _renderer = renderer;
                     _fiberNode = fiberNode;
                     _currentKeyToIdMap = currentKeyToIdMap;
                     _currentIdToKeyMap = currentIdToKeyMap;
@@ -2029,6 +2094,7 @@ namespace Fiber
                             else
                             {
                                 createdChildNode = new FiberNode(
+                                    renderer: _renderer,
                                     nativeNode: null,
                                     virtualNode: child,
                                     parent: _fiberNode,
@@ -2073,7 +2139,7 @@ namespace Fiber
 
             public override void Render(FiberNode fiberNode)
             {
-                fiberNode.PushEffect(new ForEffect(_eachSignal, _children, _renderQueue, _operationsQueue, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
+                fiberNode.PushEffect(new ForEffect(_eachSignal, _children, _renderQueue, _operationsQueue, _renderer, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
 
                 var each = _eachSignal.Get();
                 FiberNode previousChildFiberNode = null;
@@ -2084,6 +2150,7 @@ namespace Fiber
                     if (child != null)
                     {
                         var childFiberNode = new FiberNode(
+                            renderer: _renderer,
                             nativeNode: null,
                             virtualNode: child,
                             parent: fiberNode,
@@ -2108,7 +2175,7 @@ namespace Fiber
 
         public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children)
         {
-            return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue);
+            return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue, this);
         }
 
         private class SwitchComponent : VirtualNode
@@ -2117,18 +2184,21 @@ namespace Fiber
             private readonly SignalList<BaseSignal<bool>> _matchSignals;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
+            private readonly Renderer _renderer;
 
             public SwitchComponent(
                 VirtualNode fallback,
                 List<VirtualNode> children,
                 Queue<FiberNode> renderQueue,
-                MixedQueue operationsQueue
+                MixedQueue operationsQueue,
+                Renderer renderer
             )
                 : base(children)
             {
                 _fallback = fallback;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
+                _renderer = renderer;
 
                 _matchSignals = new(children.Count);
                 for (var i = 0; i < children.Count; ++i)
@@ -2148,6 +2218,7 @@ namespace Fiber
                 private readonly FiberNode _fiberNode;
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
+                private readonly Renderer _renderer;
                 private readonly Ref<int> _lastRenderedIndexRef;
 
                 public SwitchEffect(
@@ -2157,6 +2228,7 @@ namespace Fiber
                     FiberNode fiberNode,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
+                    Renderer renderer,
                     Ref<int> lastRenderedIndexRef
                 )
                 : base(matchSignals, runOnMount: false)
@@ -2166,9 +2238,10 @@ namespace Fiber
                     _fiberNode = fiberNode;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
+                    _renderer = renderer;
                     _lastRenderedIndexRef = lastRenderedIndexRef;
                 }
-                protected override void Run(DynamicSignals<bool> matchSignals)
+                protected override void Run(DynamicDependencies<bool> matchSignals)
                 {
                     for (var i = 0; i < matchSignals.Count; ++i)
                     {
@@ -2188,6 +2261,7 @@ namespace Fiber
 
                             var child = _children[i];
                             var childFiberNode = new FiberNode(
+                                renderer: _renderer,
                                 nativeNode: null,
                                 virtualNode: child,
                                 parent: _fiberNode,
@@ -2214,6 +2288,7 @@ namespace Fiber
                     if (_fallback != null)
                     {
                         var childFiberNode = new FiberNode(
+                            renderer: _renderer,
                             nativeNode: null,
                             virtualNode: _fallback,
                             parent: _fiberNode,
@@ -2230,7 +2305,7 @@ namespace Fiber
             public VirtualNode Render(FiberNode fiberNode)
             {
                 var _lastRenderedIndexRef = new Ref<int>(-1);
-                fiberNode.PushEffect(new SwitchEffect(_matchSignals, children, _fallback, fiberNode, _renderQueue, _operationsQueue, _lastRenderedIndexRef));
+                fiberNode.PushEffect(new SwitchEffect(_matchSignals, children, _fallback, fiberNode, _renderQueue, _operationsQueue, _renderer, _lastRenderedIndexRef));
 
                 for (var i = 0; i < children.Count; ++i)
                 {

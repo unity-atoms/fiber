@@ -440,7 +440,7 @@ namespace Fiber.UIElements
                 TextFieldElementInstance.value = virtualNode.Value.Get();
                 if (virtualNode.Value.IsSignal)
                 {
-                    virtualNode.Value.Signal.RegisterDependentSignal(this);
+                    virtualNode.Value.Signal.RegisterDependent(this);
                 }
                 _valueWorkLoopItem = new(virtualNode.Value);
             }
@@ -454,9 +454,9 @@ namespace Fiber.UIElements
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_valueWorkLoopItem.Check())
             {
                 TextFieldElementInstance.value = _valueWorkLoopItem.Get();
@@ -469,7 +469,7 @@ namespace Fiber.UIElements
 
             if (_valueWorkLoopItem.IsSignal)
             {
-                _valueWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _valueWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -490,15 +490,15 @@ namespace Fiber.UIElements
                 TextElementInstance.text = virtualNode.Text.Get();
                 if (virtualNode.Text.IsSignal)
                 {
-                    virtualNode.Text.Signal.RegisterDependentSignal(this);
+                    virtualNode.Text.Signal.RegisterDependent(this);
                 }
                 _textWorkLoopItem = new(virtualNode.Text);
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_textWorkLoopItem.Check())
             {
                 TextElementInstance.text = _textWorkLoopItem.Get();
@@ -511,7 +511,7 @@ namespace Fiber.UIElements
 
             if (_textWorkLoopItem.IsSignal)
             {
-                _textWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _textWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -545,7 +545,7 @@ namespace Fiber.UIElements
                 _textWorkLoopItem = new(virtualNode.Text);
                 if (virtualNode.Text.IsSignal)
                 {
-                    virtualNode.Text.Signal.RegisterDependentSignal(this);
+                    virtualNode.Text.Signal.RegisterDependent(this);
                 }
             }
             if (virtualNode.OnKeyDown != null)
@@ -554,9 +554,9 @@ namespace Fiber.UIElements
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_textWorkLoopItem.Check())
             {
                 ButtonInstance.text = _textWorkLoopItem.Get();
@@ -569,7 +569,7 @@ namespace Fiber.UIElements
 
             if (_textWorkLoopItem.IsSignal)
             {
-                _textWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _textWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -652,7 +652,7 @@ namespace Fiber.UIElements
                 _styleWorkLoopItem = new(virtualNode.Style);
                 if (virtualNode.Style.IsSignal)
                 {
-                    virtualNode.Style.Signal.RegisterDependentSignal(this);
+                    virtualNode.Style.Signal.RegisterDependent(this);
                 }
                 var style = virtualNode.Style.Get();
                 _lastStyleFromSignal = style;
@@ -662,7 +662,7 @@ namespace Fiber.UIElements
                     Instance.style.position = style.Position.Get();
                     if (style.Position.IsSignal)
                     {
-                        style.Position.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Position.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _positionWorkLoopItem = new(style.Position);
@@ -672,7 +672,7 @@ namespace Fiber.UIElements
                     Instance.style.right = style.Right.Get();
                     if (style.Right.IsSignal)
                     {
-                        style.Right.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Right.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _rightWorkLoopItem = new(style.Right);
@@ -682,7 +682,7 @@ namespace Fiber.UIElements
                     Instance.style.bottom = style.Bottom.Get();
                     if (style.Bottom.IsSignal)
                     {
-                        style.Bottom.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Bottom.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _bottomWorkLoopItem = new(style.Bottom);
@@ -692,7 +692,7 @@ namespace Fiber.UIElements
                     Instance.style.left = style.Left.Get();
                     if (style.Left.IsSignal)
                     {
-                        style.Left.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Left.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _leftWorkLoopItem = new(style.Left);
@@ -702,7 +702,7 @@ namespace Fiber.UIElements
                     Instance.style.top = style.Top.Get();
                     if (style.Top.IsSignal)
                     {
-                        style.Top.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Top.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _topWorkLoopItem = new(style.Top);
@@ -712,7 +712,7 @@ namespace Fiber.UIElements
                     Instance.style.paddingRight = style.PaddingRight.Get();
                     if (style.PaddingRight.IsSignal)
                     {
-                        style.PaddingRight.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.PaddingRight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _paddingRightWorkLoopItem = new(style.PaddingRight);
@@ -722,7 +722,7 @@ namespace Fiber.UIElements
                     Instance.style.paddingBottom = style.PaddingBottom.Get();
                     if (style.PaddingBottom.IsSignal)
                     {
-                        style.PaddingBottom.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.PaddingBottom.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _paddingBottomWorkLoopItem = new(style.PaddingBottom);
@@ -732,7 +732,7 @@ namespace Fiber.UIElements
                     Instance.style.paddingLeft = style.PaddingLeft.Get();
                     if (style.PaddingLeft.IsSignal)
                     {
-                        style.PaddingLeft.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.PaddingLeft.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _paddingLeftWorkLoopItem = new(style.PaddingLeft);
@@ -742,7 +742,7 @@ namespace Fiber.UIElements
                     Instance.style.paddingTop = style.PaddingTop.Get();
                     if (style.PaddingTop.IsSignal)
                     {
-                        style.PaddingTop.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.PaddingTop.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _paddingTopWorkLoopItem = new(style.PaddingTop);
@@ -752,7 +752,7 @@ namespace Fiber.UIElements
                     Instance.style.marginRight = style.MarginRight.Get();
                     if (style.MarginRight.IsSignal)
                     {
-                        style.MarginRight.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MarginRight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _marginRightWorkLoopItem = new(style.MarginRight);
@@ -762,7 +762,7 @@ namespace Fiber.UIElements
                     Instance.style.marginBottom = style.MarginBottom.Get();
                     if (style.MarginBottom.IsSignal)
                     {
-                        style.MarginBottom.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MarginBottom.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _marginBottomWorkLoopItem = new(style.MarginBottom);
@@ -772,7 +772,7 @@ namespace Fiber.UIElements
                     Instance.style.marginLeft = style.MarginLeft.Get();
                     if (style.MarginLeft.IsSignal)
                     {
-                        style.MarginLeft.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MarginLeft.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _marginLeftWorkLoopItem = new(style.MarginLeft);
@@ -782,7 +782,7 @@ namespace Fiber.UIElements
                     Instance.style.marginTop = style.MarginTop.Get();
                     if (style.MarginTop.IsSignal)
                     {
-                        style.MarginTop.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MarginTop.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _marginTopWorkLoopItem = new(style.MarginTop);
@@ -792,7 +792,7 @@ namespace Fiber.UIElements
                     Instance.style.borderTopRightRadius = style.BorderTopRightRadius.Get();
                     if (style.BorderTopRightRadius.IsSignal)
                     {
-                        style.BorderTopRightRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderTopRightRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderTopRightRadiusWorkLoopItem = new(style.BorderTopRightRadius);
@@ -802,7 +802,7 @@ namespace Fiber.UIElements
                     Instance.style.borderTopLeftRadius = style.BorderTopLeftRadius.Get();
                     if (style.BorderTopLeftRadius.IsSignal)
                     {
-                        style.BorderTopLeftRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderTopLeftRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderTopLeftRadiusWorkLoopItem = new(style.BorderTopLeftRadius);
@@ -812,7 +812,7 @@ namespace Fiber.UIElements
                     Instance.style.borderBottomRightRadius = style.BorderBottomRightRadius.Get();
                     if (style.BorderBottomRightRadius.IsSignal)
                     {
-                        style.BorderBottomRightRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderBottomRightRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderBottomRightRadiusWorkLoopItem = new(style.BorderBottomRightRadius);
@@ -822,7 +822,7 @@ namespace Fiber.UIElements
                     Instance.style.borderBottomLeftRadius = style.BorderBottomLeftRadius.Get();
                     if (style.BorderBottomLeftRadius.IsSignal)
                     {
-                        style.BorderBottomLeftRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderBottomLeftRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderBottomLeftRadiusWorkLoopItem = new(style.BorderBottomLeftRadius);
@@ -832,7 +832,7 @@ namespace Fiber.UIElements
                     Instance.style.borderRightWidth = style.BorderRightWidth.Get();
                     if (style.BorderRightWidth.IsSignal)
                     {
-                        style.BorderRightWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderRightWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderRightWidthWorkLoopItem = new(style.BorderRightWidth);
@@ -842,7 +842,7 @@ namespace Fiber.UIElements
                     Instance.style.borderBottomWidth = style.BorderBottomWidth.Get();
                     if (style.BorderBottomWidth.IsSignal)
                     {
-                        style.BorderBottomWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderBottomWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderBottomWidthWorkLoopItem = new(style.BorderBottomWidth);
@@ -852,7 +852,7 @@ namespace Fiber.UIElements
                     Instance.style.borderLeftWidth = style.BorderLeftWidth.Get();
                     if (style.BorderLeftWidth.IsSignal)
                     {
-                        style.BorderLeftWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderLeftWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderLeftWidthWorkLoopItem = new(style.BorderLeftWidth);
@@ -862,7 +862,7 @@ namespace Fiber.UIElements
                     Instance.style.borderTopWidth = style.BorderTopWidth.Get();
                     if (style.BorderTopWidth.IsSignal)
                     {
-                        style.BorderTopWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderTopWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderTopWidthWorkLoopItem = new(style.BorderTopWidth);
@@ -872,7 +872,7 @@ namespace Fiber.UIElements
                     Instance.style.borderRightColor = style.BorderRightColor.Get();
                     if (style.BorderRightColor.IsSignal)
                     {
-                        style.BorderRightColor.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderRightColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderRightColorWorkLoopItem = new(style.BorderRightColor);
@@ -882,7 +882,7 @@ namespace Fiber.UIElements
                     Instance.style.borderBottomColor = style.BorderBottomColor.Get();
                     if (style.BorderBottomColor.IsSignal)
                     {
-                        style.BorderBottomColor.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderBottomColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderBottomColorWorkLoopItem = new(style.BorderBottomColor);
@@ -892,7 +892,7 @@ namespace Fiber.UIElements
                     Instance.style.borderLeftColor = style.BorderLeftColor.Get();
                     if (style.BorderLeftColor.IsSignal)
                     {
-                        style.BorderLeftColor.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderLeftColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderLeftColorWorkLoopItem = new(style.BorderLeftColor);
@@ -902,7 +902,7 @@ namespace Fiber.UIElements
                     Instance.style.borderTopColor = style.BorderTopColor.Get();
                     if (style.BorderTopColor.IsSignal)
                     {
-                        style.BorderTopColor.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BorderTopColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _borderTopColorWorkLoopItem = new(style.BorderTopColor);
@@ -912,7 +912,7 @@ namespace Fiber.UIElements
                     Instance.style.display = style.Display.Get();
                     if (style.Display.IsSignal)
                     {
-                        style.Display.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Display.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _displayWorkLoopItem = new(style.Display);
@@ -922,7 +922,7 @@ namespace Fiber.UIElements
                     Instance.style.flexShrink = style.FlexShrink.Get();
                     if (style.FlexShrink.IsSignal)
                     {
-                        style.FlexShrink.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.FlexShrink.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _flexShrinkWorkLoopItem = new(style.FlexShrink);
@@ -932,7 +932,7 @@ namespace Fiber.UIElements
                     Instance.style.flexGrow = style.FlexGrow.Get();
                     if (style.FlexGrow.IsSignal)
                     {
-                        style.FlexGrow.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.FlexGrow.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _flexGrowWorkLoopItem = new(style.FlexGrow);
@@ -942,7 +942,7 @@ namespace Fiber.UIElements
                     Instance.style.flexDirection = style.FlexDirection.Get();
                     if (style.FlexDirection.IsSignal)
                     {
-                        style.FlexDirection.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.FlexDirection.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _flexDirectionWorkLoopItem = new(style.FlexDirection);
@@ -952,7 +952,7 @@ namespace Fiber.UIElements
                     Instance.style.justifyContent = style.JustifyContent.Get();
                     if (style.JustifyContent.IsSignal)
                     {
-                        style.JustifyContent.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.JustifyContent.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _justifyContentWorkLoopItem = new(style.JustifyContent);
@@ -962,7 +962,7 @@ namespace Fiber.UIElements
                     Instance.style.alignItems = style.AlignItems.Get();
                     if (style.AlignItems.IsSignal)
                     {
-                        style.AlignItems.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.AlignItems.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _alignItemsWorkLoopItem = new(style.AlignItems);
@@ -972,7 +972,7 @@ namespace Fiber.UIElements
                     Instance.style.width = style.Width.Get();
                     if (style.Width.IsSignal)
                     {
-                        style.Width.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Width.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _widthWorkLoopItem = new(style.Width);
@@ -982,7 +982,7 @@ namespace Fiber.UIElements
                     Instance.style.maxWidth = style.MaxWidth.Get();
                     if (style.MaxWidth.IsSignal)
                     {
-                        style.MaxWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MaxWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _maxWidthWorkLoopItem = new(style.MaxWidth);
@@ -992,7 +992,7 @@ namespace Fiber.UIElements
                     Instance.style.minWidth = style.MinWidth.Get();
                     if (style.MinWidth.IsSignal)
                     {
-                        style.MinWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MinWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _minWidthWorkLoopItem = new(style.MinWidth);
@@ -1002,7 +1002,7 @@ namespace Fiber.UIElements
                     Instance.style.height = style.Height.Get();
                     if (style.Height.IsSignal)
                     {
-                        style.Height.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Height.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _heightWorkLoopItem = new(style.Height);
@@ -1012,7 +1012,7 @@ namespace Fiber.UIElements
                     Instance.style.maxHeight = style.MaxHeight.Get();
                     if (style.MaxHeight.IsSignal)
                     {
-                        style.MaxHeight.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MaxHeight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _maxHeightWorkLoopItem = new(style.MaxHeight);
@@ -1022,7 +1022,7 @@ namespace Fiber.UIElements
                     Instance.style.minHeight = style.MinHeight.Get();
                     if (style.MinHeight.IsSignal)
                     {
-                        style.MinHeight.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.MinHeight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _minHeightWorkLoopItem = new(style.MinHeight);
@@ -1032,7 +1032,7 @@ namespace Fiber.UIElements
                     Instance.style.backgroundColor = style.BackgroundColor.Get();
                     if (style.BackgroundColor.IsSignal)
                     {
-                        style.BackgroundColor.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.BackgroundColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _backgroundColorWorkLoopItem = new(style.BackgroundColor);
@@ -1042,7 +1042,7 @@ namespace Fiber.UIElements
                     Instance.style.color = style.Color.Get();
                     if (style.Color.IsSignal)
                     {
-                        style.Color.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Color.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _colorWorkLoopItem = new(style.Color);
@@ -1052,7 +1052,7 @@ namespace Fiber.UIElements
                     Instance.style.fontSize = style.FontSize.Get();
                     if (style.FontSize.IsSignal)
                     {
-                        style.FontSize.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.FontSize.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _fontSizeWorkLoopItem = new(style.FontSize);
@@ -1062,7 +1062,7 @@ namespace Fiber.UIElements
                     Instance.style.unityFont = style.UnityFont.Get();
                     if (style.UnityFont.IsSignal)
                     {
-                        style.UnityFont.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.UnityFont.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _unityFontWorkLoopItem = new(style.UnityFont);
@@ -1072,7 +1072,7 @@ namespace Fiber.UIElements
                     Instance.style.unityFontDefinition = style.UnityFontDefinition.Get();
                     if (style.UnityFontDefinition.IsSignal)
                     {
-                        style.UnityFontDefinition.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.UnityFontDefinition.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _unityFontDefinitionWorkLoopItem = new(style.UnityFontDefinition);
@@ -1082,7 +1082,7 @@ namespace Fiber.UIElements
                     Instance.style.unityFontStyleAndWeight = style.UnityFontStyle.Get();
                     if (style.UnityFontStyle.IsSignal)
                     {
-                        style.UnityFontStyle.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.UnityFontStyle.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _unityFontStyleWorkLoopItem = new(style.UnityFontStyle);
@@ -1092,7 +1092,7 @@ namespace Fiber.UIElements
                     Instance.style.unityParagraphSpacing = style.UnityParagraphSpacing.Get();
                     if (style.UnityParagraphSpacing.IsSignal)
                     {
-                        style.UnityParagraphSpacing.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.UnityParagraphSpacing.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _unityParagraphSpacingWorkLoopItem = new(style.UnityParagraphSpacing);
@@ -1102,7 +1102,7 @@ namespace Fiber.UIElements
                     Instance.style.unityTextAlign = style.UnityTextAlign.Get();
                     if (style.UnityTextAlign.IsSignal)
                     {
-                        style.UnityTextAlign.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.UnityTextAlign.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _unityTextAlignWorkLoopItem = new(style.UnityTextAlign);
@@ -1112,7 +1112,7 @@ namespace Fiber.UIElements
                     Instance.style.transitionProperty = style.TransitionProperty.Get();
                     if (style.TransitionProperty.IsSignal)
                     {
-                        style.TransitionProperty.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.TransitionProperty.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _transitionPropertyWorkLoopItem = new(style.TransitionProperty);
@@ -1122,7 +1122,7 @@ namespace Fiber.UIElements
                     Instance.style.transitionDelay = style.TransitionDelay.Get();
                     if (style.TransitionDelay.IsSignal)
                     {
-                        style.TransitionDelay.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.TransitionDelay.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _transitionDelayWorkLoopItem = new(style.TransitionDelay);
@@ -1132,7 +1132,7 @@ namespace Fiber.UIElements
                     Instance.style.transitionDuration = style.TransitionDuration.Get();
                     if (style.TransitionDuration.IsSignal)
                     {
-                        style.TransitionDuration.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.TransitionDuration.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _transitionDurationWorkLoopItem = new(style.TransitionDuration);
@@ -1142,7 +1142,7 @@ namespace Fiber.UIElements
                     Instance.style.transitionTimingFunction = style.TransitionTimingFunction.Get();
                     if (style.TransitionTimingFunction.IsSignal)
                     {
-                        style.TransitionTimingFunction.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.TransitionTimingFunction.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _transitionTimingFunctionWorkLoopItem = new(style.TransitionTimingFunction);
@@ -1152,7 +1152,7 @@ namespace Fiber.UIElements
                     Instance.style.transformOrigin = style.TransformOrigin.Get();
                     if (style.TransformOrigin.IsSignal)
                     {
-                        style.TransformOrigin.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.TransformOrigin.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _transformOriginWorkLoopItem = new(style.TransformOrigin);
@@ -1162,7 +1162,7 @@ namespace Fiber.UIElements
                     Instance.style.translate = style.Translate.Get();
                     if (style.Translate.IsSignal)
                     {
-                        style.Translate.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Translate.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _translateWorkLoopItem = new(style.Translate);
@@ -1172,7 +1172,7 @@ namespace Fiber.UIElements
                     Instance.style.scale = style.Scale.Get();
                     if (style.Scale.IsSignal)
                     {
-                        style.Scale.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Scale.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _scaleWorkLoopItem = new(style.Scale);
@@ -1182,7 +1182,7 @@ namespace Fiber.UIElements
                     Instance.style.rotate = style.Rotate.Get();
                     if (style.Rotate.IsSignal)
                     {
-                        style.Rotate.SignalProp.Signal.RegisterDependentSignal(this);
+                        style.Rotate.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
                 _rotateWorkLoopItem = new(style.Rotate);
@@ -1193,7 +1193,7 @@ namespace Fiber.UIElements
                 instance.name = virtualNode.Name.Get();
                 if (virtualNode.Name.IsSignal)
                 {
-                    virtualNode.Name.Signal.RegisterDependentSignal(this);
+                    virtualNode.Name.Signal.RegisterDependent(this);
                 }
                 _nameWorkLoopItem = new(virtualNode.Name);
             }
@@ -1202,7 +1202,7 @@ namespace Fiber.UIElements
                 instance.pickingMode = virtualNode.PickingMode.Get();
                 if (virtualNode.PickingMode.IsSignal)
                 {
-                    virtualNode.PickingMode.Signal.RegisterDependentSignal(this);
+                    virtualNode.PickingMode.Signal.RegisterDependent(this);
                 }
                 _pickingModeWorkLoopItem = new(virtualNode.PickingMode);
             }
@@ -1223,7 +1223,7 @@ namespace Fiber.UIElements
                 }
                 if (virtualNode.ClassName.IsSignal)
                 {
-                    virtualNode.ClassName.Signal.RegisterDependentSignal(this);
+                    virtualNode.ClassName.Signal.RegisterDependent(this);
                 }
                 _classNameWorkLoopItem = new(virtualNode.ClassName);
             }
@@ -1415,11 +1415,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Position.IsSignal)
                         {
-                            _lastStyleFromSignal.Position.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Position.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Position.IsSignal)
                         {
-                            style.Position.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Position.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1451,11 +1451,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Right.IsSignal)
                         {
-                            _lastStyleFromSignal.Right.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Right.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Right.IsSignal)
                         {
-                            style.Right.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Right.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1487,11 +1487,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Bottom.IsSignal)
                         {
-                            _lastStyleFromSignal.Bottom.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Bottom.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Bottom.IsSignal)
                         {
-                            style.Bottom.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Bottom.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1523,11 +1523,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Left.IsSignal)
                         {
-                            _lastStyleFromSignal.Left.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Left.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Left.IsSignal)
                         {
-                            style.Left.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Left.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1559,11 +1559,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Top.IsSignal)
                         {
-                            _lastStyleFromSignal.Top.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Top.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Top.IsSignal)
                         {
-                            style.Top.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Top.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1595,11 +1595,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.PaddingRight.IsSignal)
                         {
-                            _lastStyleFromSignal.PaddingRight.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.PaddingRight.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.PaddingRight.IsSignal)
                         {
-                            style.PaddingRight.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.PaddingRight.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1631,11 +1631,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.PaddingBottom.IsSignal)
                         {
-                            _lastStyleFromSignal.PaddingBottom.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.PaddingBottom.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.PaddingBottom.IsSignal)
                         {
-                            style.PaddingBottom.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.PaddingBottom.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1667,11 +1667,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.PaddingLeft.IsSignal)
                         {
-                            _lastStyleFromSignal.PaddingLeft.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.PaddingLeft.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.PaddingLeft.IsSignal)
                         {
-                            style.PaddingLeft.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.PaddingLeft.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1703,11 +1703,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.PaddingTop.IsSignal)
                         {
-                            _lastStyleFromSignal.PaddingTop.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.PaddingTop.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.PaddingTop.IsSignal)
                         {
-                            style.PaddingTop.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.PaddingTop.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1739,11 +1739,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MarginRight.IsSignal)
                         {
-                            _lastStyleFromSignal.MarginRight.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MarginRight.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MarginRight.IsSignal)
                         {
-                            style.MarginRight.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MarginRight.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1775,11 +1775,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MarginBottom.IsSignal)
                         {
-                            _lastStyleFromSignal.MarginBottom.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MarginBottom.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MarginBottom.IsSignal)
                         {
-                            style.MarginBottom.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MarginBottom.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1811,11 +1811,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MarginLeft.IsSignal)
                         {
-                            _lastStyleFromSignal.MarginLeft.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MarginLeft.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MarginLeft.IsSignal)
                         {
-                            style.MarginLeft.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MarginLeft.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1847,11 +1847,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MarginTop.IsSignal)
                         {
-                            _lastStyleFromSignal.MarginTop.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MarginTop.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MarginTop.IsSignal)
                         {
-                            style.MarginTop.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MarginTop.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1883,11 +1883,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderTopRightRadius.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderTopRightRadius.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderTopRightRadius.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderTopRightRadius.IsSignal)
                         {
-                            style.BorderTopRightRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderTopRightRadius.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1919,11 +1919,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderTopLeftRadius.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderTopLeftRadius.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderTopLeftRadius.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderTopLeftRadius.IsSignal)
                         {
-                            style.BorderTopLeftRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderTopLeftRadius.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1955,11 +1955,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderBottomRightRadius.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderBottomRightRadius.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderBottomRightRadius.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderBottomRightRadius.IsSignal)
                         {
-                            style.BorderBottomRightRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderBottomRightRadius.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -1991,11 +1991,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderBottomLeftRadius.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderBottomLeftRadius.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderBottomLeftRadius.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderBottomLeftRadius.IsSignal)
                         {
-                            style.BorderBottomLeftRadius.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderBottomLeftRadius.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2027,11 +2027,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderRightWidth.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderRightWidth.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderRightWidth.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderRightWidth.IsSignal)
                         {
-                            style.BorderRightWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderRightWidth.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2063,11 +2063,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderBottomWidth.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderBottomWidth.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderBottomWidth.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderBottomWidth.IsSignal)
                         {
-                            style.BorderBottomWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderBottomWidth.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2099,11 +2099,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderLeftWidth.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderLeftWidth.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderLeftWidth.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderLeftWidth.IsSignal)
                         {
-                            style.BorderLeftWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderLeftWidth.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2135,11 +2135,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderTopWidth.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderTopWidth.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderTopWidth.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderTopWidth.IsSignal)
                         {
-                            style.BorderTopWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderTopWidth.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2171,11 +2171,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderRightColor.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderRightColor.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderRightColor.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderRightColor.IsSignal)
                         {
-                            style.BorderRightColor.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderRightColor.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2207,11 +2207,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderBottomColor.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderBottomColor.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderBottomColor.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderBottomColor.IsSignal)
                         {
-                            style.BorderBottomColor.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderBottomColor.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2243,11 +2243,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderLeftColor.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderLeftColor.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderLeftColor.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderLeftColor.IsSignal)
                         {
-                            style.BorderLeftColor.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderLeftColor.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2279,11 +2279,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BorderTopColor.IsSignal)
                         {
-                            _lastStyleFromSignal.BorderTopColor.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BorderTopColor.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BorderTopColor.IsSignal)
                         {
-                            style.BorderTopColor.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BorderTopColor.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2297,11 +2297,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Display.IsSignal)
                         {
-                            _lastStyleFromSignal.Display.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Display.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Display.IsSignal)
                         {
-                            style.Display.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Display.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2333,11 +2333,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.FlexShrink.IsSignal)
                         {
-                            _lastStyleFromSignal.FlexShrink.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.FlexShrink.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.FlexShrink.IsSignal)
                         {
-                            style.FlexShrink.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.FlexShrink.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2368,11 +2368,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.FlexGrow.IsSignal)
                         {
-                            _lastStyleFromSignal.FlexGrow.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.FlexGrow.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.FlexGrow.IsSignal)
                         {
-                            style.FlexGrow.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.FlexGrow.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2404,11 +2404,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.FlexDirection.IsSignal)
                         {
-                            _lastStyleFromSignal.FlexDirection.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.FlexDirection.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.FlexDirection.IsSignal)
                         {
-                            style.FlexDirection.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.FlexDirection.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2440,11 +2440,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.JustifyContent.IsSignal)
                         {
-                            _lastStyleFromSignal.JustifyContent.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.JustifyContent.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.JustifyContent.IsSignal)
                         {
-                            style.JustifyContent.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.JustifyContent.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2476,11 +2476,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.AlignItems.IsSignal)
                         {
-                            _lastStyleFromSignal.AlignItems.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.AlignItems.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.AlignItems.IsSignal)
                         {
-                            style.AlignItems.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.AlignItems.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2512,11 +2512,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Width.IsSignal)
                         {
-                            _lastStyleFromSignal.Width.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Width.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Width.IsSignal)
                         {
-                            style.Width.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Width.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2548,11 +2548,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MaxWidth.IsSignal)
                         {
-                            _lastStyleFromSignal.MaxWidth.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MaxWidth.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MaxWidth.IsSignal)
                         {
-                            style.MaxWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MaxWidth.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2584,11 +2584,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MinWidth.IsSignal)
                         {
-                            _lastStyleFromSignal.MinWidth.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MinWidth.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MinWidth.IsSignal)
                         {
-                            style.MinWidth.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MinWidth.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2620,11 +2620,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Height.IsSignal)
                         {
-                            _lastStyleFromSignal.Height.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Height.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Height.IsSignal)
                         {
-                            style.Height.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Height.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2656,11 +2656,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MaxHeight.IsSignal)
                         {
-                            _lastStyleFromSignal.MaxHeight.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MaxHeight.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MaxHeight.IsSignal)
                         {
-                            style.MaxHeight.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MaxHeight.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2692,11 +2692,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.MinHeight.IsSignal)
                         {
-                            _lastStyleFromSignal.MinHeight.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.MinHeight.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.MinHeight.IsSignal)
                         {
-                            style.MinHeight.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.MinHeight.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2728,11 +2728,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.BackgroundColor.IsSignal)
                         {
-                            _lastStyleFromSignal.BackgroundColor.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.BackgroundColor.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.BackgroundColor.IsSignal)
                         {
-                            style.BackgroundColor.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.BackgroundColor.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2764,11 +2764,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Color.IsSignal)
                         {
-                            _lastStyleFromSignal.Color.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Color.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Color.IsSignal)
                         {
-                            style.Color.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Color.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2800,11 +2800,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.FontSize.IsSignal)
                         {
-                            _lastStyleFromSignal.FontSize.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.FontSize.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.FontSize.IsSignal)
                         {
-                            style.FontSize.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.FontSize.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2836,11 +2836,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.UnityFont.IsSignal)
                         {
-                            _lastStyleFromSignal.UnityFont.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.UnityFont.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.UnityFont.IsSignal)
                         {
-                            style.UnityFont.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.UnityFont.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2872,11 +2872,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.UnityFontDefinition.IsSignal)
                         {
-                            _lastStyleFromSignal.UnityFontDefinition.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.UnityFontDefinition.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.UnityFontDefinition.IsSignal)
                         {
-                            style.UnityFontDefinition.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.UnityFontDefinition.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2908,11 +2908,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.UnityFontStyle.IsSignal)
                         {
-                            _lastStyleFromSignal.UnityFontStyle.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.UnityFontStyle.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.UnityFontStyle.IsSignal)
                         {
-                            style.UnityFontStyle.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.UnityFontStyle.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2944,11 +2944,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.UnityParagraphSpacing.IsSignal)
                         {
-                            _lastStyleFromSignal.UnityParagraphSpacing.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.UnityParagraphSpacing.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.UnityParagraphSpacing.IsSignal)
                         {
-                            style.UnityParagraphSpacing.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.UnityParagraphSpacing.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -2980,11 +2980,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.UnityTextAlign.IsSignal)
                         {
-                            _lastStyleFromSignal.UnityTextAlign.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.UnityTextAlign.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.UnityTextAlign.IsSignal)
                         {
-                            style.UnityTextAlign.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.UnityTextAlign.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3016,11 +3016,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.TransitionProperty.IsSignal)
                         {
-                            _lastStyleFromSignal.TransitionProperty.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.TransitionProperty.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.TransitionProperty.IsSignal)
                         {
-                            style.TransitionProperty.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.TransitionProperty.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3052,11 +3052,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.TransitionDelay.IsSignal)
                         {
-                            _lastStyleFromSignal.TransitionDelay.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.TransitionDelay.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.TransitionDelay.IsSignal)
                         {
-                            style.TransitionDelay.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.TransitionDelay.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3088,11 +3088,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.TransitionDuration.IsSignal)
                         {
-                            _lastStyleFromSignal.TransitionDuration.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.TransitionDuration.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.TransitionDuration.IsSignal)
                         {
-                            style.TransitionDuration.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.TransitionDuration.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3124,11 +3124,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.TransitionTimingFunction.IsSignal)
                         {
-                            _lastStyleFromSignal.TransitionTimingFunction.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.TransitionTimingFunction.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.TransitionTimingFunction.IsSignal)
                         {
-                            style.TransitionTimingFunction.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.TransitionTimingFunction.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3160,11 +3160,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.TransformOrigin.IsSignal)
                         {
-                            _lastStyleFromSignal.TransformOrigin.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.TransformOrigin.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.TransformOrigin.IsSignal)
                         {
-                            style.TransformOrigin.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.TransformOrigin.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3196,11 +3196,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Translate.IsSignal)
                         {
-                            _lastStyleFromSignal.Translate.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Translate.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Translate.IsSignal)
                         {
-                            style.Translate.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Translate.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3232,11 +3232,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Scale.IsSignal)
                         {
-                            _lastStyleFromSignal.Scale.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Scale.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Scale.IsSignal)
                         {
-                            style.Scale.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Scale.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3268,11 +3268,11 @@ namespace Fiber.UIElements
                     {
                         if (_lastStyleFromSignal.Rotate.IsSignal)
                         {
-                            _lastStyleFromSignal.Rotate.SignalProp.Signal.UnregisterDependentSignal(this);
+                            _lastStyleFromSignal.Rotate.SignalProp.Signal.UnregisterDependent(this);
                         }
                         if (style.Rotate.IsSignal)
                         {
-                            style.Rotate.SignalProp.Signal.RegisterDependentSignal(this);
+                            style.Rotate.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -3282,7 +3282,7 @@ namespace Fiber.UIElements
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
             UpdateStyle();
 
@@ -3328,232 +3328,232 @@ namespace Fiber.UIElements
             // start style
             if (_styleWorkLoopItem.IsSignal)
             {
-                _styleWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _styleWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_positionWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _positionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _positionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_rightWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _rightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _rightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_bottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _bottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _bottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_leftWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _leftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _leftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_topWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _topWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _topWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_paddingRightWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _paddingRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _paddingRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_paddingBottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _paddingBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _paddingBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_paddingLeftWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _paddingLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _paddingLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_paddingTopWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _paddingTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _paddingTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_marginRightWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _marginRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _marginRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_marginBottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _marginBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _marginBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_marginLeftWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _marginLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _marginLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_marginTopWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _marginTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _marginTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderTopRightRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderTopRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderTopRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderTopLeftRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderTopLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderTopLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderBottomRightRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderBottomRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderBottomRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderBottomLeftRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderBottomLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderBottomLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderRightWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderRightWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderRightWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderBottomWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderBottomWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderBottomWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderLeftWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderLeftWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderLeftWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderTopWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderTopWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderTopWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderRightColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderRightColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderRightColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderBottomColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderBottomColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderBottomColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderLeftColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderLeftColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderLeftColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_borderTopColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _borderTopColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _borderTopColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_displayWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _displayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _displayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_flexShrinkWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _flexShrinkWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _flexShrinkWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_flexGrowWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _flexGrowWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _flexGrowWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_flexDirectionWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _flexDirectionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _flexDirectionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_justifyContentWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _justifyContentWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _justifyContentWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_alignItemsWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _alignItemsWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _alignItemsWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_widthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _widthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _widthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_maxWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _maxWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _maxWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_minWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _minWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _minWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_heightWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _heightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _heightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_maxHeightWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _maxHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _maxHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_minHeightWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _minHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _minHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_backgroundColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _backgroundColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _backgroundColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_colorWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _colorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _colorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_fontSizeWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _fontSizeWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _fontSizeWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_unityFontWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _unityFontWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _unityFontWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_unityFontDefinitionWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _unityFontDefinitionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _unityFontDefinitionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_unityFontStyleWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _unityFontStyleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _unityFontStyleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_unityParagraphSpacingWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _unityParagraphSpacingWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _unityParagraphSpacingWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_unityTextAlignWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _unityTextAlignWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _unityTextAlignWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_transitionPropertyWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _transitionPropertyWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _transitionPropertyWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_transitionDelayWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _transitionDelayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _transitionDelayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_transitionDurationWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _transitionDurationWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _transitionDurationWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_transitionTimingFunctionWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _transitionTimingFunctionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _transitionTimingFunctionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_transformOriginWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _transformOriginWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _transformOriginWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_translateWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _translateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _translateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_scaleWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _scaleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _scaleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_rotateWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
-                _rotateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependentSignal(this);
+                _rotateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             // end style
             if (_nameWorkLoopItem.IsSignal)
             {
-                _nameWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _nameWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_pickingModeWorkLoopItem.IsSignal)
             {
-                _pickingModeWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _pickingModeWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_classNameWorkLoopItem.IsSignal)
             {
-                _classNameWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _classNameWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -3578,7 +3578,7 @@ namespace Fiber.UIElements
                 uiDocument.sortingOrder = component.SortingOrder.Get();
                 if (component.SortingOrder.IsSignal)
                 {
-                    component.SortingOrder.Signal.RegisterDependentSignal(this);
+                    component.SortingOrder.Signal.RegisterDependent(this);
                 }
                 _sortingOrderWorkLoopItem = new(component.SortingOrder);
             }
@@ -3635,9 +3635,9 @@ namespace Fiber.UIElements
             base.MoveChild(node, index);
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_sortingOrderWorkLoopItem.Check())
             {
                 _uiDocument.sortingOrder = _sortingOrderWorkLoopItem.Get();
@@ -3650,7 +3650,7 @@ namespace Fiber.UIElements
 
             if (_sortingOrderWorkLoopItem.IsSignal)
             {
-                _sortingOrderWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _sortingOrderWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }

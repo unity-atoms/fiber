@@ -38,31 +38,31 @@ namespace Fiber.DesignTokens
         )
         {
             Heading1 = heading1;
-            Heading1?.RegisterDependentSignal(this);
+            Heading1?.RegisterDependent(this);
             Heading2 = heading2;
-            Heading2?.RegisterDependentSignal(this);
+            Heading2?.RegisterDependent(this);
             Heading3 = heading3;
-            Heading3?.RegisterDependentSignal(this);
+            Heading3?.RegisterDependent(this);
             Heading4 = heading4;
-            Heading4?.RegisterDependentSignal(this);
+            Heading4?.RegisterDependent(this);
             Heading5 = heading5;
-            Heading5?.RegisterDependentSignal(this);
+            Heading5?.RegisterDependent(this);
             Heading6 = heading6;
-            Heading6?.RegisterDependentSignal(this);
+            Heading6?.RegisterDependent(this);
             Subtitle1 = subtitle1;
-            Subtitle1?.RegisterDependentSignal(this);
+            Subtitle1?.RegisterDependent(this);
             Subtitle2 = subtitle2;
-            Subtitle2?.RegisterDependentSignal(this);
+            Subtitle2?.RegisterDependent(this);
             Body1 = body1;
-            Body1?.RegisterDependentSignal(this);
+            Body1?.RegisterDependent(this);
             Body2 = body2;
-            Body2?.RegisterDependentSignal(this);
+            Body2?.RegisterDependent(this);
             Button = button;
-            Button?.RegisterDependentSignal(this);
+            Button?.RegisterDependent(this);
             Caption = caption;
-            Caption?.RegisterDependentSignal(this);
+            Caption?.RegisterDependent(this);
             Overline = overline;
-            Overline?.RegisterDependentSignal(this);
+            Overline?.RegisterDependent(this);
         }
 
         public override TypographyTokens Get() => this;
@@ -90,6 +90,11 @@ namespace Fiber.DesignTokens
                 TypographyType.Overline => Overline,
                 _ => null,
             };
+        }
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
         }
     }
 
@@ -123,17 +128,22 @@ namespace Fiber.DesignTokens
         )
         {
             Font = new(new(font));
-            Font.RegisterDependentSignal(this);
+            Font.RegisterDependent(this);
             FontSize = new(fontSize);
-            FontSize.RegisterDependentSignal(this);
+            FontSize.RegisterDependent(this);
             FontStyle = new(fontStyle);
-            FontStyle.RegisterDependentSignal(this);
+            FontStyle.RegisterDependent(this);
         }
 
         public override TypographyTypeTokens Get() => this;
         public override bool IsDirty(byte otherDirtyBit)
         {
             return DirtyBit != otherDirtyBit;
+        }
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
         }
     }
 
@@ -144,13 +154,18 @@ namespace Fiber.DesignTokens
         public SpacingTokens(int baseline = 4)
         {
             Baseline = new(baseline);
-            Baseline.RegisterDependentSignal(this);
+            Baseline.RegisterDependent(this);
         }
 
         public override SpacingTokens Get() => this;
         public override bool IsDirty(byte otherDirtyBit)
         {
             return DirtyBit != otherDirtyBit;
+        }
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
         }
     }
 
@@ -205,11 +220,11 @@ namespace Fiber.DesignTokens
         )
         {
             Background = background ?? new();
-            Background.RegisterDependentSignal(this);
+            Background.RegisterDependent(this);
             Border = border ?? new();
-            Border.RegisterDependentSignal(this);
+            Border.RegisterDependent(this);
             Text = text ?? new();
-            Text.RegisterDependentSignal(this);
+            Text.RegisterDependent(this);
         }
 
         public override Role Get() => this;
@@ -227,6 +242,11 @@ namespace Fiber.DesignTokens
                 ElementType.Text => Text,
                 _ => null,
             };
+        }
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
         }
     }
 
@@ -252,6 +272,7 @@ namespace Fiber.DesignTokens
         )
         {
             Variants = variants ?? new();
+            Variants.RegisterDependent(this);
         }
     }
 
@@ -274,23 +295,28 @@ namespace Fiber.DesignTokens
         )
         {
             Default = new Signal<T>(@default ?? default, this);
-            Default.RegisterDependentSignal(this);
+            Default.RegisterDependent(this);
             Selected = new Signal<T>(selected ?? default, this);
-            Selected.RegisterDependentSignal(this);
+            Selected.RegisterDependent(this);
             Focused = new Signal<T>(focused ?? default, this);
-            Focused.RegisterDependentSignal(this);
+            Focused.RegisterDependent(this);
             Hovered = new Signal<T>(hovered ?? default, this);
-            Hovered.RegisterDependentSignal(this);
+            Hovered.RegisterDependent(this);
             Pressed = new Signal<T>(pressed ?? default, this);
-            Pressed.RegisterDependentSignal(this);
+            Pressed.RegisterDependent(this);
             Disabled = new Signal<T>(disabled ?? default, this);
-            Disabled.RegisterDependentSignal(this);
+            Disabled.RegisterDependent(this);
         }
 
         public override Modifiers<T> Get() => this;
         public override bool IsDirty(byte otherDirtyBit)
         {
             return DirtyBit != otherDirtyBit;
+        }
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
         }
     }
 

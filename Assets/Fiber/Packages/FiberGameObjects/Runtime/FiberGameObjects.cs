@@ -126,7 +126,7 @@ namespace Fiber.GameObjects
                 Instance.name = virtualNode.Name.Get();
                 if (virtualNode.Name.IsSignal)
                 {
-                    virtualNode.Name.Signal.RegisterDependentSignal(this);
+                    virtualNode.Name.Signal.RegisterDependent(this);
                 }
                 _nameWorkLoopItem = new(virtualNode.Name);
             }
@@ -135,7 +135,7 @@ namespace Fiber.GameObjects
                 // Don't set active here since it will be handled by Fiber when calling SetVisible()
                 if (virtualNode.Active.IsSignal)
                 {
-                    virtualNode.Active.Signal.RegisterDependentSignal(this);
+                    virtualNode.Active.Signal.RegisterDependent(this);
                 }
                 _activeWorkLoopItem = new(virtualNode.Active);
             }
@@ -144,7 +144,7 @@ namespace Fiber.GameObjects
                 Instance.transform.position = virtualNode.Position.Get();
                 if (virtualNode.Position.IsSignal)
                 {
-                    virtualNode.Position.Signal.RegisterDependentSignal(this);
+                    virtualNode.Position.Signal.RegisterDependent(this);
                 }
                 _positionWorkLoopItem = new(virtualNode.Position);
             }
@@ -153,7 +153,7 @@ namespace Fiber.GameObjects
                 Instance.transform.localScale = virtualNode.LocalScale.Get();
                 if (virtualNode.LocalScale.IsSignal)
                 {
-                    virtualNode.LocalScale.Signal.RegisterDependentSignal(this);
+                    virtualNode.LocalScale.Signal.RegisterDependent(this);
                 }
                 _localScaleWorkLoopItem = new(virtualNode.LocalScale);
             }
@@ -228,7 +228,7 @@ namespace Fiber.GameObjects
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
             if (_nameWorkLoopItem.Check())
             {
@@ -252,19 +252,19 @@ namespace Fiber.GameObjects
         {
             if (_nameWorkLoopItem.IsSignal)
             {
-                _nameWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _nameWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_activeWorkLoopItem.IsSignal)
             {
-                _activeWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _activeWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_positionWorkLoopItem.IsSignal)
             {
-                _positionWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _positionWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_localScaleWorkLoopItem.IsSignal)
             {
-                _localScaleWorkLoopItem.SignalProp.Signal.UnregisterDependentSignal(this);
+                _localScaleWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
