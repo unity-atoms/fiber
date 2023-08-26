@@ -14,7 +14,7 @@ namespace Fiber.UI
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
                 BaseSignal<string> selectedItemId,
-                ShallowSignalList<string> expandedItemIds,
+                BaseSignalList<string> expandedItemIds,
                 string role = Constants.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
         )
@@ -62,12 +62,12 @@ namespace Fiber.UI
         {
             public BaseSignal<string> SelectedItemId;
             public Action<string> OnItemSelected;
-            public ShallowSignalList<string> ExapndedItemIds;
+            public BaseSignalList<string> ExapndedItemIds;
 
             public TreeViewStateContext(
                 BaseSignal<string> selectedItemId,
                 Action<string> onItemIdSelected,
-                ShallowSignalList<string> expandedItemIds
+                BaseSignalList<string> expandedItemIds
             )
             {
                 SelectedItemId = selectedItemId;
@@ -80,7 +80,7 @@ namespace Fiber.UI
         {
             private readonly Action<string> _onItemIdSelected;
             private readonly BaseSignal<string> _selectedItemId;
-            private readonly ShallowSignalList<string> _expandedItemIds;
+            private readonly BaseSignalList<string> _expandedItemIds;
             private readonly string _role;
             private readonly Ref<VisualElement> _forwardRef;
 
@@ -88,7 +88,7 @@ namespace Fiber.UI
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
                 BaseSignal<string> selectedItemId,
-                ShallowSignalList<string> expandedItemIds,
+                BaseSignalList<string> expandedItemIds,
                 string role = Constants.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
