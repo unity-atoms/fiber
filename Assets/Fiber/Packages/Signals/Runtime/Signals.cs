@@ -226,7 +226,7 @@ namespace Signals
     }
 
     [Serializable]
-    public abstract class BaseSignalList<T, LT> : BaseSignal<LT> where LT : IList<T>
+    public abstract class BaseSignalList<T> : BaseSignal<IList<T>>
     {
         [SerializeField]
         protected List<T> _list;
@@ -248,7 +248,7 @@ namespace Signals
 
     // Doesn't track changes of items, only mutations to the list itself
     [Serializable]
-    public class ShallowSignalList<T> : BaseSignalList<T, ShallowSignalList<T>>, IList<T>
+    public class ShallowSignalList<T> : BaseSignalList<T>, IList<T>
     {
         const int DEFAULT_CAPACITY = 5;
 
@@ -355,7 +355,7 @@ namespace Signals
             _dirtyBit++;
         }
 
-        public override sealed ShallowSignalList<T> Get()
+        public override sealed IList<T> Get()
         {
             return this;
         }
@@ -364,7 +364,7 @@ namespace Signals
 
     // Tracks both mutations to the list and changes to the items in the list.
     [Serializable]
-    public class SignalList<T> : BaseSignalList<T, SignalList<T>>, IList<T>
+    public class SignalList<T> : BaseSignalList<T>, IList<T>
         where T : BaseSignal
     {
         const int DEFAULT_CAPACITY = 5;
@@ -512,7 +512,7 @@ namespace Signals
             _dirtyBit++;
         }
 
-        public override sealed SignalList<T> Get()
+        public override sealed IList<T> Get()
         {
             return this;
         }

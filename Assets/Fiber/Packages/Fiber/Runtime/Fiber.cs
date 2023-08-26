@@ -83,11 +83,10 @@ namespace Fiber
         public VirtualNode Visible(BaseSignal<bool> whenSignal, List<VirtualNode> children);
         public VirtualNode Active(BaseSignal<bool> whenSignal, List<VirtualNode> children);
         public VirtualNode Mount(BaseSignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode For<ItemType, SignalReturnType, KeyType>(
-            BaseSignalList<ItemType, SignalReturnType> each,
+        public VirtualNode For<ItemType, KeyType>(
+            BaseSignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
-        )
-            where SignalReturnType : IList<ItemType>;
+        );
         public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children);
         public VirtualNode Match(BaseSignal<bool> when, List<VirtualNode> children);
     }
@@ -652,12 +651,12 @@ namespace Fiber
         public VirtualNode Active(BaseSignal<bool> when, List<VirtualNode> children) => Api.Active(when, children);
         public VirtualNode Mount(BaseSignal<bool> when, List<VirtualNode> children) => Api.Mount(when, children);
         public VirtualNode For<ItemType, SignalReturnType, KeyType>(
-            BaseSignalList<ItemType, SignalReturnType> each,
+            BaseSignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
         )
             where SignalReturnType : IList<ItemType>
         {
-            return Api.For<ItemType, SignalReturnType, KeyType>(each, children);
+            return Api.For<ItemType, KeyType>(each, children);
         }
         public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children) => Api.Switch(fallback, children);
         public VirtualNode Match(BaseSignal<bool> when, List<VirtualNode> children) => Api.Match(when, children);
@@ -1988,13 +1987,12 @@ namespace Fiber
             }
         }
 
-        public VirtualNode For<ItemType, SignalReturnType, KeyType>(
-            BaseSignalList<ItemType, SignalReturnType> each,
+        public VirtualNode For<ItemType, KeyType>(
+            BaseSignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
         )
-            where SignalReturnType : IList<ItemType>
         {
-            return new ForComponent<ItemType, SignalReturnType, KeyType>(each, children, _renderQueue, _operationsQueue, this);
+            return new ForComponent<ItemType, KeyType>(each, children, _renderQueue, _operationsQueue, this);
         }
 
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
@@ -2004,10 +2002,9 @@ namespace Fiber
             public abstract void Render(FiberNode fiberNode);
         }
 
-        private class ForComponent<ItemType, SignalReturnType, KeyType> : BaseForComponent
-            where SignalReturnType : IList<ItemType>
+        private class ForComponent<ItemType, KeyType> : BaseForComponent
         {
-            private readonly BaseSignalList<ItemType, SignalReturnType> _eachSignal;
+            private readonly BaseSignalList<ItemType> _eachSignal;
             private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
@@ -2016,7 +2013,7 @@ namespace Fiber
             private readonly Dictionary<int, KeyType> _currentIdToKeyMap;
 
             public ForComponent(
-                BaseSignalList<ItemType, SignalReturnType> eachSignal,
+                BaseSignalList<ItemType> eachSignal,
                 Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
                 Queue<FiberNode> renderQueue,
                 MixedQueue operationsQueue,
@@ -2033,7 +2030,7 @@ namespace Fiber
                 _currentIdToKeyMap = new();
             }
 
-            private class ForEffect : Effect<SignalReturnType>
+            private class ForEffect : Effect<IList<ItemType>>
             {
                 private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
                 private readonly Queue<FiberNode> _renderQueue;
@@ -2045,7 +2042,7 @@ namespace Fiber
                 private readonly HashSet<KeyType> _allKeys;
 
                 public ForEffect(
-                    BaseSignalList<ItemType, SignalReturnType> eachSignal,
+                    BaseSignalList<ItemType> eachSignal,
                     Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
@@ -2066,7 +2063,7 @@ namespace Fiber
                     _allKeys = new();
                 }
 
-                protected override void Run(SignalReturnType each)
+                protected override void Run(IList<ItemType> each)
                 {
                     var currentChildAtIndex = _fiberNode.Child;
                     FiberNode previousChildFiberNode = null;
