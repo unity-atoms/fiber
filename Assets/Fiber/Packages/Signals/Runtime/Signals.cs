@@ -226,7 +226,7 @@ namespace Signals
     }
 
     [Serializable]
-    public abstract class BaseSignalList<T, LT> : BaseSignal<LT> where LT : ISignalList<T>
+    public abstract class BaseSignalList<T, LT> : BaseSignal<LT> where LT : IList<T>
     {
         [SerializeField]
         protected List<T> _list;
@@ -246,15 +246,9 @@ namespace Signals
     }
 
 
-    public interface ISignalList<T>
-    {
-        int Count { get; }
-        T GetAt(int index);
-    }
-
     // Doesn't track changes of items, only mutations to the list itself
     [Serializable]
-    public class ShallowSignalList<T> : BaseSignalList<T, ShallowSignalList<T>>, IList<T>, ISignalList<T>
+    public class ShallowSignalList<T> : BaseSignalList<T, ShallowSignalList<T>>, IList<T>
     {
         const int DEFAULT_CAPACITY = 5;
 
@@ -370,7 +364,7 @@ namespace Signals
 
     // Tracks both mutations to the list and changes to the items in the list.
     [Serializable]
-    public class SignalList<T> : BaseSignalList<T, SignalList<T>>, IList<T>, ISignalList<T>
+    public class SignalList<T> : BaseSignalList<T, SignalList<T>>, IList<T>
         where T : BaseSignal
     {
         const int DEFAULT_CAPACITY = 5;
@@ -748,10 +742,13 @@ namespace Signals
     }
 
     [Serializable]
-    public class IndexedSignalDictionary<K, V> : BaseSignalList<V, IndexedSignalDictionary<K, V>>, ISignalList<V>, IEnumerable
+    public class IndexedSignalDictionary<K, V> : BaseSignal<IndexedSignalDictionary<K, V>>, IEnumerable
         where V : BaseSignal
     {
+        public int Count => _list.Count;
+        public bool IsReadOnly { get => false; }
         protected Dictionary<K, V> _dict;
+        protected List<V> _list;
 
         const int DEFAULT_CAPACITY = 5;
 
@@ -808,6 +805,11 @@ namespace Signals
 
                 NotifySignalUpdate();
             }
+        }
+
+        public V GetAt(int index)
+        {
+            return _list[index];
         }
 
         public void AddRange(IDictionary<K, V> source)
