@@ -201,11 +201,11 @@ namespace Fiber.Suite
                                         }
                                     }
                                 ),
-                                For<TodoItem, ShallowSignalList<TodoItem>, ShallowSignalList<TodoItem>, int>(
+                                For<TodoItem, ShallowSignalList<TodoItem>, int>(
                                     each: todoItemsSignal,
                                     children: (item, i) =>
                                     {
-                                        return (item.Id, For<TodoItem, ShallowSignalList<TodoItem>, ShallowSignalList<TodoItem>, int>(
+                                        return (item.Id, For<TodoItem, ShallowSignalList<TodoItem>, int>(
                                             each: todoItemsSignal,
                                             children: (item, i) =>
                                             {
