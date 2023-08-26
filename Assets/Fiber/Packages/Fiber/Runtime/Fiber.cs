@@ -1225,7 +1225,11 @@ namespace Fiber
                 else if (_fiberNodesToUpdate.Count > 0)
                 {
                     var fiberNode = _fiberNodesToUpdate.Dequeue();
-                    fiberNode.Update();
+
+                    if (fiberNode.Phase == FiberNodePhase.Mounted)
+                    {
+                        fiberNode.Update();
+                    }
                 }
                 else
                 {
