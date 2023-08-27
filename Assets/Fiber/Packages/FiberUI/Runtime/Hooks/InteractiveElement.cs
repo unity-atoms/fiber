@@ -8,8 +8,8 @@ namespace Fiber.UI
     {
         public static InteractiveElement CreateInteractiveElement(
             this BaseComponent component,
-             Ref<VisualElement> _ref = null,
-            BaseSignal<bool> isDisabled = null,
+            Ref<VisualElement> _ref = null,
+            ISignal<bool> isDisabled = null,
             Action onPress = null
         )
         {
@@ -57,11 +57,11 @@ namespace Fiber.UI
         public Signal<bool> IsHovered { get; private set; }
         public Signal<bool> IsPressed { get; private set; }
         // IsDisabled will most likely be derived from external state, but can be handled interanlly
-        public BaseSignal<bool> IsDisabled { get; private set; }
+        public ISignal<bool> IsDisabled { get; private set; }
 
         public InteractiveElement(
             Ref<VisualElement> _ref = null,
-            BaseSignal<bool> isDisabled = null
+            ISignal<bool> isDisabled = null
         )
         {
             Ref = _ref ?? new Ref<VisualElement>();

@@ -26,14 +26,14 @@ namespace Signals
     [Serializable]
     public class DynamicDependencies<T>
     {
-        private readonly BaseSignal _dependent;
-        public List<BaseSignal<T>> Signals { get => _signals; }
-        private readonly List<BaseSignal<T>> _signals;
+        private readonly ISignal _dependent;
+        public List<ISignal<T>> Signals { get => _signals; }
+        private readonly List<ISignal<T>> _signals;
         private readonly List<byte> _dirtyBits;
         private int _count = 0;
         private int _previousCount = 0;
 
-        public DynamicDependencies(BaseSignal dependent, IList<BaseSignal<T>> dependencies = null, bool initializeDirty = true)
+        public DynamicDependencies(ISignal dependent, IList<ISignal<T>> dependencies = null, bool initializeDirty = true)
         {
             _dependent = dependent;
             _signals = dependencies != null ? new(dependencies) : new();
@@ -71,7 +71,7 @@ namespace Signals
             return isDirty;
         }
 
-        public void Add<ST>(ST signal) where ST : BaseSignal<T>
+        public void Add<ST>(ST signal) where ST : ISignal<T>
         {
             _signals.Add(signal);
             signal.RegisterDependent(_dependent);
@@ -79,7 +79,7 @@ namespace Signals
             _count++;
         }
 
-        public void Remove<ST>(ST signal) where ST : BaseSignal<T>
+        public void Remove<ST>(ST signal) where ST : ISignal<T>
         {
             var index = _signals.IndexOf(signal);
             signal.UnregisterDependent(_dependent);
@@ -110,7 +110,7 @@ namespace Signals
     {
         private readonly DynamicDependencies<DT> _dynamicDependencies;
 
-        public DynamicComputedSignal(IList<BaseSignal<DT>> dynamicDependencies = null) : base()
+        public DynamicComputedSignal(IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
             _dynamicDependencies = new(dependent: this, dynamicDependencies);
         }
@@ -135,14 +135,15 @@ namespace Signals
         protected abstract RT Compute(DynamicDependencies<DT> dynamicSignals);
     }
 
+
     [Serializable]
     public abstract class DynamicComputedSignal<T1, DT, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
         private readonly DynamicDependencies<DT> _dynamicDependencies;
 
-        public DynamicComputedSignal(BaseSignal<T1> signal1, IList<BaseSignal<DT>> dynamicDependencies = null) : base()
+        public DynamicComputedSignal(ISignal<T1> signal1, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
             _signal1 = signal1;
             _signal1.RegisterDependent(this);
@@ -181,13 +182,13 @@ namespace Signals
     [Serializable]
     public abstract class DynamicComputedSignal<T1, T2, DT, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
         private readonly DynamicDependencies<DT> _dynamicDependencies;
 
-        public DynamicComputedSignal(BaseSignal<T1> signal1, BaseSignal<T2> signal2, IList<BaseSignal<DT>> dynamicDependencies = null) : base()
+        public DynamicComputedSignal(ISignal<T1> signal1, ISignal<T2> signal2, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
             _signal1 = signal1;
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
@@ -230,13 +231,13 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1
+            ISignal<T1> signal1
         ) : base()
         {
             _signal1 = signal1;
@@ -274,16 +275,16 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2
+            ISignal<T1> signal1,
+            ISignal<T2> signal2
         ) : base()
         {
             _signal1 = signal1;
@@ -326,19 +327,19 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3
         ) : base()
         {
             _signal1 = signal1;
@@ -379,22 +380,22 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4
         ) : base()
         {
             _signal1 = signal1;
@@ -447,25 +448,25 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, T5, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
-        protected BaseSignal<T5> _signal5;
+        protected ISignal<T5> _signal5;
         protected byte _lastDirtyBit5;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5
         ) : base()
         {
             _signal1 = signal1;
@@ -523,28 +524,28 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, T5, T6, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
-        protected BaseSignal<T5> _signal5;
+        protected ISignal<T5> _signal5;
         protected byte _lastDirtyBit5;
-        protected BaseSignal<T6> _signal6;
+        protected ISignal<T6> _signal6;
         protected byte _lastDirtyBit6;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6
         ) : base()
         {
             _signal1 = signal1;
@@ -607,31 +608,31 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
-        protected BaseSignal<T5> _signal5;
+        protected ISignal<T5> _signal5;
         protected byte _lastDirtyBit5;
-        protected BaseSignal<T6> _signal6;
+        protected ISignal<T6> _signal6;
         protected byte _lastDirtyBit6;
-        protected BaseSignal<T7> _signal7;
+        protected ISignal<T7> _signal7;
         protected byte _lastDirtyBit7;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6,
-            BaseSignal<T7> signal7
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6,
+            ISignal<T7> signal7
         ) : base()
         {
             _signal1 = signal1;
@@ -708,9 +709,9 @@ namespace Signals
         IndexedDictionary<Key, ItemSignal>
     >
         where Key : IEquatable<Key>
-        where KeysSignal : BaseSignal<Keys>
+        where KeysSignal : ISignal<Keys>
         where Keys : IList<Key>
-        where ItemSignal : BaseSignal<ItemType>
+        where ItemSignal : ISignal<ItemType>
     {
         IndexedDictionary<Key, ItemSignal> _signalsByKey;
 
@@ -779,7 +780,7 @@ namespace Signals
 
     public class NegatedBoolSignal : ComputedSignal<bool, bool>
     {
-        public NegatedBoolSignal(BaseSignal<bool> signal) : base(signal) { }
+        public NegatedBoolSignal(ISignal<bool> signal) : base(signal) { }
         protected override bool Compute(bool value)
         {
             return !value;
@@ -788,7 +789,7 @@ namespace Signals
 
     public class IntToStringSignal : ComputedSignal<int, string>
     {
-        public IntToStringSignal(BaseSignal<int> signal) : base(signal) { }
+        public IntToStringSignal(ISignal<int> signal) : base(signal) { }
         protected override string Compute(int value)
         {
             return value.ToString();

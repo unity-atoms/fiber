@@ -13,13 +13,13 @@ namespace Signals
     public class SignalSubscription<T1> : BaseSignal, ISignalSubscription
     {
         private readonly Action<ISignalSubscription> _addToDirtySubscriptions;
-        private readonly BaseSignal<T1> _signal1;
+        private readonly ISignal<T1> _signal1;
         private byte _dirtyBit1;
         private readonly Action<T1> _onChange;
 
         public SignalSubscription(
             Action<ISignalSubscription> addToDirtySubscriptions,
-            BaseSignal<T1> signal1,
+            ISignal<T1> signal1,
             Action<T1> onChange,
             bool triggerHandlerOnSubscribe = true
         )
@@ -59,16 +59,16 @@ namespace Signals
     public class SignalSubscription<T1, T2> : BaseSignal, ISignalSubscription
     {
         private readonly Action<ISignalSubscription> _addToDirtySubscriptions;
-        private readonly BaseSignal<T1> _signal1;
+        private readonly ISignal<T1> _signal1;
         private byte _dirtyBit1;
-        private readonly BaseSignal<T2> _signal2;
+        private readonly ISignal<T2> _signal2;
         private byte _dirtyBit2;
         private readonly Action<T1, T2> _onChange;
 
         public SignalSubscription(
             Action<ISignalSubscription> addToDirtySubscriptions,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
             Action<T1, T2> onChange,
             bool triggerHandlerOnSubscribe = true
         )
@@ -114,19 +114,19 @@ namespace Signals
     public class SignalSubscription<T1, T2, T3> : BaseSignal, ISignalSubscription
     {
         private readonly Action<ISignalSubscription> _addToDirtySubscriptions;
-        private readonly BaseSignal<T1> _signal1;
+        private readonly ISignal<T1> _signal1;
         private byte _dirtyBit1;
-        private readonly BaseSignal<T2> _signal2;
+        private readonly ISignal<T2> _signal2;
         private byte _dirtyBit2;
-        private readonly BaseSignal<T3> _signal3;
+        private readonly ISignal<T3> _signal3;
         private byte _dirtyBit3;
         private readonly Action<T1, T2, T3> _onChange;
 
         public SignalSubscription(
             Action<ISignalSubscription> addToDirtySubscriptions,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
             Action<T1, T2, T3> onChange,
             bool triggerHandlerOnSubscribe = true
         )
@@ -178,22 +178,22 @@ namespace Signals
     public class SignalSubscription<T1, T2, T3, T4> : BaseSignal, ISignalSubscription
     {
         private readonly Action<ISignalSubscription> _addToDirtySubscriptions;
-        private readonly BaseSignal<T1> _signal1;
+        private readonly ISignal<T1> _signal1;
         private byte _dirtyBit1;
-        private readonly BaseSignal<T2> _signal2;
+        private readonly ISignal<T2> _signal2;
         private byte _dirtyBit2;
-        private readonly BaseSignal<T3> _signal3;
+        private readonly ISignal<T3> _signal3;
         private byte _dirtyBit3;
-        private readonly BaseSignal<T4> _signal4;
+        private readonly ISignal<T4> _signal4;
         private byte _dirtyBit4;
         private readonly Action<T1, T2, T3, T4> _onChange;
 
         public SignalSubscription(
             Action<ISignalSubscription> addToDirtySubscriptions,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
             Action<T1, T2, T3, T4> onChange,
             bool triggerHandlerOnSubscribe = true
         )
@@ -283,7 +283,7 @@ namespace Signals
         }
 
         public int Subscribe<T>(
-            BaseSignal<T> signal1,
+            ISignal<T> signal1,
             Action<T> onChange,
             bool triggerHandlerOnSubscribe = true
         )
@@ -302,7 +302,7 @@ namespace Signals
         }
 
         public int Subscribe<T1, T2>(
-            BaseSignal<T1> signal1, BaseSignal<T2> signal2,
+            ISignal<T1> signal1, ISignal<T2> signal2,
             Action<T1, T2> onChange,
             bool triggerHandlerOnSubscribe = true
         )
@@ -322,9 +322,9 @@ namespace Signals
         }
 
         public int Subscribe<T1, T2, T3>(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
             Action<T1, T2, T3> onChange,
             bool triggerHandlerOnSubscribe = true
         )
@@ -345,10 +345,10 @@ namespace Signals
         }
 
         public int Subscribe<T1, T2, T3, T4>(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
             Action<T1, T2, T3, T4> onChange,
             bool triggerHandlerOnSubscribe = true
         )

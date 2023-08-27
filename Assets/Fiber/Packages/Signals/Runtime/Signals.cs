@@ -5,7 +5,27 @@ using UnityEngine;
 
 namespace Signals
 {
-    public abstract class BaseSignal
+    public interface ISignal
+    {
+        byte DirtyBit { get; }
+        void RegisterDependent(ISignal dependant);
+        void UnregisterDependent(ISignal dependant);
+        void NotifySignalUpdate();
+        bool IsDirty(byte otherDirtyBit);
+    }
+
+    public interface ISignal<T> : ISignal
+    {
+        T Get();
+    }
+
+    public interface ISignalList<T> : ISignal<IList<T>>
+    {
+        int Count { get; }
+        T GetAt(int index);
+    }
+
+    public abstract class BaseSignal : ISignal
     {
         // The deep dirty bit is used to track changes to the signal. Incrementing
         // this value indicates that the signal has changed. 
@@ -17,7 +37,7 @@ namespace Signals
         {
             if (_dependents != null)
             {
-                if (_dependents is List<BaseSignal> listOfDependents)
+                if (_dependents is List<ISignal> listOfDependents)
                 {
                     for (var i = listOfDependents.Count - 1; i >= 0; --i)
                     {
@@ -26,7 +46,7 @@ namespace Signals
                 }
                 else
                 {
-                    var dependent = (BaseSignal)_dependents;
+                    var dependent = (ISignal)_dependents;
                     UnregisterDependent(dependent);
                 }
             }
@@ -39,7 +59,7 @@ namespace Signals
             OnNotifySignalUpdate();
             if (_dependents != null)
             {
-                if (_dependents is List<BaseSignal> listOfDependents)
+                if (_dependents is List<ISignal> listOfDependents)
                 {
                     for (var i = 0; i < listOfDependents.Count; ++i)
                     {
@@ -48,24 +68,24 @@ namespace Signals
                 }
                 else
                 {
-                    var dependent = (BaseSignal)_dependents;
+                    var dependent = (ISignal)_dependents;
                     dependent.NotifySignalUpdate();
                 }
             }
         }
 
         protected object _dependents;
-        public void RegisterDependent(BaseSignal dependant)
+        public void RegisterDependent(ISignal dependant)
         {
-            if (_dependents is List<BaseSignal> listOfDependentSignals)
+            if (_dependents is List<ISignal> listOfDependentSignals)
             {
                 listOfDependentSignals.Add(dependant);
             }
-            else if (_dependents is BaseSignal)
+            else if (_dependents is ISignal)
             {
-                _dependents = new List<BaseSignal>()
+                _dependents = new List<ISignal>()
                 {
-                    (BaseSignal)_dependents,
+                    (ISignal)_dependents,
                     dependant
                 };
             }
@@ -75,9 +95,9 @@ namespace Signals
             }
         }
 
-        public void UnregisterDependent(BaseSignal dependant)
+        public void UnregisterDependent(ISignal dependant)
         {
-            if (_dependents is List<BaseSignal> listOfDependentSignals)
+            if (_dependents is List<ISignal> listOfDependentSignals)
             {
                 listOfDependentSignals.Remove(dependant);
             }
@@ -91,7 +111,7 @@ namespace Signals
     }
 
     [Serializable]
-    public abstract class BaseSignal<T> : BaseSignal
+    public abstract class BaseSignal<T> : BaseSignal, ISignal<T>
     {
         public abstract T Get();
     }
@@ -226,7 +246,7 @@ namespace Signals
     }
 
     [Serializable]
-    public abstract class BaseSignalList<T> : BaseSignal<IList<T>>
+    public abstract class BaseSignalList<T> : BaseSignal<IList<T>>, ISignalList<T>
     {
         [SerializeField]
         protected List<T> _list;
@@ -257,19 +277,19 @@ namespace Signals
             _list = new(DEFAULT_CAPACITY);
         }
 
-        public ShallowSignalList(BaseSignal dependent = null)
+        public ShallowSignalList(ISignal dependent = null)
         {
             _list = new(DEFAULT_CAPACITY);
             RegisterDependent(dependent);
         }
 
-        public ShallowSignalList(int capacity = DEFAULT_CAPACITY, BaseSignal dependent = null)
+        public ShallowSignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _list = new(capacity);
             RegisterDependent(dependent);
         }
 
-        public ShallowSignalList(IList<T> source, BaseSignal dependent = null)
+        public ShallowSignalList(IList<T> source, ISignal dependent = null)
         {
             _list = new(source?.Count ?? DEFAULT_CAPACITY);
             for (var i = 0; source != null && i < source.Count; ++i)
@@ -365,7 +385,7 @@ namespace Signals
     // Tracks both mutations to the list and changes to the items in the list.
     [Serializable]
     public class SignalList<T> : BaseSignalList<T>, IList<T>
-        where T : BaseSignal
+        where T : ISignal
     {
         const int DEFAULT_CAPACITY = 5;
 
@@ -374,19 +394,19 @@ namespace Signals
             _list = new(DEFAULT_CAPACITY);
         }
 
-        public SignalList(BaseSignal dependent = null)
+        public SignalList(ISignal dependent = null)
         {
             _list = new(DEFAULT_CAPACITY);
             RegisterDependent(dependent);
         }
 
-        public SignalList(int capacity = DEFAULT_CAPACITY, BaseSignal dependent = null)
+        public SignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _list = new(capacity);
             RegisterDependent(dependent);
         }
 
-        public SignalList(IList<T> source, BaseSignal dependent = null)
+        public SignalList(IList<T> source, ISignal dependent = null)
         {
             _list = new(source?.Count ?? DEFAULT_CAPACITY);
             for (var i = 0; source != null && i < source.Count; ++i)
@@ -534,13 +554,13 @@ namespace Signals
             _dict = new(DEFAULT_CAPACITY);
         }
 
-        public ShallowSignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal dependent = null)
+        public ShallowSignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _dict = new(capacity);
             RegisterDependent(dependent);
         }
 
-        public ShallowSignalDictionary(IDictionary<K, V> source, BaseSignal dependent = null)
+        public ShallowSignalDictionary(IDictionary<K, V> source, ISignal dependent = null)
         {
             _dict = new(source);
             RegisterDependent(dependent);
@@ -612,7 +632,7 @@ namespace Signals
     // Tracks both mutations to the dictionary and changes to the values in the dictionary.
     [Serializable]
     public class SignalDictionary<K, V> : BaseSignal<SignalDictionary<K, V>>, IEnumerable
-        where V : BaseSignal
+        where V : ISignal
     {
         protected Dictionary<K, V> _dict;
 
@@ -625,13 +645,13 @@ namespace Signals
             _dict = new(DEFAULT_CAPACITY);
         }
 
-        public SignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal dependent = null)
+        public SignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _dict = new(capacity);
             RegisterDependent(dependent);
         }
 
-        public SignalDictionary(IDictionary<K, V> source, BaseSignal dependent = null)
+        public SignalDictionary(IDictionary<K, V> source, ISignal dependent = null)
         {
             _dict = new(source?.Count ?? DEFAULT_CAPACITY);
             foreach (var kvp in source)
@@ -743,7 +763,7 @@ namespace Signals
 
     [Serializable]
     public class IndexedSignalDictionary<K, V> : BaseSignal<IndexedSignalDictionary<K, V>>, IEnumerable
-        where V : BaseSignal
+        where V : ISignal
     {
         public int Count => _list.Count;
         public bool IsReadOnly { get => false; }
@@ -758,14 +778,14 @@ namespace Signals
             _list = new(DEFAULT_CAPACITY);
         }
 
-        public IndexedSignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal dependent = null)
+        public IndexedSignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _dict = new(capacity);
             _list = new(capacity);
             RegisterDependent(dependent);
         }
 
-        public IndexedSignalDictionary(IDictionary<K, V> source, BaseSignal dependent = null)
+        public IndexedSignalDictionary(IDictionary<K, V> source, ISignal dependent = null)
         {
             _dict = new(source?.Count ?? DEFAULT_CAPACITY);
             _list = new(source?.Count ?? DEFAULT_CAPACITY);

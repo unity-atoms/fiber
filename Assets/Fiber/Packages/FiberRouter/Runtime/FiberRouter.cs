@@ -137,9 +137,9 @@ namespace Fiber.Router
 
         public RouteDefinition RouterTree { get; private set; }
         public SignalList<Route> RouteStack { get; private set; }
-        private readonly BaseSignal _parent;
+        private readonly ISignal _parent;
 
-        public Router(RouteDefinition routerTree, BaseSignal parent = null)
+        public Router(RouteDefinition routerTree, ISignal parent = null)
         {
             RouterTree = routerTree;
             RouteStack = new(5, this);

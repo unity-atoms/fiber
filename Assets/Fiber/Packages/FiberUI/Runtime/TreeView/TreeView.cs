@@ -13,8 +13,8 @@ namespace Fiber.UI
             this BaseComponent component,
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
-                BaseSignal<string> selectedItemId,
-                BaseSignalList<string> expandedItemIds,
+                ISignal<string> selectedItemId,
+                ISignalList<string> expandedItemIds,
                 string role = Constants.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
         )
@@ -60,14 +60,14 @@ namespace Fiber.UI
 
         private class TreeViewStateContext
         {
-            public BaseSignal<string> SelectedItemId;
+            public ISignal<string> SelectedItemId;
             public Action<string> OnItemSelected;
-            public BaseSignalList<string> ExapndedItemIds;
+            public ISignalList<string> ExapndedItemIds;
 
             public TreeViewStateContext(
-                BaseSignal<string> selectedItemId,
+                ISignal<string> selectedItemId,
                 Action<string> onItemIdSelected,
-                BaseSignalList<string> expandedItemIds
+                ISignalList<string> expandedItemIds
             )
             {
                 SelectedItemId = selectedItemId;
@@ -79,16 +79,16 @@ namespace Fiber.UI
         public class Container : BaseComponent
         {
             private readonly Action<string> _onItemIdSelected;
-            private readonly BaseSignal<string> _selectedItemId;
-            private readonly BaseSignalList<string> _expandedItemIds;
+            private readonly ISignal<string> _selectedItemId;
+            private readonly ISignalList<string> _expandedItemIds;
             private readonly string _role;
             private readonly Ref<VisualElement> _forwardRef;
 
             public Container(
                 List<VirtualNode> children,
                 Action<string> onItemIdSelected,
-                BaseSignal<string> selectedItemId,
-                BaseSignalList<string> expandedItemIds,
+                ISignal<string> selectedItemId,
+                ISignalList<string> expandedItemIds,
                 string role = Constants.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
@@ -220,13 +220,13 @@ namespace Fiber.UI
         {
             private readonly int _identationLevel;
             private readonly string _role;
-            private readonly BaseSignal<bool> _isExpanded;
+            private readonly ISignal<bool> _isExpanded;
 
             public VisualItemGroup(
                 List<VirtualNode> children,
                 int identationLevel,
                 string role,
-                BaseSignal<bool> isExpanded
+                ISignal<bool> isExpanded
             ) : base(children)
             {
                 _identationLevel = identationLevel;
@@ -257,8 +257,8 @@ namespace Fiber.UI
             private readonly string _role;
             private readonly bool _hasSubItems;
             private readonly InteractiveElement _interactiveElement;
-            private readonly BaseSignal<bool> _isSelected;
-            private readonly BaseSignal<bool> _isExpanded;
+            private readonly ISignal<bool> _isSelected;
+            private readonly ISignal<bool> _isExpanded;
 
             public VisualItem(
                 SignalProp<string> label,
@@ -266,8 +266,8 @@ namespace Fiber.UI
                 string role,
                 bool hasSubItems,
                 InteractiveElement interactiveElement,
-                BaseSignal<bool> isSelected,
-                BaseSignal<bool> isExpanded
+                ISignal<bool> isSelected,
+                ISignal<bool> isExpanded
             ) : base()
             {
                 _label = label;
