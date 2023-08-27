@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using FiberUtils;
 using Signals;
+using PlasticGui.WorkspaceWindow;
 
 namespace Fiber
 {
@@ -994,7 +995,28 @@ namespace Fiber
         // If disabled underlying effects and signals will not update.
         // If disabled the full sub tree will also be excluded from
         // being processed in the WorkLoop.
-        public bool IsEnabled { get; set; } = true;
+        private bool _isEnabled = true;
+        public bool IsEnabled
+        {
+            get
+            {
+                var current = this;
+                do
+                {
+                    if (!current._isEnabled)
+                    {
+                        return false;
+                    }
+                    current = current.Parent;
+                } while (current != null);
+
+                return true;
+            }
+            set
+            {
+                _isEnabled = value;
+            }
+        }
 
         private List<BaseEffect> _effects = new List<BaseEffect>();
         private Renderer _renderer;
@@ -1212,21 +1234,12 @@ namespace Fiber
             }
         }
 
-        public FiberNode NextEnabledNode(FiberNode root = null)
-        {
-            FiberNode current = this;
-            do
-            {
-                current = current.NextNode(root);
-            }
-            while (current != null && !current.IsEnabled && current.Phase != FiberNodePhase.Mounted);
-
-            return current;
-        }
-
         protected override sealed void OnNotifySignalUpdate()
         {
-            _renderer.AddFiberNodeToUpdateQueue(this);
+            if (Phase == FiberNodePhase.Mounted && IsEnabled)
+            {
+                _renderer.AddFiberNodeToUpdateQueue(this);
+            }
         }
         public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
@@ -1401,7 +1414,7 @@ namespace Fiber
                 {
                     var fiberNode = _fiberNodesToUpdate.Dequeue();
 
-                    if (fiberNode.Phase == FiberNodePhase.Mounted)
+                    if (fiberNode.Phase == FiberNodePhase.Mounted && fiberNode.IsEnabled)
                     {
                         fiberNode.Update();
                     }
@@ -2046,39 +2059,70 @@ namespace Fiber
 
         public VirtualNode Enable(ISignal<bool> whenSignal, List<VirtualNode> children)
         {
-            return new EnableComponent(whenSignal, children);
+            return new EnableComponent(whenSignal, children, this);
         }
 
         private class EnableComponent : VirtualNode
         {
             private readonly ISignal<bool> _whenSignal;
+            private readonly Renderer _renderer;
 
-            public EnableComponent(ISignal<bool> whenSignal, List<VirtualNode> children) : base(children)
+            public EnableComponent(ISignal<bool> whenSignal, List<VirtualNode> children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
+                _renderer = renderer;
             }
 
             private class EnabledEffect : Effect<bool>
             {
                 private readonly FiberNode _fiberNode;
+                private readonly Renderer _renderer;
+
                 public EnabledEffect(
                     ISignal<bool> whenSignal,
-                    FiberNode fiberNode
+                    FiberNode fiberNode,
+                    Renderer renderer
                 )
                     : base(whenSignal, runOnMount: true)
                 {
                     _fiberNode = fiberNode;
+                    _renderer = renderer;
                 }
+
+                private void RehydrateSubTree(FiberNode root)
+                {
+                    _renderer.AddFiberNodeToUpdateQueue(root);
+                    for (var node = root.Child; node != null; node = node.NextNode(root: root, skipChildren: false))
+                    {
+                        _renderer.AddFiberNodeToUpdateQueue(node);
+                    }
+                }
+
                 protected override void Run(bool enabled)
                 {
-                    _fiberNode.IsEnabled = enabled;
+                    // We need to enable / disable the children instead of this node since 
+                    // this effect won't otherwise run (since its node is disabled...)
+                    var child = _fiberNode.Child;
+                    while (child != null)
+                    {
+                        var valueBeforeChange = child.IsEnabled;
+                        child.IsEnabled = enabled;
+                        if (!valueBeforeChange && enabled)
+                        {
+                            // Some props in the sub tree might have become dirty while the node was disabled.
+                            // Just rehydrate the whole sub tree to be sure. We could optimize this in the future,
+                            // but it is questionable if that will be worth it.
+                            RehydrateSubTree(child);
+                        }
+                        child = child.Sibling;
+                    }
                 }
                 public override void Cleanup() { }
             }
 
             public List<VirtualNode> Render(FiberNode fiberNode)
             {
-                fiberNode.PushEffect(new EnabledEffect(_whenSignal, fiberNode));
+                fiberNode.PushEffect(new EnabledEffect(_whenSignal, fiberNode, _renderer));
                 return children;
             }
         }
@@ -2134,15 +2178,17 @@ namespace Fiber
 
         public VirtualNode Active(ISignal<bool> whenSignal, List<VirtualNode> children)
         {
-            return new ActiveComponent(whenSignal, children);
+            return new ActiveComponent(whenSignal, children, this);
         }
 
         private class ActiveComponent : VirtualNode
         {
             private readonly ISignal<bool> _whenSignal;
-            public ActiveComponent(ISignal<bool> whenSignal, List<VirtualNode> children) : base(children)
+            private readonly Renderer _renderer;
+            public ActiveComponent(ISignal<bool> whenSignal, List<VirtualNode> children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
+                _renderer = renderer;
             }
 
             public VirtualNode Render(FiberNode fiberNode)
@@ -2152,7 +2198,8 @@ namespace Fiber
                     new List<VirtualNode> {
                         new EnableComponent(
                             _whenSignal,
-                            children
+                            children,
+                            _renderer
                         )
                     }
                 );
