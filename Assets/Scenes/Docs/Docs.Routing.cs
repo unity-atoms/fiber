@@ -75,16 +75,14 @@ public static class DocsRouting
                 return route?.Id;
             }, router);
 
-            var expandedItemIds = new ShallowSignalList<string>();
-            F.CreateEffect((router) =>
+            var expandedItemIds = F.CreateComputedSignalList<Router, string>((router, list) =>
             {
-                expandedItemIds.Clear();
                 for (var i = 0; i < router.RouteStack.Count; ++i)
                 {
                     var route = router.RouteStack[i];
-                    expandedItemIds.Add(route.Id);
+                    list.Add(route.Id);
                 }
-                return null;
+                return list;
             }, router);
 
             var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);

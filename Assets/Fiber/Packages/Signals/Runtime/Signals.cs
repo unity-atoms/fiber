@@ -5,39 +5,113 @@ using UnityEngine;
 
 namespace Signals
 {
-    public abstract class BaseSignal
+    public interface ISignal
     {
+        byte DirtyBit { get; }
+        void RegisterDependent(ISignal dependant);
+        void UnregisterDependent(ISignal dependant);
+        void NotifySignalUpdate();
+        bool IsDirty(byte otherDirtyBit);
+    }
+
+    public interface ISignal<T> : ISignal
+    {
+        T Get();
+    }
+
+    public interface ISignalList<T> : ISignal<IList<T>>
+    {
+        int Count { get; }
+        T GetAt(int index);
+    }
+
+    public abstract class BaseSignal : ISignal
+    {
+        // The deep dirty bit is used to track changes to the signal. Incrementing
+        // this value indicates that the signal has changed. 
         [SerializeField]
         protected byte _dirtyBit = 0;
-        public byte DirtyBit
+        public byte DirtyBit => _dirtyBit;
+
+        ~BaseSignal()
         {
-            get => _dirtyBit;
-            set
+            if (_dependents != null)
             {
-                _dirtyBit = value;
-                if (_parent != null)
+                if (_dependents is List<ISignal> listOfDependents)
                 {
-                    _parent.DirtyBit = (byte)(_parent.DirtyBit + 1);
+                    for (var i = listOfDependents.Count - 1; i >= 0; --i)
+                    {
+                        UnregisterDependent(listOfDependents[i]);
+                    }
+                }
+                else
+                {
+                    var dependent = (ISignal)_dependents;
+                    UnregisterDependent(dependent);
                 }
             }
         }
 
-        protected BaseSignal _parent;
-        public void RegisterParent(BaseSignal parent)
+        protected abstract void OnNotifySignalUpdate();
+
+        public void NotifySignalUpdate()
         {
-            _parent = parent;
+            OnNotifySignalUpdate();
+            if (_dependents != null)
+            {
+                if (_dependents is List<ISignal> listOfDependents)
+                {
+                    for (var i = 0; i < listOfDependents.Count; ++i)
+                    {
+                        listOfDependents[i].NotifySignalUpdate();
+                    }
+                }
+                else
+                {
+                    var dependent = (ISignal)_dependents;
+                    dependent.NotifySignalUpdate();
+                }
+            }
         }
 
-        public void UnregisterParent()
+        protected object _dependents;
+        public void RegisterDependent(ISignal dependant)
         {
-            _parent = null;
+            if (_dependents is List<ISignal> listOfDependentSignals)
+            {
+                listOfDependentSignals.Add(dependant);
+            }
+            else if (_dependents is ISignal)
+            {
+                _dependents = new List<ISignal>()
+                {
+                    (ISignal)_dependents,
+                    dependant
+                };
+            }
+            else
+            {
+                _dependents = dependant;
+            }
+        }
+
+        public void UnregisterDependent(ISignal dependant)
+        {
+            if (_dependents is List<ISignal> listOfDependentSignals)
+            {
+                listOfDependentSignals.Remove(dependant);
+            }
+            else
+            {
+                _dependents = null;
+            }
         }
 
         public abstract bool IsDirty(byte otherDirtyBit);
     }
 
     [Serializable]
-    public abstract class BaseSignal<T> : BaseSignal
+    public abstract class BaseSignal<T> : BaseSignal, ISignal<T>
     {
         public abstract T Get();
     }
@@ -51,27 +125,24 @@ namespace Signals
             _wrappedSignal = wrappedSignal;
             if (_wrappedSignal != null)
             {
-                _wrappedSignal.RegisterParent(this);
+                _wrappedSignal.RegisterDependent(this);
             }
         }
+
         ~NullableSignal()
         {
             if (_wrappedSignal != null)
             {
-                _wrappedSignal.UnregisterParent();
+                _wrappedSignal.UnregisterDependent(this);
             }
         }
 
-        public override T Get()
+        protected override sealed void OnNotifySignalUpdate()
         {
-            return _wrappedSignal == null ? default(T) : _wrappedSignal.Get();
+            _dirtyBit++;
         }
-
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            Get(); // We need to run the signal in order to update the dirty bit
-            return DirtyBit != otherDirtyBit;
-        }
+        public override sealed T Get() => _wrappedSignal == null ? default : _wrappedSignal.Get();
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     [Serializable]
@@ -87,15 +158,12 @@ namespace Signals
             _value = value;
         }
 
-        public override T Get()
+        protected override sealed void OnNotifySignalUpdate()
         {
-            return _value;
+            _dirtyBit++;
         }
-
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
+        public override sealed T Get() => _value;
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     [Serializable]
@@ -109,26 +177,22 @@ namespace Signals
             set
             {
                 _value = value;
-                DirtyBit = (byte)(DirtyBit + 1);
+                NotifySignalUpdate();
             }
         }
 
-        public Signal(T value = default(T), BaseSignal parent = null)
+        public Signal(T value = default, BaseSignal dependent = null)
         {
             _value = value;
-            _dirtyBit = 0;
-            _parent = parent;
+            _dependents = dependent;
         }
 
-        public override T Get()
+        protected override sealed void OnNotifySignalUpdate()
         {
-            return Value;
+            _dirtyBit++;
         }
-
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
+        public override sealed T Get() => _value;
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     [Serializable]
@@ -144,41 +208,45 @@ namespace Signals
             {
                 if (_value != null)
                 {
-                    _value.UnregisterParent();
+                    _value.UnregisterDependent(this);
                 }
                 _value = value;
                 if (_value != null)
                 {
-                    _value.RegisterParent(this);
+                    _value.RegisterDependent(this);
                 }
-                DirtyBit = (byte)(DirtyBit + 1);
+                NotifySignalUpdate();
             }
         }
 
-        public Store(T value = default(T), BaseSignal parent = null)
+        public Store(T value = default, BaseSignal dependent = null)
         {
             _value = value;
             if (_value != null)
             {
-                _value.RegisterParent(this);
+                _value.RegisterDependent(this);
             }
-            _dirtyBit = 0;
-            _parent = parent;
+            _dependents = dependent;
         }
 
-        public override T Get()
+        ~Store()
         {
-            return Value;
+            if (_value != null)
+            {
+                _value.UnregisterDependent(this);
+            }
         }
 
-        public override bool IsDirty(byte otherDirtyBit)
+        protected override sealed void OnNotifySignalUpdate()
         {
-            return DirtyBit != otherDirtyBit;
+            _dirtyBit++;
         }
+        public override sealed T Get() => _value;
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     [Serializable]
-    public abstract class BaseSignalList<T, LT> : BaseSignal<LT> where LT : ISignalList<T>
+    public abstract class BaseSignalList<T> : BaseSignal<IList<T>>, ISignalList<T>
     {
         [SerializeField]
         protected List<T> _list;
@@ -198,15 +266,9 @@ namespace Signals
     }
 
 
-    public interface ISignalList<T>
-    {
-        int Count { get; }
-        T GetAt(int index);
-    }
-
     // Doesn't track changes of items, only mutations to the list itself
     [Serializable]
-    public class ShallowSignalList<T> : BaseSignalList<T, ShallowSignalList<T>>, IList<T>, ISignalList<T>
+    public class ShallowSignalList<T> : BaseSignalList<T>, IList<T>
     {
         const int DEFAULT_CAPACITY = 5;
 
@@ -215,32 +277,32 @@ namespace Signals
             _list = new(DEFAULT_CAPACITY);
         }
 
-        public ShallowSignalList(BaseSignal parent = null)
+        public ShallowSignalList(ISignal dependent = null)
         {
             _list = new(DEFAULT_CAPACITY);
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
-        public ShallowSignalList(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
+        public ShallowSignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _list = new(capacity);
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
-        public ShallowSignalList(IList<T> source, BaseSignal parent = null)
+        public ShallowSignalList(IList<T> source, ISignal dependent = null)
         {
             _list = new(source?.Count ?? DEFAULT_CAPACITY);
             for (var i = 0; source != null && i < source.Count; ++i)
             {
                 _list.Add(source[i]);
             }
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
         public virtual T this[int i]
         {
             get { return _list[i]; }
-            set { _list[i] = value; DirtyBit++; }
+            set { _list[i] = value; NotifySignalUpdate(); }
         }
 
         public int IndexOf(T item)
@@ -254,25 +316,25 @@ namespace Signals
             {
                 _list.Add(source[i]);
             }
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public virtual void Add(T item)
         {
             _list.Add(item);
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public virtual void Insert(int index, T item)
         {
             _list.Insert(index, item);
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public virtual bool Remove(T item)
         {
             var result = _list.Remove(item);
-            DirtyBit++;
+            NotifySignalUpdate();
             return result;
         }
 
@@ -280,13 +342,13 @@ namespace Signals
         {
             var item = _list[index];
             _list.RemoveAt(index);
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public virtual void Clear()
         {
             _list.Clear();
-            DirtyBit++;
+            NotifySignalUpdate();
         }
         public bool Contains(T item)
         {
@@ -308,21 +370,22 @@ namespace Signals
             return _list.GetEnumerator();
         }
 
-        public override ShallowSignalList<T> Get()
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
+        }
+
+        public override sealed IList<T> Get()
         {
             return this;
         }
-
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     // Tracks both mutations to the list and changes to the items in the list.
     [Serializable]
-    public class SignalList<T> : BaseSignalList<T, SignalList<T>>, IList<T>, ISignalList<T>
-        where T : BaseSignal
+    public class SignalList<T> : BaseSignalList<T>, IList<T>
+        where T : ISignal
     {
         const int DEFAULT_CAPACITY = 5;
 
@@ -331,13 +394,19 @@ namespace Signals
             _list = new(DEFAULT_CAPACITY);
         }
 
-        public SignalList(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
+        public SignalList(ISignal dependent = null)
         {
-            _list = new(capacity);
-            RegisterParent(parent);
+            _list = new(DEFAULT_CAPACITY);
+            RegisterDependent(dependent);
         }
 
-        public SignalList(IList<T> source, BaseSignal parent = null)
+        public SignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
+        {
+            _list = new(capacity);
+            RegisterDependent(dependent);
+        }
+
+        public SignalList(IList<T> source, ISignal dependent = null)
         {
             _list = new(source?.Count ?? DEFAULT_CAPACITY);
             for (var i = 0; source != null && i < source.Count; ++i)
@@ -345,10 +414,10 @@ namespace Signals
                 _list.Add(source[i]);
                 if (source[i] != null)
                 {
-                    source[i].RegisterParent(this);
+                    source[i].RegisterDependent(this);
                 }
             }
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
 
@@ -360,13 +429,13 @@ namespace Signals
                 var oldItem = _list[i];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent();
+                    oldItem.UnregisterDependent(this);
                 }
 
                 _list[i] = value;
                 if (_list[i] != null)
                 {
-                    _list[i].RegisterParent(this);
+                    _list[i].RegisterDependent(this);
                 }
             }
         }
@@ -381,39 +450,39 @@ namespace Signals
             for (var i = 0; i < source.Count; ++i)
             {
                 _list.Add(source[i]);
-                source[i].RegisterParent(this);
+                source[i].RegisterDependent(this);
             }
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public void Add(T item)
         {
             _list.Add(item);
-            DirtyBit++;
+            NotifySignalUpdate();
             if (item != null)
             {
-                item.RegisterParent(this);
+                item.RegisterDependent(this);
             }
         }
 
         public void Insert(int index, T item)
         {
             _list.Insert(index, item);
-            DirtyBit++;
+            NotifySignalUpdate();
             if (item != null)
             {
-                item.RegisterParent(this);
+                item.RegisterDependent(this);
             }
         }
 
         public bool Remove(T item)
         {
             var result = _list.Remove(item);
-            DirtyBit++;
+            NotifySignalUpdate();
 
             if (item != null)
             {
-                item.UnregisterParent();
+                item.UnregisterDependent(this);
             }
             return result;
         }
@@ -422,10 +491,10 @@ namespace Signals
         {
             var item = _list[index];
             _list.RemoveAt(index);
-            DirtyBit++;
+            NotifySignalUpdate();
             if (item != null)
             {
-                item.UnregisterParent();
+                item.UnregisterDependent(this);
             }
         }
 
@@ -433,10 +502,10 @@ namespace Signals
         {
             for (var i = 0; i < _list.Count; i++)
             {
-                _list[i].UnregisterParent();
+                _list[i].UnregisterDependent(this);
             }
             _list.Clear();
-            DirtyBit++;
+            NotifySignalUpdate();
         }
         public bool Contains(T item)
         {
@@ -458,15 +527,16 @@ namespace Signals
             return _list.GetEnumerator();
         }
 
-        public override SignalList<T> Get()
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
+        }
+
+        public override sealed IList<T> Get()
         {
             return this;
         }
-
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     // Doesn't track changes of values, only mutations to the dictionary itself
@@ -484,16 +554,16 @@ namespace Signals
             _dict = new(DEFAULT_CAPACITY);
         }
 
-        public ShallowSignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
+        public ShallowSignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _dict = new(capacity);
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
-        public ShallowSignalDictionary(IDictionary<K, V> source, BaseSignal parent = null)
+        public ShallowSignalDictionary(IDictionary<K, V> source, ISignal dependent = null)
         {
             _dict = new(source);
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
         public V this[K key]
@@ -508,14 +578,14 @@ namespace Signals
             {
                 _dict.Add(kvp.Key, kvp.Value);
             }
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
 
         public V Add(K key, V value)
         {
             _dict.Add(key, value);
-            DirtyBit++;
+            NotifySignalUpdate();
             return value;
         }
 
@@ -523,7 +593,7 @@ namespace Signals
         {
             var value = _dict[key];
             _dict.Remove(key);
-            DirtyBit++;
+            NotifySignalUpdate();
             return value;
         }
 
@@ -539,7 +609,7 @@ namespace Signals
         public void Clear()
         {
             _dict.Clear();
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public bool ContainsKey(K key)
@@ -547,21 +617,22 @@ namespace Signals
             return _dict.ContainsKey(key);
         }
 
-        public override ShallowSignalDictionary<K, V> Get()
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
+        }
+
+        public override sealed ShallowSignalDictionary<K, V> Get()
         {
             return this;
         }
-
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     // Tracks both mutations to the dictionary and changes to the values in the dictionary.
     [Serializable]
     public class SignalDictionary<K, V> : BaseSignal<SignalDictionary<K, V>>, IEnumerable
-        where V : BaseSignal
+        where V : ISignal
     {
         protected Dictionary<K, V> _dict;
 
@@ -574,13 +645,13 @@ namespace Signals
             _dict = new(DEFAULT_CAPACITY);
         }
 
-        public SignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
+        public SignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _dict = new(capacity);
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
-        public SignalDictionary(IDictionary<K, V> source, BaseSignal parent = null)
+        public SignalDictionary(IDictionary<K, V> source, ISignal dependent = null)
         {
             _dict = new(source?.Count ?? DEFAULT_CAPACITY);
             foreach (var kvp in source)
@@ -588,10 +659,10 @@ namespace Signals
                 _dict.Add(kvp.Key, kvp.Value);
                 if (kvp.Value != null)
                 {
-                    kvp.Value.RegisterParent(this);
+                    kvp.Value.RegisterDependent(this);
                 }
             }
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
         public V this[K key]
@@ -602,16 +673,16 @@ namespace Signals
                 var oldItem = _dict[key];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent();
+                    oldItem.UnregisterDependent(this);
                 }
 
                 _dict[key] = value;
                 if (_dict[key] != null)
                 {
-                    _dict[key].RegisterParent(this);
+                    _dict[key].RegisterDependent(this);
                 }
 
-                DirtyBit++;
+                NotifySignalUpdate();
             }
         }
 
@@ -620,20 +691,20 @@ namespace Signals
             foreach (var kvp in source)
             {
                 _dict.Add(kvp.Key, kvp.Value);
-                kvp.Value.RegisterParent(this);
+                kvp.Value.RegisterDependent(this);
             }
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
 
         public V Add(K key, V value)
         {
             _dict.Add(key, value);
-            DirtyBit++;
+            NotifySignalUpdate();
 
             if (value != null)
             {
-                value.RegisterParent(this);
+                value.RegisterDependent(this);
             }
 
             return value;
@@ -643,10 +714,10 @@ namespace Signals
         {
             var value = _dict[key];
             _dict.Remove(key);
-            DirtyBit++;
+            NotifySignalUpdate();
             if (value != null)
             {
-                value.UnregisterParent();
+                value.UnregisterDependent(this);
             }
             return value;
         }
@@ -664,11 +735,11 @@ namespace Signals
         {
             foreach (var kvp in _dict)
             {
-                kvp.Value.UnregisterParent();
+                kvp.Value.UnregisterDependent(this);
             }
 
             _dict.Clear();
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public bool ContainsKey(K key)
@@ -676,24 +747,28 @@ namespace Signals
             return _dict.ContainsKey(key);
         }
 
-        public override SignalDictionary<K, V> Get()
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
+        }
+
+        public override sealed SignalDictionary<K, V> Get()
         {
             return this;
         }
-
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
         public IEnumerator GetEnumerator() => _dict.GetEnumerator();
     }
 
     [Serializable]
-    public class IndexedSignalDictionary<K, V> : BaseSignalList<V, IndexedSignalDictionary<K, V>>, ISignalList<V>, IEnumerable
-        where V : BaseSignal
+    public class IndexedSignalDictionary<K, V> : BaseSignal<IndexedSignalDictionary<K, V>>, IEnumerable
+        where V : ISignal
     {
+        public int Count => _list.Count;
+        public bool IsReadOnly { get => false; }
         protected Dictionary<K, V> _dict;
+        protected List<V> _list;
 
         const int DEFAULT_CAPACITY = 5;
 
@@ -703,14 +778,14 @@ namespace Signals
             _list = new(DEFAULT_CAPACITY);
         }
 
-        public IndexedSignalDictionary(int capacity = DEFAULT_CAPACITY, BaseSignal parent = null)
+        public IndexedSignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
         {
             _dict = new(capacity);
             _list = new(capacity);
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
-        public IndexedSignalDictionary(IDictionary<K, V> source, BaseSignal parent = null)
+        public IndexedSignalDictionary(IDictionary<K, V> source, ISignal dependent = null)
         {
             _dict = new(source?.Count ?? DEFAULT_CAPACITY);
             _list = new(source?.Count ?? DEFAULT_CAPACITY);
@@ -720,10 +795,10 @@ namespace Signals
                 _list.Add(kvp.Value);
                 if (kvp.Value != null)
                 {
-                    kvp.Value.RegisterParent(this);
+                    kvp.Value.RegisterDependent(this);
                 }
             }
-            RegisterParent(parent);
+            RegisterDependent(dependent);
         }
 
         public V this[int i]
@@ -739,17 +814,22 @@ namespace Signals
                 var oldItem = _dict[key];
                 if (oldItem != null)
                 {
-                    oldItem.UnregisterParent();
+                    oldItem.UnregisterDependent(this);
                 }
 
                 _dict[key] = value;
                 if (_dict[key] != null)
                 {
-                    _dict[key].RegisterParent(this);
+                    _dict[key].RegisterDependent(this);
                 }
 
-                DirtyBit++;
+                NotifySignalUpdate();
             }
+        }
+
+        public V GetAt(int index)
+        {
+            return _list[index];
         }
 
         public void AddRange(IDictionary<K, V> source)
@@ -757,10 +837,10 @@ namespace Signals
             foreach (var kvp in source)
             {
                 _dict.Add(kvp.Key, kvp.Value);
-                kvp.Value.RegisterParent(this);
+                kvp.Value.RegisterDependent(this);
             }
             _list.AddRange(source.Values);
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
 
@@ -768,11 +848,11 @@ namespace Signals
         {
             _dict.Add(key, value);
             _list.Add(value);
-            DirtyBit++;
+            NotifySignalUpdate();
 
             if (value != null)
             {
-                value.RegisterParent(this);
+                value.RegisterDependent(this);
             }
 
             return value;
@@ -783,10 +863,10 @@ namespace Signals
             var value = _dict[key];
             _dict.Remove(key);
             _list.Remove(value);
-            DirtyBit++;
+            NotifySignalUpdate();
             if (value != null)
             {
-                value.UnregisterParent();
+                value.UnregisterDependent(this);
             }
             return value;
         }
@@ -804,12 +884,12 @@ namespace Signals
         {
             foreach (var kvp in _dict)
             {
-                kvp.Value.UnregisterParent();
+                kvp.Value.UnregisterDependent(this);
             }
 
             _dict.Clear();
             _list.Clear();
-            DirtyBit++;
+            NotifySignalUpdate();
         }
 
         public bool ContainsKey(K key)
@@ -822,15 +902,17 @@ namespace Signals
             return _list.Contains(value);
         }
 
-        public override IndexedSignalDictionary<K, V> Get()
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
+        }
+
+        public override sealed IndexedSignalDictionary<K, V> Get()
         {
             return this;
         }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
         public IEnumerator GetEnumerator() => _dict.GetEnumerator();
     }
 }

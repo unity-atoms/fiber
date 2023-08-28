@@ -5,38 +5,17 @@ using FiberUtils;
 
 namespace Signals
 {
-    public interface IShouldRecomputeSignal
-    {
-        bool ShouldRecomputeSignal();
-    }
-
-    public class DefaultShouldRecomputeSignal : IShouldRecomputeSignal
-    {
-        public bool ShouldRecomputeSignal() => true;
-    }
-
     [Serializable]
     public abstract class BaseComputedSignal<RT> : BaseSignal<RT>
     {
         [SerializeField]
-        protected RT _lastValue = default(RT);
+        protected RT _lastValue = default;
         public RT LastValue { get => _lastValue; }
-        [NonSerialized]
-        public IShouldRecomputeSignal CustomShouldRecomputeLogic = new DefaultShouldRecomputeSignal();
-
-        public BaseComputedSignal()
-        {
-            CustomShouldRecomputeLogic = new DefaultShouldRecomputeSignal();
-        }
-
-        public BaseComputedSignal(IShouldRecomputeSignal recomputeSignalExpression)
-        {
-            CustomShouldRecomputeLogic = recomputeSignalExpression;
-        }
 
         protected virtual void Cleanup(RT previousValue) { }
         protected virtual bool ShouldSetDirty(RT newValue, RT previousValue) => true;
 
+        protected override sealed void OnNotifySignalUpdate() { }
         public override bool IsDirty(byte otherDirtyBit)
         {
             Get(); // We need to run the signal in order to update the dirty bit
@@ -45,22 +24,33 @@ namespace Signals
     }
 
     [Serializable]
-    public class DynamicSignals<T>
+    public class DynamicDependencies<T>
     {
-        public List<BaseSignal<T>> Signals { get => _signals; }
-        private List<BaseSignal<T>> _signals = new List<BaseSignal<T>>();
-        private List<byte> _dirtyBits = new List<byte>();
+        private readonly ISignal _dependent;
+        public List<ISignal<T>> Signals { get => _signals; }
+        private readonly List<ISignal<T>> _signals;
+        private readonly List<byte> _dirtyBits;
         private int _count = 0;
         private int _previousCount = 0;
 
-        public DynamicSignals(IList<BaseSignal<T>> signals = null, bool initializeDirty = true)
+        public DynamicDependencies(ISignal dependent, IList<ISignal<T>> dependencies = null, bool initializeDirty = true)
         {
-            _signals = signals != null ? new(signals) : new();
-            _dirtyBits = new List<byte>(_signals.Count);
+            _dependent = dependent;
+            _signals = dependencies != null ? new(dependencies) : new();
+            _dirtyBits = new(_signals.Count);
             for (var i = 0; i < _signals.Count; ++i)
             {
-                _dirtyBits.Add(initializeDirty ? (byte)(_signals[i].DirtyBit - 1) : _signals[i].DirtyBit);
+                var signal = _signals[i];
+                signal.RegisterDependent(_dependent);
+                _dirtyBits.Add(initializeDirty ? (byte)(signal.DirtyBit - 1) : signal.DirtyBit);
                 _count++;
+            }
+        }
+        ~DynamicDependencies()
+        {
+            for (int i = 0; i < _count; ++i)
+            {
+                _signals[i].UnregisterDependent(_dependent);
             }
         }
 
@@ -81,16 +71,18 @@ namespace Signals
             return isDirty;
         }
 
-        public void Add<ST>(ST item) where ST : BaseSignal<T>
+        public void Add<ST>(ST signal) where ST : ISignal<T>
         {
-            _signals.Add(item);
-            _dirtyBits.Add((byte)(item.DirtyBit - 1));
+            _signals.Add(signal);
+            signal.RegisterDependent(_dependent);
+            _dirtyBits.Add((byte)(signal.DirtyBit - 1));
             _count++;
         }
 
-        public void Remove<ST>(ST item) where ST : BaseSignal<T>
+        public void Remove<ST>(ST signal) where ST : ISignal<T>
         {
-            var index = _signals.IndexOf(item);
+            var index = _signals.IndexOf(signal);
+            signal.UnregisterDependent(_dependent);
             _signals.RemoveAt(index);
             _dirtyBits.RemoveAt(index);
             _count--;
@@ -98,6 +90,8 @@ namespace Signals
 
         public void RemoveAt(int index)
         {
+            var signal = _signals[index];
+            signal.UnregisterDependent(_dependent);
             _signals.RemoveAt(index);
             _dirtyBits.RemoveAt(index);
             _count--;
@@ -114,34 +108,23 @@ namespace Signals
     [Serializable]
     public abstract class DynamicComputedSignal<DT, RT> : BaseComputedSignal<RT>
     {
-        private DynamicSignals<DT> _dynamicSignals;
+        private readonly DynamicDependencies<DT> _dynamicDependencies;
 
-        public DynamicComputedSignal(IList<BaseSignal<DT>> dynamicSignals = null) : base()
+        public DynamicComputedSignal(IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
-            _dynamicSignals = new(dynamicSignals);
-        }
-
-        public DynamicComputedSignal(IShouldRecomputeSignal recomputeSignalExpression, IList<BaseSignal<DT>> dynamicSignals = null)
-            : base(recomputeSignalExpression)
-        {
-            _dynamicSignals = new(dynamicSignals);
+            _dynamicDependencies = new(dependent: this, dynamicDependencies);
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
-
-            if (_dynamicSignals.IsDirty())
+            if (_dynamicDependencies.IsDirty())
             {
                 var previousValue = _lastValue;
-                _lastValue = Compute(_dynamicSignals);
+                _lastValue = Compute(_dynamicDependencies);
+
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -149,58 +132,43 @@ namespace Signals
             return _lastValue;
         }
 
-        protected abstract RT Compute(DynamicSignals<DT> dynamicSignals);
+        protected abstract RT Compute(DynamicDependencies<DT> dynamicDependencies);
     }
+
 
     [Serializable]
     public abstract class DynamicComputedSignal<T1, DT, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
+        private readonly DynamicDependencies<DT> _dynamicDependencies;
 
-        private DynamicSignals<DT> _dynamicSignals;
-
-        public DynamicComputedSignal(BaseSignal<T1> signal1, IList<BaseSignal<DT>> dynamicSignals = null) : base()
+        public DynamicComputedSignal(ISignal<T1> signal1, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
-            UpdateDeps(signal1);
-            _dynamicSignals = new(dynamicSignals);
+            _signal1 = signal1;
+            _signal1.RegisterDependent(this);
+            _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+            _dynamicDependencies = new(dependent: this, dynamicDependencies);
         }
 
-        public DynamicComputedSignal(BaseSignal<T1> signal1, IShouldRecomputeSignal recomputeSignalExpression, IList<BaseSignal<DT>> dynamicSignals = null)
-            : base(recomputeSignalExpression)
+        ~DynamicComputedSignal()
         {
-            UpdateDeps(signal1);
-            _dynamicSignals = new(dynamicSignals);
+            _signal1?.UnregisterDependent(this);
         }
 
-        public void UpdateDeps(
-            BaseSignal<T1> signal1
-        )
-        {
-            if (!object.ReferenceEquals(_signal1, signal1))
-            {
-                _signal1 = signal1;
-                _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
-            }
-        }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
-            if (_signal1.IsDirty(_lastDirtyBit1) || _dynamicSignals.IsDirty())
+            if (_signal1.IsDirty(_lastDirtyBit1) || _dynamicDependencies.IsDirty())
             {
                 var previousValue = _lastValue;
-                _lastValue = Compute(_signal1.Get(), _dynamicSignals);
+                _lastValue = Compute(_signal1.Get(), _dynamicDependencies);
 
                 _lastDirtyBit1 = _signal1.DirtyBit;
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -208,62 +176,48 @@ namespace Signals
             return _lastValue;
         }
 
-        protected abstract RT Compute(T1 value1, DynamicSignals<DT> dynamicSignals);
+        protected abstract RT Compute(T1 value1, DynamicDependencies<DT> dynamicSignals);
     }
 
     [Serializable]
     public abstract class DynamicComputedSignal<T1, T2, DT, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
+        private readonly DynamicDependencies<DT> _dynamicDependencies;
 
-        private DynamicSignals<DT> _dynamicSignals;
-
-        public DynamicComputedSignal(BaseSignal<T1> signal1, BaseSignal<T2> signal2, IList<BaseSignal<DT>> dynamicSignals = null) : base()
+        public DynamicComputedSignal(ISignal<T1> signal1, ISignal<T2> signal2, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
-            UpdateDeps(signal1, signal2);
-            _dynamicSignals = new(dynamicSignals);
+            _signal1 = signal1;
+            _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+            _signal1.RegisterDependent(this);
+            _signal2 = signal2;
+            _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
+            _signal2.RegisterDependent(this);
+            _dynamicDependencies = new(dependent: this, dynamicDependencies);
         }
 
-        public DynamicComputedSignal(BaseSignal<T1> signal1, BaseSignal<T2> signal2, IShouldRecomputeSignal recomputeSignalExpression, IList<BaseSignal<DT>> dynamicSignals = null)
-            : base(recomputeSignalExpression)
+        ~DynamicComputedSignal()
         {
-            UpdateDeps(signal1, signal2);
-            _dynamicSignals = new(dynamicSignals);
-        }
-
-        public void UpdateDeps(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2
-        )
-        {
-            if (!object.ReferenceEquals(_signal1, signal1))
-            {
-                _signal1 = signal1;
-                _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
-            }
-            if (!object.ReferenceEquals(_signal2, signal2))
-            {
-                _signal2 = signal2;
-                _lastDirtyBit1 = (byte)(signal2.DirtyBit - 1);
-            }
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
         }
 
         public override RT Get()
         {
-            if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _dynamicSignals.IsDirty())
+            if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _dynamicDependencies.IsDirty())
             {
                 var previousValue = _lastValue;
-                _lastValue = Compute(_signal1.Get(), _signal2.Get(), _dynamicSignals);
+                _lastValue = Compute(_signal1.Get(), _signal2.Get(), _dynamicDependencies);
 
                 _lastDirtyBit1 = _signal1.DirtyBit;
                 _lastDirtyBit2 = _signal2.DirtyBit;
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -271,54 +225,44 @@ namespace Signals
             return _lastValue;
         }
 
-        protected abstract RT Compute(T1 value1, T2 value2, DynamicSignals<DT> dynamicSignals);
+        protected abstract RT Compute(T1 value1, T2 value2, DynamicDependencies<DT> dynamicSignals);
     }
 
     [Serializable]
     public abstract class ComputedSignal<T1, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1
+            ISignal<T1> signal1
         ) : base()
         {
-            UpdateDeps(
-                signal1
-            );
+            UpdateDeps(signal1);
         }
 
-        public ComputedSignal(
-            BaseSignal<T1> signal1,
-            IShouldRecomputeSignal recomputeSignalExpression
-        ) : base(recomputeSignalExpression)
+        ~ComputedSignal()
         {
-            UpdateDeps(
-                signal1
-            );
+            _signal1?.UnregisterDependent(this);
         }
 
         public void UpdateDeps(
-            BaseSignal<T1> signal1
+            ISignal<T1> signal1
         )
         {
-            if (!object.ReferenceEquals(_signal1, signal1))
+            if (!ReferenceEquals(_signal1, signal1))
             {
+                _signal1?.UnregisterDependent(this);
                 _signal1 = signal1;
                 _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+                _signal1?.RegisterDependent(this);
             }
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
             if (_signal1.IsDirty(_lastDirtyBit1))
             {
                 var previousValue = _lastValue;
@@ -328,7 +272,7 @@ namespace Signals
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -342,60 +286,50 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2
+            ISignal<T1> signal1,
+            ISignal<T2> signal2
         ) : base()
         {
-            UpdateDeps(
-                signal1,
-                signal2
-            );
+            UpdateDeps(signal1, signal2);
         }
 
-        public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            IShouldRecomputeSignal recomputeSignalExpression
-        ) : base(recomputeSignalExpression)
+        ~ComputedSignal()
         {
-            UpdateDeps(
-                signal1,
-                signal2
-            );
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
         }
 
         public void UpdateDeps(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2
+            ISignal<T1> signal1,
+            ISignal<T2> signal2
         )
         {
-            if (!object.ReferenceEquals(_signal1, signal1))
+            if (!ReferenceEquals(_signal1, signal1))
             {
+                _signal1?.UnregisterDependent(this);
                 _signal1 = signal1;
                 _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+                _signal1?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal2, signal2))
+            if (!ReferenceEquals(_signal2, signal2))
             {
+                _signal2?.UnregisterDependent(this);
                 _signal2 = signal2;
                 _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
+                _signal2?.RegisterDependent(this);
             }
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
             if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2))
             {
                 var previousValue = _lastValue;
@@ -406,7 +340,7 @@ namespace Signals
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -420,72 +354,62 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3
         ) : base()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3
-            );
+            UpdateDeps(signal1, signal2, signal3);
         }
 
-        public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            IShouldRecomputeSignal recomputeSignalExpression
-        ) : base(recomputeSignalExpression)
+        ~ComputedSignal()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3
-            );
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
+            _signal3?.UnregisterDependent(this);
         }
 
         public void UpdateDeps(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3
         )
         {
-            if (!object.ReferenceEquals(_signal1, signal1))
+            if (!ReferenceEquals(_signal1, signal1))
             {
+                _signal1?.UnregisterDependent(this);
                 _signal1 = signal1;
                 _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+                _signal1?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal2, signal2))
+            if (!ReferenceEquals(_signal2, signal2))
             {
+                _signal2?.UnregisterDependent(this);
                 _signal2 = signal2;
                 _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
+                _signal2?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal3, signal3))
+            if (!ReferenceEquals(_signal3, signal3))
             {
+                _signal3?.UnregisterDependent(this);
                 _signal3 = signal3;
                 _lastDirtyBit3 = (byte)(signal3.DirtyBit - 1);
+                _signal3?.RegisterDependent(this);
             }
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
             if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _signal3.IsDirty(_lastDirtyBit3))
             {
                 var previousValue = _lastValue;
@@ -497,7 +421,7 @@ namespace Signals
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -511,84 +435,74 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4
         ) : base()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4
-            );
+            UpdateDeps(signal1, signal2, signal3, signal4);
         }
 
-        public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            IShouldRecomputeSignal recomputeSignalExpression
-        ) : base(recomputeSignalExpression)
+        ~ComputedSignal()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4
-            );
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
+            _signal3?.UnregisterDependent(this);
+            _signal4?.UnregisterDependent(this);
         }
 
         public void UpdateDeps(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4
         )
         {
-            if (!object.ReferenceEquals(_signal1, signal1))
+            if (!ReferenceEquals(_signal1, signal1))
             {
+                _signal1?.UnregisterDependent(this);
                 _signal1 = signal1;
                 _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+                _signal1?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal2, signal2))
+            if (!ReferenceEquals(_signal2, signal2))
             {
+                _signal2?.UnregisterDependent(this);
                 _signal2 = signal2;
                 _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
+                _signal2?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal3, signal3))
+            if (!ReferenceEquals(_signal3, signal3))
             {
+                _signal3?.UnregisterDependent(this);
                 _signal3 = signal3;
                 _lastDirtyBit3 = (byte)(signal3.DirtyBit - 1);
+                _signal3?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal4, signal4))
+            if (!ReferenceEquals(_signal4, signal4))
             {
+                _signal4?.UnregisterDependent(this);
                 _signal4 = signal4;
                 _lastDirtyBit4 = (byte)(signal4.DirtyBit - 1);
+                _signal4?.RegisterDependent(this);
             }
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
             if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _signal3.IsDirty(_lastDirtyBit3) || _signal4.IsDirty(_lastDirtyBit4))
             {
                 var previousValue = _lastValue;
@@ -601,7 +515,7 @@ namespace Signals
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -615,96 +529,86 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, T5, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
-        protected BaseSignal<T5> _signal5;
+        protected ISignal<T5> _signal5;
         protected byte _lastDirtyBit5;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5
         ) : base()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4,
-                signal5
-            );
+            UpdateDeps(signal1, signal2, signal3, signal4, signal5);
         }
 
-        public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            IShouldRecomputeSignal recomputeSignalExpression
-        ) : base(recomputeSignalExpression)
+        ~ComputedSignal()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4,
-                signal5
-            );
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
+            _signal3?.UnregisterDependent(this);
+            _signal4?.UnregisterDependent(this);
+            _signal5?.UnregisterDependent(this);
         }
 
         public void UpdateDeps(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5
         )
         {
-            if (!object.ReferenceEquals(_signal1, signal1))
+            if (!ReferenceEquals(_signal1, signal1))
             {
+                _signal1?.UnregisterDependent(this);
                 _signal1 = signal1;
                 _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+                _signal1?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal2, signal2))
+            if (!ReferenceEquals(_signal2, signal2))
             {
+                _signal2?.UnregisterDependent(this);
                 _signal2 = signal2;
                 _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
+                _signal2?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal3, signal3))
+            if (!ReferenceEquals(_signal3, signal3))
             {
+                _signal3?.UnregisterDependent(this);
                 _signal3 = signal3;
                 _lastDirtyBit3 = (byte)(signal3.DirtyBit - 1);
+                _signal3?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal4, signal4))
+            if (!ReferenceEquals(_signal4, signal4))
             {
+                _signal4?.UnregisterDependent(this);
                 _signal4 = signal4;
                 _lastDirtyBit4 = (byte)(signal4.DirtyBit - 1);
+                _signal4?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal5, signal5))
+            if (!ReferenceEquals(_signal5, signal5))
             {
+                _signal5?.UnregisterDependent(this);
                 _signal5 = signal5;
                 _lastDirtyBit5 = (byte)(signal5.DirtyBit - 1);
+                _signal5?.RegisterDependent(this);
             }
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
             if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _signal3.IsDirty(_lastDirtyBit3) || _signal4.IsDirty(_lastDirtyBit4) || _signal5.IsDirty(_lastDirtyBit5))
             {
                 var previousValue = _lastValue;
@@ -718,7 +622,7 @@ namespace Signals
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -732,108 +636,98 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, T5, T6, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
-        protected BaseSignal<T5> _signal5;
+        protected ISignal<T5> _signal5;
         protected byte _lastDirtyBit5;
-        protected BaseSignal<T6> _signal6;
+        protected ISignal<T6> _signal6;
         protected byte _lastDirtyBit6;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6
         ) : base()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4,
-                signal5,
-                signal6
-            );
+            UpdateDeps(signal1, signal2, signal3, signal4, signal5, signal6);
         }
 
-        public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6,
-            IShouldRecomputeSignal recomputeSignalExpression
-        ) : base(recomputeSignalExpression)
+        ~ComputedSignal()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4,
-                signal5,
-                signal6
-            );
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
+            _signal3?.UnregisterDependent(this);
+            _signal4?.UnregisterDependent(this);
+            _signal5?.UnregisterDependent(this);
+            _signal6?.UnregisterDependent(this);
         }
 
         public void UpdateDeps(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6
         )
         {
-            if (!object.ReferenceEquals(_signal1, signal1))
+            if (!ReferenceEquals(_signal1, signal1))
             {
+                _signal1?.UnregisterDependent(this);
                 _signal1 = signal1;
                 _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+                _signal1?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal2, signal2))
+            if (!ReferenceEquals(_signal2, signal2))
             {
+                _signal2?.UnregisterDependent(this);
                 _signal2 = signal2;
                 _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
+                _signal2?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal3, signal3))
+            if (!ReferenceEquals(_signal3, signal3))
             {
+                _signal3?.UnregisterDependent(this);
                 _signal3 = signal3;
                 _lastDirtyBit3 = (byte)(signal3.DirtyBit - 1);
+                _signal3?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal4, signal4))
+            if (!ReferenceEquals(_signal4, signal4))
             {
+                _signal4?.UnregisterDependent(this);
                 _signal4 = signal4;
                 _lastDirtyBit4 = (byte)(signal4.DirtyBit - 1);
+                _signal4?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal5, signal5))
+            if (!ReferenceEquals(_signal5, signal5))
             {
+                _signal5?.UnregisterDependent(this);
                 _signal5 = signal5;
                 _lastDirtyBit5 = (byte)(signal5.DirtyBit - 1);
+                _signal5?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal6, signal6))
+            if (!ReferenceEquals(_signal6, signal6))
             {
+                _signal6?.UnregisterDependent(this);
                 _signal6 = signal6;
                 _lastDirtyBit6 = (byte)(signal6.DirtyBit - 1);
+                _signal6?.RegisterDependent(this);
             }
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
             if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _signal3.IsDirty(_lastDirtyBit3) || _signal4.IsDirty(_lastDirtyBit4) || _signal5.IsDirty(_lastDirtyBit5) || _signal6.IsDirty(_lastDirtyBit6))
             {
                 var previousValue = _lastValue;
@@ -848,7 +742,7 @@ namespace Signals
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -862,120 +756,110 @@ namespace Signals
     [Serializable]
     public abstract class ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> : BaseComputedSignal<RT>
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
-        protected BaseSignal<T4> _signal4;
+        protected ISignal<T4> _signal4;
         protected byte _lastDirtyBit4;
-        protected BaseSignal<T5> _signal5;
+        protected ISignal<T5> _signal5;
         protected byte _lastDirtyBit5;
-        protected BaseSignal<T6> _signal6;
+        protected ISignal<T6> _signal6;
         protected byte _lastDirtyBit6;
-        protected BaseSignal<T7> _signal7;
+        protected ISignal<T7> _signal7;
         protected byte _lastDirtyBit7;
 
         public ComputedSignal() : base() { }
 
         public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6,
-            BaseSignal<T7> signal7
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6,
+            ISignal<T7> signal7
         ) : base()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4,
-                signal5,
-                signal6,
-                signal7
-            );
+            UpdateDeps(signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         }
 
-        public ComputedSignal(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6,
-            BaseSignal<T7> signal7,
-            IShouldRecomputeSignal recomputeSignalExpression
-        ) : base(recomputeSignalExpression)
+        ~ComputedSignal()
         {
-            UpdateDeps(
-                signal1,
-                signal2,
-                signal3,
-                signal4,
-                signal5,
-                signal6,
-                signal7
-            );
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
+            _signal3?.UnregisterDependent(this);
+            _signal4?.UnregisterDependent(this);
+            _signal5?.UnregisterDependent(this);
+            _signal6?.UnregisterDependent(this);
+            _signal7?.UnregisterDependent(this);
         }
 
         public void UpdateDeps(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
-            BaseSignal<T4> signal4,
-            BaseSignal<T5> signal5,
-            BaseSignal<T6> signal6,
-            BaseSignal<T7> signal7
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6,
+            ISignal<T7> signal7
         )
         {
-            if (!object.ReferenceEquals(_signal1, signal1))
+            if (!ReferenceEquals(_signal1, signal1))
             {
+                _signal1?.UnregisterDependent(this);
                 _signal1 = signal1;
                 _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
+                _signal1?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal2, signal2))
+            if (!ReferenceEquals(_signal2, signal2))
             {
+                _signal2?.UnregisterDependent(this);
                 _signal2 = signal2;
                 _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
+                _signal2?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal3, signal3))
+            if (!ReferenceEquals(_signal3, signal3))
             {
+                _signal3?.UnregisterDependent(this);
                 _signal3 = signal3;
                 _lastDirtyBit3 = (byte)(signal3.DirtyBit - 1);
+                _signal3?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal4, signal4))
+            if (!ReferenceEquals(_signal4, signal4))
             {
+                _signal4?.UnregisterDependent(this);
                 _signal4 = signal4;
                 _lastDirtyBit4 = (byte)(signal4.DirtyBit - 1);
+                _signal4?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal5, signal5))
+            if (!ReferenceEquals(_signal5, signal5))
             {
+                _signal5?.UnregisterDependent(this);
                 _signal5 = signal5;
                 _lastDirtyBit5 = (byte)(signal5.DirtyBit - 1);
+                _signal5?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal6, signal6))
+            if (!ReferenceEquals(_signal6, signal6))
             {
+                _signal6?.UnregisterDependent(this);
                 _signal6 = signal6;
                 _lastDirtyBit6 = (byte)(signal6.DirtyBit - 1);
+                _signal6?.RegisterDependent(this);
             }
-            if (!object.ReferenceEquals(_signal7, signal7))
+            if (!ReferenceEquals(_signal7, signal7))
             {
+                _signal7?.UnregisterDependent(this);
                 _signal7 = signal7;
                 _lastDirtyBit7 = (byte)(signal7.DirtyBit - 1);
+                _signal7?.RegisterDependent(this);
             }
         }
 
         public override RT Get()
         {
-            if (!CustomShouldRecomputeLogic.ShouldRecomputeSignal())
-            {
-                return LastValue;
-            }
-
             if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _signal3.IsDirty(_lastDirtyBit3) || _signal4.IsDirty(_lastDirtyBit4) || _signal5.IsDirty(_lastDirtyBit5) || _signal6.IsDirty(_lastDirtyBit6) || _signal7.IsDirty(_lastDirtyBit7))
             {
                 var previousValue = _lastValue;
@@ -991,7 +875,7 @@ namespace Signals
 
                 if (ShouldSetDirty(newValue: _lastValue, previousValue: previousValue))
                 {
-                    DirtyBit++;
+                    _dirtyBit++;
                 }
                 Cleanup(previousValue);
             }
@@ -1014,18 +898,13 @@ namespace Signals
         IndexedDictionary<Key, ItemSignal>
     >
         where Key : IEquatable<Key>
-        where KeysSignal : BaseSignal<Keys>
+        where KeysSignal : ISignal<Keys>
         where Keys : IList<Key>
-        where ItemSignal : BaseSignal<ItemType>
+        where ItemSignal : ISignal<ItemType>
     {
         IndexedDictionary<Key, ItemSignal> _signalsByKey;
 
         public ComputedSignalsByKey(KeysSignal keysSignal) : base(keysSignal)
-        {
-            _signalsByKey = new();
-        }
-
-        public ComputedSignalsByKey(KeysSignal keysSignal, IShouldRecomputeSignal recomputeSignalExpression) : base(keysSignal, recomputeSignalExpression)
         {
             _signalsByKey = new();
         }
@@ -1035,7 +914,7 @@ namespace Signals
             Get(); // Ensure that the signals are up to date
             if (!_signalsByKey.ContainsKey(key))
             {
-                return default(ItemType);
+                return default;
             }
             return _signalsByKey[key].Get();
         }
@@ -1045,12 +924,12 @@ namespace Signals
             Get(); // Ensure that the signals are up to date
             if (!_signalsByKey.ContainsKey(key))
             {
-                return default(ItemSignal);
+                return default;
             }
             return _signalsByKey[key];
         }
 
-        protected override IndexedDictionary<Key, ItemSignal> Compute(Keys keys, DynamicSignals<ItemType> dynamicSignals)
+        protected override IndexedDictionary<Key, ItemSignal> Compute(Keys keys, DynamicDependencies<ItemType> dynamicDependencies)
         {
             // Add new keys
             for (var i = 0; i < keys.Count; i++)
@@ -1059,7 +938,7 @@ namespace Signals
                 if (!_signalsByKey.ContainsKey(key))
                 {
                     var itemSignal = CreateItemSignal(key);
-                    dynamicSignals.Add<ItemSignal>(itemSignal);
+                    dynamicDependencies.Add(itemSignal);
                     _signalsByKey.Add(key, itemSignal);
                 }
                 else
@@ -1074,7 +953,7 @@ namespace Signals
                 var kvp = _signalsByKey.GetKVPAt(i);
                 if (!keys.Contains(kvp.Key))
                 {
-                    dynamicSignals.RemoveAt(i);
+                    dynamicDependencies.RemoveAt(i);
                     _signalsByKey.Remove(kvp.Key);
                     CleanupItemSignal(kvp.Key, kvp.Value);
                 }
@@ -1090,7 +969,7 @@ namespace Signals
 
     public class NegatedBoolSignal : ComputedSignal<bool, bool>
     {
-        public NegatedBoolSignal(BaseSignal<bool> signal) : base(signal) { }
+        public NegatedBoolSignal(ISignal<bool> signal) : base(signal) { }
         protected override bool Compute(bool value)
         {
             return !value;
@@ -1099,7 +978,7 @@ namespace Signals
 
     public class IntToStringSignal : ComputedSignal<int, string>
     {
-        public IntToStringSignal(BaseSignal<int> signal) : base(signal) { }
+        public IntToStringSignal(ISignal<int> signal) : base(signal) { }
         protected override string Compute(int value)
         {
             return value.ToString();

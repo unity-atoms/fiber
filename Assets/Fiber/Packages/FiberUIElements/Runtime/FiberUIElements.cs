@@ -438,6 +438,10 @@ namespace Fiber.UIElements
             if (!virtualNode.Value.IsEmpty)
             {
                 TextFieldElementInstance.value = virtualNode.Value.Get();
+                if (virtualNode.Value.IsSignal)
+                {
+                    virtualNode.Value.Signal.RegisterDependent(this);
+                }
                 _valueWorkLoopItem = new(virtualNode.Value);
             }
             if (virtualNode.OnChange != null)
@@ -450,12 +454,22 @@ namespace Fiber.UIElements
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_valueWorkLoopItem.Check())
             {
                 TextFieldElementInstance.value = _valueWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_valueWorkLoopItem.IsSignal)
+            {
+                _valueWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -474,16 +488,30 @@ namespace Fiber.UIElements
             if (!virtualNode.Text.IsEmpty)
             {
                 TextElementInstance.text = virtualNode.Text.Get();
+                if (virtualNode.Text.IsSignal)
+                {
+                    virtualNode.Text.Signal.RegisterDependent(this);
+                }
                 _textWorkLoopItem = new(virtualNode.Text);
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_textWorkLoopItem.Check())
             {
                 TextElementInstance.text = _textWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_textWorkLoopItem.IsSignal)
+            {
+                _textWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -495,8 +523,8 @@ namespace Fiber.UIElements
         public ScrollViewNativeNode(ScrollViewComponent virtualNode, ScrollView instance) : base(virtualNode, instance)
         {
             ScrollViewInstance = instance;
-            if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            virtualNode.OnCreateRef?.Invoke(instance);
+            if (virtualNode.ScrollRef != null) virtualNode.ScrollRef.Current = instance;
+            virtualNode.OnCreateScrollRef?.Invoke(instance);
         }
     }
 
@@ -515,6 +543,10 @@ namespace Fiber.UIElements
             {
                 ButtonInstance.text = virtualNode.Text.Get();
                 _textWorkLoopItem = new(virtualNode.Text);
+                if (virtualNode.Text.IsSignal)
+                {
+                    virtualNode.Text.Signal.RegisterDependent(this);
+                }
             }
             if (virtualNode.OnKeyDown != null)
             {
@@ -522,12 +554,22 @@ namespace Fiber.UIElements
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_textWorkLoopItem.Check())
             {
                 ButtonInstance.text = _textWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_textWorkLoopItem.IsSignal)
+            {
+                _textWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -608,446 +650,566 @@ namespace Fiber.UIElements
             if (!virtualNode.Style.IsEmpty)
             {
                 _styleWorkLoopItem = new(virtualNode.Style);
+                if (virtualNode.Style.IsSignal)
+                {
+                    virtualNode.Style.Signal.RegisterDependent(this);
+                }
                 var style = virtualNode.Style.Get();
                 _lastStyleFromSignal = style;
-                var isStyleValue = virtualNode.Style.IsValue;
 
                 if (!style.Position.IsEmpty)
                 {
                     Instance.style.position = style.Position.Get();
-                    if (isStyleValue)
+                    if (style.Position.IsSignal)
                     {
-                        _positionWorkLoopItem = new(style.Position);
+                        style.Position.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _positionWorkLoopItem = new(style.Position);
+
                 if (!style.Right.IsEmpty)
                 {
                     Instance.style.right = style.Right.Get();
-                    if (isStyleValue)
+                    if (style.Right.IsSignal)
                     {
-                        _rightWorkLoopItem = new(style.Right);
+                        style.Right.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _rightWorkLoopItem = new(style.Right);
+
                 if (!style.Bottom.IsEmpty)
                 {
                     Instance.style.bottom = style.Bottom.Get();
-                    if (isStyleValue)
+                    if (style.Bottom.IsSignal)
                     {
-                        _bottomWorkLoopItem = new(style.Bottom);
+                        style.Bottom.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _bottomWorkLoopItem = new(style.Bottom);
+
                 if (!style.Left.IsEmpty)
                 {
                     Instance.style.left = style.Left.Get();
-                    if (isStyleValue)
+                    if (style.Left.IsSignal)
                     {
-                        _leftWorkLoopItem = new(style.Left);
+                        style.Left.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _leftWorkLoopItem = new(style.Left);
+
                 if (!style.Top.IsEmpty)
                 {
                     Instance.style.top = style.Top.Get();
-                    if (isStyleValue)
+                    if (style.Top.IsSignal)
                     {
-                        _topWorkLoopItem = new(style.Top);
+                        style.Top.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _topWorkLoopItem = new(style.Top);
+
                 if (!style.PaddingRight.IsEmpty)
                 {
                     Instance.style.paddingRight = style.PaddingRight.Get();
-                    if (isStyleValue)
+                    if (style.PaddingRight.IsSignal)
                     {
-                        _paddingRightWorkLoopItem = new(style.PaddingRight);
+                        style.PaddingRight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _paddingRightWorkLoopItem = new(style.PaddingRight);
+
                 if (!style.PaddingBottom.IsEmpty)
                 {
                     Instance.style.paddingBottom = style.PaddingBottom.Get();
-                    if (isStyleValue)
+                    if (style.PaddingBottom.IsSignal)
                     {
-                        _paddingBottomWorkLoopItem = new(style.PaddingBottom);
+                        style.PaddingBottom.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _paddingBottomWorkLoopItem = new(style.PaddingBottom);
+
                 if (!style.PaddingLeft.IsEmpty)
                 {
                     Instance.style.paddingLeft = style.PaddingLeft.Get();
-                    if (isStyleValue)
+                    if (style.PaddingLeft.IsSignal)
                     {
-                        _paddingLeftWorkLoopItem = new(style.PaddingLeft);
+                        style.PaddingLeft.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _paddingLeftWorkLoopItem = new(style.PaddingLeft);
+
                 if (!style.PaddingTop.IsEmpty)
                 {
                     Instance.style.paddingTop = style.PaddingTop.Get();
-                    if (isStyleValue)
+                    if (style.PaddingTop.IsSignal)
                     {
-                        _paddingTopWorkLoopItem = new(style.PaddingTop);
+                        style.PaddingTop.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _paddingTopWorkLoopItem = new(style.PaddingTop);
+
                 if (!style.MarginRight.IsEmpty)
                 {
                     Instance.style.marginRight = style.MarginRight.Get();
-                    if (isStyleValue)
+                    if (style.MarginRight.IsSignal)
                     {
-                        _marginRightWorkLoopItem = new(style.MarginRight);
+                        style.MarginRight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _marginRightWorkLoopItem = new(style.MarginRight);
+
                 if (!style.MarginBottom.IsEmpty)
                 {
                     Instance.style.marginBottom = style.MarginBottom.Get();
-                    if (isStyleValue)
+                    if (style.MarginBottom.IsSignal)
                     {
-                        _marginBottomWorkLoopItem = new(style.MarginBottom);
+                        style.MarginBottom.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _marginBottomWorkLoopItem = new(style.MarginBottom);
+
                 if (!style.MarginLeft.IsEmpty)
                 {
                     Instance.style.marginLeft = style.MarginLeft.Get();
-                    if (isStyleValue)
+                    if (style.MarginLeft.IsSignal)
                     {
-                        _marginLeftWorkLoopItem = new(style.MarginLeft);
+                        style.MarginLeft.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _marginLeftWorkLoopItem = new(style.MarginLeft);
+
                 if (!style.MarginTop.IsEmpty)
                 {
                     Instance.style.marginTop = style.MarginTop.Get();
-                    if (isStyleValue)
+                    if (style.MarginTop.IsSignal)
                     {
-                        _marginTopWorkLoopItem = new(style.MarginTop);
+                        style.MarginTop.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _marginTopWorkLoopItem = new(style.MarginTop);
+
                 if (!style.BorderTopRightRadius.IsEmpty)
                 {
                     Instance.style.borderTopRightRadius = style.BorderTopRightRadius.Get();
-                    if (isStyleValue)
+                    if (style.BorderTopRightRadius.IsSignal)
                     {
-                        _borderTopRightRadiusWorkLoopItem = new(style.BorderTopRightRadius);
+                        style.BorderTopRightRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderTopRightRadiusWorkLoopItem = new(style.BorderTopRightRadius);
+
                 if (!style.BorderTopLeftRadius.IsEmpty)
                 {
                     Instance.style.borderTopLeftRadius = style.BorderTopLeftRadius.Get();
-                    if (isStyleValue)
+                    if (style.BorderTopLeftRadius.IsSignal)
                     {
-                        _borderTopLeftRadiusWorkLoopItem = new(style.BorderTopLeftRadius);
+                        style.BorderTopLeftRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderTopLeftRadiusWorkLoopItem = new(style.BorderTopLeftRadius);
+
                 if (!style.BorderBottomRightRadius.IsEmpty)
                 {
                     Instance.style.borderBottomRightRadius = style.BorderBottomRightRadius.Get();
-                    if (isStyleValue)
+                    if (style.BorderBottomRightRadius.IsSignal)
                     {
-                        _borderBottomRightRadiusWorkLoopItem = new(style.BorderBottomRightRadius);
+                        style.BorderBottomRightRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderBottomRightRadiusWorkLoopItem = new(style.BorderBottomRightRadius);
+
                 if (!style.BorderBottomLeftRadius.IsEmpty)
                 {
                     Instance.style.borderBottomLeftRadius = style.BorderBottomLeftRadius.Get();
-                    if (isStyleValue)
+                    if (style.BorderBottomLeftRadius.IsSignal)
                     {
-                        _borderBottomLeftRadiusWorkLoopItem = new(style.BorderBottomLeftRadius);
+                        style.BorderBottomLeftRadius.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderBottomLeftRadiusWorkLoopItem = new(style.BorderBottomLeftRadius);
+
                 if (!style.BorderRightWidth.IsEmpty)
                 {
                     Instance.style.borderRightWidth = style.BorderRightWidth.Get();
-                    if (isStyleValue)
+                    if (style.BorderRightWidth.IsSignal)
                     {
-                        _borderRightWidthWorkLoopItem = new(style.BorderRightWidth);
+                        style.BorderRightWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderRightWidthWorkLoopItem = new(style.BorderRightWidth);
+
                 if (!style.BorderBottomWidth.IsEmpty)
                 {
                     Instance.style.borderBottomWidth = style.BorderBottomWidth.Get();
-                    if (isStyleValue)
+                    if (style.BorderBottomWidth.IsSignal)
                     {
-                        _borderBottomWidthWorkLoopItem = new(style.BorderBottomWidth);
+                        style.BorderBottomWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderBottomWidthWorkLoopItem = new(style.BorderBottomWidth);
+
                 if (!style.BorderLeftWidth.IsEmpty)
                 {
                     Instance.style.borderLeftWidth = style.BorderLeftWidth.Get();
-                    if (isStyleValue)
+                    if (style.BorderLeftWidth.IsSignal)
                     {
-                        _borderLeftWidthWorkLoopItem = new(style.BorderLeftWidth);
+                        style.BorderLeftWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderLeftWidthWorkLoopItem = new(style.BorderLeftWidth);
+
                 if (!style.BorderTopWidth.IsEmpty)
                 {
                     Instance.style.borderTopWidth = style.BorderTopWidth.Get();
-                    if (isStyleValue)
+                    if (style.BorderTopWidth.IsSignal)
                     {
-                        _borderTopWidthWorkLoopItem = new(style.BorderTopWidth);
+                        style.BorderTopWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderTopWidthWorkLoopItem = new(style.BorderTopWidth);
+
                 if (!style.BorderRightColor.IsEmpty)
                 {
                     Instance.style.borderRightColor = style.BorderRightColor.Get();
-                    if (isStyleValue)
+                    if (style.BorderRightColor.IsSignal)
                     {
-                        _borderRightColorWorkLoopItem = new(style.BorderRightColor);
+                        style.BorderRightColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderRightColorWorkLoopItem = new(style.BorderRightColor);
+
                 if (!style.BorderBottomColor.IsEmpty)
                 {
                     Instance.style.borderBottomColor = style.BorderBottomColor.Get();
-                    if (isStyleValue)
+                    if (style.BorderBottomColor.IsSignal)
                     {
-                        _borderBottomColorWorkLoopItem = new(style.BorderBottomColor);
+                        style.BorderBottomColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderBottomColorWorkLoopItem = new(style.BorderBottomColor);
+
                 if (!style.BorderLeftColor.IsEmpty)
                 {
                     Instance.style.borderLeftColor = style.BorderLeftColor.Get();
-                    if (isStyleValue)
+                    if (style.BorderLeftColor.IsSignal)
                     {
-                        _borderLeftColorWorkLoopItem = new(style.BorderLeftColor);
+                        style.BorderLeftColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderLeftColorWorkLoopItem = new(style.BorderLeftColor);
+
                 if (!style.BorderTopColor.IsEmpty)
                 {
                     Instance.style.borderTopColor = style.BorderTopColor.Get();
-                    if (isStyleValue)
+                    if (style.BorderTopColor.IsSignal)
                     {
-                        _borderTopColorWorkLoopItem = new(style.BorderTopColor);
+                        style.BorderTopColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _borderTopColorWorkLoopItem = new(style.BorderTopColor);
+
                 if (!style.Display.IsEmpty)
                 {
                     Instance.style.display = style.Display.Get();
-                    if (isStyleValue)
+                    if (style.Display.IsSignal)
                     {
-                        _displayWorkLoopItem = new(style.Display);
+                        style.Display.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _displayWorkLoopItem = new(style.Display);
+
                 if (!style.FlexShrink.IsEmpty)
                 {
                     Instance.style.flexShrink = style.FlexShrink.Get();
-                    if (isStyleValue)
+                    if (style.FlexShrink.IsSignal)
                     {
-                        _flexShrinkWorkLoopItem = new(style.FlexShrink);
+                        style.FlexShrink.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _flexShrinkWorkLoopItem = new(style.FlexShrink);
+
                 if (!style.FlexGrow.IsEmpty)
                 {
                     Instance.style.flexGrow = style.FlexGrow.Get();
-                    if (isStyleValue)
+                    if (style.FlexGrow.IsSignal)
                     {
-                        _flexGrowWorkLoopItem = new(style.FlexGrow);
+                        style.FlexGrow.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _flexGrowWorkLoopItem = new(style.FlexGrow);
+
                 if (!style.FlexDirection.IsEmpty)
                 {
                     Instance.style.flexDirection = style.FlexDirection.Get();
-                    if (isStyleValue)
+                    if (style.FlexDirection.IsSignal)
                     {
-                        _flexDirectionWorkLoopItem = new(style.FlexDirection);
+                        style.FlexDirection.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _flexDirectionWorkLoopItem = new(style.FlexDirection);
+
                 if (!style.JustifyContent.IsEmpty)
                 {
                     Instance.style.justifyContent = style.JustifyContent.Get();
-                    if (isStyleValue)
+                    if (style.JustifyContent.IsSignal)
                     {
-                        _justifyContentWorkLoopItem = new(style.JustifyContent);
+                        style.JustifyContent.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _justifyContentWorkLoopItem = new(style.JustifyContent);
+
                 if (!style.AlignItems.IsEmpty)
                 {
                     Instance.style.alignItems = style.AlignItems.Get();
-                    if (isStyleValue)
+                    if (style.AlignItems.IsSignal)
                     {
-                        _alignItemsWorkLoopItem = new(style.AlignItems);
+                        style.AlignItems.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _alignItemsWorkLoopItem = new(style.AlignItems);
+
                 if (!style.Width.IsEmpty)
                 {
                     Instance.style.width = style.Width.Get();
-                    if (isStyleValue)
+                    if (style.Width.IsSignal)
                     {
-                        _widthWorkLoopItem = new(style.Width);
+                        style.Width.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _widthWorkLoopItem = new(style.Width);
+
                 if (!style.MaxWidth.IsEmpty)
                 {
                     Instance.style.maxWidth = style.MaxWidth.Get();
-                    if (isStyleValue)
+                    if (style.MaxWidth.IsSignal)
                     {
-                        _maxWidthWorkLoopItem = new(style.MaxWidth);
+                        style.MaxWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _maxWidthWorkLoopItem = new(style.MaxWidth);
+
                 if (!style.MinWidth.IsEmpty)
                 {
                     Instance.style.minWidth = style.MinWidth.Get();
-                    if (isStyleValue)
+                    if (style.MinWidth.IsSignal)
                     {
-                        _minWidthWorkLoopItem = new(style.MinWidth);
+                        style.MinWidth.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _minWidthWorkLoopItem = new(style.MinWidth);
+
                 if (!style.Height.IsEmpty)
                 {
                     Instance.style.height = style.Height.Get();
-                    if (isStyleValue)
+                    if (style.Height.IsSignal)
                     {
-                        _heightWorkLoopItem = new(style.Height);
+                        style.Height.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _heightWorkLoopItem = new(style.Height);
+
                 if (!style.MaxHeight.IsEmpty)
                 {
                     Instance.style.maxHeight = style.MaxHeight.Get();
-                    if (isStyleValue)
+                    if (style.MaxHeight.IsSignal)
                     {
-                        _maxHeightWorkLoopItem = new(style.MaxHeight);
+                        style.MaxHeight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _maxHeightWorkLoopItem = new(style.MaxHeight);
+
                 if (!style.MinHeight.IsEmpty)
                 {
                     Instance.style.minHeight = style.MinHeight.Get();
-                    if (isStyleValue)
+                    if (style.MinHeight.IsSignal)
                     {
-                        _minHeightWorkLoopItem = new(style.MinHeight);
+                        style.MinHeight.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _minHeightWorkLoopItem = new(style.MinHeight);
+
                 if (!style.BackgroundColor.IsEmpty)
                 {
                     Instance.style.backgroundColor = style.BackgroundColor.Get();
-                    if (isStyleValue)
+                    if (style.BackgroundColor.IsSignal)
                     {
-                        _backgroundColorWorkLoopItem = new(style.BackgroundColor);
+                        style.BackgroundColor.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _backgroundColorWorkLoopItem = new(style.BackgroundColor);
+
                 if (!style.Color.IsEmpty)
                 {
                     Instance.style.color = style.Color.Get();
-                    if (isStyleValue)
+                    if (style.Color.IsSignal)
                     {
-                        _colorWorkLoopItem = new(style.Color);
+                        style.Color.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _colorWorkLoopItem = new(style.Color);
+
                 if (!style.FontSize.IsEmpty)
                 {
                     Instance.style.fontSize = style.FontSize.Get();
-                    if (isStyleValue)
+                    if (style.FontSize.IsSignal)
                     {
-                        _fontSizeWorkLoopItem = new(style.FontSize);
+                        style.FontSize.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _fontSizeWorkLoopItem = new(style.FontSize);
+
                 if (!style.UnityFont.IsEmpty)
                 {
                     Instance.style.unityFont = style.UnityFont.Get();
-                    if (isStyleValue)
+                    if (style.UnityFont.IsSignal)
                     {
-                        _unityFontWorkLoopItem = new(style.UnityFont);
+                        style.UnityFont.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _unityFontWorkLoopItem = new(style.UnityFont);
+
                 if (!style.UnityFontDefinition.IsEmpty)
                 {
                     Instance.style.unityFontDefinition = style.UnityFontDefinition.Get();
-                    if (isStyleValue)
+                    if (style.UnityFontDefinition.IsSignal)
                     {
-                        _unityFontDefinitionWorkLoopItem = new(style.UnityFontDefinition);
+                        style.UnityFontDefinition.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _unityFontDefinitionWorkLoopItem = new(style.UnityFontDefinition);
+
                 if (!style.UnityFontStyle.IsEmpty)
                 {
                     Instance.style.unityFontStyleAndWeight = style.UnityFontStyle.Get();
-                    if (isStyleValue)
+                    if (style.UnityFontStyle.IsSignal)
                     {
-                        _unityFontStyleWorkLoopItem = new(style.UnityFontStyle);
+                        style.UnityFontStyle.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _unityFontStyleWorkLoopItem = new(style.UnityFontStyle);
+
                 if (!style.UnityParagraphSpacing.IsEmpty)
                 {
                     Instance.style.unityParagraphSpacing = style.UnityParagraphSpacing.Get();
-                    if (isStyleValue)
+                    if (style.UnityParagraphSpacing.IsSignal)
                     {
-                        _unityParagraphSpacingWorkLoopItem = new(style.UnityParagraphSpacing);
+                        style.UnityParagraphSpacing.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _unityParagraphSpacingWorkLoopItem = new(style.UnityParagraphSpacing);
+
                 if (!style.UnityTextAlign.IsEmpty)
                 {
                     Instance.style.unityTextAlign = style.UnityTextAlign.Get();
-                    if (isStyleValue)
+                    if (style.UnityTextAlign.IsSignal)
                     {
-                        _unityTextAlignWorkLoopItem = new(style.UnityTextAlign);
+                        style.UnityTextAlign.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _unityTextAlignWorkLoopItem = new(style.UnityTextAlign);
+
                 if (!style.TransitionProperty.IsEmpty)
                 {
                     Instance.style.transitionProperty = style.TransitionProperty.Get();
-                    if (isStyleValue)
+                    if (style.TransitionProperty.IsSignal)
                     {
-                        _transitionPropertyWorkLoopItem = new(style.TransitionProperty);
+                        style.TransitionProperty.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _transitionPropertyWorkLoopItem = new(style.TransitionProperty);
+
                 if (!style.TransitionDelay.IsEmpty)
                 {
                     Instance.style.transitionDelay = style.TransitionDelay.Get();
-                    if (isStyleValue)
+                    if (style.TransitionDelay.IsSignal)
                     {
-                        _transitionDelayWorkLoopItem = new(style.TransitionDelay);
+                        style.TransitionDelay.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _transitionDelayWorkLoopItem = new(style.TransitionDelay);
+
                 if (!style.TransitionDuration.IsEmpty)
                 {
                     Instance.style.transitionDuration = style.TransitionDuration.Get();
-                    if (isStyleValue)
+                    if (style.TransitionDuration.IsSignal)
                     {
-                        _transitionDurationWorkLoopItem = new(style.TransitionDuration);
+                        style.TransitionDuration.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _transitionDurationWorkLoopItem = new(style.TransitionDuration);
+
                 if (!style.TransitionTimingFunction.IsEmpty)
                 {
                     Instance.style.transitionTimingFunction = style.TransitionTimingFunction.Get();
-                    if (isStyleValue)
+                    if (style.TransitionTimingFunction.IsSignal)
                     {
-                        _transitionTimingFunctionWorkLoopItem = new(style.TransitionTimingFunction);
+                        style.TransitionTimingFunction.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _transitionTimingFunctionWorkLoopItem = new(style.TransitionTimingFunction);
+
                 if (!style.TransformOrigin.IsEmpty)
                 {
                     Instance.style.transformOrigin = style.TransformOrigin.Get();
-                    if (isStyleValue)
+                    if (style.TransformOrigin.IsSignal)
                     {
-                        _transformOriginWorkLoopItem = new(style.TransformOrigin);
+                        style.TransformOrigin.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _transformOriginWorkLoopItem = new(style.TransformOrigin);
+
                 if (!style.Translate.IsEmpty)
                 {
                     Instance.style.translate = style.Translate.Get();
-                    if (isStyleValue)
+                    if (style.Translate.IsSignal)
                     {
-                        _translateWorkLoopItem = new(style.Translate);
+                        style.Translate.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _translateWorkLoopItem = new(style.Translate);
+
                 if (!style.Scale.IsEmpty)
                 {
                     Instance.style.scale = style.Scale.Get();
-                    if (isStyleValue)
+                    if (style.Scale.IsSignal)
                     {
-                        _scaleWorkLoopItem = new(style.Scale);
+                        style.Scale.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _scaleWorkLoopItem = new(style.Scale);
+
                 if (!style.Rotate.IsEmpty)
                 {
                     Instance.style.rotate = style.Rotate.Get();
-                    if (isStyleValue)
+                    if (style.Rotate.IsSignal)
                     {
-                        _rotateWorkLoopItem = new(style.Rotate);
+                        style.Rotate.SignalProp.Signal.RegisterDependent(this);
                     }
                 }
+                _rotateWorkLoopItem = new(style.Rotate);
+
             }
             if (!virtualNode.Name.IsEmpty)
             {
                 instance.name = virtualNode.Name.Get();
+                if (virtualNode.Name.IsSignal)
+                {
+                    virtualNode.Name.Signal.RegisterDependent(this);
+                }
                 _nameWorkLoopItem = new(virtualNode.Name);
             }
             if (!virtualNode.PickingMode.IsEmpty)
             {
                 instance.pickingMode = virtualNode.PickingMode.Get();
+                if (virtualNode.PickingMode.IsSignal)
+                {
+                    virtualNode.PickingMode.Signal.RegisterDependent(this);
+                }
                 _pickingModeWorkLoopItem = new(virtualNode.PickingMode);
             }
-            if (virtualNode.OnClick != null) instance.RegisterCallback<ClickEvent>(virtualNode.OnClick);
+            if (virtualNode.OnClick != null)
+            {
+                instance.RegisterCallback<ClickEvent>(virtualNode.OnClick);
+            }
 
             if (!virtualNode.ClassName.IsEmpty)
             {
@@ -1058,6 +1220,10 @@ namespace Fiber.UIElements
                     var name = names[i];
                     _previousClassNameList.Add(name);
                     Instance.AddToClassList(name);
+                }
+                if (virtualNode.ClassName.IsSignal)
+                {
+                    virtualNode.ClassName.Signal.RegisterDependent(this);
                 }
                 _classNameWorkLoopItem = new(virtualNode.ClassName);
             }
@@ -1155,705 +1321,1971 @@ namespace Fiber.UIElements
             throw new Exception($"Trying to move child of unknown type {node.VirtualNode.GetType()}.");
         }
 
-        public override void WorkLoop()
+        private void UpdateStyle()
         {
-            // If style is a signal itself we listen to changes to it and then just re set all values that are not empty.
-            // If style is a value we instead check if the value has changed and only set the values that have changed.
-            // TODO: Removing of properties
-            if (_styleWorkLoopItem.IsSignal && _styleWorkLoopItem.Check())
+            // Position
+            // Right
+            // Bottom
+            // Left
+            // Top
+            // PaddingRight
+            // PaddingBottom
+            // PaddingLeft
+            // PaddingTop
+            // MarginRight
+            // MarginBottom
+            // MarginLeft
+            // MarginTop
+            // BorderTopRightRadius
+            // BorderTopLeftRadius
+            // BorderBottomRightRadius
+            // BorderBottomLeftRadius
+            // BorderRightWidth
+            // BorderBottomWidth
+            // BorderLeftWidth
+            // BorderTopWidth
+            // BorderRightColor
+            // BorderBottomColor
+            // BorderLeftColor
+            // BorderTopColor
+            // Display
+            // FlexShrink
+            // FlexGrow
+            // FlexDirection
+            // JustifyContent
+            // AlignItems
+            // Width
+            // MaxWidth
+            // MinWidth
+            // Height
+            // MaxHeight
+            // MinHeight
+            // BackgroundColor
+            // Color
+            // FontSize
+            // UnityFont
+            // UnityFontDefinition
+            // UnityFontStyle
+            // UnityParagraphSpacing
+            // UnityTextAlign
+            // TransitionProperty
+            // TransitionDelay
+            // TransitionDuration
+            // TransitionTimingFunction
+            // TransformOrigin
+            // Translate
+            // Scale
+            // Rotate
+            if (!_styleWorkLoopItem.IsEmpty)
             {
-                var style = _styleWorkLoopItem.Get();
-                // OPEN POINT: Should we compare current value with new value before applying?
-                if (!style.Position.IsEmpty)
+                if (_styleWorkLoopItem.IsSignal && !_styleWorkLoopItem.Check())
                 {
-                    Instance.style.position = style.Position.Get();
+                    return;
                 }
-                else if (!_lastStyleFromSignal.Position.IsEmpty)
+
+                var style = _styleWorkLoopItem.Get();
+
+                // OPEN POINT: We are currently not handling cleaning up signals that are no longer used when
+                // the style itself is a signal and a prop goes from being a signal to a regular value
+
+                // Position - Update instance value
+                if (style.Position.IsSignal)
+                {
+                    if (_positionWorkLoopItem.Check())
+                    {
+                        Instance.style.position = _positionWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Position.IsValue)
+                {
+                    var value = style.Position.Get();
+                    if (Instance.style.position != value)
+                    {
+                        Instance.style.position = value;
+                    }
+                }
+                else if (style.Position.IsEmpty && !_lastStyleFromSignal.Position.IsEmpty)
                 {
                     Instance.style.position = StyleKeyword.Initial;
                 }
-
-                if (!style.Right.IsEmpty)
+                // Position - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.right = style.Right.Get();
+                    if (_lastStyleFromSignal.Position.SignalProp.Signal != style.Position.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Position.IsSignal)
+                        {
+                            _lastStyleFromSignal.Position.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Position.IsSignal)
+                        {
+                            style.Position.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Right.IsEmpty)
+
+                // Right - Update instance value
+                if (style.Right.IsSignal)
+                {
+                    if (_rightWorkLoopItem.Check())
+                    {
+                        Instance.style.right = _rightWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Right.IsValue)
+                {
+                    var value = style.Right.Get();
+                    if (Instance.style.right != value)
+                    {
+                        Instance.style.right = value;
+                    }
+                }
+                else if (style.Right.IsEmpty && !_lastStyleFromSignal.Right.IsEmpty)
                 {
                     Instance.style.right = StyleKeyword.Initial;
                 }
-
-                if (!style.Bottom.IsEmpty)
+                // Right - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.bottom = style.Bottom.Get();
+                    if (_lastStyleFromSignal.Right.SignalProp.Signal != style.Right.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Right.IsSignal)
+                        {
+                            _lastStyleFromSignal.Right.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Right.IsSignal)
+                        {
+                            style.Right.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Bottom.IsEmpty)
+
+                // Bottom - Update instance value
+                if (style.Bottom.IsSignal)
+                {
+                    if (_bottomWorkLoopItem.Check())
+                    {
+                        Instance.style.bottom = _bottomWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Bottom.IsValue)
+                {
+                    var value = style.Bottom.Get();
+                    if (Instance.style.bottom != value)
+                    {
+                        Instance.style.bottom = value;
+                    }
+                }
+                else if (style.Bottom.IsEmpty && !_lastStyleFromSignal.Bottom.IsEmpty)
                 {
                     Instance.style.bottom = StyleKeyword.Initial;
                 }
-
-                if (!style.Left.IsEmpty)
+                // Bottom - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.left = style.Left.Get();
+                    if (_lastStyleFromSignal.Bottom.SignalProp.Signal != style.Bottom.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Bottom.IsSignal)
+                        {
+                            _lastStyleFromSignal.Bottom.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Bottom.IsSignal)
+                        {
+                            style.Bottom.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Left.IsEmpty)
+
+                // Left - Update instance value
+                if (style.Left.IsSignal)
+                {
+                    if (_leftWorkLoopItem.Check())
+                    {
+                        Instance.style.left = _leftWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Left.IsValue)
+                {
+                    var value = style.Left.Get();
+                    if (Instance.style.left != value)
+                    {
+                        Instance.style.left = value;
+                    }
+                }
+                else if (style.Left.IsEmpty && !_lastStyleFromSignal.Left.IsEmpty)
                 {
                     Instance.style.left = StyleKeyword.Initial;
                 }
-
-                if (!style.Top.IsEmpty)
+                // Left - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.top = style.Top.Get();
+                    if (_lastStyleFromSignal.Left.SignalProp.Signal != style.Left.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Left.IsSignal)
+                        {
+                            _lastStyleFromSignal.Left.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Left.IsSignal)
+                        {
+                            style.Left.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Top.IsEmpty)
+
+                // Top - Update instance value
+                if (style.Top.IsSignal)
+                {
+                    if (_topWorkLoopItem.Check())
+                    {
+                        Instance.style.top = _topWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Top.IsValue)
+                {
+                    var value = style.Top.Get();
+                    if (Instance.style.top != value)
+                    {
+                        Instance.style.top = value;
+                    }
+                }
+                else if (style.Top.IsEmpty && !_lastStyleFromSignal.Top.IsEmpty)
                 {
                     Instance.style.top = StyleKeyword.Initial;
                 }
-
-                if (!style.PaddingRight.IsEmpty)
+                // Top - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.paddingRight = style.PaddingRight.Get();
+                    if (_lastStyleFromSignal.Top.SignalProp.Signal != style.Top.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Top.IsSignal)
+                        {
+                            _lastStyleFromSignal.Top.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Top.IsSignal)
+                        {
+                            style.Top.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.PaddingRight.IsEmpty)
+
+                // PaddingRight - Update instance value
+                if (style.PaddingRight.IsSignal)
+                {
+                    if (_paddingRightWorkLoopItem.Check())
+                    {
+                        Instance.style.paddingRight = _paddingRightWorkLoopItem.Get();
+                    }
+                }
+                else if (style.PaddingRight.IsValue)
+                {
+                    var value = style.PaddingRight.Get();
+                    if (Instance.style.paddingRight != value)
+                    {
+                        Instance.style.paddingRight = value;
+                    }
+                }
+                else if (style.PaddingRight.IsEmpty && !_lastStyleFromSignal.PaddingRight.IsEmpty)
                 {
                     Instance.style.paddingRight = StyleKeyword.Initial;
                 }
-
-                if (!style.PaddingBottom.IsEmpty)
+                // PaddingRight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.paddingBottom = style.PaddingBottom.Get();
+                    if (_lastStyleFromSignal.PaddingRight.SignalProp.Signal != style.PaddingRight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingRight.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingRight.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.PaddingRight.IsSignal)
+                        {
+                            style.PaddingRight.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.PaddingBottom.IsEmpty)
+
+                // PaddingBottom - Update instance value
+                if (style.PaddingBottom.IsSignal)
+                {
+                    if (_paddingBottomWorkLoopItem.Check())
+                    {
+                        Instance.style.paddingBottom = _paddingBottomWorkLoopItem.Get();
+                    }
+                }
+                else if (style.PaddingBottom.IsValue)
+                {
+                    var value = style.PaddingBottom.Get();
+                    if (Instance.style.paddingBottom != value)
+                    {
+                        Instance.style.paddingBottom = value;
+                    }
+                }
+                else if (style.PaddingBottom.IsEmpty && !_lastStyleFromSignal.PaddingBottom.IsEmpty)
                 {
                     Instance.style.paddingBottom = StyleKeyword.Initial;
                 }
-
-                if (!style.PaddingLeft.IsEmpty)
+                // PaddingBottom - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.paddingLeft = style.PaddingLeft.Get();
+                    if (_lastStyleFromSignal.PaddingBottom.SignalProp.Signal != style.PaddingBottom.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingBottom.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingBottom.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.PaddingBottom.IsSignal)
+                        {
+                            style.PaddingBottom.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.PaddingLeft.IsEmpty)
+
+                // PaddingLeft - Update instance value
+                if (style.PaddingLeft.IsSignal)
+                {
+                    if (_paddingLeftWorkLoopItem.Check())
+                    {
+                        Instance.style.paddingLeft = _paddingLeftWorkLoopItem.Get();
+                    }
+                }
+                else if (style.PaddingLeft.IsValue)
+                {
+                    var value = style.PaddingLeft.Get();
+                    if (Instance.style.paddingLeft != value)
+                    {
+                        Instance.style.paddingLeft = value;
+                    }
+                }
+                else if (style.PaddingLeft.IsEmpty && !_lastStyleFromSignal.PaddingLeft.IsEmpty)
                 {
                     Instance.style.paddingLeft = StyleKeyword.Initial;
                 }
-
-                if (!style.PaddingTop.IsEmpty)
+                // PaddingLeft - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.paddingTop = style.PaddingTop.Get();
+                    if (_lastStyleFromSignal.PaddingLeft.SignalProp.Signal != style.PaddingLeft.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingLeft.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingLeft.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.PaddingLeft.IsSignal)
+                        {
+                            style.PaddingLeft.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.PaddingTop.IsEmpty)
+
+                // PaddingTop - Update instance value
+                if (style.PaddingTop.IsSignal)
+                {
+                    if (_paddingTopWorkLoopItem.Check())
+                    {
+                        Instance.style.paddingTop = _paddingTopWorkLoopItem.Get();
+                    }
+                }
+                else if (style.PaddingTop.IsValue)
+                {
+                    var value = style.PaddingTop.Get();
+                    if (Instance.style.paddingTop != value)
+                    {
+                        Instance.style.paddingTop = value;
+                    }
+                }
+                else if (style.PaddingTop.IsEmpty && !_lastStyleFromSignal.PaddingTop.IsEmpty)
                 {
                     Instance.style.paddingTop = StyleKeyword.Initial;
                 }
-
-                if (!style.MarginRight.IsEmpty)
+                // PaddingTop - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.marginRight = style.MarginRight.Get();
+                    if (_lastStyleFromSignal.PaddingTop.SignalProp.Signal != style.PaddingTop.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.PaddingTop.IsSignal)
+                        {
+                            _lastStyleFromSignal.PaddingTop.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.PaddingTop.IsSignal)
+                        {
+                            style.PaddingTop.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MarginRight.IsEmpty)
+
+                // MarginRight - Update instance value
+                if (style.MarginRight.IsSignal)
+                {
+                    if (_marginRightWorkLoopItem.Check())
+                    {
+                        Instance.style.marginRight = _marginRightWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MarginRight.IsValue)
+                {
+                    var value = style.MarginRight.Get();
+                    if (Instance.style.marginRight != value)
+                    {
+                        Instance.style.marginRight = value;
+                    }
+                }
+                else if (style.MarginRight.IsEmpty && !_lastStyleFromSignal.MarginRight.IsEmpty)
                 {
                     Instance.style.marginRight = StyleKeyword.Initial;
                 }
-
-                if (!style.MarginBottom.IsEmpty)
+                // MarginRight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.marginBottom = style.MarginBottom.Get();
+                    if (_lastStyleFromSignal.MarginRight.SignalProp.Signal != style.MarginRight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginRight.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginRight.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MarginRight.IsSignal)
+                        {
+                            style.MarginRight.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MarginBottom.IsEmpty)
+
+                // MarginBottom - Update instance value
+                if (style.MarginBottom.IsSignal)
+                {
+                    if (_marginBottomWorkLoopItem.Check())
+                    {
+                        Instance.style.marginBottom = _marginBottomWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MarginBottom.IsValue)
+                {
+                    var value = style.MarginBottom.Get();
+                    if (Instance.style.marginBottom != value)
+                    {
+                        Instance.style.marginBottom = value;
+                    }
+                }
+                else if (style.MarginBottom.IsEmpty && !_lastStyleFromSignal.MarginBottom.IsEmpty)
                 {
                     Instance.style.marginBottom = StyleKeyword.Initial;
                 }
-
-                if (!style.MarginLeft.IsEmpty)
+                // MarginBottom - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.marginLeft = style.MarginLeft.Get();
+                    if (_lastStyleFromSignal.MarginBottom.SignalProp.Signal != style.MarginBottom.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginBottom.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginBottom.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MarginBottom.IsSignal)
+                        {
+                            style.MarginBottom.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MarginLeft.IsEmpty)
+
+                // MarginLeft - Update instance value
+                if (style.MarginLeft.IsSignal)
+                {
+                    if (_marginLeftWorkLoopItem.Check())
+                    {
+                        Instance.style.marginLeft = _marginLeftWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MarginLeft.IsValue)
+                {
+                    var value = style.MarginLeft.Get();
+                    if (Instance.style.marginLeft != value)
+                    {
+                        Instance.style.marginLeft = value;
+                    }
+                }
+                else if (style.MarginLeft.IsEmpty && !_lastStyleFromSignal.MarginLeft.IsEmpty)
                 {
                     Instance.style.marginLeft = StyleKeyword.Initial;
                 }
-
-                if (!style.MarginTop.IsEmpty)
+                // MarginLeft - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.marginTop = style.MarginTop.Get();
+                    if (_lastStyleFromSignal.MarginLeft.SignalProp.Signal != style.MarginLeft.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginLeft.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginLeft.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MarginLeft.IsSignal)
+                        {
+                            style.MarginLeft.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MarginTop.IsEmpty)
+
+                // MarginTop - Update instance value
+                if (style.MarginTop.IsSignal)
+                {
+                    if (_marginTopWorkLoopItem.Check())
+                    {
+                        Instance.style.marginTop = _marginTopWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MarginTop.IsValue)
+                {
+                    var value = style.MarginTop.Get();
+                    if (Instance.style.marginTop != value)
+                    {
+                        Instance.style.marginTop = value;
+                    }
+                }
+                else if (style.MarginTop.IsEmpty && !_lastStyleFromSignal.MarginTop.IsEmpty)
                 {
                     Instance.style.marginTop = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderTopRightRadius.IsEmpty)
+                // MarginTop - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderTopRightRadius = style.BorderTopRightRadius.Get();
+                    if (_lastStyleFromSignal.MarginTop.SignalProp.Signal != style.MarginTop.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MarginTop.IsSignal)
+                        {
+                            _lastStyleFromSignal.MarginTop.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MarginTop.IsSignal)
+                        {
+                            style.MarginTop.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderTopRightRadius.IsEmpty)
+
+                // BorderTopRightRadius - Update instance value
+                if (style.BorderTopRightRadius.IsSignal)
+                {
+                    if (_borderTopRightRadiusWorkLoopItem.Check())
+                    {
+                        Instance.style.borderTopRightRadius = _borderTopRightRadiusWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderTopRightRadius.IsValue)
+                {
+                    var value = style.BorderTopRightRadius.Get();
+                    if (Instance.style.borderTopRightRadius != value)
+                    {
+                        Instance.style.borderTopRightRadius = value;
+                    }
+                }
+                else if (style.BorderTopRightRadius.IsEmpty && !_lastStyleFromSignal.BorderTopRightRadius.IsEmpty)
                 {
                     Instance.style.borderTopRightRadius = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderTopLeftRadius.IsEmpty)
+                // BorderTopRightRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderTopLeftRadius = style.BorderTopLeftRadius.Get();
+                    if (_lastStyleFromSignal.BorderTopRightRadius.SignalProp.Signal != style.BorderTopRightRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopRightRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopRightRadius.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderTopRightRadius.IsSignal)
+                        {
+                            style.BorderTopRightRadius.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderTopLeftRadius.IsEmpty)
+
+                // BorderTopLeftRadius - Update instance value
+                if (style.BorderTopLeftRadius.IsSignal)
+                {
+                    if (_borderTopLeftRadiusWorkLoopItem.Check())
+                    {
+                        Instance.style.borderTopLeftRadius = _borderTopLeftRadiusWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderTopLeftRadius.IsValue)
+                {
+                    var value = style.BorderTopLeftRadius.Get();
+                    if (Instance.style.borderTopLeftRadius != value)
+                    {
+                        Instance.style.borderTopLeftRadius = value;
+                    }
+                }
+                else if (style.BorderTopLeftRadius.IsEmpty && !_lastStyleFromSignal.BorderTopLeftRadius.IsEmpty)
                 {
                     Instance.style.borderTopLeftRadius = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderBottomRightRadius.IsEmpty)
+                // BorderTopLeftRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderBottomRightRadius = style.BorderBottomRightRadius.Get();
+                    if (_lastStyleFromSignal.BorderTopLeftRadius.SignalProp.Signal != style.BorderTopLeftRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopLeftRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopLeftRadius.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderTopLeftRadius.IsSignal)
+                        {
+                            style.BorderTopLeftRadius.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderBottomRightRadius.IsEmpty)
+
+                // BorderBottomRightRadius - Update instance value
+                if (style.BorderBottomRightRadius.IsSignal)
+                {
+                    if (_borderBottomRightRadiusWorkLoopItem.Check())
+                    {
+                        Instance.style.borderBottomRightRadius = _borderBottomRightRadiusWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderBottomRightRadius.IsValue)
+                {
+                    var value = style.BorderBottomRightRadius.Get();
+                    if (Instance.style.borderBottomRightRadius != value)
+                    {
+                        Instance.style.borderBottomRightRadius = value;
+                    }
+                }
+                else if (style.BorderBottomRightRadius.IsEmpty && !_lastStyleFromSignal.BorderBottomRightRadius.IsEmpty)
                 {
                     Instance.style.borderBottomRightRadius = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderBottomLeftRadius.IsEmpty)
+                // BorderBottomRightRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderBottomLeftRadius = style.BorderBottomLeftRadius.Get();
+                    if (_lastStyleFromSignal.BorderBottomRightRadius.SignalProp.Signal != style.BorderBottomRightRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomRightRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomRightRadius.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderBottomRightRadius.IsSignal)
+                        {
+                            style.BorderBottomRightRadius.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderBottomLeftRadius.IsEmpty)
+
+                // BorderBottomLeftRadius - Update instance value
+                if (style.BorderBottomLeftRadius.IsSignal)
+                {
+                    if (_borderBottomLeftRadiusWorkLoopItem.Check())
+                    {
+                        Instance.style.borderBottomLeftRadius = _borderBottomLeftRadiusWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderBottomLeftRadius.IsValue)
+                {
+                    var value = style.BorderBottomLeftRadius.Get();
+                    if (Instance.style.borderBottomLeftRadius != value)
+                    {
+                        Instance.style.borderBottomLeftRadius = value;
+                    }
+                }
+                else if (style.BorderBottomLeftRadius.IsEmpty && !_lastStyleFromSignal.BorderBottomLeftRadius.IsEmpty)
                 {
                     Instance.style.borderBottomLeftRadius = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderRightWidth.IsEmpty)
+                // BorderBottomLeftRadius - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderRightWidth = style.BorderRightWidth.Get();
+                    if (_lastStyleFromSignal.BorderBottomLeftRadius.SignalProp.Signal != style.BorderBottomLeftRadius.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomLeftRadius.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomLeftRadius.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderBottomLeftRadius.IsSignal)
+                        {
+                            style.BorderBottomLeftRadius.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderRightWidth.IsEmpty)
+
+                // BorderRightWidth - Update instance value
+                if (style.BorderRightWidth.IsSignal)
+                {
+                    if (_borderRightWidthWorkLoopItem.Check())
+                    {
+                        Instance.style.borderRightWidth = _borderRightWidthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderRightWidth.IsValue)
+                {
+                    var value = style.BorderRightWidth.Get();
+                    if (Instance.style.borderRightWidth != value)
+                    {
+                        Instance.style.borderRightWidth = value;
+                    }
+                }
+                else if (style.BorderRightWidth.IsEmpty && !_lastStyleFromSignal.BorderRightWidth.IsEmpty)
                 {
                     Instance.style.borderRightWidth = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderBottomWidth.IsEmpty)
+                // BorderRightWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderBottomWidth = style.BorderBottomWidth.Get();
+                    if (_lastStyleFromSignal.BorderRightWidth.SignalProp.Signal != style.BorderRightWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderRightWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderRightWidth.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderRightWidth.IsSignal)
+                        {
+                            style.BorderRightWidth.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderBottomWidth.IsEmpty)
+
+                // BorderBottomWidth - Update instance value
+                if (style.BorderBottomWidth.IsSignal)
+                {
+                    if (_borderBottomWidthWorkLoopItem.Check())
+                    {
+                        Instance.style.borderBottomWidth = _borderBottomWidthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderBottomWidth.IsValue)
+                {
+                    var value = style.BorderBottomWidth.Get();
+                    if (Instance.style.borderBottomWidth != value)
+                    {
+                        Instance.style.borderBottomWidth = value;
+                    }
+                }
+                else if (style.BorderBottomWidth.IsEmpty && !_lastStyleFromSignal.BorderBottomWidth.IsEmpty)
                 {
                     Instance.style.borderBottomWidth = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderLeftWidth.IsEmpty)
+                // BorderBottomWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderLeftWidth = style.BorderLeftWidth.Get();
+                    if (_lastStyleFromSignal.BorderBottomWidth.SignalProp.Signal != style.BorderBottomWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomWidth.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderBottomWidth.IsSignal)
+                        {
+                            style.BorderBottomWidth.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderLeftWidth.IsEmpty)
+
+                // BorderLeftWidth - Update instance value
+                if (style.BorderLeftWidth.IsSignal)
+                {
+                    if (_borderLeftWidthWorkLoopItem.Check())
+                    {
+                        Instance.style.borderLeftWidth = _borderLeftWidthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderLeftWidth.IsValue)
+                {
+                    var value = style.BorderLeftWidth.Get();
+                    if (Instance.style.borderLeftWidth != value)
+                    {
+                        Instance.style.borderLeftWidth = value;
+                    }
+                }
+                else if (style.BorderLeftWidth.IsEmpty && !_lastStyleFromSignal.BorderLeftWidth.IsEmpty)
                 {
                     Instance.style.borderLeftWidth = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderTopWidth.IsEmpty)
+                // BorderLeftWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderTopWidth = style.BorderTopWidth.Get();
+                    if (_lastStyleFromSignal.BorderLeftWidth.SignalProp.Signal != style.BorderLeftWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderLeftWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderLeftWidth.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderLeftWidth.IsSignal)
+                        {
+                            style.BorderLeftWidth.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderTopWidth.IsEmpty)
+
+                // BorderTopWidth - Update instance value
+                if (style.BorderTopWidth.IsSignal)
+                {
+                    if (_borderTopWidthWorkLoopItem.Check())
+                    {
+                        Instance.style.borderTopWidth = _borderTopWidthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderTopWidth.IsValue)
+                {
+                    var value = style.BorderTopWidth.Get();
+                    if (Instance.style.borderTopWidth != value)
+                    {
+                        Instance.style.borderTopWidth = value;
+                    }
+                }
+                else if (style.BorderTopWidth.IsEmpty && !_lastStyleFromSignal.BorderTopWidth.IsEmpty)
                 {
                     Instance.style.borderTopWidth = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderRightColor.IsEmpty)
+                // BorderTopWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderRightColor = style.BorderRightColor.Get();
+                    if (_lastStyleFromSignal.BorderTopWidth.SignalProp.Signal != style.BorderTopWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopWidth.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderTopWidth.IsSignal)
+                        {
+                            style.BorderTopWidth.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderRightColor.IsEmpty)
+
+                // BorderRightColor - Update instance value
+                if (style.BorderRightColor.IsSignal)
+                {
+                    if (_borderRightColorWorkLoopItem.Check())
+                    {
+                        Instance.style.borderRightColor = _borderRightColorWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderRightColor.IsValue)
+                {
+                    var value = style.BorderRightColor.Get();
+                    if (Instance.style.borderRightColor != value)
+                    {
+                        Instance.style.borderRightColor = value;
+                    }
+                }
+                else if (style.BorderRightColor.IsEmpty && !_lastStyleFromSignal.BorderRightColor.IsEmpty)
                 {
                     Instance.style.borderRightColor = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderBottomColor.IsEmpty)
+                // BorderRightColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderBottomColor = style.BorderBottomColor.Get();
+                    if (_lastStyleFromSignal.BorderRightColor.SignalProp.Signal != style.BorderRightColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderRightColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderRightColor.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderRightColor.IsSignal)
+                        {
+                            style.BorderRightColor.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderBottomColor.IsEmpty)
+
+                // BorderBottomColor - Update instance value
+                if (style.BorderBottomColor.IsSignal)
+                {
+                    if (_borderBottomColorWorkLoopItem.Check())
+                    {
+                        Instance.style.borderBottomColor = _borderBottomColorWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderBottomColor.IsValue)
+                {
+                    var value = style.BorderBottomColor.Get();
+                    if (Instance.style.borderBottomColor != value)
+                    {
+                        Instance.style.borderBottomColor = value;
+                    }
+                }
+                else if (style.BorderBottomColor.IsEmpty && !_lastStyleFromSignal.BorderBottomColor.IsEmpty)
                 {
                     Instance.style.borderBottomColor = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderLeftColor.IsEmpty)
+                // BorderBottomColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderLeftColor = style.BorderLeftColor.Get();
+                    if (_lastStyleFromSignal.BorderBottomColor.SignalProp.Signal != style.BorderBottomColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderBottomColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderBottomColor.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderBottomColor.IsSignal)
+                        {
+                            style.BorderBottomColor.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderLeftColor.IsEmpty)
+
+                // BorderLeftColor - Update instance value
+                if (style.BorderLeftColor.IsSignal)
+                {
+                    if (_borderLeftColorWorkLoopItem.Check())
+                    {
+                        Instance.style.borderLeftColor = _borderLeftColorWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderLeftColor.IsValue)
+                {
+                    var value = style.BorderLeftColor.Get();
+                    if (Instance.style.borderLeftColor != value)
+                    {
+                        Instance.style.borderLeftColor = value;
+                    }
+                }
+                else if (style.BorderLeftColor.IsEmpty && !_lastStyleFromSignal.BorderLeftColor.IsEmpty)
                 {
                     Instance.style.borderLeftColor = StyleKeyword.Initial;
                 }
-
-                if (!style.BorderTopColor.IsEmpty)
+                // BorderLeftColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.borderTopColor = style.BorderTopColor.Get();
+                    if (_lastStyleFromSignal.BorderLeftColor.SignalProp.Signal != style.BorderLeftColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderLeftColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderLeftColor.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderLeftColor.IsSignal)
+                        {
+                            style.BorderLeftColor.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BorderTopColor.IsEmpty)
+
+                // BorderTopColor - Update instance value
+                if (style.BorderTopColor.IsSignal)
+                {
+                    if (_borderTopColorWorkLoopItem.Check())
+                    {
+                        Instance.style.borderTopColor = _borderTopColorWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BorderTopColor.IsValue)
+                {
+                    var value = style.BorderTopColor.Get();
+                    if (Instance.style.borderTopColor != value)
+                    {
+                        Instance.style.borderTopColor = value;
+                    }
+                }
+                else if (style.BorderTopColor.IsEmpty && !_lastStyleFromSignal.BorderTopColor.IsEmpty)
                 {
                     Instance.style.borderTopColor = StyleKeyword.Initial;
                 }
-
-                if (!style.Display.IsEmpty || !_lastStyleFromSignal.Display.IsEmpty)
+                // BorderTopColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    UpdateDisplayStyle();
+                    if (_lastStyleFromSignal.BorderTopColor.SignalProp.Signal != style.BorderTopColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BorderTopColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BorderTopColor.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BorderTopColor.IsSignal)
+                        {
+                            style.BorderTopColor.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
 
-                if (!style.FlexShrink.IsEmpty)
+                // Display - Update instance value
+                UpdateDisplayStyle();
+                // Display - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.flexShrink = style.FlexShrink.Get();
+                    if (_lastStyleFromSignal.Display.SignalProp.Signal != style.Display.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Display.IsSignal)
+                        {
+                            _lastStyleFromSignal.Display.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Display.IsSignal)
+                        {
+                            style.Display.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.FlexShrink.IsEmpty)
+
+                // FlexShrink - Update instance value
+                if (style.FlexShrink.IsSignal)
+                {
+                    if (_flexShrinkWorkLoopItem.Check())
+                    {
+                        Instance.style.flexShrink = _flexShrinkWorkLoopItem.Get();
+                    }
+                }
+                else if (style.FlexShrink.IsValue)
+                {
+                    var value = style.FlexShrink.Get();
+                    if (Instance.style.flexShrink != value)
+                    {
+                        Instance.style.flexShrink = value;
+                    }
+                }
+                else if (style.FlexShrink.IsEmpty && !_lastStyleFromSignal.FlexShrink.IsEmpty)
                 {
                     Instance.style.flexShrink = StyleKeyword.Initial;
                 }
-
-                if (!style.FlexGrow.IsEmpty)
+                // FlexShrink - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.flexGrow = style.FlexGrow.Get();
+                    if (_lastStyleFromSignal.FlexShrink.SignalProp.Signal != style.FlexShrink.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FlexShrink.IsSignal)
+                        {
+                            _lastStyleFromSignal.FlexShrink.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.FlexShrink.IsSignal)
+                        {
+                            style.FlexShrink.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.FlexGrow.IsEmpty)
+                // FlexGrow - Update instance value
+                if (style.FlexGrow.IsSignal)
+                {
+                    if (_flexGrowWorkLoopItem.Check())
+                    {
+                        Instance.style.flexGrow = _flexGrowWorkLoopItem.Get();
+                    }
+                }
+                else if (style.FlexGrow.IsValue)
+                {
+                    var value = style.FlexGrow.Get();
+                    if (Instance.style.flexGrow != value)
+                    {
+                        Instance.style.flexGrow = value;
+                    }
+                }
+                else if (style.FlexGrow.IsEmpty && !_lastStyleFromSignal.FlexGrow.IsEmpty)
                 {
                     Instance.style.flexGrow = StyleKeyword.Initial;
                 }
-
-                if (!style.FlexDirection.IsEmpty)
+                // FlexGrow - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.flexDirection = style.FlexDirection.Get();
+                    if (_lastStyleFromSignal.FlexGrow.SignalProp.Signal != style.FlexGrow.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FlexGrow.IsSignal)
+                        {
+                            _lastStyleFromSignal.FlexGrow.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.FlexGrow.IsSignal)
+                        {
+                            style.FlexGrow.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.FlexDirection.IsEmpty)
+
+                // FlexDirection - Update instance value
+                if (style.FlexDirection.IsSignal)
+                {
+                    if (_flexDirectionWorkLoopItem.Check())
+                    {
+                        Instance.style.flexDirection = _flexDirectionWorkLoopItem.Get();
+                    }
+                }
+                else if (style.FlexDirection.IsValue)
+                {
+                    var value = style.FlexDirection.Get();
+                    if (Instance.style.flexDirection != value)
+                    {
+                        Instance.style.flexDirection = value;
+                    }
+                }
+                else if (style.FlexDirection.IsEmpty && !_lastStyleFromSignal.FlexDirection.IsEmpty)
                 {
                     Instance.style.flexDirection = StyleKeyword.Initial;
                 }
-
-                if (!style.JustifyContent.IsEmpty)
+                // FlexDirection - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.justifyContent = style.JustifyContent.Get();
+                    if (_lastStyleFromSignal.FlexDirection.SignalProp.Signal != style.FlexDirection.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FlexDirection.IsSignal)
+                        {
+                            _lastStyleFromSignal.FlexDirection.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.FlexDirection.IsSignal)
+                        {
+                            style.FlexDirection.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.JustifyContent.IsEmpty)
+
+                // JustifyContent - Update instance value
+                if (style.JustifyContent.IsSignal)
+                {
+                    if (_justifyContentWorkLoopItem.Check())
+                    {
+                        Instance.style.justifyContent = _justifyContentWorkLoopItem.Get();
+                    }
+                }
+                else if (style.JustifyContent.IsValue)
+                {
+                    var value = style.JustifyContent.Get();
+                    if (Instance.style.justifyContent != value)
+                    {
+                        Instance.style.justifyContent = value;
+                    }
+                }
+                else if (style.JustifyContent.IsEmpty && !_lastStyleFromSignal.JustifyContent.IsEmpty)
                 {
                     Instance.style.justifyContent = StyleKeyword.Initial;
                 }
-
-                if (!style.AlignItems.IsEmpty)
+                // JustifyContent - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.alignItems = style.AlignItems.Get();
+                    if (_lastStyleFromSignal.JustifyContent.SignalProp.Signal != style.JustifyContent.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.JustifyContent.IsSignal)
+                        {
+                            _lastStyleFromSignal.JustifyContent.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.JustifyContent.IsSignal)
+                        {
+                            style.JustifyContent.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.AlignItems.IsEmpty)
+
+                // AlignItems - Update instance value
+                if (style.AlignItems.IsSignal)
+                {
+                    if (_alignItemsWorkLoopItem.Check())
+                    {
+                        Instance.style.alignItems = _alignItemsWorkLoopItem.Get();
+                    }
+                }
+                else if (style.AlignItems.IsValue)
+                {
+                    var value = style.AlignItems.Get();
+                    if (Instance.style.alignItems != value)
+                    {
+                        Instance.style.alignItems = value;
+                    }
+                }
+                else if (style.AlignItems.IsEmpty && !_lastStyleFromSignal.AlignItems.IsEmpty)
                 {
                     Instance.style.alignItems = StyleKeyword.Initial;
                 }
-
-                if (!style.Width.IsEmpty)
+                // AlignItems - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.width = style.Width.Get();
+                    if (_lastStyleFromSignal.AlignItems.SignalProp.Signal != style.AlignItems.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.AlignItems.IsSignal)
+                        {
+                            _lastStyleFromSignal.AlignItems.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.AlignItems.IsSignal)
+                        {
+                            style.AlignItems.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Width.IsEmpty)
+
+                // Width - Update instance value
+                if (style.Width.IsSignal)
+                {
+                    if (_widthWorkLoopItem.Check())
+                    {
+                        Instance.style.width = _widthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Width.IsValue)
+                {
+                    var value = style.Width.Get();
+                    if (Instance.style.width != value)
+                    {
+                        Instance.style.width = value;
+                    }
+                }
+                else if (style.Width.IsEmpty && !_lastStyleFromSignal.Width.IsEmpty)
                 {
                     Instance.style.width = StyleKeyword.Initial;
                 }
-
-                if (!style.MaxWidth.IsEmpty)
+                // Width - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.maxWidth = style.MaxWidth.Get();
+                    if (_lastStyleFromSignal.Width.SignalProp.Signal != style.Width.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Width.IsSignal)
+                        {
+                            _lastStyleFromSignal.Width.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Width.IsSignal)
+                        {
+                            style.Width.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MaxWidth.IsEmpty)
+
+                // MaxWidth - Update instance value
+                if (style.MaxWidth.IsSignal)
+                {
+                    if (_maxWidthWorkLoopItem.Check())
+                    {
+                        Instance.style.maxWidth = _maxWidthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MaxWidth.IsValue)
+                {
+                    var value = style.MaxWidth.Get();
+                    if (Instance.style.maxWidth != value)
+                    {
+                        Instance.style.maxWidth = value;
+                    }
+                }
+                else if (style.MaxWidth.IsEmpty && !_lastStyleFromSignal.MaxWidth.IsEmpty)
                 {
                     Instance.style.maxWidth = StyleKeyword.Initial;
                 }
-
-                if (!style.MinWidth.IsEmpty)
+                // MaxWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.minWidth = style.MinWidth.Get();
+                    if (_lastStyleFromSignal.MaxWidth.SignalProp.Signal != style.MaxWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MaxWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.MaxWidth.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MaxWidth.IsSignal)
+                        {
+                            style.MaxWidth.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MinWidth.IsEmpty)
+
+                // MinWidth - Update instance value
+                if (style.MinWidth.IsSignal)
+                {
+                    if (_minWidthWorkLoopItem.Check())
+                    {
+                        Instance.style.minWidth = _minWidthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MinWidth.IsValue)
+                {
+                    var value = style.MinWidth.Get();
+                    if (Instance.style.minWidth != value)
+                    {
+                        Instance.style.minWidth = value;
+                    }
+                }
+                else if (style.MinWidth.IsEmpty && !_lastStyleFromSignal.MinWidth.IsEmpty)
                 {
                     Instance.style.minWidth = StyleKeyword.Initial;
                 }
-
-                if (!style.Height.IsEmpty)
+                // MinWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.height = style.Height.Get();
+                    if (_lastStyleFromSignal.MinWidth.SignalProp.Signal != style.MinWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MinWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.MinWidth.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MinWidth.IsSignal)
+                        {
+                            style.MinWidth.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Height.IsEmpty)
+
+                // Height - Update instance value
+                if (style.Height.IsSignal)
+                {
+                    if (_heightWorkLoopItem.Check())
+                    {
+                        Instance.style.height = _heightWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Height.IsValue)
+                {
+                    var value = style.Height.Get();
+                    if (Instance.style.height != value)
+                    {
+                        Instance.style.height = value;
+                    }
+                }
+                else if (style.Height.IsEmpty && !_lastStyleFromSignal.Height.IsEmpty)
                 {
                     Instance.style.height = StyleKeyword.Initial;
                 }
-
-                if (!style.MaxHeight.IsEmpty)
+                // Height - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.maxHeight = style.MaxHeight.Get();
+                    if (_lastStyleFromSignal.Height.SignalProp.Signal != style.Height.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Height.IsSignal)
+                        {
+                            _lastStyleFromSignal.Height.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Height.IsSignal)
+                        {
+                            style.Height.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MaxHeight.IsEmpty)
+
+                // MaxHeight - Update instance value
+                if (style.MaxHeight.IsSignal)
+                {
+                    if (_maxHeightWorkLoopItem.Check())
+                    {
+                        Instance.style.maxHeight = _maxHeightWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MaxHeight.IsValue)
+                {
+                    var value = style.MaxHeight.Get();
+                    if (Instance.style.maxHeight != value)
+                    {
+                        Instance.style.maxHeight = value;
+                    }
+                }
+                else if (style.MaxHeight.IsEmpty && !_lastStyleFromSignal.MaxHeight.IsEmpty)
                 {
                     Instance.style.maxHeight = StyleKeyword.Initial;
                 }
-
-                if (!style.MinHeight.IsEmpty)
+                // MaxHeight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.minHeight = style.MinHeight.Get();
+                    if (_lastStyleFromSignal.MaxHeight.SignalProp.Signal != style.MaxHeight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MaxHeight.IsSignal)
+                        {
+                            _lastStyleFromSignal.MaxHeight.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MaxHeight.IsSignal)
+                        {
+                            style.MaxHeight.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.MinHeight.IsEmpty)
+
+                // MinHeight - Update instance value
+                if (style.MinHeight.IsSignal)
+                {
+                    if (_minHeightWorkLoopItem.Check())
+                    {
+                        Instance.style.minHeight = _minHeightWorkLoopItem.Get();
+                    }
+                }
+                else if (style.MinHeight.IsValue)
+                {
+                    var value = style.MinHeight.Get();
+                    if (Instance.style.minHeight != value)
+                    {
+                        Instance.style.minHeight = value;
+                    }
+                }
+                else if (style.MinHeight.IsEmpty && !_lastStyleFromSignal.MinHeight.IsEmpty)
                 {
                     Instance.style.minHeight = StyleKeyword.Initial;
                 }
-
-                if (!style.BackgroundColor.IsEmpty)
+                // MinHeight - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.backgroundColor = style.BackgroundColor.Get();
+                    if (_lastStyleFromSignal.MinHeight.SignalProp.Signal != style.MinHeight.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.MinHeight.IsSignal)
+                        {
+                            _lastStyleFromSignal.MinHeight.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.MinHeight.IsSignal)
+                        {
+                            style.MinHeight.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.BackgroundColor.IsEmpty)
+
+                // BackgroundColor - Update instance value
+                if (style.BackgroundColor.IsSignal)
+                {
+                    if (_backgroundColorWorkLoopItem.Check())
+                    {
+                        Instance.style.backgroundColor = _backgroundColorWorkLoopItem.Get();
+                    }
+                }
+                else if (style.BackgroundColor.IsValue)
+                {
+                    var value = style.BackgroundColor.Get();
+                    if (Instance.style.backgroundColor != value)
+                    {
+                        Instance.style.backgroundColor = value;
+                    }
+                }
+                else if (style.BackgroundColor.IsEmpty && !_lastStyleFromSignal.BackgroundColor.IsEmpty)
                 {
                     Instance.style.backgroundColor = StyleKeyword.Initial;
                 }
-
-                if (!style.Color.IsEmpty)
+                // BackgroundColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.color = style.Color.Get();
+                    if (_lastStyleFromSignal.BackgroundColor.SignalProp.Signal != style.BackgroundColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.BackgroundColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.BackgroundColor.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.BackgroundColor.IsSignal)
+                        {
+                            style.BackgroundColor.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Color.IsEmpty)
+
+                // Color - Update instance value
+                if (style.Color.IsSignal)
+                {
+                    if (_colorWorkLoopItem.Check())
+                    {
+                        Instance.style.color = _colorWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Color.IsValue)
+                {
+                    var value = style.Color.Get();
+                    if (Instance.style.color != value)
+                    {
+                        Instance.style.color = value;
+                    }
+                }
+                else if (style.Color.IsEmpty && !_lastStyleFromSignal.Color.IsEmpty)
                 {
                     Instance.style.color = StyleKeyword.Initial;
                 }
-
-                if (!style.FontSize.IsEmpty)
+                // Color - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.fontSize = style.FontSize.Get();
+                    if (_lastStyleFromSignal.Color.SignalProp.Signal != style.Color.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Color.IsSignal)
+                        {
+                            _lastStyleFromSignal.Color.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Color.IsSignal)
+                        {
+                            style.Color.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.FontSize.IsEmpty)
+
+                // FontSize - Update instance value
+                if (style.FontSize.IsSignal)
+                {
+                    if (_fontSizeWorkLoopItem.Check())
+                    {
+                        Instance.style.fontSize = _fontSizeWorkLoopItem.Get();
+                    }
+                }
+                else if (style.FontSize.IsValue)
+                {
+                    var value = style.FontSize.Get();
+                    if (Instance.style.fontSize != value)
+                    {
+                        Instance.style.fontSize = value;
+                    }
+                }
+                else if (style.FontSize.IsEmpty && !_lastStyleFromSignal.FontSize.IsEmpty)
                 {
                     Instance.style.fontSize = StyleKeyword.Initial;
                 }
-
-                if (!style.UnityFont.IsEmpty)
+                // FontSize - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.unityFont = style.UnityFont.Get();
+                    if (_lastStyleFromSignal.FontSize.SignalProp.Signal != style.FontSize.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FontSize.IsSignal)
+                        {
+                            _lastStyleFromSignal.FontSize.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.FontSize.IsSignal)
+                        {
+                            style.FontSize.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.UnityFont.IsEmpty)
+
+                // UnityFont - Update instance value
+                if (style.UnityFont.IsSignal)
+                {
+                    if (_unityFontWorkLoopItem.Check())
+                    {
+                        Instance.style.unityFont = _unityFontWorkLoopItem.Get();
+                    }
+                }
+                else if (style.UnityFont.IsValue)
+                {
+                    var value = style.UnityFont.Get();
+                    if (Instance.style.unityFont != value)
+                    {
+                        Instance.style.unityFont = value;
+                    }
+                }
+                else if (style.UnityFont.IsEmpty && !_lastStyleFromSignal.UnityFont.IsEmpty)
                 {
                     Instance.style.unityFont = StyleKeyword.Initial;
                 }
-
-                if (!style.UnityFontDefinition.IsEmpty)
+                // UnityFont - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.unityFontDefinition = style.UnityFontDefinition.Get();
+                    if (_lastStyleFromSignal.UnityFont.SignalProp.Signal != style.UnityFont.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityFont.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityFont.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.UnityFont.IsSignal)
+                        {
+                            style.UnityFont.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.UnityFontDefinition.IsEmpty)
+
+                // UnityFontDefinition - Update instance value
+                if (style.UnityFontDefinition.IsSignal)
+                {
+                    if (_unityFontDefinitionWorkLoopItem.Check())
+                    {
+                        Instance.style.unityFontDefinition = _unityFontDefinitionWorkLoopItem.Get();
+                    }
+                }
+                else if (style.UnityFontDefinition.IsValue)
+                {
+                    var value = style.UnityFontDefinition.Get();
+                    if (Instance.style.unityFontDefinition != value)
+                    {
+                        Instance.style.unityFontDefinition = value;
+                    }
+                }
+                else if (style.UnityFontDefinition.IsEmpty && !_lastStyleFromSignal.UnityFontDefinition.IsEmpty)
                 {
                     Instance.style.unityFontDefinition = StyleKeyword.Initial;
                 }
-
-                if (!style.UnityFontStyle.IsEmpty)
+                // UnityFontDefinition - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.unityFontStyleAndWeight = style.UnityFontStyle.Get();
+                    if (_lastStyleFromSignal.UnityFontDefinition.SignalProp.Signal != style.UnityFontDefinition.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityFontDefinition.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityFontDefinition.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.UnityFontDefinition.IsSignal)
+                        {
+                            style.UnityFontDefinition.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.UnityFontStyle.IsEmpty)
+
+                // UnityFontStyle - Update instance value
+                if (style.UnityFontStyle.IsSignal)
+                {
+                    if (_unityFontStyleWorkLoopItem.Check())
+                    {
+                        Instance.style.unityFontStyleAndWeight = _unityFontStyleWorkLoopItem.Get();
+                    }
+                }
+                else if (style.UnityFontStyle.IsValue)
+                {
+                    var value = style.UnityFontStyle.Get();
+                    if (Instance.style.unityFontStyleAndWeight != value)
+                    {
+                        Instance.style.unityFontStyleAndWeight = value;
+                    }
+                }
+                else if (style.UnityFontStyle.IsEmpty && !_lastStyleFromSignal.UnityFontStyle.IsEmpty)
                 {
                     Instance.style.unityFontStyleAndWeight = StyleKeyword.Initial;
                 }
-
-                if (!style.UnityParagraphSpacing.IsEmpty)
+                // UnityFontStyle - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.unityParagraphSpacing = style.UnityParagraphSpacing.Get();
+                    if (_lastStyleFromSignal.UnityFontStyle.SignalProp.Signal != style.UnityFontStyle.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityFontStyle.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityFontStyle.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.UnityFontStyle.IsSignal)
+                        {
+                            style.UnityFontStyle.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.UnityParagraphSpacing.IsEmpty)
+
+                // UnityParagraphSpacing - Update instance value
+                if (style.UnityParagraphSpacing.IsSignal)
+                {
+                    if (_unityParagraphSpacingWorkLoopItem.Check())
+                    {
+                        Instance.style.unityParagraphSpacing = _unityParagraphSpacingWorkLoopItem.Get();
+                    }
+                }
+                else if (style.UnityParagraphSpacing.IsValue)
+                {
+                    var value = style.UnityParagraphSpacing.Get();
+                    if (Instance.style.unityParagraphSpacing != value)
+                    {
+                        Instance.style.unityParagraphSpacing = value;
+                    }
+                }
+                else if (style.UnityParagraphSpacing.IsEmpty && !_lastStyleFromSignal.UnityParagraphSpacing.IsEmpty)
                 {
                     Instance.style.unityParagraphSpacing = StyleKeyword.Initial;
                 }
-
-                if (!style.UnityTextAlign.IsEmpty)
+                // UnityParagraphSpacing - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.unityTextAlign = style.UnityTextAlign.Get();
+                    if (_lastStyleFromSignal.UnityParagraphSpacing.SignalProp.Signal != style.UnityParagraphSpacing.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityParagraphSpacing.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityParagraphSpacing.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.UnityParagraphSpacing.IsSignal)
+                        {
+                            style.UnityParagraphSpacing.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.UnityTextAlign.IsEmpty)
+
+                // UnityTextAlign - Update instance value
+                if (style.UnityTextAlign.IsSignal)
+                {
+                    if (_unityTextAlignWorkLoopItem.Check())
+                    {
+                        Instance.style.unityTextAlign = _unityTextAlignWorkLoopItem.Get();
+                    }
+                }
+                else if (style.UnityTextAlign.IsValue)
+                {
+                    var value = style.UnityTextAlign.Get();
+                    if (Instance.style.unityTextAlign != value)
+                    {
+                        Instance.style.unityTextAlign = value;
+                    }
+                }
+                else if (style.UnityTextAlign.IsEmpty && !_lastStyleFromSignal.UnityTextAlign.IsEmpty)
                 {
                     Instance.style.unityTextAlign = StyleKeyword.Initial;
                 }
-
-                if (!style.TransitionProperty.IsEmpty)
+                // UnityTextAlign - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.transitionProperty = style.TransitionProperty.Get();
+                    if (_lastStyleFromSignal.UnityTextAlign.SignalProp.Signal != style.UnityTextAlign.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityTextAlign.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityTextAlign.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.UnityTextAlign.IsSignal)
+                        {
+                            style.UnityTextAlign.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.TransitionProperty.IsEmpty)
+
+                // TransitionProperty - Update instance value
+                if (style.TransitionProperty.IsSignal)
+                {
+                    if (_transitionPropertyWorkLoopItem.Check())
+                    {
+                        Instance.style.transitionProperty = _transitionPropertyWorkLoopItem.Get();
+                    }
+                }
+                else if (style.TransitionProperty.IsValue)
+                {
+                    var value = style.TransitionProperty.Get();
+                    if (Instance.style.transitionProperty != value)
+                    {
+                        Instance.style.transitionProperty = value;
+                    }
+                }
+                else if (style.TransitionProperty.IsEmpty && !_lastStyleFromSignal.TransitionProperty.IsEmpty)
                 {
                     Instance.style.transitionProperty = StyleKeyword.Initial;
                 }
-
-                if (!style.TransitionDelay.IsEmpty)
+                // TransitionProperty - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.transitionDelay = style.TransitionDelay.Get();
+                    if (_lastStyleFromSignal.TransitionProperty.SignalProp.Signal != style.TransitionProperty.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionProperty.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionProperty.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.TransitionProperty.IsSignal)
+                        {
+                            style.TransitionProperty.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.TransitionDelay.IsEmpty)
+
+                // TransitionDelay - Update instance value
+                if (style.TransitionDelay.IsSignal)
+                {
+                    if (_transitionDelayWorkLoopItem.Check())
+                    {
+                        Instance.style.transitionDelay = _transitionDelayWorkLoopItem.Get();
+                    }
+                }
+                else if (style.TransitionDelay.IsValue)
+                {
+                    var value = style.TransitionDelay.Get();
+                    if (Instance.style.transitionDelay != value)
+                    {
+                        Instance.style.transitionDelay = value;
+                    }
+                }
+                else if (style.TransitionDelay.IsEmpty && !_lastStyleFromSignal.TransitionDelay.IsEmpty)
                 {
                     Instance.style.transitionDelay = StyleKeyword.Initial;
                 }
-
-                if (!style.TransitionDuration.IsEmpty)
+                // TransitionDelay - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.transitionDuration = style.TransitionDuration.Get();
+                    if (_lastStyleFromSignal.TransitionDelay.SignalProp.Signal != style.TransitionDelay.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionDelay.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionDelay.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.TransitionDelay.IsSignal)
+                        {
+                            style.TransitionDelay.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.TransitionDuration.IsEmpty)
+
+                // TransitionDuration - Update instance value
+                if (style.TransitionDuration.IsSignal)
+                {
+                    if (_transitionDurationWorkLoopItem.Check())
+                    {
+                        Instance.style.transitionDuration = _transitionDurationWorkLoopItem.Get();
+                    }
+                }
+                else if (style.TransitionDuration.IsValue)
+                {
+                    var value = style.TransitionDuration.Get();
+                    if (Instance.style.transitionDuration != value)
+                    {
+                        Instance.style.transitionDuration = value;
+                    }
+                }
+                else if (style.TransitionDuration.IsEmpty && !_lastStyleFromSignal.TransitionDuration.IsEmpty)
                 {
                     Instance.style.transitionDuration = StyleKeyword.Initial;
                 }
-
-                if (!style.TransitionTimingFunction.IsEmpty)
+                // TransitionDuration - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.transitionTimingFunction = style.TransitionTimingFunction.Get();
+                    if (_lastStyleFromSignal.TransitionDuration.SignalProp.Signal != style.TransitionDuration.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionDuration.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionDuration.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.TransitionDuration.IsSignal)
+                        {
+                            style.TransitionDuration.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.TransitionTimingFunction.IsEmpty)
+
+                // TransitionTimingFunction - Update instance value
+                if (style.TransitionTimingFunction.IsSignal)
+                {
+                    if (_transitionTimingFunctionWorkLoopItem.Check())
+                    {
+                        Instance.style.transitionTimingFunction = _transitionTimingFunctionWorkLoopItem.Get();
+                    }
+                }
+                else if (style.TransitionTimingFunction.IsValue)
+                {
+                    var value = style.TransitionTimingFunction.Get();
+                    if (Instance.style.transitionTimingFunction != value)
+                    {
+                        Instance.style.transitionTimingFunction = value;
+                    }
+                }
+                else if (style.TransitionTimingFunction.IsEmpty && !_lastStyleFromSignal.TransitionTimingFunction.IsEmpty)
                 {
                     Instance.style.transitionTimingFunction = StyleKeyword.Initial;
                 }
-
-                if (!style.TransformOrigin.IsEmpty)
+                // TransitionTimingFunction - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.transformOrigin = style.TransformOrigin.Get();
+                    if (_lastStyleFromSignal.TransitionTimingFunction.SignalProp.Signal != style.TransitionTimingFunction.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransitionTimingFunction.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransitionTimingFunction.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.TransitionTimingFunction.IsSignal)
+                        {
+                            style.TransitionTimingFunction.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.TransformOrigin.IsEmpty)
+
+                // TransformOrigin - Update instance value
+                if (style.TransformOrigin.IsSignal)
+                {
+                    if (_transformOriginWorkLoopItem.Check())
+                    {
+                        Instance.style.transformOrigin = _transformOriginWorkLoopItem.Get();
+                    }
+                }
+                else if (style.TransformOrigin.IsValue)
+                {
+                    var value = style.TransformOrigin.Get();
+                    if (Instance.style.transformOrigin != value)
+                    {
+                        Instance.style.transformOrigin = value;
+                    }
+                }
+                else if (style.TransformOrigin.IsEmpty && !_lastStyleFromSignal.TransformOrigin.IsEmpty)
                 {
                     Instance.style.transformOrigin = StyleKeyword.Initial;
                 }
-
-                if (!style.Translate.IsEmpty)
+                // TransformOrigin - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.translate = style.Translate.Get();
+                    if (_lastStyleFromSignal.TransformOrigin.SignalProp.Signal != style.TransformOrigin.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.TransformOrigin.IsSignal)
+                        {
+                            _lastStyleFromSignal.TransformOrigin.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.TransformOrigin.IsSignal)
+                        {
+                            style.TransformOrigin.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Translate.IsEmpty)
+
+                // Translate - Update instance value
+                if (style.Translate.IsSignal)
+                {
+                    if (_translateWorkLoopItem.Check())
+                    {
+                        Instance.style.translate = _translateWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Translate.IsValue)
+                {
+                    var value = style.Translate.Get();
+                    if (Instance.style.translate != value)
+                    {
+                        Instance.style.translate = value;
+                    }
+                }
+                else if (style.Translate.IsEmpty && !_lastStyleFromSignal.Translate.IsEmpty)
                 {
                     Instance.style.translate = StyleKeyword.Initial;
                 }
-
-                if (!style.Scale.IsEmpty)
+                // Translate - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.scale = style.Scale.Get();
+                    if (_lastStyleFromSignal.Translate.SignalProp.Signal != style.Translate.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Translate.IsSignal)
+                        {
+                            _lastStyleFromSignal.Translate.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Translate.IsSignal)
+                        {
+                            style.Translate.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Scale.IsEmpty)
+
+                // Scale - Update instance value
+                if (style.Scale.IsSignal)
+                {
+                    if (_scaleWorkLoopItem.Check())
+                    {
+                        Instance.style.scale = _scaleWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Scale.IsValue)
+                {
+                    var value = style.Scale.Get();
+                    if (Instance.style.scale != value)
+                    {
+                        Instance.style.scale = value;
+                    }
+                }
+                else if (style.Scale.IsEmpty && !_lastStyleFromSignal.Scale.IsEmpty)
                 {
                     Instance.style.scale = StyleKeyword.Initial;
                 }
-
-                if (!style.Rotate.IsEmpty)
+                // Scale - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
                 {
-                    Instance.style.rotate = style.Rotate.Get();
+                    if (_lastStyleFromSignal.Scale.SignalProp.Signal != style.Scale.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Scale.IsSignal)
+                        {
+                            _lastStyleFromSignal.Scale.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Scale.IsSignal)
+                        {
+                            style.Scale.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
                 }
-                else if (!_lastStyleFromSignal.Rotate.IsEmpty)
+
+                // Rotate - Update instance value
+                if (style.Rotate.IsSignal)
+                {
+                    if (_rotateWorkLoopItem.Check())
+                    {
+                        Instance.style.rotate = _rotateWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Rotate.IsValue)
+                {
+                    var value = style.Rotate.Get();
+                    if (Instance.style.rotate != value)
+                    {
+                        Instance.style.rotate = value;
+                    }
+                }
+                else if (style.Rotate.IsEmpty && !_lastStyleFromSignal.Rotate.IsEmpty)
                 {
                     Instance.style.rotate = StyleKeyword.Initial;
                 }
+                // Rotate - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Rotate.SignalProp.Signal != style.Rotate.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Rotate.IsSignal)
+                        {
+                            _lastStyleFromSignal.Rotate.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Rotate.IsSignal)
+                        {
+                            style.Rotate.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
+                }
+
 
                 _lastStyleFromSignal = style;
             }
-            else if (_styleWorkLoopItem.IsValue)
-            {
-                if (_positionWorkLoopItem.Check())
-                {
-                    Instance.style.position = _positionWorkLoopItem.Get();
-                }
-                if (_rightWorkLoopItem.Check())
-                {
-                    Instance.style.right = _rightWorkLoopItem.Get();
-                }
-                if (_bottomWorkLoopItem.Check())
-                {
-                    Instance.style.bottom = _bottomWorkLoopItem.Get();
-                }
-                if (_leftWorkLoopItem.Check())
-                {
-                    Instance.style.left = _leftWorkLoopItem.Get();
-                }
-                if (_topWorkLoopItem.Check())
-                {
-                    Instance.style.top = _topWorkLoopItem.Get();
-                }
-                if (_paddingRightWorkLoopItem.Check())
-                {
-                    Instance.style.paddingRight = _paddingRightWorkLoopItem.Get();
-                }
-                if (_paddingBottomWorkLoopItem.Check())
-                {
-                    Instance.style.paddingBottom = _paddingBottomWorkLoopItem.Get();
-                }
-                if (_paddingLeftWorkLoopItem.Check())
-                {
-                    Instance.style.paddingLeft = _paddingLeftWorkLoopItem.Get();
-                }
-                if (_paddingTopWorkLoopItem.Check())
-                {
-                    Instance.style.paddingTop = _paddingTopWorkLoopItem.Get();
-                }
-                if (_marginRightWorkLoopItem.Check())
-                {
-                    Instance.style.marginRight = _marginRightWorkLoopItem.Get();
-                }
-                if (_marginBottomWorkLoopItem.Check())
-                {
-                    Instance.style.marginBottom = _marginBottomWorkLoopItem.Get();
-                }
-                if (_marginLeftWorkLoopItem.Check())
-                {
-                    Instance.style.marginLeft = _marginLeftWorkLoopItem.Get();
-                }
-                if (_marginTopWorkLoopItem.Check())
-                {
-                    Instance.style.marginTop = _marginTopWorkLoopItem.Get();
-                }
-                if (_borderTopRightRadiusWorkLoopItem.Check())
-                {
-                    Instance.style.borderTopRightRadius = _borderTopRightRadiusWorkLoopItem.Get();
-                }
-                if (_borderTopLeftRadiusWorkLoopItem.Check())
-                {
-                    Instance.style.borderTopLeftRadius = _borderTopLeftRadiusWorkLoopItem.Get();
-                }
-                if (_borderBottomRightRadiusWorkLoopItem.Check())
-                {
-                    Instance.style.borderBottomRightRadius = _borderBottomRightRadiusWorkLoopItem.Get();
-                }
-                if (_borderBottomLeftRadiusWorkLoopItem.Check())
-                {
-                    Instance.style.borderBottomLeftRadius = _borderBottomLeftRadiusWorkLoopItem.Get();
-                }
-                if (_borderRightWidthWorkLoopItem.Check())
-                {
-                    Instance.style.borderRightWidth = _borderRightWidthWorkLoopItem.Get();
-                }
-                if (_borderBottomWidthWorkLoopItem.Check())
-                {
-                    Instance.style.borderBottomWidth = _borderBottomWidthWorkLoopItem.Get();
-                }
-                if (_borderLeftWidthWorkLoopItem.Check())
-                {
-                    Instance.style.borderLeftWidth = _borderLeftWidthWorkLoopItem.Get();
-                }
-                if (_borderTopWidthWorkLoopItem.Check())
-                {
-                    Instance.style.borderTopWidth = _borderTopWidthWorkLoopItem.Get();
-                }
-                if (_borderRightColorWorkLoopItem.Check())
-                {
-                    Instance.style.borderRightColor = _borderRightColorWorkLoopItem.Get();
-                }
-                if (_borderBottomColorWorkLoopItem.Check())
-                {
-                    Instance.style.borderBottomColor = _borderBottomColorWorkLoopItem.Get();
-                }
-                if (_borderLeftColorWorkLoopItem.Check())
-                {
-                    Instance.style.borderLeftColor = _borderLeftColorWorkLoopItem.Get();
-                }
-                if (_borderTopColorWorkLoopItem.Check())
-                {
-                    Instance.style.borderTopColor = _borderTopColorWorkLoopItem.Get();
-                }
-                if (_displayWorkLoopItem.Check())
-                {
-                    UpdateDisplayStyle();
-                }
-                if (_flexShrinkWorkLoopItem.Check())
-                {
-                    Instance.style.flexShrink = _flexShrinkWorkLoopItem.Get();
-                }
-                if (_flexGrowWorkLoopItem.Check())
-                {
-                    Instance.style.flexGrow = _flexGrowWorkLoopItem.Get();
-                }
-                if (_flexDirectionWorkLoopItem.Check())
-                {
-                    Instance.style.flexDirection = _flexDirectionWorkLoopItem.Get();
-                }
-                if (_justifyContentWorkLoopItem.Check())
-                {
-                    Instance.style.justifyContent = _justifyContentWorkLoopItem.Get();
-                }
-                if (_alignItemsWorkLoopItem.Check())
-                {
-                    Instance.style.alignItems = _alignItemsWorkLoopItem.Get();
-                }
-                if (_widthWorkLoopItem.Check())
-                {
-                    Instance.style.width = _widthWorkLoopItem.Get();
-                }
-                if (_maxWidthWorkLoopItem.Check())
-                {
-                    Instance.style.maxWidth = _maxWidthWorkLoopItem.Get();
-                }
-                if (_minWidthWorkLoopItem.Check())
-                {
-                    Instance.style.minWidth = _minWidthWorkLoopItem.Get();
-                }
-                if (_heightWorkLoopItem.Check())
-                {
-                    Instance.style.height = _heightWorkLoopItem.Get();
-                }
-                if (_maxHeightWorkLoopItem.Check())
-                {
-                    Instance.style.maxHeight = _maxHeightWorkLoopItem.Get();
-                }
-                if (_minHeightWorkLoopItem.Check())
-                {
-                    Instance.style.minHeight = _minHeightWorkLoopItem.Get();
-                }
-                if (_backgroundColorWorkLoopItem.Check())
-                {
-                    Instance.style.backgroundColor = _backgroundColorWorkLoopItem.Get();
-                }
-                if (_colorWorkLoopItem.Check())
-                {
-                    Instance.style.color = _colorWorkLoopItem.Get();
-                }
-                if (_fontSizeWorkLoopItem.Check())
-                {
-                    Instance.style.fontSize = _fontSizeWorkLoopItem.Get();
-                }
-                if (_unityFontWorkLoopItem.Check())
-                {
-                    Instance.style.unityFont = _unityFontWorkLoopItem.Get();
-                }
-                if (_unityFontDefinitionWorkLoopItem.Check())
-                {
-                    Instance.style.unityFontDefinition = _unityFontDefinitionWorkLoopItem.Get();
-                }
-                if (_unityFontStyleWorkLoopItem.Check())
-                {
-                    Instance.style.unityFontStyleAndWeight = _unityFontStyleWorkLoopItem.Get();
-                }
-                if (_unityParagraphSpacingWorkLoopItem.Check())
-                {
-                    Instance.style.unityParagraphSpacing = _unityParagraphSpacingWorkLoopItem.Get();
-                }
-                if (_unityTextAlignWorkLoopItem.Check())
-                {
-                    Instance.style.unityTextAlign = _unityTextAlignWorkLoopItem.Get();
-                }
-                if (_transitionPropertyWorkLoopItem.Check())
-                {
-                    Instance.style.transitionProperty = _transitionPropertyWorkLoopItem.Get();
-                }
-                if (_transitionDelayWorkLoopItem.Check())
-                {
-                    Instance.style.transitionDelay = _transitionDelayWorkLoopItem.Get();
-                }
-                if (_transitionDurationWorkLoopItem.Check())
-                {
-                    Instance.style.transitionDuration = _transitionDurationWorkLoopItem.Get();
-                }
-                if (_transitionTimingFunctionWorkLoopItem.Check())
-                {
-                    Instance.style.transitionTimingFunction = _transitionTimingFunctionWorkLoopItem.Get();
-                }
-                if (_transformOriginWorkLoopItem.Check())
-                {
-                    Instance.style.transformOrigin = _transformOriginWorkLoopItem.Get();
-                }
-                if (_translateWorkLoopItem.Check())
-                {
-                    Instance.style.translate = _translateWorkLoopItem.Get();
-                }
-                if (_scaleWorkLoopItem.Check())
-                {
-                    Instance.style.scale = _scaleWorkLoopItem.Get();
-                }
-                if (_rotateWorkLoopItem.Check())
-                {
-                    Instance.style.rotate = _rotateWorkLoopItem.Get();
-                }
-            }
+        }
+
+        public override void Update()
+        {
+            UpdateStyle();
+
             if (_nameWorkLoopItem.Check())
             {
                 Instance.name = _nameWorkLoopItem.Get();
@@ -1890,6 +3322,240 @@ namespace Fiber.UIElements
                 }
             }
         }
+
+        public override void Cleanup()
+        {
+            // start style
+            if (_styleWorkLoopItem.IsSignal)
+            {
+                _styleWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_positionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _positionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_rightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _rightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_bottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _bottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_leftWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _leftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_topWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _topWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_paddingRightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_paddingBottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_paddingLeftWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_paddingTopWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _paddingTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_marginRightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginRightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_marginBottomWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginBottomWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_marginLeftWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginLeftWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_marginTopWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _marginTopWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderTopRightRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderTopLeftRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderBottomRightRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomRightRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderBottomLeftRadiusWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomLeftRadiusWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderRightWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderRightWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderBottomWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderLeftWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderLeftWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderTopWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderRightColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderRightColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderBottomColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderBottomColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderLeftColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderLeftColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_borderTopColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _borderTopColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_displayWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _displayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_flexShrinkWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _flexShrinkWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_flexGrowWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _flexGrowWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_flexDirectionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _flexDirectionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_justifyContentWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _justifyContentWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_alignItemsWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _alignItemsWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_widthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _widthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_maxWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _maxWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_minWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _minWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_heightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _heightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_maxHeightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _maxHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_minHeightWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _minHeightWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_backgroundColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _backgroundColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_colorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _colorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_fontSizeWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _fontSizeWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_unityFontWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityFontWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_unityFontDefinitionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityFontDefinitionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_unityFontStyleWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityFontStyleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_unityParagraphSpacingWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityParagraphSpacingWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_unityTextAlignWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityTextAlignWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_transitionPropertyWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionPropertyWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_transitionDelayWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionDelayWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_transitionDurationWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionDurationWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_transitionTimingFunctionWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transitionTimingFunctionWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_transformOriginWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _transformOriginWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_translateWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _translateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_scaleWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _scaleWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_rotateWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _rotateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            // end style
+            if (_nameWorkLoopItem.IsSignal)
+            {
+                _nameWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_pickingModeWorkLoopItem.IsSignal)
+            {
+                _pickingModeWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_classNameWorkLoopItem.IsSignal)
+            {
+                _classNameWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+        }
     }
 
     public class UIDocumentNativeNode : GameObjectNativeNode
@@ -1910,6 +3576,10 @@ namespace Fiber.UIElements
             if (!component.SortingOrder.IsEmpty)
             {
                 uiDocument.sortingOrder = component.SortingOrder.Get();
+                if (component.SortingOrder.IsSignal)
+                {
+                    component.SortingOrder.Signal.RegisterDependent(this);
+                }
                 _sortingOrderWorkLoopItem = new(component.SortingOrder);
             }
         }
@@ -1965,12 +3635,22 @@ namespace Fiber.UIElements
             base.MoveChild(node, index);
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
-            base.WorkLoop();
+            base.Update();
             if (_sortingOrderWorkLoopItem.Check())
             {
                 _uiDocument.sortingOrder = _sortingOrderWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_sortingOrderWorkLoopItem.IsSignal)
+            {
+                _sortingOrderWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }

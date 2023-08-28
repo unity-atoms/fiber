@@ -68,7 +68,7 @@ namespace Fiber.Router
                 }
                 // TODO: Pool routes
                 Modals.Add(new ModalRoute(id));
-                DirtyBit++;
+                NotifySignalUpdate();
             }
 
             public void PushModal<C>(string id, C context)
@@ -80,13 +80,13 @@ namespace Fiber.Router
 
                 // TODO: Pool routes
                 Modals.Add(new ModalRoute<C>(id, context));
-                DirtyBit++;
+                NotifySignalUpdate();
             }
 
             public void PopModal()
             {
                 Modals.RemoveAt(Modals.Count - 1);
-                DirtyBit++;
+                NotifySignalUpdate();
             }
 
             public void PopModal(string id)
@@ -104,7 +104,7 @@ namespace Fiber.Router
                         break;
                     }
                 }
-                DirtyBit++;
+                NotifySignalUpdate();
             }
 
             public bool IsModalPushed(string id)
@@ -117,6 +117,11 @@ namespace Fiber.Router
                     }
                 }
                 return false;
+            }
+
+            protected override sealed void OnNotifySignalUpdate()
+            {
+                _dirtyBit++;
             }
         }
 
@@ -132,19 +137,22 @@ namespace Fiber.Router
 
         public RouteDefinition RouterTree { get; private set; }
         public SignalList<Route> RouteStack { get; private set; }
+        private readonly ISignal _parent;
 
-        public Router(RouteDefinition routerTree, BaseSignal parent = null)
+        public Router(RouteDefinition routerTree, ISignal parent = null)
         {
             RouterTree = routerTree;
             RouteStack = new(5, this);
             if (parent != null)
             {
-                RegisterParent(parent);
+                _parent = parent;
+                RegisterDependent(parent);
             }
         }
+
         ~Router()
         {
-            UnregisterParent();
+            UnregisterDependent(_parent);
         }
 
         public Router Navigate(string path)
@@ -256,7 +264,7 @@ namespace Fiber.Router
             PushIntermediateLayoutRoutes(path);
             // TODO: Pool routes
             RouteStack.Add(new Route(path, isLayoutRoute: false));
-            DirtyBit++;
+            NotifySignalUpdate();
             return this;
         }
 
@@ -265,7 +273,7 @@ namespace Fiber.Router
             PushIntermediateLayoutRoutes(path);
             // TODO: Pool routes
             RouteStack.Add(new Route<C>(path, context));
-            DirtyBit++;
+            NotifySignalUpdate();
             return this;
         }
 
@@ -283,7 +291,7 @@ namespace Fiber.Router
                 RouteStack.RemoveAt(RouteStack.Count - 1);
             }
 
-            DirtyBit++;
+            NotifySignalUpdate();
             return this;
         }
 
@@ -395,11 +403,16 @@ namespace Fiber.Router
             return null;
         }
 
-        public override bool IsDirty(byte otherDirtyBit)
+        public override sealed bool IsDirty(byte otherDirtyBit)
         {
             return otherDirtyBit != DirtyBit;
         }
         public override Router Get() => this;
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
+        }
     }
 
     public abstract class BaseRouteComponent : BaseComponent
@@ -657,10 +670,10 @@ namespace Fiber.Router
             _currentStackIndex = 0;
         }
 
-        private RouterProvider(RouteDefinition routeDefinition, Router routeStack, int currentStackIndex) : base()
+        private RouterProvider(RouteDefinition routeDefinition, Router router, int currentStackIndex) : base()
         {
             _routeDefinition = routeDefinition;
-            _router = routeStack;
+            _router = router;
             _currentStackIndex = currentStackIndex;
         }
 

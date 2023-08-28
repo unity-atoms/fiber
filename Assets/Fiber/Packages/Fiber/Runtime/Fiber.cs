@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using FiberUtils;
 using Signals;
+using PlasticGui.WorkspaceWindow;
 
 namespace Fiber
 {
@@ -12,7 +13,7 @@ namespace Fiber
 
         public Ref()
         {
-            Current = default(T);
+            Current = default;
         }
         public Ref(T initialValue)
         {
@@ -20,13 +21,16 @@ namespace Fiber
         }
     }
 
-    public abstract class NativeNode
+    public abstract class NativeNode : BaseSignal
     {
         public abstract void AddChild(FiberNode node, int index);
         public abstract void RemoveChild(FiberNode node);
         public abstract void MoveChild(FiberNode node, int index);
-        public abstract void WorkLoop();
+        public abstract void Update();
+        public abstract void Cleanup();
         public abstract void SetVisible(bool visible);
+        protected override sealed void OnNotifySignalUpdate() { }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public interface IComponentAPI
@@ -38,56 +42,75 @@ namespace Fiber
         public NativeNode GetParentNativeNode();
         public void CreateEffect(BaseEffect effect);
         public void CreateEffect(Func<Action> effect);
-        public void CreateEffect<T1>(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount);
+        public void CreateEffect<T1>(Func<T1, Action> effect, ISignal<T1> signal1, bool runOnMount);
         public void CreateEffect<T1, T2>(
             Func<T1, T2, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
             bool runOnMount
         );
         public void CreateEffect<T1, T2, T3>(
             Func<T1, T2, T3, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
             bool runOnMount
         );
         public void CreateUpdateEffect(Action<float> onUpdate);
-        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp);
+        public ISignal<T> WrapSignalProp<T>(SignalProp<T> signalProp);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
-            Func<T1, RT> compute, BaseSignal<T1> signal1
+            Func<T1, RT> compute, ISignal<T1> signal1
         );
         public ComputedSignal<T1, T2, RT> CreateComputedSignal<T1, T2, RT>(
-            Func<T1, T2, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2
+            Func<T1, T2, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2
         );
         public ComputedSignal<T1, T2, T3, RT> CreateComputedSignal<T1, T2, T3, RT>(
-            Func<T1, T2, T3, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3
+            Func<T1, T2, T3, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
         );
         public ComputedSignal<T1, T2, T3, T4, RT> CreateComputedSignal<T1, T2, T3, T4, RT>(
-            Func<T1, T2, T3, T4, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4
+            Func<T1, T2, T3, T4, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
         );
         public ComputedSignal<T1, T2, T3, T4, T5, RT> CreateComputedSignal<T1, T2, T3, T4, T5, RT>(
-            Func<T1, T2, T3, T4, T5, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5
+            Func<T1, T2, T3, T4, T5, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
         );
         public ComputedSignal<T1, T2, T3, T4, T5, T6, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, RT>(
-            Func<T1, T2, T3, T4, T5, T6, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6
+            Func<T1, T2, T3, T4, T5, T6, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
         );
         public ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(
-            Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6, BaseSignal<T7> signal7
+            Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
+        );
+        public ISignalList<ItemType> CreateComputedSignalList<T1, ItemType>(
+            Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1
+        );
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, ItemType>(
+            Func<T1, T2, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        );
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, ItemType>(
+            Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
+        );
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, ItemType>(
+            Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
+        );
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(
+            Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
+        );
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
+            Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
+        );
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
+            Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         );
         public VirtualNode Fragment(List<VirtualNode> children);
-        public VirtualNode Enable(BaseSignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode Visible(BaseSignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode Active(BaseSignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode Mount(BaseSignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode For<ItemType, SignalType, SignalReturnType, KeyType>(
-            SignalType each,
+        public VirtualNode Enable(ISignal<bool> whenSignal, List<VirtualNode> children);
+        public VirtualNode Visible(ISignal<bool> whenSignal, List<VirtualNode> children);
+        public VirtualNode Active(ISignal<bool> whenSignal, List<VirtualNode> children);
+        public VirtualNode Mount(ISignal<bool> whenSignal, List<VirtualNode> children);
+        public VirtualNode For<ItemType, KeyType>(
+            ISignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
-        )
-            where SignalType : BaseSignal<SignalReturnType>
-            where SignalReturnType : IList<ItemType>;
+        );
         public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children);
-        public VirtualNode Match(BaseSignal<bool> when, List<VirtualNode> children);
+        public VirtualNode Match(ISignal<bool> when, List<VirtualNode> children);
     }
 
     public interface IEffectAPI
@@ -96,7 +119,7 @@ namespace Fiber
         public T GetGlobal<T>();
     }
 
-    public abstract class BaseEffect
+    public abstract class BaseEffect : BaseSignal
     {
         public IEffectAPI Api { private get; set; }
         public FiberNode FiberNode { private get; set; }
@@ -108,6 +131,8 @@ namespace Fiber
 
         public abstract void RunIfDirty();
         public abstract void Cleanup();
+        protected override sealed void OnNotifySignalUpdate() { }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public abstract class Effect : BaseEffect
@@ -132,12 +157,12 @@ namespace Fiber
 
     public abstract class DynamicEffect<T> : BaseEffect
     {
-        private DynamicSignals<T> _dynamicSignals;
+        private DynamicDependencies<T> _dynamicSignals;
         bool _hasRun = false;
 
-        public DynamicEffect(IList<BaseSignal<T>> signals, bool runOnMount = true)
+        public DynamicEffect(IList<ISignal<T>> signals, bool runOnMount = true)
         {
-            _dynamicSignals = new DynamicSignals<T>(signals, runOnMount);
+            _dynamicSignals = new DynamicDependencies<T>(this, signals, runOnMount);
         }
 
         public sealed override void RunIfDirty()
@@ -153,22 +178,28 @@ namespace Fiber
             }
         }
 
-        protected abstract void Run(DynamicSignals<T> signals);
+        protected abstract void Run(DynamicDependencies<T> signals);
     }
 
     public abstract class Effect<T1> : BaseEffect
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
         bool _hasRun = false;
 
         public Effect(
-            BaseSignal<T1> signal1,
+            ISignal<T1> signal1,
             bool runOnMount = true
         )
         {
             _signal1 = signal1;
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
+            _signal1.RegisterDependent(this);
+        }
+
+        ~Effect()
+        {
+            _signal1?.UnregisterDependent(this);
         }
 
         public sealed override void RunIfDirty()
@@ -192,15 +223,15 @@ namespace Fiber
 
     public abstract class Effect<T1, T2> : BaseEffect
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
         bool _hasRun = false;
 
         public Effect(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
             bool runOnMount = true
         )
         {
@@ -208,6 +239,14 @@ namespace Fiber
             _signal2 = signal2;
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
             _lastDirtyBit2 = (byte)(signal2.DirtyBit - (runOnMount ? 1 : 0));
+            _signal1.RegisterDependent(this);
+            _signal2.RegisterDependent(this);
+        }
+
+        ~Effect()
+        {
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
         }
 
         public sealed override void RunIfDirty()
@@ -232,18 +271,18 @@ namespace Fiber
 
     public abstract class Effect<T1, T2, T3> : BaseEffect
     {
-        protected BaseSignal<T1> _signal1;
+        protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        protected BaseSignal<T2> _signal2;
+        protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        protected BaseSignal<T3> _signal3;
+        protected ISignal<T3> _signal3;
         protected byte _lastDirtyBit3;
         bool _hasRun = false;
 
         public Effect(
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
             bool runOnMount = true
         )
         {
@@ -253,6 +292,16 @@ namespace Fiber
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
             _lastDirtyBit2 = (byte)(signal2.DirtyBit - (runOnMount ? 1 : 0));
             _lastDirtyBit3 = (byte)(signal3.DirtyBit - (runOnMount ? 1 : 0));
+            _signal1.RegisterDependent(this);
+            _signal2.RegisterDependent(this);
+            _signal3.RegisterDependent(this);
+        }
+
+        ~Effect()
+        {
+            _signal1?.UnregisterDependent(this);
+            _signal2?.UnregisterDependent(this);
+            _signal3?.UnregisterDependent(this);
         }
 
         public sealed override void RunIfDirty()
@@ -304,7 +353,7 @@ namespace Fiber
         Func<T1, Action> _effect;
         Action _cleanup;
 
-        public InlineEffect(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount)
+        public InlineEffect(Func<T1, Action> effect, ISignal<T1> signal1, bool runOnMount)
             : base(signal1, runOnMount)
         {
             _effect = effect;
@@ -330,8 +379,8 @@ namespace Fiber
 
         public InlineEffect(
             Func<T1, T2, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
             bool runOnMount
         )
             : base(signal1, signal2, runOnMount)
@@ -359,9 +408,9 @@ namespace Fiber
 
         public InlineEffect(
             Func<T1, T2, T3, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
             bool runOnMount
         )
             : base(signal1, signal2, signal3, runOnMount)
@@ -385,7 +434,7 @@ namespace Fiber
     public class InlineComputedSignal<T1, RT> : ComputedSignal<T1, RT>
     {
         Func<T1, RT> _compute;
-        public InlineComputedSignal(Func<T1, RT> compute, BaseSignal<T1> signal1)
+        public InlineComputedSignal(Func<T1, RT> compute, ISignal<T1> signal1)
             : base(signal1)
         {
             _compute = compute;
@@ -399,7 +448,7 @@ namespace Fiber
     public class InlineComputedSignal<T1, T2, RT> : ComputedSignal<T1, T2, RT>
     {
         Func<T1, T2, RT> _compute;
-        public InlineComputedSignal(Func<T1, T2, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2)
+        public InlineComputedSignal(Func<T1, T2, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2)
             : base(signal1, signal2)
         {
             _compute = compute;
@@ -413,7 +462,7 @@ namespace Fiber
     public class InlineComputedSignal<T1, T2, T3, RT> : ComputedSignal<T1, T2, T3, RT>
     {
         Func<T1, T2, T3, RT> _compute;
-        public InlineComputedSignal(Func<T1, T2, T3, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3)
+        public InlineComputedSignal(Func<T1, T2, T3, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3)
             : base(signal1, signal2, signal3)
         {
             _compute = compute;
@@ -427,7 +476,7 @@ namespace Fiber
     public class InlineComputedSignal<T1, T2, T3, T4, RT> : ComputedSignal<T1, T2, T3, T4, RT>
     {
         Func<T1, T2, T3, T4, RT> _compute;
-        public InlineComputedSignal(Func<T1, T2, T3, T4, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4)
+        public InlineComputedSignal(Func<T1, T2, T3, T4, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4)
             : base(signal1, signal2, signal3, signal4)
         {
             _compute = compute;
@@ -441,7 +490,7 @@ namespace Fiber
     public class InlineComputedSignal<T1, T2, T3, T4, T5, RT> : ComputedSignal<T1, T2, T3, T4, T5, RT>
     {
         Func<T1, T2, T3, T4, T5, RT> _compute;
-        public InlineComputedSignal(Func<T1, T2, T3, T4, T5, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5)
+        public InlineComputedSignal(Func<T1, T2, T3, T4, T5, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5)
             : base(signal1, signal2, signal3, signal4, signal5)
         {
             _compute = compute;
@@ -455,7 +504,7 @@ namespace Fiber
     public class InlineComputedSignal<T1, T2, T3, T4, T5, T6, RT> : ComputedSignal<T1, T2, T3, T4, T5, T6, RT>
     {
         Func<T1, T2, T3, T4, T5, T6, RT> _compute;
-        public InlineComputedSignal(Func<T1, T2, T3, T4, T5, T6, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6)
+        public InlineComputedSignal(Func<T1, T2, T3, T4, T5, T6, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6)
             : base(signal1, signal2, signal3, signal4, signal5, signal6)
         {
             _compute = compute;
@@ -469,7 +518,7 @@ namespace Fiber
     public class InlineComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> : ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>
     {
         Func<T1, T2, T3, T4, T5, T6, T7, RT> _compute;
-        public InlineComputedSignal(Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6, BaseSignal<T7> signal7)
+        public InlineComputedSignal(Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7)
             : base(signal1, signal2, signal3, signal4, signal5, signal6, signal7)
         {
             _compute = compute;
@@ -478,6 +527,139 @@ namespace Fiber
         {
             return _compute(value1, value2, value3, value4, value5, value6, value7);
         }
+    }
+
+    public class InlineComputedSignalList<T1, ItemType> : ComputedSignal<T1, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, IList<ItemType>, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1)
+            : base(signal1)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1)
+        {
+            _list.Clear();
+            return _compute(value1, _list);
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, ItemType> : ComputedSignal<T1, T2, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, T2, IList<ItemType>, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Func<T1, T2, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2)
+            : base(signal1, signal2)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2)
+        {
+            _list.Clear();
+            return _compute(value1, value2, _list);
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, ItemType> : ComputedSignal<T1, T2, T3, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3)
+            : base(signal1, signal2, signal3)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3)
+        {
+            _list.Clear();
+            return _compute(value1, value2, value3, _list);
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, ItemType> : ComputedSignal<T1, T2, T3, T4, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4)
+            : base(signal1, signal2, signal3, signal4)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4)
+        {
+            _list.Clear();
+            return _compute(value1, value2, value3, value4, _list);
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, T5, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5)
+            : base(signal1, signal2, signal3, signal4, signal5)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
+        {
+            _list.Clear();
+            return _compute(value1, value2, value3, value4, value5, _list);
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6)
+            : base(signal1, signal2, signal3, signal4, signal5, signal6)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6)
+        {
+            _list.Clear();
+            return _compute(value1, value2, value3, value4, value5, value6, _list);
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7)
+            : base(signal1, signal2, signal3, signal4, signal5, signal6, signal7)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7)
+        {
+            _list.Clear();
+            return _compute(value1, value2, value3, value4, value5, value6, value7, _list);
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
     public class VirtualNode
@@ -572,14 +754,14 @@ namespace Fiber
         public NativeNode GetParentNativeNode() => Api.GetParentNativeNode();
         public void CreateEffect(BaseEffect effect) => Api.CreateEffect(effect);
         public void CreateEffect(Func<Action> effect) => Api.CreateEffect(effect);
-        public void CreateEffect<T1>(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount = true)
+        public void CreateEffect<T1>(Func<T1, Action> effect, ISignal<T1> signal1, bool runOnMount = true)
         {
             Api.CreateEffect(effect, signal1, runOnMount);
         }
         public void CreateEffect<T1, T2>(
             Func<T1, T2, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
             bool runOnMount = true
         )
         {
@@ -587,53 +769,72 @@ namespace Fiber
         }
         public void CreateEffect<T1, T2, T3>(
             Func<T1, T2, T3, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
             bool runOnMount = true
         )
         {
             Api.CreateEffect(effect, signal1, signal2, signal3, runOnMount);
         }
         public void CreateUpdateEffect(Action<float> onUpdate) => Api.CreateUpdateEffect(onUpdate);
-        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp) => Api.WrapSignalProp<T>(signalProp);
+        public ISignal<T> WrapSignalProp<T>(SignalProp<T> signalProp) => Api.WrapSignalProp<T>(signalProp);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
-            Func<T1, RT> compute, BaseSignal<T1> signal1
+            Func<T1, RT> compute, ISignal<T1> signal1
         ) => Api.CreateComputedSignal<T1, RT>(compute, signal1);
         public ComputedSignal<T1, T2, RT> CreateComputedSignal<T1, T2, RT>(
-            Func<T1, T2, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2
+            Func<T1, T2, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2
         ) => Api.CreateComputedSignal<T1, T2, RT>(compute, signal1, signal2);
         public ComputedSignal<T1, T2, T3, RT> CreateComputedSignal<T1, T2, T3, RT>(
-            Func<T1, T2, T3, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3
+            Func<T1, T2, T3, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
         ) => Api.CreateComputedSignal<T1, T2, T3, RT>(compute, signal1, signal2, signal3);
         public ComputedSignal<T1, T2, T3, T4, RT> CreateComputedSignal<T1, T2, T3, T4, RT>(
-            Func<T1, T2, T3, T4, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4
+            Func<T1, T2, T3, T4, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
         ) => Api.CreateComputedSignal<T1, T2, T3, T4, RT>(compute, signal1, signal2, signal3, signal4);
         public ComputedSignal<T1, T2, T3, T4, T5, RT> CreateComputedSignal<T1, T2, T3, T4, T5, RT>(
-            Func<T1, T2, T3, T4, T5, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5
+            Func<T1, T2, T3, T4, T5, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
         ) => Api.CreateComputedSignal<T1, T2, T3, T4, T5, RT>(compute, signal1, signal2, signal3, signal4, signal5);
         public ComputedSignal<T1, T2, T3, T4, T5, T6, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, RT>(
-            Func<T1, T2, T3, T4, T5, T6, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6
+            Func<T1, T2, T3, T4, T5, T6, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
         ) => Api.CreateComputedSignal<T1, T2, T3, T4, T5, T6, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
         public ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(
-            Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6, BaseSignal<T7> signal7
+            Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) => Api.CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        public ISignalList<ItemType> CreateComputedSignalList<T1, ItemType>(
+            Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1
+        ) => Api.CreateComputedSignalList<T1, ItemType>(compute, signal1);
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, ItemType>(
+            Func<T1, T2, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        ) => Api.CreateComputedSignalList<T1, T2, ItemType>(compute, signal1, signal2);
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, ItemType>(
+            Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
+        ) => Api.CreateComputedSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, ItemType>(
+            Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
+        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(
+            Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
+        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
+            Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
+        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
+            Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
+        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         public VirtualNode Fragment(List<VirtualNode> children) => Api.Fragment(children);
-        public VirtualNode Enable(BaseSignal<bool> when, List<VirtualNode> children) => Api.Enable(when, children);
-        public VirtualNode Visible(BaseSignal<bool> when, List<VirtualNode> children) => Api.Visible(when, children);
-        public VirtualNode Active(BaseSignal<bool> when, List<VirtualNode> children) => Api.Active(when, children);
-        public VirtualNode Mount(BaseSignal<bool> when, List<VirtualNode> children) => Api.Mount(when, children);
-        public VirtualNode For<ItemType, SignalType, SignalReturnType, KeyType>(
-            SignalType each,
+        public VirtualNode Enable(ISignal<bool> when, List<VirtualNode> children) => Api.Enable(when, children);
+        public VirtualNode Visible(ISignal<bool> when, List<VirtualNode> children) => Api.Visible(when, children);
+        public VirtualNode Active(ISignal<bool> when, List<VirtualNode> children) => Api.Active(when, children);
+        public VirtualNode Mount(ISignal<bool> when, List<VirtualNode> children) => Api.Mount(when, children);
+        public VirtualNode For<ItemType, KeyType>(
+            ISignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
         )
-            where SignalType : BaseSignal<SignalReturnType>
-            where SignalReturnType : IList<ItemType>
         {
-            return Api.For<ItemType, SignalType, SignalReturnType, KeyType>(each, children);
+            return Api.For<ItemType, KeyType>(each, children);
         }
         public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children) => Api.Switch(fallback, children);
-        public VirtualNode Match(BaseSignal<bool> when, List<VirtualNode> children) => Api.Match(when, children);
+        public VirtualNode Match(ISignal<bool> when, List<VirtualNode> children) => Api.Match(when, children);
         public List<VirtualNode> Children()
         {
             var children = new List<VirtualNode>();
@@ -777,7 +978,7 @@ namespace Fiber
         Unmounted = 4
     }
 
-    public class FiberNode
+    public class FiberNode : BaseSignal
     {
         public int Id { get; set; } // Unique id for this node. Not used directly in Fiber, but used by other renderers, for example Fiber.GameObjects.
         private static IntIdGenerator _idGenerator = new IntIdGenerator();
@@ -793,17 +994,41 @@ namespace Fiber
         // If disabled underlying effects and signals will not update.
         // If disabled the full sub tree will also be excluded from
         // being processed in the WorkLoop.
-        public bool IsEnabled { get; set; } = true;
+        private bool _isEnabled = true;
+        public bool IsEnabled
+        {
+            get
+            {
+                var current = this;
+                do
+                {
+                    if (!current._isEnabled)
+                    {
+                        return false;
+                    }
+                    current = current.Parent;
+                } while (current != null);
+
+                return true;
+            }
+            set
+            {
+                _isEnabled = value;
+            }
+        }
 
         private List<BaseEffect> _effects = new List<BaseEffect>();
+        private Renderer _renderer;
 
         public FiberNode(
+            Renderer renderer,
             NativeNode nativeNode,
             VirtualNode virtualNode,
             FiberNode parent,
             FiberNode sibling
         )
         {
+            _renderer = renderer;
             Id = _idGenerator.NextId();
             NativeNode = nativeNode;
             VirtualNode = virtualNode;
@@ -816,6 +1041,17 @@ namespace Fiber
         public void PushEffect(BaseEffect effect)
         {
             _effects.Add(effect);
+            effect.RegisterDependent(this);
+        }
+
+        public void Update()
+        {
+            RunEffects();
+
+            if (NativeNode != null)
+            {
+                NativeNode.Update();
+            }
         }
 
         public void RunEffects()
@@ -837,6 +1073,7 @@ namespace Fiber
             for (var i = 0; i < effectsCount; ++i)
             {
                 _effects[i].Cleanup();
+                _effects[i].UnregisterDependent(this);
             }
         }
 
@@ -968,16 +1205,6 @@ namespace Fiber
             return false;
         }
 
-        public void WorkLoop()
-        {
-            if (NativeNode != null)
-            {
-                NativeNode.WorkLoop();
-            }
-
-            RunEffects();
-        }
-
         // Get the next node in the virtual tree (traversing depth first)
         // In order to travers the tree you can do the following: 
         // for (var current = root; current != null; current = current.NextNode()) { .... }
@@ -1006,17 +1233,14 @@ namespace Fiber
             }
         }
 
-        public FiberNode NextEnabledNode(FiberNode root = null)
+        protected override sealed void OnNotifySignalUpdate()
         {
-            FiberNode current = this;
-            do
+            if (Phase == FiberNodePhase.Mounted && IsEnabled)
             {
-                current = current.NextNode(root);
+                _renderer.AddFiberNodeToUpdateQueue(this);
             }
-            while (current != null && !current.IsEnabled && current.Phase != FiberNodePhase.Mounted);
-
-            return current;
         }
+        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public abstract class RendererExtension
@@ -1031,6 +1255,7 @@ namespace Fiber
 
         private Queue<FiberNode> _renderQueue;
         private MixedQueue _operationsQueue;
+        private Queue<FiberNode> _fiberNodesToUpdate;
         protected List<RendererExtension> _rendererExtensions;
         private Dictionary<Type, object> _globals;
         private ContextsAPI _contextsAPI;
@@ -1087,6 +1312,7 @@ namespace Fiber
         {
             _renderQueue = new();
             _operationsQueue = new();
+            _fiberNodesToUpdate = new();
             _globals = globals ?? new();
             _rendererExtensions = rendererExtensions;
             _contextsAPI = new();
@@ -1108,6 +1334,7 @@ namespace Fiber
             }
 
             _root = new FiberNode(
+                renderer: this,
                 nativeNode: nativeNodeRoot,
                 virtualNode: virtualNode,
                 parent: null,
@@ -1159,16 +1386,9 @@ namespace Fiber
         }
 
         private Stopwatch _stopWatch = new Stopwatch();
-        private FiberNode _currentWorkLoopNode = null;
         public void WorkLoop(bool immediatelyExecuteRemainingWork = false)
         {
             _stopWatch.Restart();
-
-            // Reset the current work loop node to the root
-            if (_currentWorkLoopNode == null)
-            {
-                _currentWorkLoopNode = _root;
-            }
 
             do
             {
@@ -1189,10 +1409,14 @@ namespace Fiber
                     // - Move -> Moves the node in the virtual tree as well as in the native tree.
                     CommitNextOperation();
                 }
-                else if (_currentWorkLoopNode != null)
+                else if (_fiberNodesToUpdate.Count > 0)
                 {
-                    _currentWorkLoopNode.WorkLoop();
-                    _currentWorkLoopNode = _currentWorkLoopNode.NextEnabledNode();
+                    var fiberNode = _fiberNodesToUpdate.Dequeue();
+
+                    if (fiberNode.Phase == FiberNodePhase.Mounted && fiberNode.IsEnabled)
+                    {
+                        fiberNode.Update();
+                    }
                 }
                 else
                 {
@@ -1222,6 +1446,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: this,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1234,12 +1459,12 @@ namespace Fiber
             else if (fiberNode.VirtualNode is EnableComponent enableComponent)
             {
                 var children = enableComponent.Render(fiberNode);
-                RenderChildren(fiberNode, children, _renderQueue);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is VisibleComponent visibleComponent)
             {
                 var children = visibleComponent.Render(fiberNode);
-                RenderChildren(fiberNode, children, _renderQueue);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is ActiveComponent activeComponent)
             {
@@ -1247,6 +1472,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: this,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1259,7 +1485,7 @@ namespace Fiber
             else if (fiberNode.VirtualNode is MountComponent mountComponent)
             {
                 var children = mountComponent.Render(fiberNode);
-                RenderChildren(fiberNode, children, _renderQueue);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is BaseForComponent forComponent)
             {
@@ -1274,6 +1500,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: this,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1289,16 +1516,17 @@ namespace Fiber
                 fiberNode.NativeNode = CreateNativeNode(fiberNode);
                 if (fiberNode.NativeNode != null)
                 {
+                    fiberNode.NativeNode.RegisterDependent(fiberNode);
                     fiberNode.NativeNode.SetVisible(false);
                 }
-                RenderChildren(fiberNode, fiberNode.VirtualNode.children, _renderQueue);
+                RenderChildren(this, fiberNode, fiberNode.VirtualNode.children, _renderQueue);
             }
 
             fiberNode.Phase = FiberNodePhase.Rendered;
             _operationsQueue.Enqueue(new MountOperation(node: fiberNode));
         }
 
-        public static void RenderChildren(FiberNode fiberNode, List<VirtualNode> children, Queue<FiberNode> renderQueue)
+        public static void RenderChildren(Renderer renderer, FiberNode fiberNode, List<VirtualNode> children, Queue<FiberNode> renderQueue)
         {
             FiberNode previousChildFiberNode = null;
             for (var i = 0; children != null && i < children.Count; ++i)
@@ -1307,6 +1535,7 @@ namespace Fiber
                 if (child != null)
                 {
                     var childFiberNode = new FiberNode(
+                        renderer: renderer,
                         nativeNode: null,
                         virtualNode: child,
                         parent: fiberNode,
@@ -1324,6 +1553,11 @@ namespace Fiber
                     renderQueue.Enqueue(childFiberNode);
                 }
             }
+        }
+
+        public void AddFiberNodeToUpdateQueue(FiberNode fiberNode)
+        {
+            _fiberNodesToUpdate.Enqueue(fiberNode);
         }
 
         private bool IsVisible(FiberNode fiberNode)
@@ -1474,6 +1708,7 @@ namespace Fiber
         void CleanupNode(FiberNode fiberNode)
         {
             fiberNode.CleanupEffects();
+            fiberNode?.NativeNode?.Cleanup();
 
             var child = fiberNode.Child;
             while (child != null)
@@ -1597,44 +1832,52 @@ namespace Fiber
 
         public void CreateEffect(Func<Action> effect)
         {
-            var inlineEffect = new InlineEffect(effect);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect(effect)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
-        public void CreateEffect<T1>(Func<T1, Action> effect, BaseSignal<T1> signal1, bool runOnMount)
+        public void CreateEffect<T1>(Func<T1, Action> effect, ISignal<T1> signal1, bool runOnMount)
         {
-            var inlineEffect = new InlineEffect<T1>(effect, signal1, runOnMount);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect<T1>(effect, signal1, runOnMount)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
         public void CreateEffect<T1, T2>(
             Func<T1, T2, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
             bool runOnMount
         )
         {
-            var inlineEffect = new InlineEffect<T1, T2>(effect, signal1, signal2, runOnMount);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect<T1, T2>(effect, signal1, signal2, runOnMount)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
         public void CreateEffect<T1, T2, T3>(
             Func<T1, T2, T3, Action> effect,
-            BaseSignal<T1> signal1,
-            BaseSignal<T2> signal2,
-            BaseSignal<T3> signal3,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
             bool runOnMount
         )
         {
-            var inlineEffect = new InlineEffect<T1, T2, T3>(effect, signal1, signal2, signal3, runOnMount);
-            inlineEffect.Api = this;
-            inlineEffect.FiberNode = _currentFiberNode;
+            var inlineEffect = new InlineEffect<T1, T2, T3>(effect, signal1, signal2, signal3, runOnMount)
+            {
+                Api = this,
+                FiberNode = _currentFiberNode
+            };
             _currentFiberNode.PushEffect(inlineEffect);
         }
 
@@ -1651,7 +1894,7 @@ namespace Fiber
             });
         }
 
-        public BaseSignal<T> WrapSignalProp<T>(SignalProp<T> signalProp)
+        public ISignal<T> WrapSignalProp<T>(SignalProp<T> signalProp)
         {
             if (signalProp.IsValue)
             {
@@ -1666,52 +1909,128 @@ namespace Fiber
         }
 
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
-            Func<T1, RT> compute, BaseSignal<T1> signal1
+            Func<T1, RT> compute, ISignal<T1> signal1
         )
         {
             return new InlineComputedSignal<T1, RT>(compute, signal1);
         }
 
         public ComputedSignal<T1, T2, RT> CreateComputedSignal<T1, T2, RT>(
-            Func<T1, T2, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2
+            Func<T1, T2, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2
         )
         {
             return new InlineComputedSignal<T1, T2, RT>(compute, signal1, signal2);
         }
 
         public ComputedSignal<T1, T2, T3, RT> CreateComputedSignal<T1, T2, T3, RT>(
-            Func<T1, T2, T3, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3
+            Func<T1, T2, T3, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
         )
         {
             return new InlineComputedSignal<T1, T2, T3, RT>(compute, signal1, signal2, signal3);
         }
 
         public ComputedSignal<T1, T2, T3, T4, RT> CreateComputedSignal<T1, T2, T3, T4, RT>(
-            Func<T1, T2, T3, T4, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4
+            Func<T1, T2, T3, T4, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
         )
         {
             return new InlineComputedSignal<T1, T2, T3, T4, RT>(compute, signal1, signal2, signal3, signal4);
         }
 
         public ComputedSignal<T1, T2, T3, T4, T5, RT> CreateComputedSignal<T1, T2, T3, T4, T5, RT>(
-            Func<T1, T2, T3, T4, T5, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5
+            Func<T1, T2, T3, T4, T5, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
         )
         {
             return new InlineComputedSignal<T1, T2, T3, T4, T5, RT>(compute, signal1, signal2, signal3, signal4, signal5);
         }
 
         public ComputedSignal<T1, T2, T3, T4, T5, T6, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, RT>(
-            Func<T1, T2, T3, T4, T5, T6, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6
+            Func<T1, T2, T3, T4, T5, T6, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
         )
         {
             return new InlineComputedSignal<T1, T2, T3, T4, T5, T6, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
         }
 
         public ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(
-            Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, BaseSignal<T1> signal1, BaseSignal<T2> signal2, BaseSignal<T3> signal3, BaseSignal<T4> signal4, BaseSignal<T5> signal5, BaseSignal<T6> signal6, BaseSignal<T7> signal7
+            Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         )
         {
             return new InlineComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, ItemType>(
+            Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1
+        )
+        {
+            return new InlineComputedSignalList<T1, ItemType>(compute, signal1);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, ItemType>(
+            Func<T1, T2, IList<ItemType>, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2
+        )
+        {
+            return new InlineComputedSignalList<T1, T2, ItemType>(compute, signal1, signal2);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, ItemType>(
+            Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3
+        )
+        {
+            return new InlineComputedSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, ItemType>(
+            Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4
+        )
+        {
+            return new InlineComputedSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(
+            Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5
+        )
+        {
+            return new InlineComputedSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
+            Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6
+        )
+        {
+            return new InlineComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
+            Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6,
+            ISignal<T7> signal7
+        )
+        {
+            return new InlineComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         }
 
         public T GetRendererExtension<T>() where T : RendererExtension
@@ -1737,46 +2056,77 @@ namespace Fiber
             public FragmentComponent(List<VirtualNode> children) : base(children) { }
         }
 
-        public VirtualNode Enable(BaseSignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Enable(ISignal<bool> whenSignal, List<VirtualNode> children)
         {
-            return new EnableComponent(whenSignal, children);
+            return new EnableComponent(whenSignal, children, this);
         }
 
         private class EnableComponent : VirtualNode
         {
-            private readonly BaseSignal<bool> _whenSignal;
+            private readonly ISignal<bool> _whenSignal;
+            private readonly Renderer _renderer;
 
-            public EnableComponent(BaseSignal<bool> whenSignal, List<VirtualNode> children) : base(children)
+            public EnableComponent(ISignal<bool> whenSignal, List<VirtualNode> children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
+                _renderer = renderer;
             }
 
             private class EnabledEffect : Effect<bool>
             {
                 private readonly FiberNode _fiberNode;
+                private readonly Renderer _renderer;
+
                 public EnabledEffect(
-                    BaseSignal<bool> whenSignal,
-                    FiberNode fiberNode
+                    ISignal<bool> whenSignal,
+                    FiberNode fiberNode,
+                    Renderer renderer
                 )
                     : base(whenSignal, runOnMount: true)
                 {
                     _fiberNode = fiberNode;
+                    _renderer = renderer;
                 }
+
+                private void RehydrateSubTree(FiberNode root)
+                {
+                    _renderer.AddFiberNodeToUpdateQueue(root);
+                    for (var node = root.Child; node != null; node = node.NextNode(root: root, skipChildren: false))
+                    {
+                        _renderer.AddFiberNodeToUpdateQueue(node);
+                    }
+                }
+
                 protected override void Run(bool enabled)
                 {
-                    _fiberNode.IsEnabled = enabled;
+                    // We need to enable / disable the children instead of this node since 
+                    // this effect won't otherwise run (since its node is disabled...)
+                    var child = _fiberNode.Child;
+                    while (child != null)
+                    {
+                        var valueBeforeChange = child.IsEnabled;
+                        child.IsEnabled = enabled;
+                        if (!valueBeforeChange && enabled)
+                        {
+                            // Some props in the sub tree might have become dirty while the node was disabled.
+                            // Just rehydrate the whole sub tree to be sure. We could optimize this in the future,
+                            // but it is questionable if that will be worth it.
+                            RehydrateSubTree(child);
+                        }
+                        child = child.Sibling;
+                    }
                 }
                 public override void Cleanup() { }
             }
 
             public List<VirtualNode> Render(FiberNode fiberNode)
             {
-                fiberNode.PushEffect(new EnabledEffect(_whenSignal, fiberNode));
+                fiberNode.PushEffect(new EnabledEffect(_whenSignal, fiberNode, _renderer));
                 return children;
             }
         }
 
-        public VirtualNode Visible(BaseSignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Visible(ISignal<bool> whenSignal, List<VirtualNode> children)
         {
             return new VisibleComponent(whenSignal, children);
         }
@@ -1784,8 +2134,8 @@ namespace Fiber
         private class VisibleComponent : VirtualNode
         {
             public bool IsVisible { get => _whenSignal.Get(); }
-            private readonly BaseSignal<bool> _whenSignal;
-            public VisibleComponent(BaseSignal<bool> whenSignal, List<VirtualNode> children) : base(children)
+            private readonly ISignal<bool> _whenSignal;
+            public VisibleComponent(ISignal<bool> whenSignal, List<VirtualNode> children) : base(children)
             {
                 _whenSignal = whenSignal;
             }
@@ -1794,7 +2144,7 @@ namespace Fiber
             {
                 private readonly FiberNode _fiberNode;
                 public VisibleEffect(
-                    BaseSignal<bool> whenSignal,
+                    ISignal<bool> whenSignal,
                     FiberNode fiberNode
                 )
                     : base(whenSignal, runOnMount: true)
@@ -1825,17 +2175,19 @@ namespace Fiber
             }
         }
 
-        public VirtualNode Active(BaseSignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Active(ISignal<bool> whenSignal, List<VirtualNode> children)
         {
-            return new ActiveComponent(whenSignal, children);
+            return new ActiveComponent(whenSignal, children, this);
         }
 
         private class ActiveComponent : VirtualNode
         {
-            private readonly BaseSignal<bool> _whenSignal;
-            public ActiveComponent(BaseSignal<bool> whenSignal, List<VirtualNode> children) : base(children)
+            private readonly ISignal<bool> _whenSignal;
+            private readonly Renderer _renderer;
+            public ActiveComponent(ISignal<bool> whenSignal, List<VirtualNode> children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
+                _renderer = renderer;
             }
 
             public VirtualNode Render(FiberNode fiberNode)
@@ -1845,49 +2197,55 @@ namespace Fiber
                     new List<VirtualNode> {
                         new EnableComponent(
                             _whenSignal,
-                            children
+                            children,
+                            _renderer
                         )
                     }
                 );
             }
         }
 
-        public VirtualNode Mount(BaseSignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Mount(ISignal<bool> whenSignal, List<VirtualNode> children)
         {
-            return new MountComponent(whenSignal, children, _renderQueue, _operationsQueue);
+            return new MountComponent(whenSignal, children, _renderQueue, _operationsQueue, this);
         }
 
         private class MountComponent : VirtualNode
         {
-            private readonly BaseSignal<bool> _whenSignal;
+            private readonly ISignal<bool> _whenSignal;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
+            private readonly Renderer _renderer;
 
             public MountComponent(
-                BaseSignal<bool> whenSignal,
+                ISignal<bool> whenSignal,
                 List<VirtualNode> children,
                 Queue<FiberNode> renderQueue,
-                MixedQueue operationsQueue
+                MixedQueue operationsQueue,
+                Renderer renderer
             ) : base(children)
             {
                 _whenSignal = whenSignal;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
+                _renderer = renderer;
             }
 
             private class MountEffect : Effect<bool>
             {
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
+                private readonly Renderer _renderer;
                 private readonly FiberNode _mountFiberNode;
                 private readonly List<VirtualNode> _children;
                 private bool _valueLastTime;
 
                 public MountEffect(
-                    BaseSignal<bool> whenSignal,
+                    ISignal<bool> whenSignal,
                     List<VirtualNode> children,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
+                    Renderer renderer,
                     FiberNode mountFiberNode
                 )
                     : base(whenSignal, runOnMount: false)
@@ -1895,6 +2253,7 @@ namespace Fiber
                     _children = children;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
+                    _renderer = renderer;
                     _mountFiberNode = mountFiberNode;
                     _valueLastTime = whenSignal.Get();
                 }
@@ -1907,7 +2266,7 @@ namespace Fiber
 
                     if (mount)
                     {
-                        Renderer.RenderChildren(_mountFiberNode, _children, _renderQueue);
+                        RenderChildren(_renderer, _mountFiberNode, _children, _renderQueue);
                     }
                     else
                     {
@@ -1924,19 +2283,17 @@ namespace Fiber
 
             public List<VirtualNode> Render(FiberNode mountFiberNode)
             {
-                mountFiberNode.PushEffect(new MountEffect(_whenSignal, children, _renderQueue, _operationsQueue, mountFiberNode));
+                mountFiberNode.PushEffect(new MountEffect(_whenSignal, children, _renderQueue, _operationsQueue, _renderer, mountFiberNode));
                 return _whenSignal.Get() ? children : null;
             }
         }
 
-        public VirtualNode For<ItemType, SignalType, SignalReturnType, KeyType>(
-            SignalType each,
+        public VirtualNode For<ItemType, KeyType>(
+            ISignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
         )
-            where SignalType : BaseSignal<SignalReturnType>
-            where SignalReturnType : IList<ItemType>
         {
-            return new ForComponent<ItemType, SignalType, SignalReturnType, KeyType>(each, children, _renderQueue, _operationsQueue);
+            return new ForComponent<ItemType, KeyType>(each, children, _renderQueue, _operationsQueue, this);
         }
 
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
@@ -1946,48 +2303,51 @@ namespace Fiber
             public abstract void Render(FiberNode fiberNode);
         }
 
-        private class ForComponent<ItemType, SignalType, SignalReturnType, KeyType> : BaseForComponent
-            where SignalType : BaseSignal<SignalReturnType>
-            where SignalReturnType : IList<ItemType>
+        private class ForComponent<ItemType, KeyType> : BaseForComponent
         {
-            private readonly SignalType _eachSignal;
+            private readonly ISignalList<ItemType> _eachSignal;
             private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
+            private readonly Renderer _renderer;
             private readonly Dictionary<KeyType, int> _currentKeyToIdMap;
             private readonly Dictionary<int, KeyType> _currentIdToKeyMap;
 
             public ForComponent(
-                SignalType eachSignal,
+                ISignalList<ItemType> eachSignal,
                 Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
                 Queue<FiberNode> renderQueue,
-                MixedQueue operationsQueue
+                MixedQueue operationsQueue,
+                Renderer renderer
             ) : base()
             {
                 _eachSignal = eachSignal;
                 _children = children;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
+                _renderer = renderer;
 
                 _currentKeyToIdMap = new();
                 _currentIdToKeyMap = new();
             }
 
-            private class ForEffect : Effect<SignalReturnType>
+            private class ForEffect : Effect<IList<ItemType>>
             {
                 private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
+                private readonly Renderer _renderer;
                 private readonly FiberNode _fiberNode;
                 private readonly Dictionary<KeyType, int> _currentKeyToIdMap;
                 private readonly Dictionary<int, KeyType> _currentIdToKeyMap;
                 private readonly HashSet<KeyType> _allKeys;
 
                 public ForEffect(
-                    SignalType eachSignal,
+                    ISignalList<ItemType> eachSignal,
                     Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
+                    Renderer renderer,
                     FiberNode fiberNode,
                     Dictionary<KeyType, int> currentKeyToIdMap,
                     Dictionary<int, KeyType> currentIdToKeyMap
@@ -1997,13 +2357,14 @@ namespace Fiber
                     _children = children;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
+                    _renderer = renderer;
                     _fiberNode = fiberNode;
                     _currentKeyToIdMap = currentKeyToIdMap;
                     _currentIdToKeyMap = currentIdToKeyMap;
                     _allKeys = new();
                 }
 
-                protected override void Run(SignalReturnType each)
+                protected override void Run(IList<ItemType> each)
                 {
                     var currentChildAtIndex = _fiberNode.Child;
                     FiberNode previousChildFiberNode = null;
@@ -2027,6 +2388,7 @@ namespace Fiber
                             else
                             {
                                 createdChildNode = new FiberNode(
+                                    renderer: _renderer,
                                     nativeNode: null,
                                     virtualNode: child,
                                     parent: _fiberNode,
@@ -2071,7 +2433,7 @@ namespace Fiber
 
             public override void Render(FiberNode fiberNode)
             {
-                fiberNode.PushEffect(new ForEffect(_eachSignal, _children, _renderQueue, _operationsQueue, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
+                fiberNode.PushEffect(new ForEffect(_eachSignal, _children, _renderQueue, _operationsQueue, _renderer, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
 
                 var each = _eachSignal.Get();
                 FiberNode previousChildFiberNode = null;
@@ -2082,6 +2444,7 @@ namespace Fiber
                     if (child != null)
                     {
                         var childFiberNode = new FiberNode(
+                            renderer: _renderer,
                             nativeNode: null,
                             virtualNode: child,
                             parent: fiberNode,
@@ -2106,27 +2469,30 @@ namespace Fiber
 
         public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children)
         {
-            return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue);
+            return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue, this);
         }
 
         private class SwitchComponent : VirtualNode
         {
             private readonly VirtualNode _fallback;
-            private readonly SignalList<BaseSignal<bool>> _matchSignals;
+            private readonly SignalList<ISignal<bool>> _matchSignals;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
+            private readonly Renderer _renderer;
 
             public SwitchComponent(
                 VirtualNode fallback,
                 List<VirtualNode> children,
                 Queue<FiberNode> renderQueue,
-                MixedQueue operationsQueue
+                MixedQueue operationsQueue,
+                Renderer renderer
             )
                 : base(children)
             {
                 _fallback = fallback;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
+                _renderer = renderer;
 
                 _matchSignals = new(children.Count);
                 for (var i = 0; i < children.Count; ++i)
@@ -2146,15 +2512,17 @@ namespace Fiber
                 private readonly FiberNode _fiberNode;
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
+                private readonly Renderer _renderer;
                 private readonly Ref<int> _lastRenderedIndexRef;
 
                 public SwitchEffect(
-                    SignalList<BaseSignal<bool>> matchSignals,
+                    SignalList<ISignal<bool>> matchSignals,
                     List<VirtualNode> children,
                     VirtualNode fallback,
                     FiberNode fiberNode,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
+                    Renderer renderer,
                     Ref<int> lastRenderedIndexRef
                 )
                 : base(matchSignals, runOnMount: false)
@@ -2164,9 +2532,10 @@ namespace Fiber
                     _fiberNode = fiberNode;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
+                    _renderer = renderer;
                     _lastRenderedIndexRef = lastRenderedIndexRef;
                 }
-                protected override void Run(DynamicSignals<bool> matchSignals)
+                protected override void Run(DynamicDependencies<bool> matchSignals)
                 {
                     for (var i = 0; i < matchSignals.Count; ++i)
                     {
@@ -2186,6 +2555,7 @@ namespace Fiber
 
                             var child = _children[i];
                             var childFiberNode = new FiberNode(
+                                renderer: _renderer,
                                 nativeNode: null,
                                 virtualNode: child,
                                 parent: _fiberNode,
@@ -2212,6 +2582,7 @@ namespace Fiber
                     if (_fallback != null)
                     {
                         var childFiberNode = new FiberNode(
+                            renderer: _renderer,
                             nativeNode: null,
                             virtualNode: _fallback,
                             parent: _fiberNode,
@@ -2228,7 +2599,7 @@ namespace Fiber
             public VirtualNode Render(FiberNode fiberNode)
             {
                 var _lastRenderedIndexRef = new Ref<int>(-1);
-                fiberNode.PushEffect(new SwitchEffect(_matchSignals, children, _fallback, fiberNode, _renderQueue, _operationsQueue, _lastRenderedIndexRef));
+                fiberNode.PushEffect(new SwitchEffect(_matchSignals, children, _fallback, fiberNode, _renderQueue, _operationsQueue, _renderer, _lastRenderedIndexRef));
 
                 for (var i = 0; i < children.Count; ++i)
                 {
@@ -2249,16 +2620,16 @@ namespace Fiber
             }
         }
 
-        public VirtualNode Match(BaseSignal<bool> when, List<VirtualNode> children)
+        public VirtualNode Match(ISignal<bool> when, List<VirtualNode> children)
         {
             return new MatchComponent(when, children);
         }
 
         private class MatchComponent : VirtualNode
         {
-            public BaseSignal<bool> When { get; private set; }
+            public ISignal<bool> When { get; private set; }
 
-            public MatchComponent(BaseSignal<bool> when, List<VirtualNode> children)
+            public MatchComponent(ISignal<bool> when, List<VirtualNode> children)
                 : base(children)
             {
                 When = when;

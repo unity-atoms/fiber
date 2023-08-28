@@ -29,7 +29,9 @@ namespace Fiber.Suite
                     uiElementsRendererExtension,
                     gameObjectRendererExtension,
                 },
-                globals: globals
+                globals: globals,
+                autonomousWorkLoop: autonomousWorkLoop,
+                workLoopTimeBudgetMs: workLoopTimeBudgetMs
             );
             _rootGameObjectNativeNode = new GameObjectNativeNode(new GameObjectComponent(), rootGameObject, gameObjectRendererExtension);
         }

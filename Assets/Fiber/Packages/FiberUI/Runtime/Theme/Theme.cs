@@ -1,7 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Fiber.UIElements;
 using Fiber.DesignTokens;
 using Signals;
 
@@ -23,17 +19,22 @@ namespace Fiber.UI
         {
             FallbackRole = fallbackRole;
             Color = color;
-            Color.RegisterParent(this);
+            Color.RegisterDependent(this);
             Typography = typography;
-            Typography.RegisterParent(this);
+            Typography.RegisterDependent(this);
             Spacing = new SpacingTokens(spacingBaseline);
-            Spacing.RegisterParent(this);
+            Spacing.RegisterDependent(this);
         }
 
         public override Theme Get() => this;
         public override bool IsDirty(byte otherDirtyBit)
         {
             return DirtyBit != otherDirtyBit;
+        }
+
+        protected override sealed void OnNotifySignalUpdate()
+        {
+            _dirtyBit++;
         }
 
         public ColorModifiers GetColorModifiers(string role, ElementType elementType, string variant = null)

@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Fiber.UIElements;
 using Fiber.DesignTokens;
 using Signals;
 
@@ -72,9 +70,9 @@ namespace Fiber.UI
         public BaseSignal<StyleColor> Color(
             string role,
             ElementType elementType,
-            BaseSignal<bool> isPressed,
-            BaseSignal<bool> isHovered,
-            BaseSignal<bool> isSelected = null,
+            ISignal<bool> isPressed,
+            ISignal<bool> isHovered,
+            ISignal<bool> isSelected = null,
             string variant = null
         )
         {

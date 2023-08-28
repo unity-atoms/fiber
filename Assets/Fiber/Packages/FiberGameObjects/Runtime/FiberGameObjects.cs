@@ -124,20 +124,37 @@ namespace Fiber.GameObjects
             if (!virtualNode.Name.IsEmpty)
             {
                 Instance.name = virtualNode.Name.Get();
+                if (virtualNode.Name.IsSignal)
+                {
+                    virtualNode.Name.Signal.RegisterDependent(this);
+                }
                 _nameWorkLoopItem = new(virtualNode.Name);
             }
             if (!virtualNode.Active.IsEmpty)
             {
+                // Don't set active here since it will be handled by Fiber when calling SetVisible()
+                if (virtualNode.Active.IsSignal)
+                {
+                    virtualNode.Active.Signal.RegisterDependent(this);
+                }
                 _activeWorkLoopItem = new(virtualNode.Active);
             }
             if (!virtualNode.Position.IsEmpty)
             {
                 Instance.transform.position = virtualNode.Position.Get();
+                if (virtualNode.Position.IsSignal)
+                {
+                    virtualNode.Position.Signal.RegisterDependent(this);
+                }
                 _positionWorkLoopItem = new(virtualNode.Position);
             }
             if (!virtualNode.LocalScale.IsEmpty)
             {
                 Instance.transform.localScale = virtualNode.LocalScale.Get();
+                if (virtualNode.LocalScale.IsSignal)
+                {
+                    virtualNode.LocalScale.Signal.RegisterDependent(this);
+                }
                 _localScaleWorkLoopItem = new(virtualNode.LocalScale);
             }
             if (virtualNode.Ref != null)
@@ -211,7 +228,7 @@ namespace Fiber.GameObjects
             }
         }
 
-        public override void WorkLoop()
+        public override void Update()
         {
             if (_nameWorkLoopItem.Check())
             {
@@ -228,6 +245,26 @@ namespace Fiber.GameObjects
             if (_localScaleWorkLoopItem.Check())
             {
                 Instance.transform.localScale = _localScaleWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            if (_nameWorkLoopItem.IsSignal)
+            {
+                _nameWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_activeWorkLoopItem.IsSignal)
+            {
+                _activeWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_positionWorkLoopItem.IsSignal)
+            {
+                _positionWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_localScaleWorkLoopItem.IsSignal)
+            {
+                _localScaleWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
