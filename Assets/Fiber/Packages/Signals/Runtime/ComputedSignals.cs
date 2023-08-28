@@ -132,7 +132,7 @@ namespace Signals
             return _lastValue;
         }
 
-        protected abstract RT Compute(DynamicDependencies<DT> dynamicSignals);
+        protected abstract RT Compute(DynamicDependencies<DT> dynamicDependencies);
     }
 
 

@@ -826,11 +826,10 @@ namespace Fiber
         public VirtualNode Visible(ISignal<bool> when, List<VirtualNode> children) => Api.Visible(when, children);
         public VirtualNode Active(ISignal<bool> when, List<VirtualNode> children) => Api.Active(when, children);
         public VirtualNode Mount(ISignal<bool> when, List<VirtualNode> children) => Api.Mount(when, children);
-        public VirtualNode For<ItemType, SignalReturnType, KeyType>(
+        public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
         )
-            where SignalReturnType : IList<ItemType>
         {
             return Api.For<ItemType, KeyType>(each, children);
         }
