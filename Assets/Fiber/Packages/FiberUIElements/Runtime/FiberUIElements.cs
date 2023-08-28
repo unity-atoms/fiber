@@ -523,8 +523,8 @@ namespace Fiber.UIElements
         public ScrollViewNativeNode(ScrollViewComponent virtualNode, ScrollView instance) : base(virtualNode, instance)
         {
             ScrollViewInstance = instance;
-            if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
-            virtualNode.OnCreateRef?.Invoke(instance);
+            if (virtualNode.ScrollRef != null) virtualNode.ScrollRef.Current = instance;
+            virtualNode.OnCreateScrollRef?.Invoke(instance);
         }
     }
 
