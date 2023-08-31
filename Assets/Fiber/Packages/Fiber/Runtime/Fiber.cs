@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Collections.Generic;
 using FiberUtils;
 using Signals;
-using PlasticGui.WorkspaceWindow;
 
 namespace Fiber
 {
