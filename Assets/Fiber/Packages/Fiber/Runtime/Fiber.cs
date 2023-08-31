@@ -1511,7 +1511,6 @@ namespace Fiber
             }
             else
             {
-                // OPEN POINT: Should we really create the native node here? Isn't better to that when we commit the work?
                 fiberNode.NativeNode = CreateNativeNode(fiberNode);
                 if (fiberNode.NativeNode != null)
                 {
