@@ -67,6 +67,35 @@ public static class DocsRouting
         public override VirtualNode Render()
         {
             var themeStore = C<ThemeStore>();
+            var rootViewRef = new Ref<VisualElement>();
+            var screenSizeSignal = G<ScreenSizeSignal>();
+            var rootDimenstionsSignal = new Signal<Rect>();
+
+            F.CreateEffect(() =>
+            {
+                void LogScreenSize(GeometryChangedEvent e)
+                {
+                    rootDimenstionsSignal.Value = e.newRect;
+
+                    var screenSize = screenSizeSignal.Value;
+                    var width = screenSize.PixelWidth;
+                    var height = screenSize.PixelHeight;
+                    var dpi = screenSize.DPI;
+                    var dpWidth = screenSize.DPWidth;
+                    var dpHeight = screenSize.DPHeight;
+
+
+                    Debug.Log($"ScreenSize: {width}x{height} @ {dpi}dpi ({dpWidth}x{dpHeight}dp) - Root dimensions: {e.newRect.width}x{e.newRect.height}");
+                }
+
+                rootViewRef.Current.RegisterCallback((EventCallback<GeometryChangedEvent>)LogScreenSize);
+                return () => rootViewRef.Current.UnregisterCallback((EventCallback<GeometryChangedEvent>)LogScreenSize);
+            });
+
+            var screenSizeDebugString = F.CreateComputedSignal((screenSize, rootDimensions) =>
+            {
+                return $"ScreenSize: {screenSize.PixelWidth}x{screenSize.PixelHeight} @ {screenSize.DPI}dpi ({screenSize.DPWidth}x{screenSize.DPHeight}dp) - Root dimensions: {rootDimensions.width}x{rootDimensions.height} - RuntimePlatform {Application.platform}";
+            }, screenSizeSignal, rootDimenstionsSignal);
 
             var router = C<Router>();
             var selectedItemId = F.CreateComputedSignal((router) =>
@@ -90,11 +119,13 @@ public static class DocsRouting
 
 
             return F.View(
+                _ref: rootViewRef,
                 style: new Style(
                     display: DisplayStyle.Flex,
                     height: new Length(100, LengthUnit.Percent),
                     width: new Length(100, LengthUnit.Percent),
-                    flexDirection: FlexDirection.Column
+                    flexDirection: FlexDirection.Column,
+                    position: Position.Relative
                 ),
                 children: F.Children(
                     new DocsHeaderComponent(),
@@ -153,6 +184,17 @@ public static class DocsRouting
                                 ),
                                 children: F.Children(F.Outlet())
                             )
+                        )
+                    ),
+                    F.Text(
+                        text: screenSizeDebugString,
+                        style: new Style(
+                            display: DisplayStyle.Flex,
+                            position: Position.Absolute,
+                            right: 0,
+                            bottom: 0,
+                            color: Color.red,
+                            fontSize: 20
                         )
                     )
                 )
