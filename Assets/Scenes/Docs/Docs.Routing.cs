@@ -53,7 +53,7 @@ public static class DocsRouting
                     overrideVisualComponents: new OverrideVisualComponents(),
                     children: F.Children(new DocsThemes.Provider(
                         children: F.Children(
-                            F.UIDocument(
+                            F.UIRoot(
                                 name: "DocsRootDocument",
                                 children: F.Children(new MainLayoutComponent())
                             )
@@ -68,38 +68,6 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            var themeStore = C<ThemeStore>();
-            var rootViewRef = new Ref<VisualElement>();
-            var scalingContext = C<ScalingContext>();
-            var screenSizeSignal = scalingContext.ScreenSizeSignal;
-            var rootDimenstionsSignal = new Signal<Rect>();
-
-            F.CreateEffect(() =>
-            {
-                void LogScreenSize(GeometryChangedEvent e)
-                {
-                    rootDimenstionsSignal.Value = e.newRect;
-
-                    var screenSize = screenSizeSignal.Value;
-                    var width = screenSize.PixelWidth;
-                    var height = screenSize.PixelHeight;
-                    var dpi = screenSize.DPI;
-                    var dpWidth = screenSize.DPWidth;
-                    var dpHeight = screenSize.DPHeight;
-
-
-                    Debug.Log($"ScreenSize: {width}x{height} @ {dpi}dpi ({dpWidth}x{dpHeight}dp) - Root dimensions: {e.newRect.width}x{e.newRect.height}");
-                }
-
-                rootViewRef.Current.RegisterCallback((EventCallback<GeometryChangedEvent>)LogScreenSize);
-                return () => rootViewRef.Current.UnregisterCallback((EventCallback<GeometryChangedEvent>)LogScreenSize);
-            });
-
-            var screenSizeDebugString = F.CreateComputedSignal((screenSize, rootDimensions) =>
-            {
-                return $"ScreenSize: {screenSize.PixelWidth}x{screenSize.PixelHeight} @ {screenSize.DPI}dpi ({screenSize.DPWidth}x{screenSize.DPHeight}dp) \nRoot dimensions: {rootDimensions.width}x{rootDimensions.height} \nRuntimePlatform {Application.platform} Screen.dpi {Screen.dpi}";
-            }, screenSizeSignal, rootDimenstionsSignal);
-
             var router = C<Router>();
             var selectedItemId = F.CreateComputedSignal((router) =>
             {
@@ -117,12 +85,12 @@ public static class DocsRouting
                 return list;
             }, router);
 
+            var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
             var deepBorderColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Border);
 
 
             return F.View(
-                _ref: rootViewRef,
                 style: new Style(
                     display: DisplayStyle.Flex,
                     height: new Length(100, LengthUnit.Percent),
@@ -189,17 +157,7 @@ public static class DocsRouting
                             )
                         )
                     ),
-                    F.Text(
-                        text: screenSizeDebugString,
-                        style: new Style(
-                            display: DisplayStyle.Flex,
-                            position: Position.Absolute,
-                            right: 0,
-                            bottom: 0,
-                            color: Color.red,
-                            fontSize: 12
-                        )
-                    )
+                    F.DebugWindowScaling()
                 )
             );
         }
