@@ -5,7 +5,7 @@ using Fiber;
 using Fiber.UIElements;
 using Fiber.Router;
 using Fiber.UI;
-using Fiber.DesignTokens;
+using Fiber.Theme;
 using Signals;
 
 public class DocsIntroductionPageComponent : BaseComponent

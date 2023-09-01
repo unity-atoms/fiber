@@ -1,6 +1,5 @@
 using System.Collections.Generic;
-using Fiber.DesignTokens;
-using Fiber.UI;
+using Fiber.Theme;
 using Fiber;
 using UnityEngine;
 
@@ -10,36 +9,7 @@ public static class DocsThemes
     {
         public const string NEUTRAL = "neutral";
         public const string DEEP_NEUTRAL = "deepNeutral";
-    }
-
-    public static class COLOR_PALETTE
-    {
-        public const string GRAY_0 = "#000000";
-        public const string GRAY_7 = "#111111";
-        public const string GRAY_13 = "#222222";
-        public const string GRAY_20 = "#333333";
-        public const string GRAY_27 = "#444444";
-        public const string GRAY_33 = "#555555";
-        public const string GRAY_40 = "#666666";
-        public const string GRAY_47 = "#777777";
-        public const string GRAY_53 = "#888888";
-        public const string GRAY_60 = "#999999";
-        public const string GRAY_67 = "#aaaaaa";
-        public const string GRAY_73 = "#bbbbbb";
-        public const string GRAY_80 = "#cccccc";
-        public const string GRAY_87 = "#dddddd";
-        public const string GRAY_93 = "#eeeeee";
-        public const string GRAY_100 = "#ffffff";
-
-        public const string LIGHT_BLUE_31 = "#01579B";
-        public const string LIGHT_BLUE_37 = "#0277BD";
-        public const string LIGHT_BLUE_41 = "#0288D1";
-        public const string LIGHT_BLUE_45 = "#039BE5";
-        public const string LIGHT_BLUE_48 = "#03A9F4";
-        public const string LIGHT_BLUE_64 = "#4FC3F7";
-        public const string LIGHT_BLUE_74 = "#81D4FA";
-        public const string LIGHT_BLUE_85 = "#B3E5FC";
-        public const string LIGHT_BLUE_94 = "#E1F5FE";
+        public const string DEBUG = "debug";
     }
 
     public class Provider : BaseComponent
@@ -86,31 +56,31 @@ public static class DocsThemes
         {
             { ROLES.NEUTRAL, new(
                 background: new(
-                    @default: COLOR_PALETTE.GRAY_13,
-                    selected: COLOR_PALETTE.GRAY_20,
-                    hovered: COLOR_PALETTE.GRAY_20,
-                    pressed: COLOR_PALETTE.GRAY_7
+                    @default: FIBER_COLOR_PALETTE.GRAY_13,
+                    selected: FIBER_COLOR_PALETTE.GRAY_20,
+                    hovered: FIBER_COLOR_PALETTE.GRAY_20,
+                    pressed: FIBER_COLOR_PALETTE.GRAY_7
                 ),
                 border: new(
-                    @default: COLOR_PALETTE.GRAY_7
+                    @default: FIBER_COLOR_PALETTE.GRAY_7
                 ),
                 text: new(
-                    @default: COLOR_PALETTE.GRAY_100,
-                    selected: COLOR_PALETTE.LIGHT_BLUE_48,
+                    @default: FIBER_COLOR_PALETTE.GRAY_100,
+                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_48,
                     variants: new ()
                     {
                         { "discord", new(
-                            @default: COLOR_PALETTE.GRAY_100,
+                            @default: FIBER_COLOR_PALETTE.GRAY_100,
                             selected: "#5865F2",
                             hovered: "#5865F2"
                         ) },
                         { "github", new(
-                            @default: COLOR_PALETTE.GRAY_100,
+                            @default: FIBER_COLOR_PALETTE.GRAY_100,
                             selected: "#FECEF1",
                             hovered: "#FECEF1"
                         ) },
                         { "sun", new(
-                            @default: COLOR_PALETTE.GRAY_100,
+                            @default: FIBER_COLOR_PALETTE.GRAY_100,
                             selected: "#F09D51",
                             hovered: "#F09D51"
                         ) },
@@ -119,17 +89,25 @@ public static class DocsThemes
             ) },
             { ROLES.DEEP_NEUTRAL, new(
                 background: new(
-                    @default: COLOR_PALETTE.GRAY_7,
-                    selected: COLOR_PALETTE.GRAY_13,
-                    hovered: COLOR_PALETTE.GRAY_13,
-                    pressed: COLOR_PALETTE.GRAY_0
+                    @default: FIBER_COLOR_PALETTE.GRAY_7,
+                    selected: FIBER_COLOR_PALETTE.GRAY_13,
+                    hovered: FIBER_COLOR_PALETTE.GRAY_13,
+                    pressed: FIBER_COLOR_PALETTE.GRAY_0
                 ),
                 border: new(
-                    @default: COLOR_PALETTE.GRAY_0
+                    @default: FIBER_COLOR_PALETTE.GRAY_0
                 ),
                 text: new(
-                    @default: COLOR_PALETTE.GRAY_100,
-                    selected: COLOR_PALETTE.LIGHT_BLUE_48
+                    @default: FIBER_COLOR_PALETTE.GRAY_100,
+                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_48
+                )
+            ) },
+            { ROLES.DEBUG, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.RED_41
                 )
             ) },
         },
@@ -142,34 +120,34 @@ public static class DocsThemes
         {
             { ROLES.NEUTRAL, new(
                 background: new(
-                    @default: COLOR_PALETTE.GRAY_100,
-                    selected: COLOR_PALETTE.GRAY_93,
-                    hovered: COLOR_PALETTE.GRAY_93,
-                    pressed: COLOR_PALETTE.GRAY_87
+                    @default: FIBER_COLOR_PALETTE.GRAY_100,
+                    selected: FIBER_COLOR_PALETTE.GRAY_93,
+                    hovered: FIBER_COLOR_PALETTE.GRAY_93,
+                    pressed: FIBER_COLOR_PALETTE.GRAY_87
                 ),
                 border: new(
-                    @default: COLOR_PALETTE.GRAY_87
+                    @default: FIBER_COLOR_PALETTE.GRAY_87
                 ),
                 text: new(
-                    @default: COLOR_PALETTE.GRAY_0,
-                    selected: COLOR_PALETTE.LIGHT_BLUE_37,
-                    hovered: COLOR_PALETTE.LIGHT_BLUE_37
+                    @default: FIBER_COLOR_PALETTE.GRAY_0,
+                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_37,
+                    hovered: FIBER_COLOR_PALETTE.LIGHT_BLUE_37
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(
                 background: new(
-                    @default: COLOR_PALETTE.GRAY_93,
-                    selected: COLOR_PALETTE.GRAY_87,
-                    hovered: COLOR_PALETTE.GRAY_87,
-                    pressed: COLOR_PALETTE.GRAY_80
+                    @default: FIBER_COLOR_PALETTE.GRAY_93,
+                    selected: FIBER_COLOR_PALETTE.GRAY_87,
+                    hovered: FIBER_COLOR_PALETTE.GRAY_87,
+                    pressed: FIBER_COLOR_PALETTE.GRAY_80
                 ),
                 border: new(
-                    @default: COLOR_PALETTE.GRAY_80
+                    @default: FIBER_COLOR_PALETTE.GRAY_80
                 ),
                 text: new(
-                    @default: COLOR_PALETTE.GRAY_0,
-                    selected: COLOR_PALETTE.LIGHT_BLUE_37,
-                    hovered: COLOR_PALETTE.LIGHT_BLUE_37
+                    @default: FIBER_COLOR_PALETTE.GRAY_0,
+                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_37,
+                    hovered: FIBER_COLOR_PALETTE.LIGHT_BLUE_37
                 )
             ) },
         },

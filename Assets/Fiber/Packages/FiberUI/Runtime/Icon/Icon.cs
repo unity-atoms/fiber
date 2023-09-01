@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
-using Fiber.DesignTokens;
+using Fiber.Theme;
 using Signals;
 
 namespace Fiber.UI
@@ -13,7 +13,7 @@ namespace Fiber.UI
         public static IconComponent Icon(
             this BaseComponent component,
             SignalProp<string> iconName,
-            string role = Constants.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -39,7 +39,7 @@ namespace Fiber.UI
 
         public IconComponent(
             SignalProp<string> iconName,
-            string role = Constants.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
             Ref<VisualElement> forwardRef = null

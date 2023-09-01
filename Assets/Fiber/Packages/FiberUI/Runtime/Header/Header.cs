@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
-using Fiber.DesignTokens;
+using Fiber.Theme;
 
 namespace Fiber.UI
 {
@@ -10,7 +10,7 @@ namespace Fiber.UI
         public static HeaderComponent Header(
             this BaseComponent component,
                 List<VirtualNode> children,
-                string role = Constants.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT_ROLE,
                 string variant = null,
                 Style style = new()
         )
@@ -46,7 +46,7 @@ namespace Fiber.UI
 
         public HeaderComponent(
             List<VirtualNode> children,
-            string role = Constants.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new()
         ) : base(children)

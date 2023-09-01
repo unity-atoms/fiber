@@ -1,7 +1,6 @@
-using Fiber.DesignTokens;
 using Signals;
 
-namespace Fiber.UI
+namespace Fiber.Theme
 {
     public class Theme : BaseSignal<Theme>
     {
