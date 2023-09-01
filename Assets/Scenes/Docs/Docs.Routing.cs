@@ -156,8 +156,7 @@ public static class DocsRouting
                                 children: F.Children(F.Outlet())
                             )
                         )
-                    ),
-                    F.DebugWindowScaling()
+                    )
                 )
             );
         }
