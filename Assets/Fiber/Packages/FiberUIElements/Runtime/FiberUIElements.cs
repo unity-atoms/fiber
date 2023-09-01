@@ -7,7 +7,7 @@ using Fiber.GameObjects;
 
 namespace Fiber.UIElements
 {
-    public static class BaseComponentExtensions
+    public static partial class BaseComponentExtensions
     {
         public static List<string> ClassName(
             this BaseComponent component,
@@ -3566,13 +3566,11 @@ namespace Fiber.UIElements
         public UIDocumentNativeNode(
             UIDocumentComponent component,
             UIDocument uiDocument,
-            GameObjectsRendererExtension rendererExtension,
-            PanelSettings defaultPanelSettings
+            GameObjectsRendererExtension rendererExtension
         ) : base(component, uiDocument.gameObject, rendererExtension)
         {
             _uiDocument = uiDocument;
 
-            uiDocument.panelSettings = component.PanelSettings ?? defaultPanelSettings;
             if (!component.SortingOrder.IsEmpty)
             {
                 uiDocument.sortingOrder = component.SortingOrder.Get();
@@ -3678,7 +3676,28 @@ namespace Fiber.UIElements
                 {
                     uiDocument = gameObject.AddComponent<UIDocument>();
                 }
-                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this, DefaultPanelSettings);
+
+                uiDocument.panelSettings = uiDocumentComponent.PanelSettings ?? DefaultPanelSettings;
+
+                var scalingProvider = fiberNode.FindClosesVirtualNode<ScalingProviderComponent>();
+                if (scalingProvider != null)
+                {
+                    // OPEN POINT: Should panel settings get created at runtime? 
+                    // The code below will globally change the reference dpi and fallback dpi
+                    // for all ui documents using the panel settings.
+
+                    var dpi = scalingProvider.ScreenSizeSignal.Get().DPI;
+#if UNITY_WEBGL && !UNITY_EDITOR
+                    // From testing it seems like Screen.dpi returns 96 * window.devicePixelRatio. 
+                    // In web builds Screen.width and Screen.height are in CSS pixels, which are density-independent
+                    // By setting reference dpi to 96f, 1px in Unity Toolkit will be 1px in CSS pixels
+                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI;
+#else
+                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI;
+#endif
+                    uiDocument.panelSettings.fallbackDpi = dpi;
+                }
+                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this);
             }
             else if (virtualNode is ScrollViewComponent scrollViewComponent)
             {

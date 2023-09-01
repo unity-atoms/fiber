@@ -48,15 +48,17 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            return F.OverrideVisualComponentsProvider(
-                overrideVisualComponents: new OverrideVisualComponents(),
-                children: F.Children(new DocsThemes.Provider(
-                    children: F.Children(
-                        F.UIDocument(
-                            name: "DocsRootDocument",
-                            children: F.Children(new MainLayoutComponent())
+            return F.ScalingProvider(
+                children: F.Children(F.OverrideVisualComponentsProvider(
+                    overrideVisualComponents: new OverrideVisualComponents(),
+                    children: F.Children(new DocsThemes.Provider(
+                        children: F.Children(
+                            F.UIDocument(
+                                name: "DocsRootDocument",
+                                children: F.Children(new MainLayoutComponent())
+                            )
                         )
-                    )
+                    ))
                 ))
             );
         }
@@ -68,7 +70,8 @@ public static class DocsRouting
         {
             var themeStore = C<ThemeStore>();
             var rootViewRef = new Ref<VisualElement>();
-            var screenSizeSignal = G<ScreenSizeSignal>();
+            var scalingContext = C<ScalingContext>();
+            var screenSizeSignal = scalingContext.ScreenSizeSignal;
             var rootDimenstionsSignal = new Signal<Rect>();
 
             F.CreateEffect(() =>
@@ -94,7 +97,7 @@ public static class DocsRouting
 
             var screenSizeDebugString = F.CreateComputedSignal((screenSize, rootDimensions) =>
             {
-                return $"ScreenSize: {screenSize.PixelWidth}x{screenSize.PixelHeight} @ {screenSize.DPI}dpi ({screenSize.DPWidth}x{screenSize.DPHeight}dp) - Root dimensions: {rootDimensions.width}x{rootDimensions.height} - RuntimePlatform {Application.platform}";
+                return $"ScreenSize: {screenSize.PixelWidth}x{screenSize.PixelHeight} @ {screenSize.DPI}dpi ({screenSize.DPWidth}x{screenSize.DPHeight}dp) \nRoot dimensions: {rootDimensions.width}x{rootDimensions.height} \nRuntimePlatform {Application.platform} Screen.dpi {Screen.dpi}";
             }, screenSizeSignal, rootDimenstionsSignal);
 
             var router = C<Router>();
@@ -194,7 +197,7 @@ public static class DocsRouting
                             right: 0,
                             bottom: 0,
                             color: Color.red,
-                            fontSize: 20
+                            fontSize: 12
                         )
                     )
                 )

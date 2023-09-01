@@ -36,7 +36,7 @@ namespace Fiber
     {
         public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children);
         public VirtualNode ContextProvider<C>(List<VirtualNode> children);
-        public T GetGlobal<T>();
+        public T GetGlobal<T>(bool throwIfNotFound = true);
         public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public NativeNode GetParentNativeNode();
         public void CreateEffect(BaseEffect effect);
@@ -115,7 +115,7 @@ namespace Fiber
     public interface IEffectAPI
     {
         public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
-        public T GetGlobal<T>();
+        public T GetGlobal<T>(bool throwIfNotFound = true);
     }
 
     public abstract class BaseEffect : BaseSignal
@@ -125,8 +125,8 @@ namespace Fiber
 
         public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
         public C C<C>(bool throwIfNotFound = true) => GetContext<C>(throwIfNotFound: throwIfNotFound);
-        public T GetGlobal<T>() => Api.GetGlobal<T>();
-        public T G<T>() => GetGlobal<T>();
+        public T GetGlobal<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
+        public T G<T>(bool throwIfNotFound = true) => GetGlobal<T>(throwIfNotFound);
 
         public abstract void RunIfDirty();
         public abstract void Cleanup();
@@ -746,8 +746,8 @@ namespace Fiber
 
         public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children) => Api.ContextProvider<C>(value, children);
         public VirtualNode ContextProvider<C>(List<VirtualNode> children) => Api.ContextProvider<C>(children);
-        public T GetGlobal<T>() => Api.GetGlobal<T>();
-        public T G<T>() => Api.GetGlobal<T>();
+        public T GetGlobal<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
+        public T G<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
         public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
         public C C<C>(bool throwIfNotFound = true) => GetContext<C>(throwIfNotFound: throwIfNotFound);
         public NativeNode GetParentNativeNode() => Api.GetParentNativeNode();
@@ -1085,6 +1085,17 @@ namespace Fiber
             }
 
             return nativeNodeParentFiber;
+        }
+
+        public V FindClosesVirtualNode<V>(bool includeSelf = false) where V : VirtualNode
+        {
+            var current = includeSelf ? this : Parent;
+            while (current != null && current.VirtualNode is not V)
+            {
+                current = current.Parent;
+            }
+
+            return current?.VirtualNode as V;
         }
 
         public bool IsAncestorOf(FiberNode node, FiberNode root = null, bool includeSelf = true)
@@ -1770,7 +1781,7 @@ namespace Fiber
             throw new Exception($"Unknown virtual node {virtualNode}.");
         }
 
-        public T GetGlobal<T>()
+        public T GetGlobal<T>(bool throwIfNotFound = true)
         {
             var type = typeof(T);
             if (_globals.ContainsKey(type))
@@ -1778,7 +1789,12 @@ namespace Fiber
                 return (T)_globals[type];
             }
 
-            throw new Exception($"Global of type {type} not found. Did you forget to add it to the renderer?");
+            if (throwIfNotFound)
+            {
+                throw new Exception($"Global of type {type} not found. Did you forget to add it to the renderer?");
+            }
+
+            return default;
         }
 
         public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children)

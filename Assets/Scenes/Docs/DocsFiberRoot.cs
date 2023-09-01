@@ -16,7 +16,7 @@ public class DocsFiberRoot : MonoBehaviour
     {
         if (_fiber == null)
         {
-            _fiber = new FiberSuite(rootGameObject: gameObject, defaultPanelSettings: _panelSettings, globals: new() { { typeof(ScreenSizeSignal), new ScreenSizeSignal() } });
+            _fiber = new FiberSuite(rootGameObject: gameObject, defaultPanelSettings: _panelSettings, globals: new() { });
         }
         if (!_fiber.IsMounted)
         {
