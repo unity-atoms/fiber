@@ -5,7 +5,7 @@ using Fiber;
 using Fiber.UIElements;
 using Fiber.Router;
 using Fiber.UI;
-using Fiber.DesignTokens;
+using Fiber.Theme;
 using Signals;
 
 public static class DocsRouting
@@ -48,15 +48,17 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            return F.OverrideVisualComponentsProvider(
-                overrideVisualComponents: new OverrideVisualComponents(),
-                children: F.Children(new DocsThemes.Provider(
-                    children: F.Children(
-                        F.UIDocument(
-                            name: "DocsRootDocument",
-                            children: F.Children(new MainLayoutComponent())
+            return F.ScalingProvider(
+                children: F.Children(F.OverrideVisualComponentsProvider(
+                    overrideVisualComponents: new OverrideVisualComponents(),
+                    children: F.Children(new DocsThemes.Provider(
+                        children: F.Children(
+                            F.UIRoot(
+                                name: "DocsRootDocument",
+                                children: F.Children(new MainLayoutComponent())
+                            )
                         )
-                    )
+                    ))
                 ))
             );
         }
@@ -66,8 +68,6 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            var themeStore = C<ThemeStore>();
-
             var router = C<Router>();
             var selectedItemId = F.CreateComputedSignal((router) =>
             {
@@ -85,6 +85,7 @@ public static class DocsRouting
                 return list;
             }, router);
 
+            var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
             var deepBorderColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Border);
 
@@ -94,7 +95,8 @@ public static class DocsRouting
                     display: DisplayStyle.Flex,
                     height: new Length(100, LengthUnit.Percent),
                     width: new Length(100, LengthUnit.Percent),
-                    flexDirection: FlexDirection.Column
+                    flexDirection: FlexDirection.Column,
+                    position: Position.Relative
                 ),
                 children: F.Children(
                     new DocsHeaderComponent(),

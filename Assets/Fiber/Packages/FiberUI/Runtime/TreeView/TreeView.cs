@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
-using Fiber.DesignTokens;
+using Fiber.Theme;
 using Signals;
 
 namespace Fiber.UI
@@ -15,7 +15,7 @@ namespace Fiber.UI
                 Action<string> onItemIdSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
-                string role = Constants.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
         )
         {
@@ -34,7 +34,7 @@ namespace Fiber.UI
                 SignalProp<string> label,
                 string id,
                 List<VirtualNode> children = null,
-                string role = Constants.INHERIT_ROLE
+                string role = THEME_CONSTANTS.INHERIT_ROLE
         )
         {
             return new TreeViewComponent.Item(
@@ -89,7 +89,7 @@ namespace Fiber.UI
                 Action<string> onItemIdSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
-                string role = Constants.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
             {
@@ -135,7 +135,7 @@ namespace Fiber.UI
 
             public VisualContainer(
                 List<VirtualNode> children,
-                string role = Constants.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
             {
@@ -168,7 +168,7 @@ namespace Fiber.UI
                 SignalProp<string> label,
                 string id,
                 List<VirtualNode> children = null,
-                string role = Constants.INHERIT_ROLE
+                string role = THEME_CONSTANTS.INHERIT_ROLE
             ) : base(children)
             {
                 _label = label;

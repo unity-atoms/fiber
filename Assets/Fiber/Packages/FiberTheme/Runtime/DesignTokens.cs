@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using Signals;
 using UnityEngine.UIElements;
 using UnityEngine;
 
-namespace Fiber.DesignTokens
+namespace Fiber.Theme
 {
     public class TypographyTokens : BaseSignal<TypographyTokens>
     {

@@ -7,7 +7,7 @@ using Fiber.GameObjects;
 
 namespace Fiber.UIElements
 {
-    public static class BaseComponentExtensions
+    public static partial class BaseComponentExtensions
     {
         public static List<string> ClassName(
             this BaseComponent component,
@@ -197,11 +197,37 @@ namespace Fiber.UIElements
             Func<GameObject, GameObject> getInstance = null,
             Action<GameObject> removeInstance = null,
             PanelSettings panelSettings = null,
-            float sortingOrder = 0f,
+            SignalProp<float> sortingOrder = new(),
             List<VirtualNode> children = null
         )
         {
             return new UIDocumentComponent(
+                name: name,
+                active: active,
+                _ref: _ref,
+                onCreateRef: onCreateRef,
+                getInstance: getInstance,
+                removeInstance: removeInstance,
+                panelSettings: panelSettings,
+                sortingOrder: sortingOrder,
+                children: children
+            );
+        }
+
+        public static UIRootComponent UIRoot(
+            this BaseComponent component,
+            SignalProp<string> name = new(),
+            SignalProp<bool> active = new(),
+            Ref<GameObject> _ref = null,
+            Action<GameObject> onCreateRef = null,
+            Func<GameObject, GameObject> getInstance = null,
+            Action<GameObject> removeInstance = null,
+            PanelSettings panelSettings = null,
+            SignalProp<float> sortingOrder = new(),
+            List<VirtualNode> children = null
+        )
+        {
+            return new UIRootComponent(
                 name: name,
                 active: active,
                 _ref: _ref,
@@ -394,10 +420,81 @@ namespace Fiber.UIElements
         }
     }
 
+    public class UIRootContext
+    {
+        public Ref<VisualElement> RootRef { get; private set; }
+
+        public UIRootContext(Ref<VisualElement> rootRef)
+        {
+            RootRef = rootRef;
+        }
+    }
+
+    public class UIRootComponent : BaseComponent
+    {
+        private SignalProp<string> Name { get; set; }
+        private new SignalProp<bool> Active { get; set; }
+        private Ref<GameObject> Ref { get; set; }
+        private Action<GameObject> OnCreateRef { get; set; }
+        private Func<GameObject, GameObject> GetInstance { get; set; }
+        private Action<GameObject> RemoveInstance { get; set; }
+        private PanelSettings PanelSettings { get; set; }
+        private SignalProp<float> SortingOrder { get; set; }
+
+        public UIRootComponent(
+            SignalProp<string> name = new(),
+            SignalProp<bool> active = new(),
+            Ref<GameObject> _ref = null,
+            Action<GameObject> onCreateRef = null,
+            Func<GameObject, GameObject> getInstance = null,
+            Action<GameObject> removeInstance = null,
+            PanelSettings panelSettings = null,
+            SignalProp<float> sortingOrder = new(),
+            List<VirtualNode> children = null
+        ) : base(children: children)
+        {
+            Name = name;
+            Active = active;
+            Ref = _ref;
+            OnCreateRef = onCreateRef;
+            GetInstance = getInstance;
+            RemoveInstance = removeInstance;
+            PanelSettings = panelSettings;
+            SortingOrder = !sortingOrder.IsEmpty ? sortingOrder : 0f;
+        }
+
+        public override VirtualNode Render()
+        {
+            var rootRef = new Ref<VisualElement>();
+
+            return F.ContextProvider(
+                value: new UIRootContext(rootRef),
+                children: F.Children(
+                    F.UIDocument(
+                        name: Name,
+                        active: Active,
+                        _ref: Ref,
+                        onCreateRef: (_ref) =>
+                        {
+                            var root = _ref.GetComponent<UIDocument>().rootVisualElement;
+                            rootRef.Current = root;
+                            OnCreateRef?.Invoke(_ref);
+                        },
+                        getInstance: GetInstance,
+                        removeInstance: RemoveInstance,
+                        panelSettings: PanelSettings,
+                        sortingOrder: SortingOrder,
+                        children: children
+                    )
+                )
+            );
+        }
+    }
+
     public class UIDocumentComponent : GameObjectComponent
     {
-        public PanelSettings PanelSettings { get; set; }
-        public SignalProp<float> SortingOrder { get; set; }
+        public PanelSettings PanelSettings { get; private set; }
+        public SignalProp<float> SortingOrder { get; private set; }
 
         public UIDocumentComponent(
             SignalProp<string> name = new(),
@@ -3566,13 +3663,11 @@ namespace Fiber.UIElements
         public UIDocumentNativeNode(
             UIDocumentComponent component,
             UIDocument uiDocument,
-            GameObjectsRendererExtension rendererExtension,
-            PanelSettings defaultPanelSettings
+            GameObjectsRendererExtension rendererExtension
         ) : base(component, uiDocument.gameObject, rendererExtension)
         {
             _uiDocument = uiDocument;
 
-            uiDocument.panelSettings = component.PanelSettings ?? defaultPanelSettings;
             if (!component.SortingOrder.IsEmpty)
             {
                 uiDocument.sortingOrder = component.SortingOrder.Get();
@@ -3678,7 +3773,28 @@ namespace Fiber.UIElements
                 {
                     uiDocument = gameObject.AddComponent<UIDocument>();
                 }
-                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this, DefaultPanelSettings);
+
+                uiDocument.panelSettings = uiDocumentComponent.PanelSettings ?? DefaultPanelSettings;
+
+                var scalingProvider = fiberNode.FindClosesVirtualNode<ScalingProviderComponent>();
+                if (scalingProvider != null)
+                {
+                    // OPEN POINT: Should panel settings get created at runtime? 
+                    // The code below will globally change the reference dpi and fallback dpi
+                    // for all ui documents using the panel settings.
+
+                    var dpi = scalingProvider.ScreenSizeSignal.Get().DPI;
+#if UNITY_WEBGL && !UNITY_EDITOR
+                    // From testing it seems like Screen.dpi returns 96 * window.devicePixelRatio. 
+                    // In web builds Screen.width and Screen.height are in CSS pixels, which are density-independent
+                    // By setting reference dpi to 96f, 1px in Unity Toolkit will be 1px in CSS pixels
+                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI;
+#else
+                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI;
+#endif
+                    uiDocument.panelSettings.fallbackDpi = dpi;
+                }
+                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this);
             }
             else if (virtualNode is ScrollViewComponent scrollViewComponent)
             {

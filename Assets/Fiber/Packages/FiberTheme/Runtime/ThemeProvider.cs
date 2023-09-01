@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Fiber.DesignTokens;
 using Signals;
 
-namespace Fiber.UI
+namespace Fiber.Theme
 {
     public static partial class BaseComponentExtensions
     {
