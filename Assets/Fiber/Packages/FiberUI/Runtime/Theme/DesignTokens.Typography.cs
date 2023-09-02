@@ -2,7 +2,7 @@ using Signals;
 using UnityEngine.UIElements;
 using UnityEngine;
 
-namespace Fiber.Theme
+namespace Fiber.UI
 {
     public class TypographyTokens : BaseSignal<TypographyTokens>
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Signals;
 
-namespace Fiber.Theme
+namespace Fiber.UI
 {
     public static partial class BaseComponentExtensions
     {

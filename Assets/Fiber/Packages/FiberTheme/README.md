@@ -1,2 +1,0 @@
-# Fiber Theme
-A general theme for fiber used by Fiber UI, but component independent in order to be applicable to other packages / solutions. A theme consists of a set of design tokens, specifying colors, spacings, typeography, etc.

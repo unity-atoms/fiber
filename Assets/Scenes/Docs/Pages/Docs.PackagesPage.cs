@@ -2,7 +2,6 @@ using Fiber;
 using Fiber.UIElements;
 using Fiber.Router;
 using Fiber.UI;
-using Fiber.Theme;
 
 public class DocsPackagesPageComponent : BaseComponent
 {

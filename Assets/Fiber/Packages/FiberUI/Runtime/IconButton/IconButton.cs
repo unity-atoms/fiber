@@ -1,7 +1,6 @@
 using System;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
-using Fiber.Theme;
 using Signals;
 
 namespace Fiber.UI

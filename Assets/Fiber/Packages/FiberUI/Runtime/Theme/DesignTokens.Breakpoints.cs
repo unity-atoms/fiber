@@ -1,6 +1,6 @@
 using Signals;
 
-namespace Fiber.Theme
+namespace Fiber.UI
 {
     // public class IsSmallSignal : ComputedSignal<BreakpointsTokens, ScreenSizeSignal, bool>
     // {

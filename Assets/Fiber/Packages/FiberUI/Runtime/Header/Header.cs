@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
-using Fiber.Theme;
 
 namespace Fiber.UI
 {

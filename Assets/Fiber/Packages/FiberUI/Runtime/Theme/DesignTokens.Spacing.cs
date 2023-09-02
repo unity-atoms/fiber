@@ -1,6 +1,6 @@
 using Signals;
 
-namespace Fiber.Theme
+namespace Fiber.UI
 {
     public class SpacingTokens : BaseSignal<SpacingTokens>
     {

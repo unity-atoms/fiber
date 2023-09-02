@@ -1,11 +1,7 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber;
-using Fiber.UIElements;
-using Fiber.Router;
 using Fiber.UI;
-using Fiber.Theme;
 using Signals;
 
 public class DocsHeaderComponent : BaseComponent
