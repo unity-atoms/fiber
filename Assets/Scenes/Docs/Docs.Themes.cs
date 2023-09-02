@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Fiber.UI;
+using Fiber.UIElements;
 using Fiber;
 using UnityEngine;
 
@@ -20,7 +21,8 @@ public static class DocsThemes
         {
             return F.ThemeProvider(
                 themeStore: new ThemeStore(
-                    theme: DARK_THEME
+                    theme: DARK_THEME,
+                    screenSizeSignal: C<ScalingContext>().ScreenSizeSignal
                 ),
                 children: children
             );

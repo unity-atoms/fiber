@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Signals;
+using Fiber.UIElements;
 
 namespace Fiber.UI
 {
@@ -23,18 +24,29 @@ namespace Fiber.UI
 
     public class ThemeStore : Store<Theme>
     {
+        private ScreenSizeSignal _screenSizeSignal;
         public ThemeStore(
-            Theme theme
+            Theme theme,
+            ScreenSizeSignal screenSizeSignal
         ) : base(theme)
         {
+            _screenSizeSignal = screenSizeSignal;
+
             _spacingSignalsCache = new();
             _nonInteractiveColorSignalsCache = new();
             _fontSignalsCache = new();
             _fontSizeSignalsCache = new();
             _fontStyleSignalsCache = new();
+
+            IsBaseScreen = new IsBaseScreenSignal(Value.Breakpoints, _screenSizeSignal);
+            IsSmallScreen = new IsSmallScreenSignal(Value.Breakpoints, _screenSizeSignal);
+            IsMediumScreen = new IsMediumScreenSignal(Value.Breakpoints, _screenSizeSignal);
+            IsLargeScreen = new IsLargeScreenSignal(Value.Breakpoints, _screenSizeSignal);
+            IsXLScreen = new IsXLScreenSignal(Value.Breakpoints, _screenSizeSignal);
+            Breakpoint = new BreakpointSignal(Value.Breakpoints, _screenSizeSignal);
         }
 
-
+        #region Spacing
         private readonly Dictionary<int, BaseSignal<StyleLength>> _spacingSignalsCache;
         public BaseSignal<StyleLength> Spacing(int multiplier)
         {
@@ -47,7 +59,8 @@ namespace Fiber.UI
             _spacingSignalsCache.Add(multiplier, spacingSignal);
             return spacingSignal;
         }
-
+        #endregion
+        #region Color
         private readonly Dictionary<ValueTuple<string, ElementType, string>, BaseSignal<StyleColor>> _nonInteractiveColorSignalsCache;
         public BaseSignal<StyleColor> Color(string role, ElementType elementType, string variant = null)
         {
@@ -95,7 +108,8 @@ namespace Fiber.UI
 
             return signal;
         }
-
+        #endregion
+        #region Typography
         private readonly Dictionary<TypographyType, BaseSignal<StyleFont>> _fontSignalsCache;
         public BaseSignal<StyleFont> Font(TypographyType typographyType)
         {
@@ -149,6 +163,19 @@ namespace Fiber.UI
 
             return signal;
         }
+        #endregion
+        #region Breakpoints
+        public static IsBaseScreenSignal IsBaseScreen;
+        public static IsSmallScreenSignal IsSmallScreen;
+        public static IsMediumScreenSignal IsMediumScreen;
+        public static IsLargeScreenSignal IsLargeScreen;
+        public static IsXLScreenSignal IsXLScreen;
+        public static BreakpointSignal Breakpoint;
+        public ResponsiveSignal<T> Responsive<T>(ResponsiveProp<T> responsiveProp)
+        {
+            return new ResponsiveSignal<T>(Breakpoint, responsiveProp);
+        }
+        #endregion
     }
 
     public class ThemeProvider : BaseComponent

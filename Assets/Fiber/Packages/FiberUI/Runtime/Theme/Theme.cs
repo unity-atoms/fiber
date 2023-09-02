@@ -8,14 +8,14 @@ namespace Fiber.UI
         public ColorTokenCollection Color;
         public TypographyTokens Typography;
         public SpacingTokens Spacing;
-        public BreakpointsTokens Breakpoints;
+        public BreakpointTokens Breakpoints;
 
         public Theme(
             string fallbackRole,
             ColorTokenCollection color,
             TypographyTokens typography,
             int spacingBaseline = 4,
-            BreakpointsTokens breakpoints = null
+            BreakpointTokens breakpoints = null
         )
         {
             FallbackRole = fallbackRole;
@@ -25,7 +25,7 @@ namespace Fiber.UI
             Typography.RegisterDependent(this);
             Spacing = new SpacingTokens(spacingBaseline);
             Spacing.RegisterDependent(this);
-            Breakpoints = breakpoints ?? new BreakpointsTokens();
+            Breakpoints = breakpoints ?? new BreakpointTokens();
             Breakpoints.RegisterDependent(this);
         }
 
