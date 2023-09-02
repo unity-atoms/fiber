@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
@@ -84,7 +82,7 @@ namespace Fiber.UI
                     unityFont: font,
                     unityFontDefinition: StyleKeyword.None,
                     unityTextAlign: TextAnchor.MiddleCenter,
-                    fontSize: themeStore.Spacing(3)
+                    fontSize: themeStore.Spacing(5)
                 )
             );
         }

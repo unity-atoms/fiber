@@ -30,22 +30,22 @@ public static class DocsThemes
     public static readonly TypographyTokens TYPOGRAPHY_TOKENS = new(
         heading1: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
-            fontSize: 40,
+            fontSize: 48,
             fontStyle: FontStyle.Bold
         ),
         heading3: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
-            fontSize: 20,
+            fontSize: 24,
             fontStyle: FontStyle.Bold
         ),
         body1: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
-            fontSize: 12,
+            fontSize: 16,
             fontStyle: FontStyle.Normal
         ),
         subtitle2: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
-            fontSize: 12,
+            fontSize: 16,
             fontStyle: FontStyle.Normal
         )
     );

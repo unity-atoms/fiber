@@ -80,7 +80,9 @@ namespace Fiber.UI
                         style: new Style(
                             mergedStyle: _style,
                             width: new Length(100, LengthUnit.Percent),
-                            height: themeStore.Spacing(13),
+                            height: themeStore.Spacing(14),
+                            paddingBottom: themeStore.Spacing(2),
+                            paddingTop: themeStore.Spacing(2),
                             paddingLeft: themeStore.Spacing(4),
                             paddingRight: themeStore.Spacing(4),
                             backgroundColor: themeStore.Color(role, ElementType.Background, _variant),
