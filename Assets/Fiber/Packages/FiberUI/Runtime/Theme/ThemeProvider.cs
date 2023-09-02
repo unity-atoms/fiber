@@ -38,7 +38,6 @@ namespace Fiber.UI
             _fontSizeSignalsCache = new();
             _fontStyleSignalsCache = new();
 
-            IsBaseScreen = new IsBaseScreenSignal(Value.Breakpoints, _screenSizeSignal);
             IsSmallScreen = new IsSmallScreenSignal(Value.Breakpoints, _screenSizeSignal);
             IsMediumScreen = new IsMediumScreenSignal(Value.Breakpoints, _screenSizeSignal);
             IsLargeScreen = new IsLargeScreenSignal(Value.Breakpoints, _screenSizeSignal);
@@ -165,12 +164,11 @@ namespace Fiber.UI
         }
         #endregion
         #region Breakpoints
-        public static IsBaseScreenSignal IsBaseScreen;
-        public static IsSmallScreenSignal IsSmallScreen;
-        public static IsMediumScreenSignal IsMediumScreen;
-        public static IsLargeScreenSignal IsLargeScreen;
-        public static IsXLScreenSignal IsXLScreen;
-        public static BreakpointSignal Breakpoint;
+        public IsSmallScreenSignal IsSmallScreen;
+        public IsMediumScreenSignal IsMediumScreen;
+        public IsLargeScreenSignal IsLargeScreen;
+        public IsXLScreenSignal IsXLScreen;
+        public BreakpointSignal Breakpoint;
         public ResponsiveSignal<T> Responsive<T>(ResponsiveProp<T> responsiveProp)
         {
             return new ResponsiveSignal<T>(Breakpoint, responsiveProp);

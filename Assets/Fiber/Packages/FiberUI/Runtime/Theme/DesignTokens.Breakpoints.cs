@@ -3,25 +3,20 @@ using Fiber.UIElements;
 
 namespace Fiber.UI
 {
-    public class IsBaseScreenSignal : ComputedSignal<BreakpointTokens, ScreenSize, bool>
-    {
-        public IsBaseScreenSignal(BreakpointTokens breakpointTokens, ScreenSizeSignal screenSizeSignal) : base(breakpointTokens, screenSizeSignal) { }
-        protected override bool Compute(BreakpointTokens breakpointTokens, ScreenSize screenSize) => breakpointTokens.Small.Get() > screenSize.DPWidth;
-    }
     public class IsSmallScreenSignal : ComputedSignal<BreakpointTokens, ScreenSize, bool>
     {
         public IsSmallScreenSignal(BreakpointTokens breakpointTokens, ScreenSizeSignal screenSizeSignal) : base(breakpointTokens, screenSizeSignal) { }
-        protected override bool Compute(BreakpointTokens breakpointTokens, ScreenSize screenSize) => breakpointTokens.Small.Get() <= screenSize.DPWidth && breakpointTokens.Medium.Get() > screenSize.DPWidth;
+        protected override bool Compute(BreakpointTokens breakpointTokens, ScreenSize screenSize) => breakpointTokens.Small.Get() <= screenSize.DPWidth;
     }
     public class IsMediumScreenSignal : ComputedSignal<BreakpointTokens, ScreenSize, bool>
     {
         public IsMediumScreenSignal(BreakpointTokens breakpointTokens, ScreenSizeSignal screenSizeSignal) : base(breakpointTokens, screenSizeSignal) { }
-        protected override bool Compute(BreakpointTokens breakpointTokens, ScreenSize screenSize) => breakpointTokens.Medium.Get() <= screenSize.DPWidth && breakpointTokens.Large.Get() > screenSize.DPWidth;
+        protected override bool Compute(BreakpointTokens breakpointTokens, ScreenSize screenSize) => breakpointTokens.Medium.Get() <= screenSize.DPWidth;
     }
     public class IsLargeScreenSignal : ComputedSignal<BreakpointTokens, ScreenSize, bool>
     {
         public IsLargeScreenSignal(BreakpointTokens breakpointTokens, ScreenSizeSignal screenSizeSignal) : base(breakpointTokens, screenSizeSignal) { }
-        protected override bool Compute(BreakpointTokens breakpointTokens, ScreenSize screenSize) => breakpointTokens.Large.Get() <= screenSize.DPWidth && breakpointTokens.XL.Get() > screenSize.DPWidth;
+        protected override bool Compute(BreakpointTokens breakpointTokens, ScreenSize screenSize) => breakpointTokens.Large.Get() <= screenSize.DPWidth;
     }
     public class IsXLScreenSignal : ComputedSignal<BreakpointTokens, ScreenSize, bool>
     {
