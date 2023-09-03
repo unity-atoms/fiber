@@ -18,7 +18,14 @@ public class DocsDrawerComponent : BaseComponent
             children: F.Children(
                 F.Visible(
                     when: drawerContext.IsOpen,
-                    children: F.Children(new OverlayComponent())
+                    children: F.Children(
+                        new OverlayComponent(
+                            onClick: (e) =>
+                            {
+                                drawerContext.IsOpen.Value = false;
+                            }
+                        )
+                    )
                 ),
                 new DrawerComponent(
                     role: DocsThemes.ROLES.DEEP_NEUTRAL,
@@ -69,7 +76,14 @@ public class DocsDrawerComponent : BaseComponent
 
 public class OverlayComponent : BaseComponent
 {
-    public OverlayComponent(List<VirtualNode> children = null) : base(children) { }
+    private readonly EventCallback<ClickEvent> _onClick;
+    public OverlayComponent(
+        List<VirtualNode> children = null,
+        EventCallback<ClickEvent> onClick = null
+    ) : base(children)
+    {
+        _onClick = onClick;
+    }
     public override VirtualNode Render()
     {
         var themeStore = C<ThemeStore>();
@@ -85,6 +99,7 @@ public class OverlayComponent : BaseComponent
                 backgroundColor: new Color(0, 0, 0, 0.5f)
             ),
             pickingMode: PickingMode.Position,
+            onClick: _onClick,
             children: children
         );
     }
