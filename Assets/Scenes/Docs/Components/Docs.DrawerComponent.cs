@@ -146,7 +146,7 @@ public class DrawerComponent : BaseComponent
         {
             return isOpen ?
                 new Translate(new Length(0, LengthUnit.Percent), new Length(0, LengthUnit.Pixel)) :
-                new Translate(new Length(-100, LengthUnit.Percent), new Length(0, LengthUnit.Pixel));
+                new Translate(new Length(_position == DrawerPosition.Left ? -100 : 100, LengthUnit.Percent), new Length(0, LengthUnit.Pixel));
         }, _isOpen);
 
         return F.View(
