@@ -50,55 +50,14 @@ public static class DocsRouting
                 children: F.Children(F.OverrideVisualComponentsProvider(
                     overrideVisualComponents: new OverrideVisualComponents(),
                     children: F.Children(new DocsThemes.Provider(
-                        children: F.Children(
-                            F.UIRoot(
-                                name: "DocsRootDocument",
+                        children: F.Children(F.UIRoot(
+                            name: "DocsRootDocument",
+                            children: F.Children(new DocsDrawerContextProviderComponent(
                                 children: F.Children(new MainLayoutComponent())
-                            )
-                        )
+                            ))
+                        ))
                     ))
                 ))
-            );
-        }
-    }
-
-    public class DocsTreeViewComponent : BaseComponent
-    {
-        public override VirtualNode Render()
-        {
-            var router = C<Router>();
-            var selectedItemId = F.CreateComputedSignal((router) =>
-            {
-                var route = router.PeekRoute();
-                return route?.Id;
-            }, router);
-
-            var expandedItemIds = F.CreateComputedSignalList<Router, string>((router, list) =>
-            {
-                for (var i = 0; i < router.RouteStack.Count; ++i)
-                {
-                    var route = router.RouteStack[i];
-                    list.Add(route.Id);
-                }
-                return list;
-            }, router);
-
-            return F.TreeViewContainer(
-                role: DocsThemes.ROLES.DEEP_NEUTRAL,
-                selectedItemId: selectedItemId,
-                onItemIdSelected: (string id) =>
-                {
-                    router.Navigate(id);
-                },
-                expandedItemIds: expandedItemIds,
-                children: F.Children(
-                    F.TreeViewItem(id: ROUTES.INTRODUCTION, label: $"Introduction"),
-                    F.TreeViewItem(id: ROUTES.INSTALLATION, label: $"Installation"),
-                    F.TreeViewItem(id: ROUTES.PACKAGES, label: $"Packages", children: F.Children(
-                        F.TreeViewItem(id: ROUTES.ROUTER, label: $"Router"),
-                        F.TreeViewItem(id: ROUTES.UI, label: $"UI")
-                    ))
-                )
             );
         }
     }
@@ -111,29 +70,25 @@ public static class DocsRouting
             var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
             var deepBorderColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Border);
 
-            return F.Switch(
-                fallback: null,
+            return F.Mount(
+                when: themeStore.IsMediumScreen,
                 children: F.Children(
-                    F.Match(when: themeStore.IsMediumScreen, children: F.Children(
-                        F.View(
-                            style: new Style(
-                                minWidth: 100,
-                                maxWidth: 240,
-                                width: new Length(25, LengthUnit.Percent),
-                                height: new Length(100, LengthUnit.Percent),
-                                backgroundColor: themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background),
-                                borderRightColor: deepBorderColor,
-                                borderTopColor: deepBorderColor,
-                                borderBottomColor: deepBorderColor,
-                                borderRightWidth: 1,
-                                borderTopWidth: 1,
-                                borderBottomWidth: 1,
-                                flexShrink: 0,
-                                flexGrow: 0
-                            ),
-                            children: F.Children(new DocsTreeViewComponent())
-                        )
-                    ))
+                    F.View(
+                        style: new Style(
+                            width: 280,
+                            height: new Length(100, LengthUnit.Percent),
+                            backgroundColor: themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background),
+                            borderRightColor: deepBorderColor,
+                            borderTopColor: deepBorderColor,
+                            borderBottomColor: deepBorderColor,
+                            borderRightWidth: 1,
+                            borderTopWidth: 1,
+                            borderBottomWidth: 1,
+                            flexShrink: 0,
+                            flexGrow: 0
+                        ),
+                        children: F.Children(new DocsTreeViewComponent())
+                    )
                 )
             );
         }
@@ -159,12 +114,11 @@ public static class DocsRouting
                         style: new Style(
                             display: DisplayStyle.Flex,
                             alignItems: Align.Stretch,
-                            flexDirection: FlexDirection.Row,
+                            flexDirection: FlexDirection.RowReverse,
                             flexGrow: 1,
                             flexShrink: 1
                         ),
                         children: F.Children(
-                            new SideMenuComponent(),
                             F.View(
                                 style: new Style(
                                     backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
@@ -176,9 +130,11 @@ public static class DocsRouting
                                     paddingRight: themeStore.Spacing(7)
                                 ),
                                 children: F.Children(F.Outlet())
-                            )
+                            ),
+                            new SideMenuComponent()
                         )
-                    )
+                    ),
+                    new DocsDrawerComponent()
                 )
             );
         }
