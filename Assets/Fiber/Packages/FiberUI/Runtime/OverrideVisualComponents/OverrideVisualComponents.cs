@@ -23,6 +23,15 @@ namespace Fiber.UI
 
     public class OverrideVisualComponents
     {
+        // Backdrop component
+        public delegate BaseComponent CreateBackdropDelegate(
+            List<VirtualNode> children = null,
+            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string variant = null,
+            EventCallback<ClickEvent> onClick = null
+        );
+        public CreateBackdropDelegate CreateBackdrop { get; private set; }
+
         // Drawer component
         public delegate BaseComponent CreateDrawerDelegate(
             List<VirtualNode> children,
@@ -113,6 +122,7 @@ namespace Fiber.UI
         public CreateTypographyDelegate CreateTypography { get; private set; }
 
         public OverrideVisualComponents(
+            CreateBackdropDelegate createBackdrop = null,
             CreateDrawerDelegate createDrawer = null,
             CreateHeaderContainerDelegate createHeaderContainer = null,
             CreateHeaderItemGroupDelegate createHeaderItemGroup = null,
@@ -123,6 +133,7 @@ namespace Fiber.UI
             CreateTypographyDelegate createTypography = null
         )
         {
+            CreateBackdrop = createBackdrop;
             CreateDrawer = createDrawer;
             CreateHeaderContainer = createHeaderContainer;
             CreateHeaderItemGroup = createHeaderItemGroup;

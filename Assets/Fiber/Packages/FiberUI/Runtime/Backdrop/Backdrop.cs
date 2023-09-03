@@ -42,6 +42,17 @@ namespace Fiber.UI
         }
         public override VirtualNode Render()
         {
+            var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+            if (overrideVisualComponents?.CreateBackdrop != null)
+            {
+                return overrideVisualComponents.CreateBackdrop(
+                    children: children,
+                    role: _role,
+                    variant: _variant,
+                    onClick: _onClick
+                );
+            }
+
             var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(role: _role, ElementType.Overlay, variant: _variant);
 
