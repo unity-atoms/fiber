@@ -4,7 +4,6 @@ using Fiber;
 using Fiber.UIElements;
 using Fiber.UI;
 using Signals;
-using UnityEngine;
 
 public class DocsDrawerComponent : BaseComponent
 {
@@ -19,7 +18,7 @@ public class DocsDrawerComponent : BaseComponent
                 F.Visible(
                     when: drawerContext.IsOpen,
                     children: F.Children(
-                        new OverlayComponent(
+                        F.Backdrop(
                             onClick: (e) =>
                             {
                                 drawerContext.IsOpen.Value = false;
@@ -70,37 +69,6 @@ public class DocsDrawerComponent : BaseComponent
                     position: DrawerPosition.Left
                 )
             )
-        );
-    }
-}
-
-public class OverlayComponent : BaseComponent
-{
-    private readonly EventCallback<ClickEvent> _onClick;
-    public OverlayComponent(
-        List<VirtualNode> children = null,
-        EventCallback<ClickEvent> onClick = null
-    ) : base(children)
-    {
-        _onClick = onClick;
-    }
-    public override VirtualNode Render()
-    {
-        var themeStore = C<ThemeStore>();
-
-        return F.View(
-            style: new Style(
-                position: Position.Absolute,
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                // TODO: Use color token
-                backgroundColor: new Color(0, 0, 0, 0.5f)
-            ),
-            pickingMode: PickingMode.Position,
-            onClick: _onClick,
-            children: children
         );
     }
 }

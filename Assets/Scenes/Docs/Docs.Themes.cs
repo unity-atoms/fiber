@@ -87,6 +87,9 @@ public static class DocsThemes
                             hovered: "#F09D51"
                         ) },
                     }
+                ),
+                overlay: new(
+                    @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(
@@ -134,6 +137,9 @@ public static class DocsThemes
                     @default: FIBER_COLOR_PALETTE.GRAY_0,
                     selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_37,
                     hovered: FIBER_COLOR_PALETTE.LIGHT_BLUE_37
+                ),
+                overlay: new(
+                    @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(

@@ -40,6 +40,7 @@ namespace Fiber.UI
         Background = 0,
         Border = 1,
         Text = 2,
+        Overlay = 3
     }
 
     public class Role : BaseSignal<Role>
@@ -47,11 +48,13 @@ namespace Fiber.UI
         public Element Background;
         public Element Border;
         public Element Text;
+        public Element Overlay;
 
         public Role(
             Element background = null,
             Element border = null,
-            Element text = null
+            Element text = null,
+            Element overlay = null
         )
         {
             Background = background ?? new();
@@ -60,6 +63,8 @@ namespace Fiber.UI
             Border.RegisterDependent(this);
             Text = text ?? new();
             Text.RegisterDependent(this);
+            Overlay = overlay ?? new();
+            Overlay.RegisterDependent(this);
         }
 
         public override Role Get() => this;
@@ -75,6 +80,7 @@ namespace Fiber.UI
                 ElementType.Background => Background,
                 ElementType.Border => Border,
                 ElementType.Text => Text,
+                ElementType.Overlay => Overlay,
                 _ => null,
             };
         }
