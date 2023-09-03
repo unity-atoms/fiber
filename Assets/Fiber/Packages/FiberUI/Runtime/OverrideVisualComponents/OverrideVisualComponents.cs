@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
-using Fiber.Theme;
 using Signals;
 
 namespace Fiber.UI
@@ -24,6 +23,25 @@ namespace Fiber.UI
 
     public class OverrideVisualComponents
     {
+        // Backdrop component
+        public delegate BaseComponent CreateBackdropDelegate(
+            List<VirtualNode> children = null,
+            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string variant = null,
+            EventCallback<ClickEvent> onClick = null
+        );
+        public CreateBackdropDelegate CreateBackdrop { get; private set; }
+
+        // Drawer component
+        public delegate BaseComponent CreateDrawerDelegate(
+            List<VirtualNode> children,
+            string role,
+            BaseSignal<bool> isOpen,
+            DrawerPosition position,
+            Style style
+        );
+        public CreateDrawerDelegate CreateDrawer { get; private set; }
+
         // Header component
         public delegate BaseComponent CreateHeaderContainerDelegate(
             List<VirtualNode> children,
@@ -104,6 +122,8 @@ namespace Fiber.UI
         public CreateTypographyDelegate CreateTypography { get; private set; }
 
         public OverrideVisualComponents(
+            CreateBackdropDelegate createBackdrop = null,
+            CreateDrawerDelegate createDrawer = null,
             CreateHeaderContainerDelegate createHeaderContainer = null,
             CreateHeaderItemGroupDelegate createHeaderItemGroup = null,
             CreateIconDelegate createIcon = null,
@@ -113,6 +133,8 @@ namespace Fiber.UI
             CreateTypographyDelegate createTypography = null
         )
         {
+            CreateBackdrop = createBackdrop;
+            CreateDrawer = createDrawer;
             CreateHeaderContainer = createHeaderContainer;
             CreateHeaderItemGroup = createHeaderItemGroup;
             CreateIcon = createIcon;

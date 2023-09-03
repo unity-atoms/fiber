@@ -1,5 +1,6 @@
 using System.Collections.Generic;
-using Fiber.Theme;
+using Fiber.UI;
+using Fiber.UIElements;
 using Fiber;
 using UnityEngine;
 
@@ -20,7 +21,8 @@ public static class DocsThemes
         {
             return F.ThemeProvider(
                 themeStore: new ThemeStore(
-                    theme: DARK_THEME
+                    theme: DARK_THEME,
+                    screenSizeSignal: C<ScalingContext>().ScreenSizeSignal
                 ),
                 children: children
             );
@@ -85,6 +87,9 @@ public static class DocsThemes
                             hovered: "#F09D51"
                         ) },
                     }
+                ),
+                overlay: new(
+                    @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(
@@ -132,6 +137,9 @@ public static class DocsThemes
                     @default: FIBER_COLOR_PALETTE.GRAY_0,
                     selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_37,
                     hovered: FIBER_COLOR_PALETTE.LIGHT_BLUE_37
+                ),
+                overlay: new(
+                    @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
                 )
             ) },
             { ROLES.DEEP_NEUTRAL, new(

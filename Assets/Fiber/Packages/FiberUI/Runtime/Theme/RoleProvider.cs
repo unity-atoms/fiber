@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Fiber.Theme
+namespace Fiber.UI
 {
     public static class THEME_CONSTANTS
     {

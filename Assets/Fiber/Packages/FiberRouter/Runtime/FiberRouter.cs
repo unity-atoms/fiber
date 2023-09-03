@@ -192,7 +192,7 @@ namespace Fiber.Router
             return GetRouteDefinition(RouteStack[RouteStack.Count - 1].Id);
         }
 
-        private RouteDefinition GetRouteDefinition(string id)
+        public RouteDefinition GetRouteDefinition(string id)
         {
             return GetRouteDefinitionRecursively(id, RouterTree);
         }

@@ -1,11 +1,8 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
-using Fiber.Router;
 using Fiber.UI;
-using Fiber.Theme;
 using Signals;
 
 public class DocsHeaderComponent : BaseComponent
@@ -13,14 +10,24 @@ public class DocsHeaderComponent : BaseComponent
     public override VirtualNode Render()
     {
         var themeStore = C<ThemeStore>();
+        var drawerContext = C<DocsDrawerContext>();
         var iconName = new Signal<string>("sun");
 
         return F.Header(children: F.Children(
             F.HeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
-                F.Typography(
-                    text: "fiber",
-                    type: TypographyType.Heading3
-                )
+                F.Visible(
+                    when: new NegatedBoolSignal(themeStore.IsMediumScreen),
+                    children: F.Children(
+                        F.IconButton(
+                            iconName: "bars", onPress: () =>
+                            {
+                                drawerContext.IsOpen.Value = true;
+                            },
+                            style: new Style(marginRight: themeStore.Spacing(2))
+                        )
+                    )
+                ),
+                new DocsLogoComponent()
             )),
             F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
                 F.IconButton(variant: "github", iconName: "github", onPress: () =>

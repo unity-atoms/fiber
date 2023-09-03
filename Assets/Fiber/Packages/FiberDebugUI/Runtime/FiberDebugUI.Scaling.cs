@@ -1,9 +1,10 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using Signals;
-using Fiber.Theme;
+using Fiber.UI;
+using Fiber.UIElements;
 
-namespace Fiber.UIElements
+namespace Fiber.DebugUI
 {
     public static partial class BaseComponentExtensions
     {

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber.UIElements;
-using Fiber.Theme;
 
 namespace Fiber.UI
 {
@@ -40,9 +39,9 @@ namespace Fiber.UI
 
     public class HeaderComponent : BaseComponent
     {
-        private readonly Style _style;
         private readonly string _role;
         private readonly string _variant;
+        private readonly Style _style;
 
         public HeaderComponent(
             List<VirtualNode> children,

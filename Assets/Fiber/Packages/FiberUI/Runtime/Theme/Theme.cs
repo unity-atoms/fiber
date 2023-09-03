@@ -1,6 +1,6 @@
 using Signals;
 
-namespace Fiber.Theme
+namespace Fiber.UI
 {
     public class Theme : BaseSignal<Theme>
     {
@@ -8,12 +8,14 @@ namespace Fiber.Theme
         public ColorTokenCollection Color;
         public TypographyTokens Typography;
         public SpacingTokens Spacing;
+        public BreakpointTokens Breakpoints;
 
         public Theme(
             string fallbackRole,
             ColorTokenCollection color,
             TypographyTokens typography,
-            int spacingBaseline = 4
+            int spacingBaseline = 4,
+            BreakpointTokens breakpoints = null
         )
         {
             FallbackRole = fallbackRole;
@@ -23,6 +25,8 @@ namespace Fiber.Theme
             Typography.RegisterDependent(this);
             Spacing = new SpacingTokens(spacingBaseline);
             Spacing.RegisterDependent(this);
+            Breakpoints = breakpoints ?? new BreakpointTokens();
+            Breakpoints.RegisterDependent(this);
         }
 
         public override Theme Get() => this;
