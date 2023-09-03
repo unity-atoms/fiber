@@ -27,10 +27,7 @@ public class DocsHeaderComponent : BaseComponent
                         )
                     )
                 ),
-                F.Typography(
-                    text: "fiber",
-                    type: TypographyType.Heading3
-                )
+                new DocsLogoComponent()
             )),
             F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
                 F.IconButton(variant: "github", iconName: "github", onPress: () =>

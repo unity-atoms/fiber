@@ -46,10 +46,7 @@ public class DocsDrawerComponent : BaseComponent
                                         borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
                                     ),
                                     children: F.Children(
-                                        F.Typography(
-                                            text: "fiber",
-                                            type: TypographyType.Heading3
-                                        ),
+                                        new DocsLogoComponent(),
                                         F.IconButton(
                                             iconName: "xmark",
                                             onPress: () =>

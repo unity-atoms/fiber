@@ -7,6 +7,7 @@ public class DocsTreeViewComponent : BaseComponent
     public override VirtualNode Render()
     {
         var router = C<Router>();
+        var drawerContext = C<DocsDrawerContext>();
         var selectedItemId = F.CreateComputedSignal((router) =>
         {
             var route = router.PeekRoute();
@@ -29,6 +30,7 @@ public class DocsTreeViewComponent : BaseComponent
             onItemIdSelected: (string id) =>
             {
                 router.Navigate(id);
+                drawerContext.IsOpen.Value = false;
             },
             expandedItemIds: expandedItemIds,
             children: F.Children(
