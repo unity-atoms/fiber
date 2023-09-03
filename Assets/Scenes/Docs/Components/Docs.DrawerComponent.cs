@@ -27,7 +27,7 @@ public class DocsDrawerComponent : BaseComponent
                         )
                     )
                 ),
-                new DrawerComponent(
+                F.Drawer(
                     role: DocsThemes.ROLES.DEEP_NEUTRAL,
                     isOpen: drawerContext.IsOpen,
                     children: F.Children(
