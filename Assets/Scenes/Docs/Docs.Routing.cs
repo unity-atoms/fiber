@@ -158,8 +158,8 @@ public static class DocsRouting
             ),
             new RouteDefinition(
                 id: ROUTES.PACKAGES,
-                isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new DocsPackagesPageComponent()),
+                isLayoutRoute: true,
+                component: new SimpleRouteComponent(component: new OutletComponent()),
                 children: new List<RouteDefinition>()
                 {
                     new RouteDefinition(

@@ -11,7 +11,7 @@ namespace Fiber.UI
         public static TreeViewComponent.Container TreeViewContainer(
             this BaseComponent component,
                 List<VirtualNode> children,
-                Action<string> onItemIdSelected,
+                Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
                 string role = THEME_CONSTANTS.INHERIT_ROLE,
@@ -20,7 +20,7 @@ namespace Fiber.UI
         {
             return new TreeViewComponent.Container(
                 children: children,
-                onItemIdSelected: onItemIdSelected,
+                onItemSelected: onItemSelected,
                 selectedItemId: selectedItemId,
                 expandedItemIds: expandedItemIds,
                 role: role,
@@ -65,19 +65,19 @@ namespace Fiber.UI
 
             public TreeViewStateContext(
                 ISignal<string> selectedItemId,
-                Action<string> onItemIdSelected,
+                Action<string> onItemSelected,
                 ISignalList<string> expandedItemIds
             )
             {
                 SelectedItemId = selectedItemId;
-                OnItemSelected = onItemIdSelected;
+                OnItemSelected = onItemSelected;
                 ExapndedItemIds = expandedItemIds;
             }
         }
 
         public class Container : BaseComponent
         {
-            private readonly Action<string> _onItemIdSelected;
+            private readonly Action<string> _onItemSelected;
             private readonly ISignal<string> _selectedItemId;
             private readonly ISignalList<string> _expandedItemIds;
             private readonly string _role;
@@ -85,7 +85,7 @@ namespace Fiber.UI
 
             public Container(
                 List<VirtualNode> children,
-                Action<string> onItemIdSelected,
+                Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
                 string role = THEME_CONSTANTS.INHERIT_ROLE,
@@ -93,7 +93,7 @@ namespace Fiber.UI
             ) : base(children)
             {
                 _role = role;
-                _onItemIdSelected = onItemIdSelected;
+                _onItemSelected = onItemSelected;
                 _selectedItemId = selectedItemId;
                 _expandedItemIds = expandedItemIds;
                 _forwardRef = forwardRef;
@@ -104,9 +104,9 @@ namespace Fiber.UI
                 return F.ContextProvider(
                     value: new TreeViewStateContext(
                         selectedItemId: _selectedItemId,
-                        onItemIdSelected: (string id) =>
+                        onItemSelected: (string id) =>
                         {
-                            _onItemIdSelected.Invoke(id);
+                            _onItemSelected.Invoke(id);
                         },
                         expandedItemIds: _expandedItemIds
                     ),

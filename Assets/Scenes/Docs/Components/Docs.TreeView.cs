@@ -1,6 +1,7 @@
 using Fiber;
 using Fiber.UI;
 using Fiber.Router;
+using Signals;
 
 public class DocsTreeViewComponent : BaseComponent
 {
@@ -14,23 +15,38 @@ public class DocsTreeViewComponent : BaseComponent
             return route?.Id;
         }, router);
 
-        var expandedItemIds = F.CreateComputedSignalList<Router, string>((router, list) =>
+        var expandedItemIds = new ShallowSignalList<string>();
+        for (var i = 0; i < router.RouteStack.Count; ++i)
         {
-            for (var i = 0; i < router.RouteStack.Count; ++i)
+            var route = router.RouteStack[i];
+            if (route.IsLayoutRoute)
             {
-                var route = router.RouteStack[i];
-                list.Add(route.Id);
+                expandedItemIds.Add(route.Id);
             }
-            return list;
-        }, router);
+        }
 
         return F.TreeViewContainer(
             role: DocsThemes.ROLES.DEEP_NEUTRAL,
             selectedItemId: selectedItemId,
-            onItemIdSelected: (string id) =>
+            onItemSelected: (string id) =>
             {
-                router.Navigate(id);
-                drawerContext.IsOpen.Value = false;
+                var routeDefinition = router.GetRouteDefinition(id);
+                if (routeDefinition.IsLayoutRoute)
+                {
+                    if (expandedItemIds.Contains(id))
+                    {
+                        expandedItemIds.Remove(id);
+                    }
+                    else
+                    {
+                        expandedItemIds.Add(id);
+                    }
+                }
+                else
+                {
+                    router.Navigate(id);
+                    drawerContext.IsOpen.Value = false;
+                }
             },
             expandedItemIds: expandedItemIds,
             children: F.Children(
