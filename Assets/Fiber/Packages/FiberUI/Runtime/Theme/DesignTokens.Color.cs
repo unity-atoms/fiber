@@ -67,6 +67,14 @@ namespace Fiber.UI
             Overlay.RegisterDependent(this);
         }
 
+        ~Role()
+        {
+            Background.UnregisterDependent(this);
+            Border.UnregisterDependent(this);
+            Text.UnregisterDependent(this);
+            Overlay.UnregisterDependent(this);
+        }
+
         public override Role Get() => this;
         public override bool IsDirty(byte otherDirtyBit)
         {
@@ -115,6 +123,11 @@ namespace Fiber.UI
             Variants = variants ?? new();
             Variants.RegisterDependent(this);
         }
+
+        ~Element()
+        {
+            Variants.UnregisterDependent(this);
+        }
     }
 
     public class Modifiers<T> : BaseSignal<Modifiers<T>>
@@ -147,6 +160,16 @@ namespace Fiber.UI
             Pressed.RegisterDependent(this);
             Disabled = new Signal<T>(disabled ?? default, this);
             Disabled.RegisterDependent(this);
+        }
+
+        ~Modifiers()
+        {
+            Default.UnregisterDependent(this);
+            Selected.UnregisterDependent(this);
+            Focused.UnregisterDependent(this);
+            Hovered.UnregisterDependent(this);
+            Pressed.UnregisterDependent(this);
+            Disabled.UnregisterDependent(this);
         }
 
         public override Modifiers<T> Get() => this;

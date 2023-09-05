@@ -7,21 +7,6 @@ using Fiber.UIElements;
 
 namespace Fiber.UI
 {
-    public static partial class BaseComponentExtensions
-    {
-        public static ThemeProvider ThemeProvider(
-            this BaseComponent component,
-            ThemeStore themeStore,
-            List<VirtualNode> children
-        )
-        {
-            return new ThemeProvider(
-                themeStore: themeStore,
-                children: children
-            );
-        }
-    }
-
     public class ThemeStore : Store<Theme>
     {
         private ScreenSizeSignal _screenSizeSignal;
@@ -37,6 +22,7 @@ namespace Fiber.UI
             _fontSignalsCache = new();
             _fontSizeSignalsCache = new();
             _fontStyleSignalsCache = new();
+            _iconSignalsCache = new();
 
             IsSmallScreen = new IsSmallScreenSignal(Value.Breakpoints, _screenSizeSignal);
             IsMediumScreen = new IsMediumScreenSignal(Value.Breakpoints, _screenSizeSignal);
@@ -46,8 +32,8 @@ namespace Fiber.UI
         }
 
         #region Spacing
-        private readonly Dictionary<int, BaseSignal<StyleLength>> _spacingSignalsCache;
-        public BaseSignal<StyleLength> Spacing(int multiplier)
+        private readonly Dictionary<float, BaseSignal<StyleLength>> _spacingSignalsCache;
+        public BaseSignal<StyleLength> Spacing(float multiplier)
         {
             if (_spacingSignalsCache.ContainsKey(multiplier))
             {
@@ -163,6 +149,20 @@ namespace Fiber.UI
             return signal;
         }
         #endregion
+        #region Icon
+        private readonly Dictionary<IconSize, BaseSignal<StyleLength>> _iconSignalsCache;
+        public BaseSignal<StyleLength> Icon(IconSize size)
+        {
+            if (_iconSignalsCache.ContainsKey(size))
+            {
+                return _iconSignalsCache[size];
+            }
+
+            var iconSignal = new InlineComputedSignal<Theme, StyleLength>((theme) => theme.Spacing.Baseline.Value * theme.Icon.GetIconSignal(size).Value, this);
+            _iconSignalsCache.Add(size, iconSignal);
+            return iconSignal;
+        }
+        #endregion
         #region Breakpoints
         public IsSmallScreenSignal IsSmallScreen;
         public IsMediumScreenSignal IsMediumScreen;
@@ -174,25 +174,5 @@ namespace Fiber.UI
             return new ResponsiveSignal<T>(Breakpoint, responsiveProp);
         }
         #endregion
-    }
-
-    public class ThemeProvider : BaseComponent
-    {
-        private readonly ThemeStore _themeStore;
-        public ThemeProvider(
-            ThemeStore themeStore,
-            List<VirtualNode> children
-        ) : base(children)
-        {
-            _themeStore = themeStore;
-        }
-
-        public override VirtualNode Render()
-        {
-            return F.ContextProvider(
-                value: _themeStore,
-                children: children
-            );
-        }
     }
 }

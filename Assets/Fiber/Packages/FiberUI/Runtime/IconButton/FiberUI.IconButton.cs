@@ -93,6 +93,7 @@ namespace Fiber.UI
             return F.Icon(
                 forwardRef: interactiveElement.Ref,
                 iconName: _iconName,
+                size: IconSize.Medium,
                 style: new Style(
                     mergedStyle: _style,
                     color: color,

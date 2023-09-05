@@ -10,6 +10,7 @@ namespace Fiber.UI
         public static IconComponent Icon(
             this BaseComponent component,
             SignalProp<string> iconName,
+            IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
@@ -18,6 +19,7 @@ namespace Fiber.UI
         {
             return new IconComponent(
                 iconName: iconName,
+                size: size,
                 role: role,
                 variant: variant,
                 style: style,
@@ -29,6 +31,7 @@ namespace Fiber.UI
     public class IconComponent : BaseComponent
     {
         private readonly SignalProp<string> _iconName;
+        private readonly IconSize _size;
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
@@ -36,6 +39,7 @@ namespace Fiber.UI
 
         public IconComponent(
             SignalProp<string> iconName,
+            IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new(),
@@ -43,6 +47,7 @@ namespace Fiber.UI
         )
         {
             _iconName = iconName;
+            _size = size;
             _role = role;
             _variant = variant;
             _style = style;
@@ -81,7 +86,7 @@ namespace Fiber.UI
                     unityFont: font,
                     unityFontDefinition: StyleKeyword.None,
                     unityTextAlign: TextAnchor.MiddleCenter,
-                    fontSize: themeStore.Spacing(5)
+                    fontSize: themeStore.Icon(_size)
                 )
             );
         }

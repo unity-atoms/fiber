@@ -4,12 +4,16 @@ namespace Fiber.UI
 {
     public class SpacingTokens : BaseSignal<SpacingTokens>
     {
-        public Signal<int> Baseline;
+        public Signal<int> Baseline { get; private set; }
 
         public SpacingTokens(int baseline = 4)
         {
             Baseline = new(baseline);
             Baseline.RegisterDependent(this);
+        }
+        ~SpacingTokens()
+        {
+            Baseline.UnregisterDependent(this);
         }
 
         public override SpacingTokens Get() => this;

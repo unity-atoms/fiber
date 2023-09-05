@@ -121,7 +121,7 @@ public static class DocsThemes
 
     public static readonly Theme LIGHT_THEME = new Theme(
         fallbackRole: ROLES.NEUTRAL,
-        new()
+        color: new()
         {
             { ROLES.NEUTRAL, new(
                 background: new(
