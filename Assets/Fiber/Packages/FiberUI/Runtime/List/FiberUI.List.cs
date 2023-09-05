@@ -70,6 +70,18 @@ namespace Fiber.UI
 
         public override VirtualNode Render()
         {
+            var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
+            if (overrideVisualComponents?.CreateListItem != null)
+            {
+                return overrideVisualComponents.CreateListItem(
+                    text: _text,
+                    iconName: _iconName,
+                    role: _role,
+                    variant: _variant,
+                    style: _style
+                );
+            }
+
             children.Add(F.Icon(
                 iconName: _iconName,
                 size: IconSize.Tiny,

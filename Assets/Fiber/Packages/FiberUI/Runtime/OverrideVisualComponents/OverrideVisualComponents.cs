@@ -80,6 +80,16 @@ namespace Fiber.UI
         );
         public CreateIconButtonDelegate CreateIconButton { get; private set; }
 
+        // List item component
+        public delegate BaseComponent CreateListItemDelegate(
+            ListItemText text,
+            string iconName,
+            string role,
+            string variant,
+            Style style
+        );
+        public CreateListItemDelegate CreateListItem { get; private set; }
+
         // TreeView Container component
         public delegate BaseComponent CreateTreeViewContainerDelegate(
             List<VirtualNode> children,
@@ -128,6 +138,7 @@ namespace Fiber.UI
             CreateHeaderItemGroupDelegate createHeaderItemGroup = null,
             CreateIconDelegate createIcon = null,
             CreateIconButtonDelegate createIconButton = null,
+            CreateListItemDelegate createListItem = null,
             CreateTreeViewContainerDelegate createTreeViewContainer = null,
             CreateTreeViewItemDelegate createTreeViewItem = null,
             CreateTypographyDelegate createTypography = null
@@ -139,6 +150,7 @@ namespace Fiber.UI
             CreateHeaderItemGroup = createHeaderItemGroup;
             CreateIcon = createIcon;
             CreateIconButton = createIconButton;
+            CreateListItem = createListItem;
             CreateTreeViewContainer = createTreeViewContainer;
             CreateTreeViewItem = createTreeViewItem;
             CreateTypography = createTypography;
