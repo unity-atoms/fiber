@@ -72,12 +72,14 @@ namespace Fiber.UI
         {
             children.Add(F.Icon(
                 iconName: _iconName,
+                size: IconSize.Tiny,
                 role: _role,
                 variant: _variant,
                 style: new Style(
+                    height: C<ThemeStore>().Spacing(5.5f), // Naughty to use fractions, but necessary to get it to align with the text
                     marginRight: C<ThemeStore>().Spacing(1),
                     marginLeft: C<ThemeStore>().Spacing(1),
-                    unityTextAlign: TextAnchor.UpperCenter
+                    unityTextAlign: TextAnchor.MiddleCenter
                 )
             ));
 

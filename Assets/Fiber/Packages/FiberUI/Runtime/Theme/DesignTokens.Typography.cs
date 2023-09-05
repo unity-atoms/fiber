@@ -6,19 +6,19 @@ namespace Fiber.UI
 {
     public class TypographyTokens : BaseSignal<TypographyTokens>
     {
-        public TypographyTypeTokens Heading1;
-        public TypographyTypeTokens Heading2;
-        public TypographyTypeTokens Heading3;
-        public TypographyTypeTokens Heading4;
-        public TypographyTypeTokens Heading5;
-        public TypographyTypeTokens Heading6;
-        public TypographyTypeTokens Subtitle1;
-        public TypographyTypeTokens Subtitle2;
-        public TypographyTypeTokens Body1;
-        public TypographyTypeTokens Body2;
-        public TypographyTypeTokens Button;
-        public TypographyTypeTokens Caption;
-        public TypographyTypeTokens Overline;
+        public TypographyTypeTokens Heading1 { get; private set; }
+        public TypographyTypeTokens Heading2 { get; private set; }
+        public TypographyTypeTokens Heading3 { get; private set; }
+        public TypographyTypeTokens Heading4 { get; private set; }
+        public TypographyTypeTokens Heading5 { get; private set; }
+        public TypographyTypeTokens Heading6 { get; private set; }
+        public TypographyTypeTokens Subtitle1 { get; private set; }
+        public TypographyTypeTokens Subtitle2 { get; private set; }
+        public TypographyTypeTokens Body1 { get; private set; }
+        public TypographyTypeTokens Body2 { get; private set; }
+        public TypographyTypeTokens Button { get; private set; }
+        public TypographyTypeTokens Caption { get; private set; }
+        public TypographyTypeTokens Overline { get; private set; }
 
         public TypographyTokens(
             TypographyTypeTokens heading1 = null,
@@ -62,6 +62,22 @@ namespace Fiber.UI
             Caption?.RegisterDependent(this);
             Overline = overline;
             Overline?.RegisterDependent(this);
+        }
+        ~TypographyTokens()
+        {
+            Heading1?.UnregisterDependent(this);
+            Heading2?.UnregisterDependent(this);
+            Heading3?.UnregisterDependent(this);
+            Heading4?.UnregisterDependent(this);
+            Heading5?.UnregisterDependent(this);
+            Heading6?.UnregisterDependent(this);
+            Subtitle1?.UnregisterDependent(this);
+            Subtitle2?.UnregisterDependent(this);
+            Body1?.UnregisterDependent(this);
+            Body2?.UnregisterDependent(this);
+            Button?.UnregisterDependent(this);
+            Caption?.UnregisterDependent(this);
+            Overline?.UnregisterDependent(this);
         }
 
         public override TypographyTokens Get() => this;
@@ -132,6 +148,12 @@ namespace Fiber.UI
             FontSize.RegisterDependent(this);
             FontStyle = new(fontStyle);
             FontStyle.RegisterDependent(this);
+        }
+        ~TypographyTypeTokens()
+        {
+            Font.UnregisterDependent(this);
+            FontSize.UnregisterDependent(this);
+            FontStyle.UnregisterDependent(this);
         }
 
         public override TypographyTypeTokens Get() => this;

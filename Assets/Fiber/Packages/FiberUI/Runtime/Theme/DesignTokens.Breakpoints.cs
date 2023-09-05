@@ -103,10 +103,10 @@ namespace Fiber.UI
 
     public class BreakpointTokens : BaseSignal<BreakpointTokens>
     {
-        public Signal<float> Small;
-        public Signal<float> Medium;
-        public Signal<float> Large;
-        public Signal<float> XL;
+        public Signal<float> Small { get; private set; }
+        public Signal<float> Medium { get; private set; }
+        public Signal<float> Large { get; private set; }
+        public Signal<float> XL { get; private set; }
 
         public BreakpointTokens(
             float small = 640,
@@ -123,6 +123,14 @@ namespace Fiber.UI
             Large.RegisterDependent(this);
             XL = new(xl);
             XL.RegisterDependent(this);
+        }
+
+        ~BreakpointTokens()
+        {
+            Small.UnregisterDependent(this);
+            Medium.UnregisterDependent(this);
+            Large.UnregisterDependent(this);
+            XL.UnregisterDependent(this);
         }
 
         public override BreakpointTokens Get() => this;

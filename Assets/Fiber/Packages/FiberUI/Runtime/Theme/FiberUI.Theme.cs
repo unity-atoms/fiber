@@ -8,6 +8,7 @@ namespace Fiber.UI
         public ColorTokenCollection Color;
         public TypographyTokens Typography;
         public SpacingTokens Spacing;
+        public IconTokens Icon;
         public BreakpointTokens Breakpoints;
 
         public Theme(
@@ -15,6 +16,7 @@ namespace Fiber.UI
             ColorTokenCollection color,
             TypographyTokens typography,
             int spacingBaseline = 4,
+            IconTokens icon = null,
             BreakpointTokens breakpoints = null
         )
         {
@@ -25,8 +27,18 @@ namespace Fiber.UI
             Typography.RegisterDependent(this);
             Spacing = new SpacingTokens(spacingBaseline);
             Spacing.RegisterDependent(this);
+            Icon = icon ?? new IconTokens();
+            Icon.RegisterDependent(this);
             Breakpoints = breakpoints ?? new BreakpointTokens();
             Breakpoints.RegisterDependent(this);
+        }
+        ~Theme()
+        {
+            Color.UnregisterDependent(this);
+            Typography.UnregisterDependent(this);
+            Spacing.UnregisterDependent(this);
+            Icon.UnregisterDependent(this);
+            Breakpoints.UnregisterDependent(this);
         }
 
         public override Theme Get() => this;
