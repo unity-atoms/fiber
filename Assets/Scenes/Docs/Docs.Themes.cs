@@ -52,6 +52,29 @@ public static class DocsThemes
         )
     );
 
+    public static readonly TypographyTokens PIXEL_TYPOGRAPHY_TOKENS = new(
+        heading1: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/8_bit_hud/8-bit-hud"),
+            fontSize: 24,
+            fontStyle: FontStyle.Bold
+        ),
+        heading3: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/8_bit_hud/8-bit-hud"),
+            fontSize: 12,
+            fontStyle: FontStyle.Bold
+        ),
+        body1: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/8_bit_hud/8-bit-hud"),
+            fontSize: 8,
+            fontStyle: FontStyle.Normal
+        ),
+        subtitle2: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/8_bit_hud/8-bit-hud"),
+            fontSize: 8,
+            fontStyle: FontStyle.Normal
+        )
+    );
+
     public static readonly Theme DARK_THEME = new Theme(
         fallbackRole: ROLES.NEUTRAL,
         color: new()
@@ -68,7 +91,7 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_48,
+                    selected: FIBER_COLOR_PALETTE.SKY_48,
                     variants: new ()
                     {
                         { "discord", new(
@@ -104,7 +127,7 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_48
+                    selected: FIBER_COLOR_PALETTE.SKY_48
                 )
             ) },
             { ROLES.DEBUG, new(
@@ -135,8 +158,8 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_0,
-                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_37,
-                    hovered: FIBER_COLOR_PALETTE.LIGHT_BLUE_37
+                    selected: FIBER_COLOR_PALETTE.SKY_37,
+                    hovered: FIBER_COLOR_PALETTE.SKY_37
                 ),
                 overlay: new(
                     @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
@@ -154,11 +177,54 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_0,
-                    selected: FIBER_COLOR_PALETTE.LIGHT_BLUE_37,
-                    hovered: FIBER_COLOR_PALETTE.LIGHT_BLUE_37
+                    selected: FIBER_COLOR_PALETTE.SKY_37,
+                    hovered: FIBER_COLOR_PALETTE.SKY_37
                 )
             ) },
         },
         typography: TYPOGRAPHY_TOKENS
+    );
+
+    public static readonly Theme ICE_PIXEL = new Theme(
+        fallbackRole: ROLES.NEUTRAL,
+        color: new()
+        {
+            { ROLES.NEUTRAL, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_37,
+                    selected: FIBER_COLOR_PALETTE.SKY_45,
+                    hovered: FIBER_COLOR_PALETTE.SKY_45,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                border: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_100,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74
+                ),
+                overlay: new(
+                    @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
+                )
+            ) },
+            { ROLES.DEEP_NEUTRAL, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_27,
+                    selected: FIBER_COLOR_PALETTE.SKY_37,
+                    hovered: FIBER_COLOR_PALETTE.SKY_37,
+                    pressed: FIBER_COLOR_PALETTE.SKY_19
+                ),
+                border: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_23
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_100,
+                    selected: FIBER_COLOR_PALETTE.SKY_85,
+                    hovered: FIBER_COLOR_PALETTE.SKY_85
+                )
+            ) },
+        },
+        typography: PIXEL_TYPOGRAPHY_TOKENS
     );
 }

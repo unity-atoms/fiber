@@ -40,15 +40,19 @@ namespace Fiber.UI
         public const string GRAY_93 = "#eeeeee";
         public const string GRAY_100 = "#ffffff";
 
-        public const string LIGHT_BLUE_31 = "#01579B";
-        public const string LIGHT_BLUE_37 = "#0277BD";
-        public const string LIGHT_BLUE_41 = "#0288D1";
-        public const string LIGHT_BLUE_45 = "#039BE5";
-        public const string LIGHT_BLUE_48 = "#03A9F4";
-        public const string LIGHT_BLUE_64 = "#4FC3F7";
-        public const string LIGHT_BLUE_74 = "#81D4FA";
-        public const string LIGHT_BLUE_85 = "#B3E5FC";
-        public const string LIGHT_BLUE_94 = "#E1F5FE";
+        public const string SKY_15 = "#002B4C";
+        public const string SKY_19 = "#013660";
+        public const string SKY_23 = "#014175";
+        public const string SKY_27 = "#014D89";
+        public const string SKY_31 = "#01579B";
+        public const string SKY_37 = "#0277BD";
+        public const string SKY_41 = "#0288D1";
+        public const string SKY_45 = "#039BE5";
+        public const string SKY_48 = "#03A9F4";
+        public const string SKY_64 = "#4FC3F7";
+        public const string SKY_74 = "#81D4FA";
+        public const string SKY_85 = "#B3E5FC";
+        public const string SKY_94 = "#E1F5FE";
 
         public const string RED_31 = "#9B0104";
         public const string RED_37 = "#BD0205";
