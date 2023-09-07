@@ -14,6 +14,8 @@ public static class DocsRouting
         public const string ROOT = "root";
 
         // Path routes
+        public const string LANDING = "landing";
+        public const string DOCS = "docs";
         public const string INTRODUCTION = "introduction";
         public const string INSTALLATION = "installation";
         public const string PACKAGES = "packages";
@@ -110,33 +112,45 @@ public static class DocsRouting
                 ),
                 children: F.Children(
                     new DocsHeaderComponent(),
-                    F.View(
-                        style: new Style(
-                            display: DisplayStyle.Flex,
-                            alignItems: Align.Stretch,
-                            flexDirection: FlexDirection.RowReverse,
-                            flexGrow: 1,
-                            flexShrink: 1
-                        ),
-                        children: F.Children(
-                            F.View(
-                                style: new Style(
-                                    backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
-                                    minHeight: new Length(100, LengthUnit.Percent),
-                                    flexShrink: 1,
-                                    flexGrow: 1,
-                                    minWidth: new Length(100, LengthUnit.Pixel),
-                                    paddingLeft: themeStore.Spacing(7),
-                                    paddingRight: themeStore.Spacing(7)
-                                ),
-                                children: F.Children(F.Outlet())
-                            ),
-                            new SideMenuComponent()
-                        )
-                    ),
-                    new DocsDrawerComponent()
+                    F.Outlet()
                 )
             );
+        }
+    }
+
+    public class DocsRootComponent : BaseComponent
+    {
+        public override VirtualNode Render()
+        {
+            var themeStore = C<ThemeStore>();
+
+            return F.Fragment(F.Children(
+                F.View(
+                    style: new Style(
+                        display: DisplayStyle.Flex,
+                        alignItems: Align.Stretch,
+                        flexDirection: FlexDirection.RowReverse,
+                        flexGrow: 1,
+                        flexShrink: 1
+                    ),
+                    children: F.Children(
+                        F.View(
+                            style: new Style(
+                                backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
+                                minHeight: new Length(100, LengthUnit.Percent),
+                                flexShrink: 1,
+                                flexGrow: 1,
+                                minWidth: new Length(100, LengthUnit.Pixel),
+                                paddingLeft: themeStore.Spacing(7),
+                                paddingRight: themeStore.Spacing(7)
+                            ),
+                            children: F.Children(F.Outlet())
+                        ),
+                        new SideMenuComponent()
+                    )
+                ),
+                new DocsDrawerComponent()
+            ));
         }
     }
 
@@ -147,30 +161,43 @@ public static class DocsRouting
         children: new List<RouteDefinition>()
         {
             new RouteDefinition(
-                id: ROUTES.INTRODUCTION,
+                id: ROUTES.LANDING,
                 isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new DocsIntroductionPageComponent())
+                component: new SimpleRouteComponent(component: new DocsLandingPageComponent())
             ),
             new RouteDefinition(
-                id: ROUTES.INSTALLATION,
-                isLayoutRoute: false,
-                component: new SimpleRouteComponent(component: new HeadingComponent("Installation"))
-            ),
-            new RouteDefinition(
-                id: ROUTES.PACKAGES,
+                id: ROUTES.DOCS,
                 isLayoutRoute: true,
-                component: new SimpleRouteComponent(component: new OutletComponent()),
+                component: new SimpleRouteComponent(component: new DocsRootComponent()),
                 children: new List<RouteDefinition>()
                 {
                     new RouteDefinition(
-                        id: ROUTES.ROUTER,
+                        id: ROUTES.INTRODUCTION,
                         isLayoutRoute: false,
-                        component: new SimpleRouteComponent(component: new HeadingComponent("Router"))
+                        component: new SimpleRouteComponent(component: new DocsIntroductionPageComponent())
                     ),
                     new RouteDefinition(
-                        id: ROUTES.UI,
+                        id: ROUTES.INSTALLATION,
                         isLayoutRoute: false,
-                        component: new SimpleRouteComponent(component: new HeadingComponent("UI"))
+                        component: new SimpleRouteComponent(component: new HeadingComponent("Installation"))
+                    ),
+                    new RouteDefinition(
+                        id: ROUTES.PACKAGES,
+                        isLayoutRoute: true,
+                        component: new SimpleRouteComponent(component: new OutletComponent()),
+                        children: new List<RouteDefinition>()
+                        {
+                            new RouteDefinition(
+                                id: ROUTES.ROUTER,
+                                isLayoutRoute: false,
+                                component: new SimpleRouteComponent(component: new HeadingComponent("Router"))
+                            ),
+                            new RouteDefinition(
+                                id: ROUTES.UI,
+                                isLayoutRoute: false,
+                                component: new SimpleRouteComponent(component: new HeadingComponent("UI"))
+                            ),
+                        }
                     ),
                 }
             ),
@@ -204,7 +231,7 @@ public static class DocsRouting
     {
         public override VirtualNode Render()
         {
-            return F.RouterProvider(new Router(ROUTER_TREE).Navigate(ROUTES.INTRODUCTION));
+            return F.RouterProvider(new Router(ROUTER_TREE).Navigate(ROUTES.LANDING));
         }
     }
 }

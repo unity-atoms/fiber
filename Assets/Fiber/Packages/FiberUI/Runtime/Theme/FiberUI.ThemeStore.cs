@@ -96,57 +96,100 @@ namespace Fiber.UI
         #endregion
         #region Typography
         private readonly Dictionary<TypographyType, BaseSignal<StyleFont>> _fontSignalsCache;
-        public BaseSignal<StyleFont> Font(TypographyType typographyType)
+        public BaseSignal<StyleFont> Font(SignalProp<TypographyType> typographyTypeProp)
         {
-            if (_fontSignalsCache.ContainsKey(typographyType))
+            if (typographyTypeProp.IsValue)
             {
-                return _fontSignalsCache[typographyType];
+                var typographyType = typographyTypeProp.Value;
+                if (_fontSignalsCache.ContainsKey(typographyType))
+                {
+                    return _fontSignalsCache[typographyType];
+                }
+
+                var signal = new InlineComputedSignal<Theme, StyleFont>((theme) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return typographyTokens.Font.Get();
+                }, this);
+                _fontSignalsCache.Add(typographyType, signal);
+
+                return signal;
             }
-
-            var signal = new InlineComputedSignal<Theme, StyleFont>((theme) =>
+            else if (typographyTypeProp.IsSignal)
             {
-                var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                return typographyTokens.Font.Get();
-            }, this);
-            _fontSignalsCache.Add(typographyType, signal);
+                var signal = new InlineComputedSignal<Theme, TypographyType, StyleFont>((theme, typographyType) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return typographyTokens.Font.Get();
+                }, this, typographyTypeProp.Signal);
+                return signal;
+            }
+            throw new ArgumentException($"TypographyTypeProp can't be empty");
 
-            return signal;
         }
 
         private readonly Dictionary<TypographyType, BaseSignal<StyleLength>> _fontSizeSignalsCache;
-        public BaseSignal<StyleLength> FontSize(TypographyType typographyType)
+        public BaseSignal<StyleLength> FontSize(SignalProp<TypographyType> typographyTypeProp)
         {
-            if (_fontSizeSignalsCache.ContainsKey(typographyType))
+            if (typographyTypeProp.IsValue)
             {
-                return _fontSizeSignalsCache[typographyType];
+                var typographyType = typographyTypeProp.Value;
+                if (_fontSizeSignalsCache.ContainsKey(typographyType))
+                {
+                    return _fontSizeSignalsCache[typographyType];
+                }
+
+                var signal = new InlineComputedSignal<Theme, StyleLength>((theme) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return typographyTokens.FontSize.Get();
+                }, this);
+                _fontSizeSignalsCache.Add(typographyType, signal);
+
+                return signal;
             }
-
-            var signal = new InlineComputedSignal<Theme, StyleLength>((theme) =>
+            else if (typographyTypeProp.IsSignal)
             {
-                var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                return typographyTokens.FontSize.Get();
-            }, this);
-            _fontSizeSignalsCache.Add(typographyType, signal);
-
-            return signal;
+                var signal = new InlineComputedSignal<Theme, TypographyType, StyleLength>((theme, typographyType) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return typographyTokens.FontSize.Get();
+                }, this, typographyTypeProp.Signal);
+                return signal;
+            }
+            throw new ArgumentException($"TypographyTypeProp can't be empty");
         }
 
         private readonly Dictionary<TypographyType, BaseSignal<StyleEnum<FontStyle>>> _fontStyleSignalsCache;
-        public BaseSignal<StyleEnum<FontStyle>> FontStyle(TypographyType typographyType)
+        public BaseSignal<StyleEnum<FontStyle>> FontStyle(SignalProp<TypographyType> typographyTypeProp)
         {
-            if (_fontStyleSignalsCache.ContainsKey(typographyType))
+            if (typographyTypeProp.IsValue)
             {
-                return _fontStyleSignalsCache[typographyType];
+                var typographyType = typographyTypeProp.Value;
+                if (_fontStyleSignalsCache.ContainsKey(typographyType))
+                {
+                    return _fontStyleSignalsCache[typographyType];
+                }
+
+                var signal = new InlineComputedSignal<Theme, StyleEnum<FontStyle>>((theme) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return typographyTokens.FontStyle.Get();
+                }, this);
+                _fontStyleSignalsCache.Add(typographyType, signal);
+
+                return signal;
             }
-
-            var signal = new InlineComputedSignal<Theme, StyleEnum<FontStyle>>((theme) =>
+            else if (typographyTypeProp.IsSignal)
             {
-                var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                return typographyTokens.FontStyle.Get();
-            }, this);
-            _fontStyleSignalsCache.Add(typographyType, signal);
-
-            return signal;
+                var signal = new InlineComputedSignal<Theme, TypographyType, StyleEnum<FontStyle>>((theme, typographyType) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return typographyTokens.FontStyle.Get();
+                }, this, typographyTypeProp.Signal);
+                return signal;
+            }
+            throw new ArgumentException($"TypographyTypeProp can't be empty");
         }
         #endregion
         #region Icon

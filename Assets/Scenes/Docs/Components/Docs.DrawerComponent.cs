@@ -52,7 +52,7 @@ public class DocsDrawerComponent : BaseComponent
                                         borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
                                     ),
                                     children: F.Children(
-                                        new DocsLogoComponent(),
+                                        new DocsLogoComponent(size: DocsLogoSize.Small),
                                         F.IconButton(
                                             iconName: "xmark",
                                             onPress: () =>

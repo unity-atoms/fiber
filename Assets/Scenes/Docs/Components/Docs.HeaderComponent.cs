@@ -27,7 +27,7 @@ public class DocsHeaderComponent : BaseComponent
                         )
                     )
                 ),
-                new DocsLogoComponent()
+                new DocsLogoComponent(size: DocsLogoSize.Small)
             )),
             F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
                 F.IconButton(variant: "github", iconName: "github", onPress: () =>

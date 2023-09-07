@@ -35,6 +35,11 @@ public static class DocsThemes
             fontSize: 48,
             fontStyle: FontStyle.Bold
         ),
+        heading2: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
+            fontSize: 32,
+            fontStyle: FontStyle.Bold
+        ),
         heading3: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 24,
@@ -48,11 +53,6 @@ public static class DocsThemes
         subtitle2: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 16,
-            fontStyle: FontStyle.Normal
-        ),
-        logo: new TypographyTypeTokens(
-            font: Resources.Load<Font>("Fonts/Pacifico/Pacifico-Regular"),
-            fontSize: 24,
             fontStyle: FontStyle.Normal
         )
     );

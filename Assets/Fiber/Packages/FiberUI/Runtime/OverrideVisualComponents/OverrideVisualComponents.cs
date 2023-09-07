@@ -112,7 +112,7 @@ namespace Fiber.UI
 
         // Typography component
         public delegate BaseComponent CreateTypographyDelegate(
-            TypographyType type,
+            SignalProp<TypographyType> type,
             SignalProp<string> text,
             string role,
             string variant,
