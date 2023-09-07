@@ -19,6 +19,7 @@ namespace Fiber.UI
         public TypographyTypeTokens Button { get; private set; }
         public TypographyTypeTokens Caption { get; private set; }
         public TypographyTypeTokens Overline { get; private set; }
+        public TypographyTypeTokens Logo { get; private set; }
 
         public TypographyTokens(
             TypographyTypeTokens heading1 = null,
@@ -33,7 +34,8 @@ namespace Fiber.UI
             TypographyTypeTokens body2 = null,
             TypographyTypeTokens button = null,
             TypographyTypeTokens caption = null,
-            TypographyTypeTokens overline = null
+            TypographyTypeTokens overline = null,
+            TypographyTypeTokens logo = null
         )
         {
             Heading1 = heading1;
@@ -62,6 +64,8 @@ namespace Fiber.UI
             Caption?.RegisterDependent(this);
             Overline = overline;
             Overline?.RegisterDependent(this);
+            Logo = logo;
+            Logo?.RegisterDependent(this);
         }
         ~TypographyTokens()
         {
@@ -78,6 +82,7 @@ namespace Fiber.UI
             Button?.UnregisterDependent(this);
             Caption?.UnregisterDependent(this);
             Overline?.UnregisterDependent(this);
+            Logo?.UnregisterDependent(this);
         }
 
         public override TypographyTokens Get() => this;
@@ -103,6 +108,7 @@ namespace Fiber.UI
                 TypographyType.Button => Button,
                 TypographyType.Caption => Caption,
                 TypographyType.Overline => Overline,
+                TypographyType.Logo => Logo,
                 _ => null,
             };
         }
@@ -128,6 +134,7 @@ namespace Fiber.UI
         Button = 10,
         Caption = 11,
         Overline = 12,
+        Logo = 13,
     }
 
     public class TypographyTypeTokens : BaseSignal<TypographyTypeTokens>

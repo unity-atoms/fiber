@@ -49,6 +49,11 @@ public static class DocsThemes
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 16,
             fontStyle: FontStyle.Normal
+        ),
+        logo: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/Pacifico/Pacifico-Regular"),
+            fontSize: 24,
+            fontStyle: FontStyle.Normal
         )
     );
 

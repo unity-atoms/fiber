@@ -134,7 +134,8 @@ namespace Fiber.UI
                     flexShrink: 1,
                     flexDirection: FlexDirection.Row,
                     alignItems: Align.Center,
-                    justifyContent: _justifyContent
+                    justifyContent: _justifyContent,
+                    height: new Length(100, LengthUnit.Percent)
                 )
             );
         }
