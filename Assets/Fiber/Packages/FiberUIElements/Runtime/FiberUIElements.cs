@@ -188,6 +188,48 @@ namespace Fiber.UIElements
             );
         }
 
+        public static ImageComponent Image(
+            this BaseComponent component,
+            SignalProp<Style> style = new(),
+            SignalProp<string> name = new(),
+            SignalProp<PickingMode> pickingMode = new(),
+            EventCallback<ClickEvent> onClick = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
+            SignalProp<List<string>> className = new(),
+            List<VirtualNode> children = null,
+            Ref<Image> imageRef = null,
+            Action<Image> onCreateImageRef = null,
+            SignalProp<Texture> image = new(),
+            SignalProp<ScaleMode> scaleMode = new(),
+            SignalProp<Rect> sourceRect = new(),
+            SignalProp<Sprite> sprite = new(),
+            SignalProp<Color> tintColor = new(),
+            SignalProp<Rect> uv = new(),
+            SignalProp<VectorImage> vectorImage = new()
+        )
+        {
+            return new ImageComponent(
+                style: style,
+                name: name,
+                pickingMode: pickingMode,
+                onClick: onClick,
+                _ref: _ref,
+                onCreateRef: onCreateRef,
+                className: className,
+                children: children,
+                imageRef: imageRef,
+                onCreateImageRef: onCreateImageRef,
+                image: image,
+                scaleMode: scaleMode,
+                sourceRect: sourceRect,
+                sprite: sprite,
+                tintColor: tintColor,
+                uv: uv,
+                vectorImage: vectorImage
+            );
+        }
+
         public static UIDocumentComponent UIDocument(
             this BaseComponent component,
             SignalProp<string> name = new(),
@@ -420,6 +462,59 @@ namespace Fiber.UIElements
         }
     }
 
+    public class ImageComponent : ViewComponent
+    {
+        public SignalProp<Texture> Image { get; set; }
+        public SignalProp<ScaleMode> ScaleMode { get; set; }
+        public SignalProp<Rect> SourceRect { get; set; }
+        public SignalProp<Sprite> Sprite { get; set; }
+        public SignalProp<Color> TintColor { get; set; }
+        public SignalProp<Rect> UV { get; set; }
+        public SignalProp<VectorImage> VectorImage { get; set; }
+        public Ref<Image> ImageRef { get; set; }
+        public Action<Image> OnCreateImageRef { get; set; }
+
+        public ImageComponent(
+            SignalProp<Style> style = new(),
+            SignalProp<string> name = new(),
+            SignalProp<PickingMode> pickingMode = new(),
+            EventCallback<ClickEvent> onClick = null,
+            Ref<VisualElement> _ref = null,
+            Action<VisualElement> onCreateRef = null,
+            SignalProp<List<string>> className = new(),
+            List<VirtualNode> children = null,
+            Ref<Image> imageRef = null,
+            Action<Image> onCreateImageRef = null,
+            SignalProp<Texture> image = new(),
+            SignalProp<ScaleMode> scaleMode = new(),
+            SignalProp<Rect> sourceRect = new(),
+            SignalProp<Sprite> sprite = new(),
+            SignalProp<Color> tintColor = new(),
+            SignalProp<Rect> uv = new(),
+            SignalProp<VectorImage> vectorImage = new()
+        ) : base(
+                style: style,
+                name: name,
+                pickingMode: !pickingMode.IsEmpty ? pickingMode : UnityEngine.UIElements.PickingMode.Position,
+                onClick: onClick,
+                _ref: _ref,
+                onCreateRef: onCreateRef,
+                className: className,
+                children: children
+            )
+        {
+            ImageRef = imageRef;
+            OnCreateImageRef = onCreateImageRef;
+            Image = image;
+            ScaleMode = scaleMode;
+            SourceRect = sourceRect;
+            Sprite = sprite;
+            TintColor = tintColor;
+            UV = uv;
+            VectorImage = vectorImage;
+        }
+    }
+
     public class UIRootContext
     {
         public Ref<VisualElement> RootRef { get; private set; }
@@ -567,6 +662,163 @@ namespace Fiber.UIElements
             if (_valueWorkLoopItem.IsSignal)
             {
                 _valueWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+        }
+    }
+
+    public class ImageNativeNode : VisualElementNativeNode
+    {
+        public virtual Image ImageInstance { get; private set; }
+        private WorkLoopSignalProp<Texture> _imageWorkLoopItem;
+        private WorkLoopSignalProp<ScaleMode> _scaleModeWorkLoopItem;
+        private WorkLoopSignalProp<Rect> _sourceRectWorkLoopItem;
+        private WorkLoopSignalProp<Sprite> _spriteWorkLoopItem;
+        private WorkLoopSignalProp<Color> _tintColorWorkLoopItem;
+        private WorkLoopSignalProp<Rect> _uvWorkLoopItem;
+        private WorkLoopSignalProp<VectorImage> _vectorImageWorkLoopItem;
+
+        public ImageNativeNode(ImageComponent virtualNode, Image instance) : base(virtualNode, instance)
+        {
+            ImageInstance = instance;
+
+            if (virtualNode.ImageRef != null) virtualNode.ImageRef.Current = instance;
+            if (virtualNode.OnCreateImageRef != null) virtualNode.OnCreateImageRef(instance);
+
+            if (!virtualNode.Image.IsEmpty)
+            {
+                ImageInstance.image = virtualNode.Image.Get();
+                if (virtualNode.Image.IsSignal)
+                {
+                    virtualNode.Image.Signal.RegisterDependent(this);
+                }
+                _imageWorkLoopItem = new(virtualNode.Image);
+            }
+
+            if (!virtualNode.ScaleMode.IsEmpty)
+            {
+                ImageInstance.scaleMode = virtualNode.ScaleMode.Get();
+                if (virtualNode.ScaleMode.IsSignal)
+                {
+                    virtualNode.ScaleMode.Signal.RegisterDependent(this);
+                }
+                _scaleModeWorkLoopItem = new(virtualNode.ScaleMode);
+            }
+
+            if (!virtualNode.SourceRect.IsEmpty)
+            {
+                ImageInstance.sourceRect = virtualNode.SourceRect.Get();
+                if (virtualNode.SourceRect.IsSignal)
+                {
+                    virtualNode.SourceRect.Signal.RegisterDependent(this);
+                }
+                _sourceRectWorkLoopItem = new(virtualNode.SourceRect);
+            }
+
+            if (!virtualNode.Sprite.IsEmpty)
+            {
+                ImageInstance.sprite = virtualNode.Sprite.Get();
+                if (virtualNode.Sprite.IsSignal)
+                {
+                    virtualNode.Sprite.Signal.RegisterDependent(this);
+                }
+                _spriteWorkLoopItem = new(virtualNode.Sprite);
+            }
+
+            if (!virtualNode.TintColor.IsEmpty)
+            {
+                ImageInstance.tintColor = virtualNode.TintColor.Get();
+                if (virtualNode.TintColor.IsSignal)
+                {
+                    virtualNode.TintColor.Signal.RegisterDependent(this);
+                }
+                _tintColorWorkLoopItem = new(virtualNode.TintColor);
+            }
+
+            if (!virtualNode.UV.IsEmpty)
+            {
+                ImageInstance.uv = virtualNode.UV.Get();
+                if (virtualNode.UV.IsSignal)
+                {
+                    virtualNode.UV.Signal.RegisterDependent(this);
+                }
+                _uvWorkLoopItem = new(virtualNode.UV);
+            }
+
+            if (!virtualNode.VectorImage.IsEmpty)
+            {
+                ImageInstance.vectorImage = virtualNode.VectorImage.Get();
+                if (virtualNode.VectorImage.IsSignal)
+                {
+                    virtualNode.VectorImage.Signal.RegisterDependent(this);
+                }
+                _vectorImageWorkLoopItem = new(virtualNode.VectorImage);
+            }
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_imageWorkLoopItem.Check())
+            {
+                ImageInstance.image = _imageWorkLoopItem.Get();
+            }
+            if (_scaleModeWorkLoopItem.Check())
+            {
+                ImageInstance.scaleMode = _scaleModeWorkLoopItem.Get();
+            }
+            if (_sourceRectWorkLoopItem.Check())
+            {
+                ImageInstance.sourceRect = _sourceRectWorkLoopItem.Get();
+            }
+            if (_spriteWorkLoopItem.Check())
+            {
+                ImageInstance.sprite = _spriteWorkLoopItem.Get();
+            }
+            if (_tintColorWorkLoopItem.Check())
+            {
+                ImageInstance.tintColor = _tintColorWorkLoopItem.Get();
+            }
+            if (_uvWorkLoopItem.Check())
+            {
+                ImageInstance.uv = _uvWorkLoopItem.Get();
+            }
+            if (_vectorImageWorkLoopItem.Check())
+            {
+                ImageInstance.vectorImage = _vectorImageWorkLoopItem.Get();
+            }
+        }
+
+        public override void Cleanup()
+        {
+            base.Cleanup();
+
+            if (_imageWorkLoopItem.IsSignal)
+            {
+                _imageWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_scaleModeWorkLoopItem.IsSignal)
+            {
+                _scaleModeWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_sourceRectWorkLoopItem.IsSignal)
+            {
+                _sourceRectWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_spriteWorkLoopItem.IsSignal)
+            {
+                _spriteWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_tintColorWorkLoopItem.IsSignal)
+            {
+                _tintColorWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_uvWorkLoopItem.IsSignal)
+            {
+                _uvWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_vectorImageWorkLoopItem.IsSignal)
+            {
+                _vectorImageWorkLoopItem.SignalProp.Signal.UnregisterDependent(this);
             }
         }
     }
@@ -3816,6 +4068,11 @@ namespace Fiber.UIElements
                 var button = new Button();
                 return new ButtonNativeNode(buttonComponent, button);
             }
+            else if (virtualNode is ImageComponent imageComponent)
+            {
+                var image = new Image();
+                return new ImageNativeNode(imageComponent, image);
+            }
             else if (virtualNode is ViewComponent viewComponent)
             {
                 var visualElement = new VisualElement();
@@ -3834,6 +4091,7 @@ namespace Fiber.UIElements
                 || type == typeof(TextFieldComponent)
                 || type == typeof(TextComponent)
                 || type == typeof(ButtonComponent)
+                || type == typeof(ImageComponent)
                 || type == typeof(ViewComponent);
         }
     }
