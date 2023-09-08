@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.UIElements;
 using Signals;
 using System;
@@ -32,7 +33,9 @@ namespace Fiber.UI
                 interactiveElement.Ref.Current.RegisterCallback<PointerDownEvent>(evt =>
                 {
                     interactiveElement.IsPressed.Value = true;
-                });
+                    // Need to specify useTrickleDown in order to catch the event for buttons
+                    // See this thread for more info: https://forum.unity.com/threads/pointerdownevent-on-buttons-not-working.1211238/
+                }, useTrickleDown: TrickleDown.TrickleDown);
                 interactiveElement.Ref.Current.RegisterCallback<PointerUpEvent>(evt =>
                 {
                     if (interactiveElement.IsPressed.Value)

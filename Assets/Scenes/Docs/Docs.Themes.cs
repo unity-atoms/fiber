@@ -8,6 +8,8 @@ public static class DocsThemes
 {
     public static class ROLES
     {
+        public const string PRIMARY = "primary";
+        public const string SECONDARY = "secondary";
         public const string NEUTRAL = "neutral";
         public const string DEEP_NEUTRAL = "deepNeutral";
         public const string DEBUG = "debug";
@@ -54,6 +56,11 @@ public static class DocsThemes
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 16,
             fontStyle: FontStyle.Normal
+        ),
+        button: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
+            fontSize: 16,
+            fontStyle: FontStyle.Bold
         )
     );
 
@@ -141,6 +148,35 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.RED_41
+                )
+            ) },
+            { ROLES.PRIMARY, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                border: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_19
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_100
+                )
+            ) },
+            { ROLES.SECONDARY, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_13,
+                    selected: FIBER_COLOR_PALETTE.GRAY_20,
+                    hovered: FIBER_COLOR_PALETTE.GRAY_20,
+                    pressed: FIBER_COLOR_PALETTE.GRAY_7
+                ),
+                border: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_7
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_100,
+                    selected: FIBER_COLOR_PALETTE.SKY_48
                 )
             ) },
         },

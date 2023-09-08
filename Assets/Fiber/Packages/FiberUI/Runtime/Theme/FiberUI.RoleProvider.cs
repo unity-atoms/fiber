@@ -49,6 +49,7 @@ namespace Fiber.UI
         public const string SKY_41 = "#0288D1";
         public const string SKY_45 = "#039BE5";
         public const string SKY_48 = "#03A9F4";
+        public const string SKY_56 = "#22B9FB";
         public const string SKY_64 = "#4FC3F7";
         public const string SKY_74 = "#81D4FA";
         public const string SKY_85 = "#B3E5FC";

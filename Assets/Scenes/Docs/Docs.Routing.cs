@@ -105,6 +105,7 @@ public static class DocsRouting
             return F.View(
                 style: new Style(
                     display: DisplayStyle.Flex,
+                    backgroundColor: C<ThemeStore>().Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
                     height: new Length(100, LengthUnit.Percent),
                     width: new Length(100, LengthUnit.Percent),
                     flexDirection: FlexDirection.Column,
