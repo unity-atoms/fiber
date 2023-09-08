@@ -1,6 +1,7 @@
 using Fiber;
 using Fiber.UIElements;
 using Fiber.UI;
+using Fiber.Router;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
 using UnityEngine;
@@ -40,6 +41,7 @@ public class DocsLandingPageComponent : BaseComponent
         var themeStore = C<ThemeStore>();
         var logoSize = F.CreateComputedSignal((isSmall) => !isSmall ? DocsLogoSize.Large : DocsLogoSize.XL, themeStore.IsSmallScreen);
         var typographyType = F.CreateComputedSignal((isSmall) => !isSmall ? TypographyType.Heading3 : TypographyType.Heading2, themeStore.IsSmallScreen);
+        var router = C<Router>();
 
         return F.Fragment(
             children: F.Children(
@@ -64,7 +66,7 @@ public class DocsLandingPageComponent : BaseComponent
                         new FiberUIButtonComponent(
                             children: F.Children(F.Text(text: "Get Started")),
                             role: DocsThemes.ROLES.PRIMARY,
-                            onPress: () => { Debug.Log($"Getting started"); }
+                            onPress: () => { router.Navigate(DocsRouting.ROUTES.INTRODUCTION); }
                         )
                     )
                 )

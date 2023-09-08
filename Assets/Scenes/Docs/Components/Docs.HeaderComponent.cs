@@ -3,12 +3,14 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using Fiber.UI;
+using Fiber.Router;
 using Signals;
 
 public class DocsHeaderComponent : BaseComponent
 {
     public override VirtualNode Render()
     {
+        var router = C<Router>();
         var themeStore = C<ThemeStore>();
         var drawerContext = C<DocsDrawerContext>();
         var iconName = new Signal<string>("sun");
@@ -27,7 +29,13 @@ public class DocsHeaderComponent : BaseComponent
                         )
                     )
                 ),
-                new DocsLogoComponent(size: DocsLogoSize.Small)
+                new DocsLogoComponent(
+                    size: DocsLogoSize.Small,
+                    onClick: (e) =>
+                    {
+                        router.Navigate(DocsRouting.ROUTES.LANDING);
+                    }
+                )
             )),
             F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
                 F.IconButton(variant: "github", iconName: "github", onPress: () =>

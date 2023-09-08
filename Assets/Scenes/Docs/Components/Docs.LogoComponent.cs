@@ -15,10 +15,15 @@ public enum DocsLogoSize
 
 public class DocsLogoComponent : BaseComponent
 {
-    private SignalProp<DocsLogoSize> _size;
-    public DocsLogoComponent(SignalProp<DocsLogoSize> size)
+    private readonly SignalProp<DocsLogoSize> _size;
+    private readonly EventCallback<ClickEvent> _onClick;
+    public DocsLogoComponent(
+        SignalProp<DocsLogoSize> size,
+        EventCallback<ClickEvent> onClick = null
+    )
     {
         _size = size;
+        _onClick = onClick;
     }
 
     StyleLength GetImgSize(DocsLogoSize size)
@@ -77,7 +82,8 @@ public class DocsLogoComponent : BaseComponent
                         color: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Text)
                     )
                 )
-            )
+            ),
+            onClick: _onClick
         );
     }
 }
