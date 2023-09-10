@@ -103,7 +103,7 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.SKY_48,
+                    selected: FIBER_COLOR_PALETTE.SKY_56,
                     variants: new ()
                     {
                         { "discord", new(
@@ -139,7 +139,7 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.SKY_48
+                    selected: FIBER_COLOR_PALETTE.SKY_56
                 )
             ) },
             { ROLES.DEBUG, new(
@@ -158,25 +158,13 @@ public static class DocsThemes
                     pressed: FIBER_COLOR_PALETTE.SKY_31
                 ),
                 border: new(
-                    @default: FIBER_COLOR_PALETTE.SKY_19
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100
-                )
-            ) },
-            { ROLES.SECONDARY, new(
-                background: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_13,
-                    selected: FIBER_COLOR_PALETTE.GRAY_20,
-                    hovered: FIBER_COLOR_PALETTE.GRAY_20,
-                    pressed: FIBER_COLOR_PALETTE.GRAY_7
-                ),
-                border: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_7
-                ),
-                text: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.SKY_48
                 )
             ) },
         },
@@ -220,6 +208,23 @@ public static class DocsThemes
                     @default: FIBER_COLOR_PALETTE.GRAY_0,
                     selected: FIBER_COLOR_PALETTE.SKY_37,
                     hovered: FIBER_COLOR_PALETTE.SKY_37
+                )
+            ) },
+            { ROLES.PRIMARY, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                border: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_100
                 )
             ) },
         },

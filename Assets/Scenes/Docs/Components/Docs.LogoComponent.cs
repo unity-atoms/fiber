@@ -17,13 +17,16 @@ public class DocsLogoComponent : BaseComponent
 {
     private readonly SignalProp<DocsLogoSize> _size;
     private readonly EventCallback<ClickEvent> _onClick;
+    private readonly Style _style;
     public DocsLogoComponent(
         SignalProp<DocsLogoSize> size,
-        EventCallback<ClickEvent> onClick = null
+        EventCallback<ClickEvent> onClick = null,
+        Style style = new()
     )
     {
         _size = size;
         _onClick = onClick;
+        _style = style;
     }
 
     StyleLength GetImgSize(DocsLogoSize size)
@@ -59,6 +62,7 @@ public class DocsLogoComponent : BaseComponent
 
         return F.View(
             style: new Style(
+                mergedStyle: _style,
                 display: DisplayStyle.Flex,
                 flexDirection: FlexDirection.Row,
                 alignItems: Align.Center
@@ -79,7 +83,8 @@ public class DocsLogoComponent : BaseComponent
                         fontSize: fontSize,
                         unityFont: Resources.Load<Font>("Fonts/Pacifico/Pacifico-Regular"),
                         unityFontDefinition: StyleKeyword.None,
-                        color: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Text)
+                        color: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Text),
+                        unityTextAlign: TextAnchor.MiddleCenter
                     )
                 )
             ),

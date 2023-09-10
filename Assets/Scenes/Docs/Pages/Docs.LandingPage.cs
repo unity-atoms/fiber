@@ -53,10 +53,16 @@ public class DocsLandingPageComponent : BaseComponent
                                 display: DisplayStyle.Flex,
                                 flexDirection: FlexDirection.Column,
                                 justifyContent: Justify.Center,
-                                alignItems: Align.Center
+                                alignItems: Align.Center,
+                                marginBottom: themeStore.Spacing(6)
                             ),
                             children: F.Children(
-                                new DocsLogoComponent(size: logoSize),
+                                new DocsLogoComponent(
+                                    size: logoSize,
+                                    style: new Style(
+                                        marginBottom: themeStore.Spacing(-4)
+                                    )
+                                ),
                                 F.Typography(
                                     text: "A declarative library for Unity",
                                     type: typographyType

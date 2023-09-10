@@ -97,8 +97,8 @@ namespace Fiber.UI
                     unityFontDefinition: StyleKeyword.None,
                     fontSize: themeStore.FontSize(TypographyType.Button),
                     unityFontStyle: themeStore.FontStyle(TypographyType.Button),
-                    paddingTop: themeStore.Spacing(3),
-                    paddingBottom: themeStore.Spacing(3),
+                    paddingTop: themeStore.Spacing(2),
+                    paddingBottom: themeStore.Spacing(2),
                     paddingLeft: themeStore.Spacing(6),
                     paddingRight: themeStore.Spacing(6)
                 ),
