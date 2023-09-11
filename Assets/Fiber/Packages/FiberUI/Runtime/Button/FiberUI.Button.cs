@@ -5,33 +5,35 @@ using Fiber.UIElements;
 
 namespace Fiber.UI
 {
-    // public static partial class BaseComponentExtensions
-    // {
-    //     public static FiberUIButtonComponent FiberUIButton(
-    //         this BaseComponent component,
-    //         List<VirtualNode> children,
-    //         string role,
-    //         string variant = null,
-    //         Style style = new()
-    //     )
-    //     {
-    //         return new FiberUIButtonComponent(
-    //             children: children,
-    //             role: role,
-    //             variant: variant,
-    //             style: style
-    //         );
-    //     }
-    // }
+    public static partial class BaseComponentExtensions
+    {
+        public static SilkButtonComponent SilkButton(
+            this BaseComponent component,
+            List<VirtualNode> children,
+            string role,
+            string variant = null,
+            Style style = new(),
+            Action onPress = null
+        )
+        {
+            return new SilkButtonComponent(
+                children: children,
+                role: role,
+                variant: variant,
+                style: style,
+                onPress: onPress
+            );
+        }
+    }
 
-    public class FiberUIButtonComponent : BaseComponent
+    public class SilkButtonComponent : BaseComponent
     {
         private readonly string _role;
         private readonly string _variant;
         private readonly Style _style;
         private readonly Action _onPress;
 
-        public FiberUIButtonComponent(
+        public SilkButtonComponent(
             List<VirtualNode> children,
             string role,
             string variant = null,

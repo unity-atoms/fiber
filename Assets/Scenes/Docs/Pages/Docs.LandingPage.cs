@@ -69,7 +69,7 @@ public class DocsLandingPageComponent : BaseComponent
                                 )
                             )
                         ),
-                        new FiberUIButtonComponent(
+                        F.SilkButton(
                             children: F.Children(F.Text(text: "Get Started")),
                             role: DocsThemes.ROLES.PRIMARY,
                             onPress: () => { router.Navigate(DocsRouting.ROUTES.INTRODUCTION); }
