@@ -4,7 +4,7 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using Fiber.Router;
-using Fiber.UI;
+using SilkUI;
 
 public static class DocsRouting
 {
@@ -217,7 +217,7 @@ public static class DocsRouting
         {
             var themeStore = C<ThemeStore>();
 
-            return F.Typography(
+            return F.SilkTypography(
                 text: _text,
                 type: TypographyType.Heading1,
                 style: new Style(

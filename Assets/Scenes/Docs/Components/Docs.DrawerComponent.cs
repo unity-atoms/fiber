@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
-using Fiber.UI;
+using SilkUI;
 using Signals;
 
 public class DocsDrawerComponent : BaseComponent
@@ -18,7 +18,7 @@ public class DocsDrawerComponent : BaseComponent
                 F.Visible(
                     when: drawerContext.IsOpen,
                     children: F.Children(
-                        F.Backdrop(
+                        F.SilkBackdrop(
                             onClick: (e) =>
                             {
                                 drawerContext.IsOpen.Value = false;
@@ -26,7 +26,7 @@ public class DocsDrawerComponent : BaseComponent
                         )
                     )
                 ),
-                F.Drawer(
+                F.SilkDrawer(
                     role: DocsThemes.ROLES.DEEP_NEUTRAL,
                     isOpen: drawerContext.IsOpen,
                     children: F.Children(
@@ -53,7 +53,7 @@ public class DocsDrawerComponent : BaseComponent
                                     ),
                                     children: F.Children(
                                         new DocsLogoComponent(size: DocsLogoSize.Small),
-                                        F.IconButton(
+                                        F.SilkIconButton(
                                             iconName: "xmark",
                                             onPress: () =>
                                             {

@@ -1,6 +1,6 @@
 using Fiber;
 using Fiber.UIElements;
-using Fiber.UI;
+using SilkUI;
 using Fiber.Router;
 using UnityEngine.UIElements;
 using System.Collections.Generic;
@@ -63,7 +63,7 @@ public class DocsLandingPageComponent : BaseComponent
                                         marginBottom: themeStore.Spacing(-4)
                                     )
                                 ),
-                                F.Typography(
+                                F.SilkTypography(
                                     text: "A declarative library for Unity",
                                     type: typographyType
                                 )

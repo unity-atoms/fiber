@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using Signals;
-using Fiber.UI;
+using SilkUI;
 using Fiber.UIElements;
 
 namespace Fiber.DebugUI
