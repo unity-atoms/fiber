@@ -108,18 +108,18 @@ public static class DocsThemes
                     {
                         { "discord", new(
                             @default: FIBER_COLOR_PALETTE.GRAY_100,
-                            selected: "#5865F2",
+                            selected: "#5865F2", // Discord's official blue
                             hovered: "#5865F2"
                         ) },
                         { "github", new(
                             @default: FIBER_COLOR_PALETTE.GRAY_100,
-                            selected: "#FECEF1",
-                            hovered: "#FECEF1"
+                            selected: FIBER_COLOR_PALETTE.ORANGE_60,
+                            hovered: FIBER_COLOR_PALETTE.ORANGE_60
                         ) },
                         { "sun", new(
                             @default: FIBER_COLOR_PALETTE.GRAY_100,
-                            selected: "#F09D51",
-                            hovered: "#F09D51"
+                            selected: FIBER_COLOR_PALETTE.YELLOW_60,
+                            hovered: FIBER_COLOR_PALETTE.YELLOW_60
                         ) },
                     }
                 ),

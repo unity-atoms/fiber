@@ -65,6 +65,29 @@ namespace SilkUI
         public const string RED_74 = "#FA8183";
         public const string RED_85 = "#FCB3B4";
         public const string RED_94 = "#FEE1E1";
+
+
+        public const string ORANGE_31 = "#923C0C";
+        public const string ORANGE_37 = "#AE480E";
+        public const string ORANGE_41 = "#C15010";
+        public const string ORANGE_45 = "#D45811";
+        public const string ORANGE_48 = "#E25D13";
+        public const string ORANGE_60 = "#F08244";
+        public const string ORANGE_64 = "#F18D55";
+        public const string ORANGE_74 = "#F5AD84";
+        public const string ORANGE_85 = "#F9D0B8";
+        public const string ORANGE_94 = "#FDECE3";
+
+        public const string YELLOW_31 = "#958E09";
+        public const string YELLOW_37 = "#B2A90A";
+        public const string YELLOW_41 = "#C6BB0B";
+        public const string YELLOW_45 = "#D9CE0C";
+        public const string YELLOW_48 = "#E7DB0D";
+        public const string YELLOW_60 = "#F4EA40";
+        public const string YELLOW_64 = "#F5EC51";
+        public const string YELLOW_74 = "#F8F182";
+        public const string YELLOW_85 = "#FBF7B7";
+        public const string YELLOW_94 = "#FDFCE2";
     }
 
     public static partial class BaseComponentExtensions
