@@ -14,11 +14,13 @@ public class DocsHeaderComponent : BaseComponent
         var themeStore = C<ThemeStore>();
         var drawerContext = C<DocsDrawerContext>();
         var iconName = new Signal<string>("sun");
+        var isLandingPageRoute = F.CreateComputedSignal((r) => r.PeekRoute().Id == DocsRouting.ROUTES.LANDING, router);
+        var smallScreenNotLandingPage = F.CreateComputedSignal((isLandingPageRoute, isMediumScreen) => !isLandingPageRoute && !isLandingPageRoute, isLandingPageRoute, themeStore.IsMediumScreen);
 
         return F.SilkHeader(children: F.Children(
             F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
                 F.Visible(
-                    when: new NegatedBoolSignal(themeStore.IsMediumScreen),
+                    when: smallScreenNotLandingPage,
                     children: F.Children(
                         F.SilkIconButton(
                             iconName: "bars", onPress: () =>

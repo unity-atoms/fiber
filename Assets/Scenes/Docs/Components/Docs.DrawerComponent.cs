@@ -3,12 +3,14 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using SilkUI;
+using Fiber.Router;
 using Signals;
 
 public class DocsDrawerComponent : BaseComponent
 {
     public override VirtualNode Render()
     {
+        var router = C<Router>();
         var themeStore = C<ThemeStore>();
         var drawerContext = C<DocsDrawerContext>();
 
@@ -52,7 +54,13 @@ public class DocsDrawerComponent : BaseComponent
                                         borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
                                     ),
                                     children: F.Children(
-                                        new DocsLogoComponent(size: DocsLogoSize.Small),
+                                        new DocsLogoComponent(
+                                            size: DocsLogoSize.Small,
+                                            onClick: (e) =>
+                                            {
+                                                router.Navigate(DocsRouting.ROUTES.LANDING);
+                                            }
+                                        ),
                                         F.SilkIconButton(
                                             iconName: "xmark",
                                             onPress: () =>
