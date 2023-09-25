@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using Fiber;
 using Signals;
 
-namespace CursorManager
+namespace Fiber.Cursed
 {
     public static partial class BaseComponentExtensions
     {

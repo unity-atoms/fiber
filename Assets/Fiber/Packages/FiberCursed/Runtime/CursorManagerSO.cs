@@ -2,9 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using FiberUtils;
 
-namespace CursorManager
+namespace Fiber.Cursed
 {
-    [CreateAssetMenu(menuName = "Fiber/CursorManager/CursorManagerSO", fileName = "CursorManagerSO")]
+    [CreateAssetMenu(menuName = "Fiber/Cursed/CursorManagerSO", fileName = "CursorManagerSO")]
     public class CursorManagerSO : ScriptableObject
     {
         [SerializeField]

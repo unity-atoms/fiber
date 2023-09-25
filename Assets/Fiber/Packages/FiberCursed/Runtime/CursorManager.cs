@@ -6,7 +6,7 @@ using FiberUtils;
 using System.Runtime.InteropServices;
 #endif
 
-namespace CursorManager
+namespace Fiber.Cursed
 {
     // Enum based on https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
     public enum CursorType
@@ -64,7 +64,7 @@ namespace CursorManager
         }
     }
 
-    public static class CursorManagerUtils
+    public static class CursorUtils
     {
         private static Dictionary<CursorType, string> _cursorTypeToStringMap = new()
         {
@@ -214,7 +214,7 @@ namespace CursorManager
         void SetCursor(CursorType cursor)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            var cursorString = CursorManagerUtils.CursorTypeToString(cursor);
+            var cursorString = CursorUtils.CursorTypeToString(cursor);
             Fiber_SetBrowserCursor(cursorString);
 #else
             for (var i = 0; i < _cursorDefinitions.Count; ++i)

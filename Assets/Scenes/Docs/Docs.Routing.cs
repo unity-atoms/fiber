@@ -6,7 +6,7 @@ using Fiber.UIElements;
 using Fiber.Router;
 using SilkUI;
 using Signals;
-using CursorManager;
+using Fiber.Cursed;
 
 public static class DocsRouting
 {

@@ -2,7 +2,7 @@ using System;
 using UnityEngine.UIElements;
 using Fiber;
 using Signals;
-using CursorManager;
+using Fiber.Cursed;
 
 namespace SilkUI
 {
@@ -51,7 +51,7 @@ namespace SilkUI
                 return null;
             });
 
-            var cursorManager = component.C<CursorManager.CursorManager>();
+            var cursorManager = component.C<CursorManager>();
             var id = cursorManager.GetUniqueID();
             component.CreateEffect((isHovered, isPressed, isDisabled) =>
             {

@@ -1,5 +1,5 @@
 {
-    "name": "Fiber.CursorManager.Runtime",
+    "name": "Fiber.Cursed.Runtime",
     "rootNamespace": "",
     "references": [
         "GUID:7d4df59988a124f1092a78e2f7af90fd",
