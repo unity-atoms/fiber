@@ -117,6 +117,7 @@ namespace Fiber.Cursed
         }
     }
 
+    [Serializable]
     public class CursorManager
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
