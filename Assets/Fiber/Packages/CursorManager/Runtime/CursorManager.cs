@@ -11,8 +11,8 @@ namespace CursorManager
     // Enum based on https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
     public enum CursorType
     {
-        Auto = 0,
-        Default = 1,
+        Default = 0,
+        Auto = 1,
         None = 2,
         ContextMenu = 3,
         Help = 4,
@@ -68,8 +68,8 @@ namespace CursorManager
     {
         private static Dictionary<CursorType, string> _cursorTypeToStringMap = new()
         {
-            { CursorType.Auto, "auto" },
             { CursorType.Default, "default" },
+            { CursorType.Auto, "auto" },
             { CursorType.None, "none" },
             { CursorType.ContextMenu, "context-menu" },
             { CursorType.Help, "help" },
@@ -188,7 +188,7 @@ namespace CursorManager
             UpdateCursor();
         }
 
-        bool IsWishingCursor(int id)
+        public bool IsWishingCursor(int id)
         {
             return _cursorWishesById.ContainsKey(id);
         }
