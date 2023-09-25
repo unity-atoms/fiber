@@ -1,5 +1,5 @@
 using Fiber;
-using Fiber.UI;
+using SilkUI;
 using Fiber.Router;
 using Signals;
 
@@ -25,7 +25,7 @@ public class DocsTreeViewComponent : BaseComponent
             }
         }
 
-        return F.TreeViewContainer(
+        return F.SilkTreeViewContainer(
             role: DocsThemes.ROLES.DEEP_NEUTRAL,
             selectedItemId: selectedItemId,
             onItemSelected: (string id) =>
@@ -50,11 +50,11 @@ public class DocsTreeViewComponent : BaseComponent
             },
             expandedItemIds: expandedItemIds,
             children: F.Children(
-                F.TreeViewItem(id: DocsRouting.ROUTES.INTRODUCTION, label: $"Introduction"),
-                F.TreeViewItem(id: DocsRouting.ROUTES.INSTALLATION, label: $"Installation"),
-                F.TreeViewItem(id: DocsRouting.ROUTES.PACKAGES, label: $"Packages", children: F.Children(
-                    F.TreeViewItem(id: DocsRouting.ROUTES.ROUTER, label: $"Router"),
-                    F.TreeViewItem(id: DocsRouting.ROUTES.UI, label: $"UI")
+                F.SilkTreeViewItem(id: DocsRouting.ROUTES.INTRODUCTION, label: $"Introduction"),
+                F.SilkTreeViewItem(id: DocsRouting.ROUTES.INSTALLATION, label: $"Installation"),
+                F.SilkTreeViewItem(id: DocsRouting.ROUTES.PACKAGES, label: $"Packages", children: F.Children(
+                    F.SilkTreeViewItem(id: DocsRouting.ROUTES.ROUTER, label: $"Router"),
+                    F.SilkTreeViewItem(id: DocsRouting.ROUTES.UI, label: $"UI")
                 ))
             )
         );

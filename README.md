@@ -116,6 +116,7 @@ See [Unity's docs](https://docs.unity3d.com/Manual/upm-ui-giturl.html) for more 
 - `Fiber.UIElements`: UI Elements renderer extension. Depends on FiberUtils, Signals, Fiber and FiberGameObjects.
 - [`Fiber.Router`](./Packages/FiberRouter/README.md): A router for Fiber. Depends on Signals and Fiber.
 - `Fiber.Suite`: A suite of all Fiber packages, exposing a convenient API for end users. Depends on all other Fiber packages.
+- `SilkUI`: A design system and component library for Unity powered by Fiber. Depends on FiberUtils, Signals, Fiber, FiberGameObjects and FiberUIElements.
 
 ## Reactivity 
 

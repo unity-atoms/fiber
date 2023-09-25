@@ -56,6 +56,19 @@ namespace FiberUtils
             get { return GetByKey(key); }
         }
 
+        public void SetByKey(K key, V value)
+        {
+            for (var i = 0; i < _list.Count; ++i)
+            {
+                if (_list[i].Key.Equals(key))
+                {
+                    _list[i] = new(key, value);
+                    break;
+                }
+            }
+            _dictionary[key] = value;
+        }
+
         public V GetByKey(K key)
         {
             return _dictionary[key];

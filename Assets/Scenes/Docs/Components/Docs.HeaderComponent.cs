@@ -2,23 +2,27 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
-using Fiber.UI;
+using SilkUI;
+using Fiber.Router;
 using Signals;
 
 public class DocsHeaderComponent : BaseComponent
 {
     public override VirtualNode Render()
     {
+        var router = C<Router>();
         var themeStore = C<ThemeStore>();
         var drawerContext = C<DocsDrawerContext>();
         var iconName = new Signal<string>("sun");
+        var isLandingPageRoute = F.CreateComputedSignal((r) => r.PeekRoute().Id == DocsRouting.ROUTES.LANDING, router);
+        var smallScreenNotLandingPage = F.CreateComputedSignal((isLandingPageRoute, isMediumScreen) => !isLandingPageRoute && !isMediumScreen, isLandingPageRoute, themeStore.IsMediumScreen);
 
-        return F.Header(children: F.Children(
-            F.HeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
+        return F.SilkHeader(children: F.Children(
+            F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
                 F.Visible(
-                    when: new NegatedBoolSignal(themeStore.IsMediumScreen),
+                    when: smallScreenNotLandingPage,
                     children: F.Children(
-                        F.IconButton(
+                        F.SilkIconButton(
                             iconName: "bars", onPress: () =>
                             {
                                 drawerContext.IsOpen.Value = true;
@@ -27,18 +31,24 @@ public class DocsHeaderComponent : BaseComponent
                         )
                     )
                 ),
-                new DocsLogoComponent()
+                new DocsLogoComponent(
+                    size: DocsLogoSize.Small,
+                    onPress: () =>
+                    {
+                        router.Navigate(DocsRouting.ROUTES.LANDING);
+                    }
+                )
             )),
-            F.HeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
-                F.IconButton(variant: "github", iconName: "github", onPress: () =>
+            F.SilkHeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
+                F.SilkIconButton(variant: "github", iconName: "github", onPress: () =>
                 {
                     Application.OpenURL("https://github.com/unity-atoms/fiber");
                 }),
-                F.IconButton(variant: "discord", iconName: "discord", onPress: () =>
+                F.SilkIconButton(variant: "discord", iconName: "discord", onPress: () =>
                 {
                     Application.OpenURL("https://discord.gg/Jw2hRhEB");
                 }),
-                F.IconButton(variant: "sun", iconName: iconName, onPress: () =>
+                F.SilkIconButton(variant: "sun", iconName: iconName, onPress: () =>
                 {
                     if (themeStore.Value == DocsThemes.LIGHT_THEME)
                     {

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Fiber.UI;
+using SilkUI;
 using Fiber.UIElements;
 using Fiber;
 using UnityEngine;
@@ -8,6 +8,8 @@ public static class DocsThemes
 {
     public static class ROLES
     {
+        public const string PRIMARY = "primary";
+        public const string SECONDARY = "secondary";
         public const string NEUTRAL = "neutral";
         public const string DEEP_NEUTRAL = "deepNeutral";
         public const string DEBUG = "debug";
@@ -35,6 +37,11 @@ public static class DocsThemes
             fontSize: 48,
             fontStyle: FontStyle.Bold
         ),
+        heading2: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
+            fontSize: 32,
+            fontStyle: FontStyle.Bold
+        ),
         heading3: new TypographyTypeTokens(
             font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
             fontSize: 24,
@@ -50,10 +57,10 @@ public static class DocsThemes
             fontSize: 16,
             fontStyle: FontStyle.Normal
         ),
-        logo: new TypographyTypeTokens(
-            font: Resources.Load<Font>("Fonts/Pacifico/Pacifico-Regular"),
-            fontSize: 24,
-            fontStyle: FontStyle.Normal
+        button: new TypographyTypeTokens(
+            font: Resources.Load<Font>("Fonts/DM_Sans/DMSans-VariableFont"),
+            fontSize: 16,
+            fontStyle: FontStyle.Bold
         )
     );
 
@@ -96,23 +103,23 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.SKY_48,
+                    selected: FIBER_COLOR_PALETTE.SKY_56,
                     variants: new ()
                     {
                         { "discord", new(
                             @default: FIBER_COLOR_PALETTE.GRAY_100,
-                            selected: "#5865F2",
+                            selected: "#5865F2", // Discord's official blue
                             hovered: "#5865F2"
                         ) },
                         { "github", new(
                             @default: FIBER_COLOR_PALETTE.GRAY_100,
-                            selected: "#FECEF1",
-                            hovered: "#FECEF1"
+                            selected: FIBER_COLOR_PALETTE.ORANGE_60,
+                            hovered: FIBER_COLOR_PALETTE.ORANGE_60
                         ) },
                         { "sun", new(
                             @default: FIBER_COLOR_PALETTE.GRAY_100,
-                            selected: "#F09D51",
-                            hovered: "#F09D51"
+                            selected: FIBER_COLOR_PALETTE.YELLOW_60,
+                            hovered: FIBER_COLOR_PALETTE.YELLOW_60
                         ) },
                     }
                 ),
@@ -132,7 +139,7 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.SKY_48
+                    selected: FIBER_COLOR_PALETTE.SKY_56
                 )
             ) },
             { ROLES.DEBUG, new(
@@ -141,6 +148,23 @@ public static class DocsThemes
                 ),
                 text: new(
                     @default: FIBER_COLOR_PALETTE.RED_41
+                )
+            ) },
+            { ROLES.PRIMARY, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                border: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_100
                 )
             ) },
         },
@@ -184,6 +208,23 @@ public static class DocsThemes
                     @default: FIBER_COLOR_PALETTE.GRAY_0,
                     selected: FIBER_COLOR_PALETTE.SKY_37,
                     hovered: FIBER_COLOR_PALETTE.SKY_37
+                )
+            ) },
+            { ROLES.PRIMARY, new(
+                background: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                border: new(
+                    @default: FIBER_COLOR_PALETTE.SKY_56,
+                    selected: FIBER_COLOR_PALETTE.SKY_74,
+                    hovered: FIBER_COLOR_PALETTE.SKY_74,
+                    pressed: FIBER_COLOR_PALETTE.SKY_31
+                ),
+                text: new(
+                    @default: FIBER_COLOR_PALETTE.GRAY_100
                 )
             ) },
         },

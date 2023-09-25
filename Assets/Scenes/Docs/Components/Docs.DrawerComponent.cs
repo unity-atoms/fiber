@@ -2,13 +2,15 @@ using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
-using Fiber.UI;
+using SilkUI;
+using Fiber.Router;
 using Signals;
 
 public class DocsDrawerComponent : BaseComponent
 {
     public override VirtualNode Render()
     {
+        var router = C<Router>();
         var themeStore = C<ThemeStore>();
         var drawerContext = C<DocsDrawerContext>();
 
@@ -18,7 +20,7 @@ public class DocsDrawerComponent : BaseComponent
                 F.Visible(
                     when: drawerContext.IsOpen,
                     children: F.Children(
-                        F.Backdrop(
+                        F.SilkBackdrop(
                             onClick: (e) =>
                             {
                                 drawerContext.IsOpen.Value = false;
@@ -26,7 +28,7 @@ public class DocsDrawerComponent : BaseComponent
                         )
                     )
                 ),
-                F.Drawer(
+                F.SilkDrawer(
                     role: DocsThemes.ROLES.DEEP_NEUTRAL,
                     isOpen: drawerContext.IsOpen,
                     children: F.Children(
@@ -52,8 +54,14 @@ public class DocsDrawerComponent : BaseComponent
                                         borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
                                     ),
                                     children: F.Children(
-                                        new DocsLogoComponent(),
-                                        F.IconButton(
+                                        new DocsLogoComponent(
+                                            size: DocsLogoSize.Small,
+                                            onPress: () =>
+                                            {
+                                                router.Navigate(DocsRouting.ROUTES.LANDING);
+                                            }
+                                        ),
+                                        F.SilkIconButton(
                                             iconName: "xmark",
                                             onPress: () =>
                                             {

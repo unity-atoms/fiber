@@ -1,8 +1,8 @@
 {
-    "name": "Fiber.Signals.Editor",
+    "name": "Fiber.FiberUtils.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:7d4df59988a124f1092a78e2f7af90fd"
+        "GUID:98d3c4a469c914c208eaed136a59b26c"
     ],
     "includePlatforms": [
         "Editor"
