@@ -2,6 +2,7 @@ using System;
 using UnityEngine.UIElements;
 using Fiber;
 using Signals;
+using CursorManager;
 
 namespace SilkUI
 {
@@ -49,6 +50,33 @@ namespace SilkUI
                 });
                 return null;
             });
+
+            var cursorManager = component.C<CursorManager.CursorManager>();
+            var id = cursorManager.GetUniqueID();
+            component.CreateEffect((isHovered, isPressed, isDisabled) =>
+            {
+                if (isDisabled)
+                {
+                    cursorManager.WishCursor(id, CursorType.NotAllowed);
+                }
+                else if (isHovered)
+                {
+                    cursorManager.WishCursor(id, CursorType.Pointer);
+                }
+                else if (isPressed)
+                {
+                    cursorManager.WishCursor(id, CursorType.Pointer);
+                }
+                else
+                {
+                    cursorManager.UnwishCursor(id);
+                }
+
+                return () =>
+                {
+                    cursorManager.UnwishCursor(id);
+                };
+            }, interactiveElement.IsHovered, interactiveElement.IsPressed, interactiveElement.IsDisabled ?? new StaticSignal<bool>(false));
 
             return interactiveElement;
         }

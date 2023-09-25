@@ -6,92 +6,129 @@ using FiberUtils;
 using System.Runtime.InteropServices;
 #endif
 
-
-/* The CursorManager handles everything in regards to the cursor.
- * 
- * Building blocks in the CursorManager:
- * - Config / definition - define cursors and when they are available
- * - API - the API to interact with the CursorManager
- * - State - the state of the CursorManager, eg. which cursor should currently be displayed.
- * - Effect - the effect of state changes in the CursorManager, eg. change the actualy cursor being displayed.
-
-- ICursorManagerAPI
-    - WishCursor(int id, string name)
-    - UnwishCursor(int id)
-
-- CursorManager
-    - SignalList<CursorDefinition> -> MASTER STATE
-    - Implements ICursorManagerAPI
-    - Implements Effect
-    
-
-- CursorManagerSO
-    - List<CursorDefinition> -> Sets initial state in CursorManager
-    - Holds CursorManager
-
-- CursorManagerComponent
-    - Prop: CursorManager -> Can be used if CursorManagerSO is used
-    - Prop: SignalList<CursorDefinition> -> Updates state in CursorManager
-    - Prop: EffectOverride - Is this needed? 
-    - Provides CursorManager via context
-
-
-------------------------------
-- If global SO, no need to reimplement in component
-- If component first -> need way to expose it in a none fiber way. Set SO value.
-
-------------------------------
-### CursorManager
-    - WishCursor(int id, string name)
-    - UnwishCursor(int id)
-    - SetCursorDefinitions()
-    - SignalList<CursorDefinition>
-    - Handles setting the cursor internally
-
-### CursorManagerSO
-    - List<CursorDefinition>
-    - Holds CursorManager
-
-### CursorManagerComponent
-    - Prop to set CursorManagerSO (from global scope)
-    - SignalList<CursorDefinition> -> Updates cursor definitions in cursor manager
-    - Exposes cursor manager via context
-
-### InteractiveElement
-    - Uses cursor manager
-
-
- */
 namespace CursorManager
 {
+    // Enum based on https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
+    public enum CursorType
+    {
+        Auto = 0,
+        Default = 1,
+        None = 2,
+        ContextMenu = 3,
+        Help = 4,
+        Pointer = 5,
+        Progress = 6,
+        Wait = 7,
+        Cell = 8,
+        CrossHair = 9,
+        Text = 10,
+        VerticalText = 11,
+        Alias = 12,
+        Copy = 13,
+        Move = 14,
+        NoDrop = 15,
+        NotAllowed = 16,
+        Grab = 17,
+        Grabbing = 18,
+        AllScroll = 19,
+        ColResize = 20,
+        RowResize = 21,
+        NResize = 22,
+        EResize = 23,
+        SResize = 24,
+        WResize = 25,
+        NeResize = 26,
+        NwResize = 27,
+        SeResize = 28,
+        SwResize = 29,
+        EwResize = 30,
+        NsResize = 31,
+        NeswResize = 32,
+        NwseResize = 33,
+        ZoomIn = 34,
+        ZoomOut = 35,
+    }
+
     [Serializable]
     public struct CursorDefinition
     {
-        public string Name;
+        public CursorType Cursor;
         public Texture2D Texture;
         public Vector2 Hotspot;
 
-        public CursorDefinition(string name, Texture2D texture, Vector2 hotspot)
+        public CursorDefinition(CursorType cursor, Texture2D texture, Vector2 hotspot)
         {
-            Name = name;
+            Cursor = cursor;
             Texture = texture;
             Hotspot = hotspot;
         }
     }
 
+    public static class CursorManagerUtils
+    {
+        private static Dictionary<CursorType, string> _cursorTypeToStringMap = new()
+        {
+            { CursorType.Auto, "auto" },
+            { CursorType.Default, "default" },
+            { CursorType.None, "none" },
+            { CursorType.ContextMenu, "context-menu" },
+            { CursorType.Help, "help" },
+            { CursorType.Pointer, "pointer" },
+            { CursorType.Progress, "progress" },
+            { CursorType.Wait, "wait" },
+            { CursorType.Cell, "cell" },
+            { CursorType.CrossHair, "crosshair" },
+            { CursorType.Text, "text" },
+            { CursorType.VerticalText, "vertical-text" },
+            { CursorType.Alias, "alias" },
+            { CursorType.Copy, "copy" },
+            { CursorType.Move, "move" },
+            { CursorType.NoDrop, "no-drop" },
+            { CursorType.NotAllowed, "not-allowed" },
+            { CursorType.Grab, "grab" },
+            { CursorType.Grabbing, "grabbing" },
+            { CursorType.AllScroll, "all-scroll" },
+            { CursorType.ColResize, "col-resize" },
+            { CursorType.RowResize, "row-resize" },
+            { CursorType.NResize, "n-resize" },
+            { CursorType.EResize, "e-resize" },
+            { CursorType.SResize, "s-resize" },
+            { CursorType.WResize, "w-resize" },
+            { CursorType.NeResize, "ne-resize" },
+            { CursorType.NwResize, "nw-resize" },
+            { CursorType.SeResize, "se-resize" },
+            { CursorType.SwResize, "sw-resize" },
+            { CursorType.EwResize, "ew-resize" },
+            { CursorType.NsResize, "ns-resize" },
+            { CursorType.NeswResize, "nesw-resize" },
+            { CursorType.NwseResize, "nwse-resize" },
+            { CursorType.ZoomIn, "zoom-in" },
+            { CursorType.ZoomOut, "zoom-out" },
+        };
 
-    [CreateAssetMenu(menuName = "Fiber/CursorManager", fileName = "CursorManager")]
-    public class CursorManager : ScriptableObject
+        public static string CursorTypeToString(CursorType cursorType)
+        {
+            if (_cursorTypeToStringMap.ContainsKey(cursorType) == false)
+            {
+                return null;
+            }
+
+            return _cursorTypeToStringMap[cursorType];
+        }
+    }
+
+    public class CursorManager
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
         [DllImport("__Internal")]
-        private static extern void SetBrowserCursor(string cursor);
+        private static extern void Fiber_SetBrowserCursor(string cursor);
 #endif
-        private const string DEFAULT_CURSOR = "auto";
 
         [SerializeField]
+        [FiberReadOnly]
         private List<CursorDefinition> _cursorDefinitions = new();
-
+        [SerializeField]
+        [FiberReadOnly]
         private IndexedDictionary<int, CursorWish> _cursorWishesById = new();
         private int _prio = 0;
         private int GetPrio()
@@ -100,32 +137,46 @@ namespace CursorManager
             return _prio;
         }
 
-        public struct CursorWish
+
+        private static IntIdGenerator _idGenerator = new IntIdGenerator();
+        public int GetUniqueID()
+        {
+            return _idGenerator.NextId();
+        }
+
+        private struct CursorWish
         {
             public int Prio;
-            public string Name;
+            public CursorType Cursor;
 
-            public CursorWish(int prio, string name)
+            public CursorWish(int prio, CursorType cursor)
             {
                 Prio = prio;
-                Name = name;
+                Cursor = cursor;
             }
         }
 
-        public bool IsWishingCursor(int id)
+        public void UpdateCursorDefinitions(IList<CursorDefinition> cursorDefinitions)
         {
-            return _cursorWishesById.ContainsKey(id);
+            _cursorDefinitions.Clear();
+
+            for (var i = 0; cursorDefinitions != null && i < cursorDefinitions.Count; ++i)
+            {
+                _cursorDefinitions.Add(cursorDefinitions[i]);
+            }
+
+            UpdateCursor();
         }
 
-        public void WishCursor(int id, string name)
+        public void WishCursor(int id, CursorType cursor)
         {
             if (IsWishingCursor(id))
             {
-                _cursorWishesById.SetByKey(id, new CursorWish(GetPrio(), name));
+                _cursorWishesById.SetByKey(id, new CursorWish(GetPrio(), cursor));
             }
             else
             {
-                _cursorWishesById.Add(id, new CursorWish(GetPrio(), name));
+                _cursorWishesById.Add(id, new CursorWish(GetPrio(), cursor));
             }
             UpdateCursor();
         }
@@ -135,6 +186,11 @@ namespace CursorManager
             if (!_cursorWishesById.ContainsKey(id)) return;
             _cursorWishesById.Remove(id);
             UpdateCursor();
+        }
+
+        bool IsWishingCursor(int id)
+        {
+            return _cursorWishesById.ContainsKey(id);
         }
 
         void UpdateCursor()
@@ -152,15 +208,19 @@ namespace CursorManager
                 }
             }
 
-            SetCursor(pickedCursorWishKey != -1 ? _cursorWishesById[pickedCursorWishKey].Name : DEFAULT_CURSOR);
+            SetCursor(pickedCursorWishKey != -1 ? _cursorWishesById.GetByKey(pickedCursorWishKey).Cursor : CursorType.Default);
         }
 
-        void SetCursor(string name = DEFAULT_CURSOR)
+        void SetCursor(CursorType cursor)
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            var cursorString = CursorManagerUtils.CursorTypeToString(cursor);
+            Fiber_SetBrowserCursor(cursorString);
+#else
             for (var i = 0; i < _cursorDefinitions.Count; ++i)
             {
                 var cursorDefinition = _cursorDefinitions[i];
-                if (cursorDefinition.Name == name)
+                if (cursorDefinition.Cursor == cursor)
                 {
                     var texture = cursorDefinition.Texture;
                     var hotspot = cursorDefinition.Hotspot;
@@ -169,7 +229,8 @@ namespace CursorManager
                 }
             }
 
-            // TODO: Set default cursor
+            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+#endif
         }
     }
 

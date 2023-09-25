@@ -15,7 +15,7 @@ public class DocsHeaderComponent : BaseComponent
         var drawerContext = C<DocsDrawerContext>();
         var iconName = new Signal<string>("sun");
         var isLandingPageRoute = F.CreateComputedSignal((r) => r.PeekRoute().Id == DocsRouting.ROUTES.LANDING, router);
-        var smallScreenNotLandingPage = F.CreateComputedSignal((isLandingPageRoute, isMediumScreen) => !isLandingPageRoute && !isLandingPageRoute, isLandingPageRoute, themeStore.IsMediumScreen);
+        var smallScreenNotLandingPage = F.CreateComputedSignal((isLandingPageRoute, isMediumScreen) => !isLandingPageRoute && !isMediumScreen, isLandingPageRoute, themeStore.IsMediumScreen);
 
         return F.SilkHeader(children: F.Children(
             F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
@@ -33,7 +33,7 @@ public class DocsHeaderComponent : BaseComponent
                 ),
                 new DocsLogoComponent(
                     size: DocsLogoSize.Small,
-                    onClick: (e) =>
+                    onPress: () =>
                     {
                         router.Navigate(DocsRouting.ROUTES.LANDING);
                     }

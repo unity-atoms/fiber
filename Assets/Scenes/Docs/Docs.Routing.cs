@@ -5,6 +5,8 @@ using Fiber;
 using Fiber.UIElements;
 using Fiber.Router;
 using SilkUI;
+using Signals;
+using CursorManager;
 
 public static class DocsRouting
 {
@@ -52,10 +54,13 @@ public static class DocsRouting
                 children: F.Children(F.OverrideVisualComponentsProvider(
                     overrideVisualComponents: new OverrideVisualComponents(),
                     children: F.Children(new DocsThemes.Provider(
-                        children: F.Children(F.UIRoot(
-                            name: "DocsRootDocument",
-                            children: F.Children(new DocsDrawerContextProviderComponent(
-                                children: F.Children(new MainLayoutComponent())
+                        children: F.Children(F.CursorManager(
+                            cursorDefinitionsStore: new Store<ShallowSignalList<CursorDefinition>>(),
+                            children: F.Children(F.UIRoot(
+                                name: "DocsRootDocument",
+                                children: F.Children(new DocsDrawerContextProviderComponent(
+                                    children: F.Children(new MainLayoutComponent())
+                                ))
                             ))
                         ))
                     ))

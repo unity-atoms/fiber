@@ -56,7 +56,7 @@ public class DocsDrawerComponent : BaseComponent
                                     children: F.Children(
                                         new DocsLogoComponent(
                                             size: DocsLogoSize.Small,
-                                            onClick: (e) =>
+                                            onPress: () =>
                                             {
                                                 router.Navigate(DocsRouting.ROUTES.LANDING);
                                             }

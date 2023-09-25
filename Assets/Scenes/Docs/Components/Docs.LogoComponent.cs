@@ -1,3 +1,4 @@
+using System;
 using Fiber;
 using SilkUI;
 using Fiber.UIElements;
@@ -16,16 +17,16 @@ public enum DocsLogoSize
 public class DocsLogoComponent : BaseComponent
 {
     private readonly SignalProp<DocsLogoSize> _size;
-    private readonly EventCallback<ClickEvent> _onClick;
+    private readonly Action _onPress;
     private readonly Style _style;
     public DocsLogoComponent(
         SignalProp<DocsLogoSize> size,
-        EventCallback<ClickEvent> onClick = null,
+        Action onPress = null,
         Style style = new()
     )
     {
         _size = size;
-        _onClick = onClick;
+        _onPress = onPress;
         _style = style;
     }
 
@@ -60,7 +61,11 @@ public class DocsLogoComponent : BaseComponent
         var imgSize = F.CreateComputedSignal(GetImgSize, sizeSignal);
         var fontSize = F.CreateComputedSignal(GetFontSize, sizeSignal);
 
+        var isInteractive = _onPress != null;
+        var interactiveElement = isInteractive ? F.CreateInteractiveElement(isDisabled: null, onPress: _onPress) : null;
+
         return F.View(
+            _ref: interactiveElement?.Ref,
             style: new Style(
                 mergedStyle: _style,
                 display: DisplayStyle.Flex,
@@ -87,8 +92,7 @@ public class DocsLogoComponent : BaseComponent
                         unityTextAlign: TextAnchor.MiddleCenter
                     )
                 )
-            ),
-            onClick: _onClick
+            )
         );
     }
 }
