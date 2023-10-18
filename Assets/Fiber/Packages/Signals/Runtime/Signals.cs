@@ -541,7 +541,7 @@ namespace Signals
 
     // Doesn't track changes of values, only mutations to the dictionary itself
     [Serializable]
-    public class ShallowSignalDictionary<K, V> : BaseSignal<ShallowSignalDictionary<K, V>>, IEnumerable
+    public class ShallowSignalDictionary<K, V> : BaseSignal<ShallowSignalDictionary<K, V>>, IEnumerable, IEnumerable<KeyValuePair<K, V>>
     {
         protected Dictionary<K, V> _dict;
 
@@ -627,12 +627,14 @@ namespace Signals
             return this;
         }
         public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
-        public IEnumerator GetEnumerator() => _dict.GetEnumerator();
+
+        public IEnumerator<KeyValuePair<K, V>> GetEnumerator() => _dict.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     // Tracks both mutations to the dictionary and changes to the values in the dictionary.
     [Serializable]
-    public class SignalDictionary<K, V> : BaseSignal<SignalDictionary<K, V>>, IEnumerable
+    public class SignalDictionary<K, V> : BaseSignal<SignalDictionary<K, V>>, IEnumerable, IEnumerable<KeyValuePair<K, V>>
         where V : ISignal
     {
         protected Dictionary<K, V> _dict;
@@ -759,7 +761,8 @@ namespace Signals
         }
         public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
-        public IEnumerator GetEnumerator() => _dict.GetEnumerator();
+        public IEnumerator<KeyValuePair<K, V>> GetEnumerator() => _dict.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
     [Serializable]
