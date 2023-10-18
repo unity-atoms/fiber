@@ -541,7 +541,7 @@ namespace Signals
 
     // Doesn't track changes of values, only mutations to the dictionary itself
     [Serializable]
-    public class ShallowSignalDictionary<K, V> : BaseSignal<ShallowSignalDictionary<K, V>>
+    public class ShallowSignalDictionary<K, V> : BaseSignal<ShallowSignalDictionary<K, V>>, IEnumerable
     {
         protected Dictionary<K, V> _dict;
 
@@ -627,6 +627,7 @@ namespace Signals
             return this;
         }
         public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
+        public IEnumerator GetEnumerator() => _dict.GetEnumerator();
     }
 
     // Tracks both mutations to the dictionary and changes to the values in the dictionary.
