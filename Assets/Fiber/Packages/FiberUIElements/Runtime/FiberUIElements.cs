@@ -975,6 +975,8 @@ namespace Fiber.UIElements
         private WorkLoopFontStyleProp _unityFontStyleWorkLoopItem;
         private WorkLoopStyleLengthProp _unityParagraphSpacingWorkLoopItem;
         private WorkLoopTextAnchorProp _unityTextAlignWorkLoopItem;
+        private WorkLoopStyleFloatProp _unityTextOutlineWidthWorkLoopItem;
+        private WorkLoopStyleColorProp _unityTextOutlineColorWorkLoopItem;
         private WorkLoopStylePropertyNamesProp _transitionPropertyWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDelayWorkLoopItem;
         private WorkLoopTimeValuesProp _transitionDurationWorkLoopItem;
@@ -1456,6 +1458,26 @@ namespace Fiber.UIElements
                 }
                 _unityTextAlignWorkLoopItem = new(style.UnityTextAlign);
 
+                if (!style.UnityTextOutlineWidth.IsEmpty)
+                {
+                    Instance.style.unityTextOutlineWidth = style.UnityTextOutlineWidth.Get();
+                    if (style.UnityTextOutlineWidth.IsSignal)
+                    {
+                        style.UnityTextOutlineWidth.SignalProp.Signal.RegisterDependent(this);
+                    }
+                }
+                _unityTextOutlineWidthWorkLoopItem = new(style.UnityTextOutlineWidth);
+
+                if (!style.UnityTextOutlineColor.IsEmpty)
+                {
+                    Instance.style.unityTextOutlineColor = style.UnityTextOutlineColor.Get();
+                    if (style.UnityTextOutlineColor.IsSignal)
+                    {
+                        style.UnityTextOutlineColor.SignalProp.Signal.RegisterDependent(this);
+                    }
+                }
+                _unityTextOutlineColorWorkLoopItem = new(style.UnityTextOutlineColor);
+
                 if (!style.TransitionProperty.IsEmpty)
                 {
                     Instance.style.transitionProperty = style.TransitionProperty.Get();
@@ -1717,6 +1739,8 @@ namespace Fiber.UIElements
             // UnityFontStyle
             // UnityParagraphSpacing
             // UnityTextAlign
+            // UnityTextOutlineWidth
+            // UnityTextOutlineColor
             // TransitionProperty
             // TransitionDelay
             // TransitionDuration
@@ -3338,6 +3362,78 @@ namespace Fiber.UIElements
                     }
                 }
 
+                // UnityTextOutlineWidth - Update instance value
+                if (style.UnityTextOutlineWidth.IsSignal)
+                {
+                    if (_unityTextOutlineWidthWorkLoopItem.Check())
+                    {
+                        Instance.style.unityTextOutlineWidth = _unityTextOutlineWidthWorkLoopItem.Get();
+                    }
+                }
+                else if (style.UnityTextOutlineWidth.IsValue)
+                {
+                    var value = style.UnityTextOutlineWidth.Get();
+                    if (Instance.style.unityTextOutlineWidth != value)
+                    {
+                        Instance.style.unityTextOutlineWidth = value;
+                    }
+                }
+                else if (style.UnityTextOutlineWidth.IsEmpty && !_lastStyleFromSignal.UnityTextOutlineWidth.IsEmpty)
+                {
+                    Instance.style.unityTextOutlineWidth = StyleKeyword.Initial;
+                }
+                // UnityTextOutlineWidth - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.UnityTextOutlineWidth.SignalProp.Signal != style.UnityTextOutlineWidth.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityTextOutlineWidth.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityTextOutlineWidth.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.UnityTextOutlineWidth.IsSignal)
+                        {
+                            style.UnityTextOutlineWidth.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
+                }
+
+                // UnityTextOutlineColor - Update instance value
+                if (style.UnityTextOutlineColor.IsSignal)
+                {
+                    if (_unityTextOutlineColorWorkLoopItem.Check())
+                    {
+                        Instance.style.unityTextOutlineColor = _unityTextOutlineColorWorkLoopItem.Get();
+                    }
+                }
+                else if (style.UnityTextOutlineColor.IsValue)
+                {
+                    var value = style.UnityTextOutlineColor.Get();
+                    if (Instance.style.unityTextOutlineColor != value)
+                    {
+                        Instance.style.unityTextOutlineColor = value;
+                    }
+                }
+                else if (style.UnityTextOutlineColor.IsEmpty && !_lastStyleFromSignal.UnityTextOutlineColor.IsEmpty)
+                {
+                    Instance.style.unityTextOutlineColor = StyleKeyword.Initial;
+                }
+                // UnityTextOutlineColor - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.UnityTextOutlineColor.SignalProp.Signal != style.UnityTextOutlineColor.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.UnityTextOutlineColor.IsSignal)
+                        {
+                            _lastStyleFromSignal.UnityTextOutlineColor.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.UnityTextOutlineColor.IsSignal)
+                        {
+                            style.UnityTextOutlineColor.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
+                }
+
                 // TransitionProperty - Update instance value
                 if (style.TransitionProperty.IsSignal)
                 {
@@ -3858,6 +3954,14 @@ namespace Fiber.UIElements
             if (_unityTextAlignWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
                 _unityTextAlignWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_unityTextOutlineWidthWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityTextOutlineWidthWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_unityTextOutlineColorWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _unityTextOutlineColorWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_transitionPropertyWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {

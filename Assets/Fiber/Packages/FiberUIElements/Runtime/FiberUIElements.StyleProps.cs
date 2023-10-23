@@ -969,6 +969,8 @@ namespace Fiber.UIElements
         public FontStyleProp UnityFontStyle { get; private set; }
         public StyleLengthProp UnityParagraphSpacing { get; private set; }
         public TextAnchorProp UnityTextAlign { get; private set; }
+        public StyleFloatProp UnityTextOutlineWidth { get; private set; }
+        public StyleColorProp UnityTextOutlineColor { get; private set; }
         public StylePropertyNamesProp TransitionProperty { get; private set; }
         public TimeValuesProp TransitionDelay { get; private set; }
         public TimeValuesProp TransitionDuration { get; private set; }
@@ -1024,6 +1026,8 @@ namespace Fiber.UIElements
             FontStyleProp unityFontStyle = new(),
             StyleLengthProp unityParagraphSpacing = new(),
             TextAnchorProp unityTextAlign = new(),
+            StyleFloatProp unityTextOutlineWidth = new(),
+            StyleColorProp unityTextOutlineColor = new(),
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
@@ -1079,6 +1083,8 @@ namespace Fiber.UIElements
             UnityFontStyle = unityFontStyle;
             UnityParagraphSpacing = unityParagraphSpacing;
             UnityTextAlign = unityTextAlign;
+            UnityTextOutlineWidth = unityTextOutlineWidth;
+            UnityTextOutlineColor = unityTextOutlineColor;
             TransitionProperty = transitionProperty;
             TransitionDelay = transitionDelay;
             TransitionDuration = transitionDuration;
@@ -1136,6 +1142,8 @@ namespace Fiber.UIElements
             FontStyleProp unityFontStyle = new(),
             StyleLengthProp unityParagraphSpacing = new(),
             TextAnchorProp unityTextAlign = new(),
+            StyleFloatProp unityTextOutlineWidth = new(),
+            StyleColorProp unityTextOutlineColor = new(),
             StylePropertyNamesProp transitionProperty = new(),
             TimeValuesProp transitionDelay = new(),
             TimeValuesProp transitionDuration = new(),
@@ -1191,6 +1199,8 @@ namespace Fiber.UIElements
             UnityFontStyle = mergedStyle.UnityFontStyle.IsEmpty ? unityFontStyle : mergedStyle.UnityFontStyle;
             UnityParagraphSpacing = mergedStyle.UnityParagraphSpacing.IsEmpty ? unityParagraphSpacing : mergedStyle.UnityParagraphSpacing;
             UnityTextAlign = mergedStyle.UnityTextAlign.IsEmpty ? unityTextAlign : mergedStyle.UnityTextAlign;
+            UnityTextOutlineWidth = mergedStyle.UnityTextOutlineWidth.IsEmpty ? unityTextOutlineWidth : mergedStyle.UnityTextOutlineWidth;
+            UnityTextOutlineColor = mergedStyle.UnityTextOutlineColor.IsEmpty ? unityTextOutlineColor : mergedStyle.UnityTextOutlineColor;
             TransitionProperty = mergedStyle.TransitionProperty.IsEmpty ? transitionProperty : mergedStyle.TransitionProperty;
             TransitionDelay = mergedStyle.TransitionDelay.IsEmpty ? transitionDelay : mergedStyle.TransitionDelay;
             TransitionDuration = mergedStyle.TransitionDuration.IsEmpty ? transitionDuration : mergedStyle.TransitionDuration;
