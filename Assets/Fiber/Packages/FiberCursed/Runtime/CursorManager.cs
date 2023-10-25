@@ -157,6 +157,13 @@ namespace Fiber.Cursed
             }
         }
 
+        public void Reset()
+        {
+            _prio = 0;
+            _cursorWishesById.Clear();
+        }
+
+
         public void UpdateCursorDefinitions(IList<CursorDefinition> cursorDefinitions)
         {
             _cursorDefinitions.Clear();

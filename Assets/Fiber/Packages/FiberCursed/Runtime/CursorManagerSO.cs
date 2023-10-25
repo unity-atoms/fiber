@@ -23,6 +23,7 @@ namespace Fiber.Cursed
         {
             if (_cursorManager != null)
             {
+                _cursorManager.Reset();
                 _cursorManager.UpdateCursorDefinitions(_cursorDefinitions);
             }
         }
