@@ -233,13 +233,11 @@ namespace Fiber.Cursed
                 {
                     var texture = cursorDefinition.Texture;
                     var hotspot = cursorDefinition.Hotspot;
-                    Debug.Log($"Set curosr to {cursor}.");
                     Cursor.SetCursor(texture, hotspot, CursorMode.Auto);
                     return;
                 }
             }
 
-            Debug.Log($"Set curosr to {cursor} failed, no cursor definition found.");
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 #endif
         }
