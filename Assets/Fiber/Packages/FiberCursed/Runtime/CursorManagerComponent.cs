@@ -39,7 +39,7 @@ namespace Fiber.Cursed
             var globalCursorManager = G<CursorManager>(throwIfNotFound: false);
             if (cursorManagerSO != null || globalCursorManager != null)
             {
-                cursorManager = cursorManagerSO.Manager != null ? cursorManagerSO.Manager : globalCursorManager;
+                cursorManager = cursorManagerSO != null && cursorManagerSO.Manager != null ? cursorManagerSO.Manager : globalCursorManager;
 
                 F.CreateEffect(() =>
                 {
