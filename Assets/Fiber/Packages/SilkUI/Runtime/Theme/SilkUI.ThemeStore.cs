@@ -242,7 +242,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get();
+                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get() * theme.Spacing.Baseline.Value;
                 }, this);
                 _outlineWidthSignalsCache.Add(typographyType, signal);
 
@@ -253,7 +253,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, TypographyType, StyleFloat>((theme, typographyType) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get();
+                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get() * theme.Spacing.Baseline.Value;
                 }, this, typographyTypeProp.Signal);
                 return signal;
             }
