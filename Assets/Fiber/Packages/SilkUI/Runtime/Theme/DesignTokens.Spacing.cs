@@ -4,12 +4,13 @@ namespace SilkUI
 {
     public class SpacingTokens : BaseSignal<SpacingTokens>
     {
+        public const int DEFAULT_BASELINE = 4;
         public Signal<int> Baseline { get; private set; }
         public BorderWidthTokens BorderWidth { get; private set; }
         public TextOutlineTokens TextOutline { get; private set; }
 
         public SpacingTokens(
-            int baseline = 4,
+            int baseline = DEFAULT_BASELINE,
             float borderWidthDefault = BorderWidthTokens.DEFAULT,
             float borderWidthThick = BorderWidthTokens.THICK,
             float borderWidthThin = BorderWidthTokens.THIN,

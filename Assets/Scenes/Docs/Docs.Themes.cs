@@ -89,6 +89,7 @@ public static class DocsThemes
 
     public static readonly Theme DARK_THEME = new Theme(
         fallbackRole: ROLES.NEUTRAL,
+        spacing: new(),
         color: new()
         {
             { ROLES.NEUTRAL, new(
@@ -173,6 +174,7 @@ public static class DocsThemes
 
     public static readonly Theme LIGHT_THEME = new Theme(
         fallbackRole: ROLES.NEUTRAL,
+        spacing: new(),
         color: new()
         {
             { ROLES.NEUTRAL, new(
@@ -233,6 +235,7 @@ public static class DocsThemes
 
     public static readonly Theme ICE_PIXEL = new Theme(
         fallbackRole: ROLES.NEUTRAL,
+        spacing: new(),
         color: new()
         {
             { ROLES.NEUTRAL, new(

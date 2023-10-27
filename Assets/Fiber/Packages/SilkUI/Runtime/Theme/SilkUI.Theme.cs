@@ -15,13 +15,7 @@ namespace SilkUI
             string fallbackRole,
             ColorTokenCollection color,
             TypographyTokens typography,
-            int spacingBaseline = 4,
-            float borderWidthDefault = BorderWidthTokens.DEFAULT,
-            float borderWidthThick = BorderWidthTokens.THICK,
-            float borderWidthThin = BorderWidthTokens.THIN,
-            float textOutlineDefault = TextOutlineTokens.DEFAULT,
-            float textOutlineEmphasis = TextOutlineTokens.EMPHASIS,
-            float textOutlineLight = TextOutlineTokens.LIGHT,
+            SpacingTokens spacing,
             IconTokens icon = null,
             BreakpointTokens breakpoints = null
         )
@@ -31,15 +25,7 @@ namespace SilkUI
             Color.RegisterDependent(this);
             Typography = typography;
             Typography.RegisterDependent(this);
-            Spacing = new SpacingTokens(
-                baseline: spacingBaseline,
-                borderWidthDefault: borderWidthDefault,
-                borderWidthThick: borderWidthThick,
-                borderWidthThin: borderWidthThin,
-                textOutlineDefault: textOutlineDefault,
-                textOutlineEmphasis: textOutlineEmphasis,
-                textOutlineLight: textOutlineLight
-            );
+            Spacing = spacing;
             Spacing.RegisterDependent(this);
             Icon = icon ?? new IconTokens();
             Icon.RegisterDependent(this);
