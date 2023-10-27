@@ -7,7 +7,9 @@ namespace FiberUtils
     [Serializable]
     public struct SerializableKVP<KeyT, ValueT>
     {
+        [SerializeField]
         public KeyT Key;
+        [SerializeField]
         public ValueT Value;
 
         public SerializableKVP(KeyT key, ValueT value)
