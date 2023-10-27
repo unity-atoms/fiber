@@ -37,13 +37,15 @@ namespace Fiber.Cursed
             // Set value of CursorManagerSO if provided by global scope
             var cursorManagerSO = G<CursorManagerSO>(throwIfNotFound: false);
             var globalCursorManager = G<CursorManager>(throwIfNotFound: false);
-            if (cursorManagerSO != null)
+            if (cursorManagerSO != null || globalCursorManager != null)
             {
-                cursorManager = cursorManagerSO.Manager;
-            }
-            else if (globalCursorManager != null)
-            {
-                cursorManager = globalCursorManager;
+                cursorManager = cursorManagerSO != null && cursorManagerSO.Manager != null ? cursorManagerSO.Manager : globalCursorManager;
+
+                F.CreateEffect(() =>
+                {
+                    cursorManager.UpdateCursor();
+                    return null;
+                });
             }
             else
             {

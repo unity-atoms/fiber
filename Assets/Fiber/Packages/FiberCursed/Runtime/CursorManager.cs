@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 namespace Fiber.Cursed
 {
     // Enum based on https://developer.mozilla.org/en-US/docs/Web/CSS/cursor
+    [Serializable]
     public enum CursorType
     {
         Default = 0,
@@ -201,7 +202,7 @@ namespace Fiber.Cursed
             return _cursorWishesById.ContainsKey(id);
         }
 
-        void UpdateCursor()
+        public void UpdateCursor()
         {
             int pickedCursorWishKey = -1;
             int pickedCursorWishPrio = int.MaxValue;
@@ -232,11 +233,13 @@ namespace Fiber.Cursed
                 {
                     var texture = cursorDefinition.Texture;
                     var hotspot = cursorDefinition.Hotspot;
+                    Debug.Log($"Set curosr to {cursor}.");
                     Cursor.SetCursor(texture, hotspot, CursorMode.Auto);
                     return;
                 }
             }
 
+            Debug.Log($"Set curosr to {cursor} failed, no cursor definition found.");
             Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 #endif
         }
