@@ -32,21 +32,29 @@ namespace Fiber.Cursed
 
         public override VirtualNode Render()
         {
-            var cursorManager = new CursorManager();
+            CursorManager cursorManager = null;
 
             // Set value of CursorManagerSO if provided by global scope
             var cursorManagerSO = G<CursorManagerSO>(throwIfNotFound: false);
+            var globalCursorManager = G<CursorManager>(throwIfNotFound: false);
             if (cursorManagerSO != null)
             {
-                cursorManagerSO.Manager = cursorManager;
+                cursorManager = cursorManagerSO.Manager;
             }
-
-            // Update cursor definitions
-            F.CreateEffect((cursorDefinitions) =>
+            else if (globalCursorManager != null)
             {
-                cursorManager.UpdateCursorDefinitions(cursorDefinitions);
-                return null;
-            }, _cursorDefinitionsStore);
+                cursorManager = globalCursorManager;
+            }
+            else
+            {
+                cursorManager = new CursorManager();
+                // Update cursor definitions
+                F.CreateEffect((cursorDefinitions) =>
+                {
+                    cursorManager.UpdateCursorDefinitions(cursorDefinitions);
+                    return null;
+                }, _cursorDefinitionsStore);
+            }
 
             return F.ContextProvider(
                 value: cursorManager,
