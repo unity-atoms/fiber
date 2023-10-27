@@ -135,11 +135,13 @@ namespace SilkUI
         public Signal<StyleFont> Font;
         public Signal<StyleLength> FontSize;
         public Signal<StyleEnum<FontStyle>> FontStyle;
+        public Signal<TextOutlineType> OutlineWidth;
 
         public TypographyTypeTokens(
             Font font,
             int fontSize,
-            FontStyle fontStyle
+            FontStyle fontStyle,
+            TextOutlineType outlineWidth = TextOutlineType.Default
         )
         {
             Font = new(new(font));
@@ -148,12 +150,15 @@ namespace SilkUI
             FontSize.RegisterDependent(this);
             FontStyle = new(fontStyle);
             FontStyle.RegisterDependent(this);
+            OutlineWidth = new(outlineWidth);
+            OutlineWidth.RegisterDependent(this);
         }
         ~TypographyTypeTokens()
         {
             Font.UnregisterDependent(this);
             FontSize.UnregisterDependent(this);
             FontStyle.UnregisterDependent(this);
+            OutlineWidth.UnregisterDependent(this);
         }
 
         public override TypographyTypeTokens Get() => this;

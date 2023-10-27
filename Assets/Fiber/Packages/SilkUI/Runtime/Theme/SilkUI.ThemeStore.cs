@@ -25,6 +25,7 @@ namespace SilkUI
             _fontSignalsCache = new();
             _fontSizeSignalsCache = new();
             _fontStyleSignalsCache = new();
+            _outlineWidthSignalsCache = new();
             _iconSignalsCache = new();
 
             IsSmallScreen = new IsSmallScreenSignal(Value.Breakpoints, _screenSizeSignal);
@@ -226,10 +227,42 @@ namespace SilkUI
             }
             throw new ArgumentException($"TypographyTypeProp can't be empty");
         }
+
+        private readonly Dictionary<TypographyType, BaseSignal<StyleFloat>> _outlineWidthSignalsCache;
+        public BaseSignal<StyleFloat> OutlineWidth(SignalProp<TypographyType> typographyTypeProp)
+        {
+            if (typographyTypeProp.IsValue)
+            {
+                var typographyType = typographyTypeProp.Value;
+                if (_outlineWidthSignalsCache.ContainsKey(typographyType))
+                {
+                    return _outlineWidthSignalsCache[typographyType];
+                }
+
+                var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get();
+                }, this);
+                _outlineWidthSignalsCache.Add(typographyType, signal);
+
+                return signal;
+            }
+            else if (typographyTypeProp.IsSignal)
+            {
+                var signal = new InlineComputedSignal<Theme, TypographyType, StyleFloat>((theme, typographyType) =>
+                {
+                    var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
+                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get();
+                }, this, typographyTypeProp.Signal);
+                return signal;
+            }
+            throw new ArgumentException($"TypographyTypeProp can't be empty");
+        }
         #endregion
         #region Icon
         private readonly Dictionary<IconSize, BaseSignal<StyleLength>> _iconSignalsCache;
-        public BaseSignal<StyleLength> Icon(IconSize size)
+        public BaseSignal<StyleLength> IconSize(IconSize size)
         {
             if (_iconSignalsCache.ContainsKey(size))
             {

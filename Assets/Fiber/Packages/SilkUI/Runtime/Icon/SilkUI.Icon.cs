@@ -87,7 +87,7 @@ namespace SilkUI
                     unityFont: font,
                     unityFontDefinition: StyleKeyword.None,
                     unityTextAlign: TextAnchor.MiddleCenter,
-                    fontSize: themeStore.Icon(_size)
+                    fontSize: themeStore.IconSize(_size)
                 )
             );
         }

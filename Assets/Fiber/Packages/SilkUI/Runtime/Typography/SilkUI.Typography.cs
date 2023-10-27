@@ -80,7 +80,9 @@ namespace SilkUI
                     unityFontDefinition: StyleKeyword.None,
                     fontSize: themeStore.FontSize(_type),
                     unityFontStyle: themeStore.FontStyle(_type),
-                    color: themeStore.Color(role, ElementType.Text, _variant)
+                    color: themeStore.Color(role, ElementType.Text, _variant),
+                    unityTextOutlineWidth: themeStore.OutlineWidth(_type),
+                    unityTextOutlineColor: themeStore.Color(role, ElementType.TextOutline, _variant)
                 )
             );
         }
