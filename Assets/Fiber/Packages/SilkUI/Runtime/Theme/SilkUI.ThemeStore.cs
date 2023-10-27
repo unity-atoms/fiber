@@ -19,6 +19,8 @@ namespace SilkUI
             _screenSizeSignal = screenSizeSignal;
 
             _spacingSignalsCache = new();
+            _borderWidthSignalsCache = new();
+            _textOutlineSignalsCache = new();
             _nonInteractiveColorSignalsCache = new();
             _fontSignalsCache = new();
             _fontSizeSignalsCache = new();
@@ -44,6 +46,38 @@ namespace SilkUI
             var spacingSignal = new InlineComputedSignal<Theme, StyleLength>((theme) => theme.Spacing.Baseline.Value * multiplier, this);
             _spacingSignalsCache.Add(multiplier, spacingSignal);
             return spacingSignal;
+        }
+        #endregion
+        #region BorderWidth
+        private readonly Dictionary<BorderWidthType, BaseSignal<StyleFloat>> _borderWidthSignalsCache;
+        public BaseSignal<StyleFloat> BorderWidth(BorderWidthType borderWidthType = BorderWidthType.Default)
+        {
+            if (_borderWidthSignalsCache.ContainsKey(borderWidthType))
+            {
+                return _borderWidthSignalsCache[borderWidthType];
+            }
+
+            var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
+            {
+                return theme.Spacing.BorderWidth.GetBorderWidthSignal(borderWidthType).Get() * theme.Spacing.Baseline.Value;
+            }, this);
+            return signal;
+        }
+        #endregion
+        #region TextOutline
+        private readonly Dictionary<TextOutlineType, BaseSignal<StyleFloat>> _textOutlineSignalsCache;
+        public BaseSignal<StyleFloat> TextOutline(TextOutlineType textOutlineType = TextOutlineType.Default)
+        {
+            if (_textOutlineSignalsCache.ContainsKey(textOutlineType))
+            {
+                return _textOutlineSignalsCache[textOutlineType];
+            }
+
+            var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
+            {
+                return theme.Spacing.TextOutline.GetTextOutlineSignal(textOutlineType).Get() * theme.Spacing.Baseline.Value;
+            }, this);
+            return signal;
         }
         #endregion
         #region Color

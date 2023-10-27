@@ -50,10 +50,7 @@ namespace SilkUI
 
         public override VirtualNode Render()
         {
-            var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: () =>
-            {
-                _onPress?.Invoke();
-            });
+            var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: _onPress);
 
             var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(
@@ -91,10 +88,10 @@ namespace SilkUI
                     borderBottomRightRadius: themeStore.Spacing(1),
                     borderTopLeftRadius: themeStore.Spacing(1),
                     borderTopRightRadius: themeStore.Spacing(1),
-                    borderTopWidth: 1,
-                    borderLeftWidth: 1,
-                    borderRightWidth: 1,
-                    borderBottomWidth: 1,
+                    borderTopWidth: themeStore.BorderWidth(),
+                    borderLeftWidth: themeStore.BorderWidth(),
+                    borderRightWidth: themeStore.BorderWidth(),
+                    borderBottomWidth: themeStore.BorderWidth(),
                     color: textColor,
                     unityFont: themeStore.Font(TypographyType.Button),
                     unityFontDefinition: StyleKeyword.None,

@@ -50,7 +50,7 @@ public class DocsDrawerComponent : BaseComponent
                                         paddingLeft: themeStore.Spacing(4),
                                         paddingRight: themeStore.Spacing(4),
                                         backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
-                                        borderBottomWidth: 1,
+                                        borderBottomWidth: themeStore.BorderWidth(),
                                         borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
                                     ),
                                     children: F.Children(

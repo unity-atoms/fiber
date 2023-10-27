@@ -94,10 +94,10 @@ namespace SilkUI
                     borderLeftColor: borderColor,
                     borderTopColor: borderColor,
                     borderBottomColor: borderColor,
-                    borderRightWidth: _position == DrawerPosition.Left ? 1 : 0,
-                    borderLeftWidth: _position == DrawerPosition.Right ? 1 : 0,
-                    borderTopWidth: 1,
-                    borderBottomWidth: 1
+                    borderRightWidth: themeStore.BorderWidth(_position == DrawerPosition.Left ? BorderWidthType.Default : BorderWidthType.None),
+                    borderLeftWidth: themeStore.BorderWidth(_position == DrawerPosition.Right ? BorderWidthType.Default : BorderWidthType.None),
+                    borderTopWidth: themeStore.BorderWidth(),
+                    borderBottomWidth: themeStore.BorderWidth()
                 ),
                 pickingMode: PickingMode.Position,
                 children: children

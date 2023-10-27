@@ -88,9 +88,9 @@ public static class DocsRouting
                             borderRightColor: deepBorderColor,
                             borderTopColor: deepBorderColor,
                             borderBottomColor: deepBorderColor,
-                            borderRightWidth: 1,
-                            borderTopWidth: 1,
-                            borderBottomWidth: 1,
+                            borderRightWidth: themeStore.BorderWidth(),
+                            borderTopWidth: themeStore.BorderWidth(),
+                            borderBottomWidth: themeStore.BorderWidth(),
                             flexShrink: 0,
                             flexGrow: 0
                         ),
