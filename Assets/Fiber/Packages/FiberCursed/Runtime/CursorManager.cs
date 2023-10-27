@@ -202,7 +202,7 @@ namespace Fiber.Cursed
             return _cursorWishesById.ContainsKey(id);
         }
 
-        void UpdateCursor()
+        public void UpdateCursor()
         {
             int pickedCursorWishKey = -1;
             int pickedCursorWishPrio = int.MaxValue;
