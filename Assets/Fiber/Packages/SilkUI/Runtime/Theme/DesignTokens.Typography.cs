@@ -141,7 +141,7 @@ namespace SilkUI
             Font font,
             int fontSize,
             FontStyle fontStyle,
-            TextOutlineType outlineWidth = TextOutlineType.Default
+            TextOutlineType outlineWidth = TextOutlineType.None
         )
         {
             Font = new(new(font));
