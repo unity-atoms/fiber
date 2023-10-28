@@ -65,9 +65,9 @@ namespace SilkUI
             return signal;
         }
         #endregion
-        #region TextOutline
+        #region OutlineWidth
         private readonly Dictionary<TextOutlineType, BaseSignal<StyleFloat>> _textOutlineSignalsCache;
-        public BaseSignal<StyleFloat> TextOutline(TextOutlineType textOutlineType = TextOutlineType.Default)
+        public BaseSignal<StyleFloat> OutlineWidth(TextOutlineType textOutlineType = TextOutlineType.Default)
         {
             if (_textOutlineSignalsCache.ContainsKey(textOutlineType))
             {
@@ -242,7 +242,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get() * theme.Spacing.Baseline.Value;
+                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get();
                 }, this);
                 _outlineWidthSignalsCache.Add(typographyType, signal);
 
@@ -253,7 +253,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, TypographyType, StyleFloat>((theme, typographyType) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get() * theme.Spacing.Baseline.Value;
+                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get();
                 }, this, typographyTypeProp.Signal);
                 return signal;
             }
