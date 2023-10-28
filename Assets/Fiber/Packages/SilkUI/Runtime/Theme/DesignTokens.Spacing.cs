@@ -52,15 +52,12 @@ namespace SilkUI
     }
     public class BorderWidthTokens : BaseSignal<BorderWidthTokens>
     {
-        public const float DEFAULT = 0.25f;
-        public const float THICK = 0.5f;
-        public const float THIN = 0.125f;
+        public const float DEFAULT = 1f;
+        public const float THICK = 2f;
+        public const float THIN = 0.5f;
 
-        // Multiplied by SpacingTokens.Baseline to get the actual value
         public Signal<float> Default { get; private set; }
-        // Multiplied by SpacingTokens.Baseline to get the actual value
         public Signal<float> Thick { get; private set; }
-        // Multiplied by SpacingTokens.Baseline to get the actual value
         public Signal<float> Thin { get; private set; }
         private StaticSignal<float> _none = new(0f);
 
@@ -119,15 +116,12 @@ namespace SilkUI
     }
     public class TextOutlineTokens : BaseSignal<TextOutlineTokens>
     {
-        public const float DEFAULT = 0.25f;
-        public const float EMPHASIS = 0.5f;
-        public const float LIGHT = 0.125f;
+        public const float DEFAULT = 1f;
+        public const float EMPHASIS = 2f;
+        public const float LIGHT = 0.5f;
 
-        // Multiplied by SpacingTokens.Baseline to get the actual value
         public Signal<float> Default { get; private set; }
-        // Multiplied by SpacingTokens.Baseline to get the actual value
         public Signal<float> Emphasis { get; private set; }
-        // Multiplied by SpacingTokens.Baseline to get the actual value
         public Signal<float> Light { get; private set; }
         private StaticSignal<float> _none = new(0f);
 

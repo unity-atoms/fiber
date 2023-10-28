@@ -60,7 +60,7 @@ namespace SilkUI
 
             var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
             {
-                return theme.Spacing.BorderWidth.GetBorderWidthSignal(borderWidthType).Get() * theme.Spacing.Baseline.Value;
+                return theme.Spacing.BorderWidth.GetBorderWidthSignal(borderWidthType).Get();
             }, this);
             return signal;
         }
@@ -76,7 +76,7 @@ namespace SilkUI
 
             var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
             {
-                return theme.Spacing.TextOutline.GetTextOutlineSignal(textOutlineType).Get() * theme.Spacing.Baseline.Value;
+                return theme.Spacing.TextOutline.GetTextOutlineSignal(textOutlineType).Get();
             }, this);
             return signal;
         }
