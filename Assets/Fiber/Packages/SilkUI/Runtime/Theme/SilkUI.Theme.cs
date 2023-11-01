@@ -2,8 +2,9 @@ using Signals;
 
 namespace SilkUI
 {
-    public class Theme : BaseSignal<Theme>
+    public class Theme : BaseSignal<Theme>, IGetName
     {
+        public string Name;
         public string FallbackRole;
         public ColorTokenCollection Color;
         public TypographyTokens Typography;
@@ -12,6 +13,7 @@ namespace SilkUI
         public BreakpointTokens Breakpoints;
 
         public Theme(
+            string name,
             string fallbackRole,
             ColorTokenCollection color,
             TypographyTokens typography,
@@ -20,6 +22,7 @@ namespace SilkUI
             BreakpointTokens breakpoints = null
         )
         {
+            Name = name;
             FallbackRole = fallbackRole;
             Color = color;
             Color.RegisterDependent(this);
@@ -59,5 +62,7 @@ namespace SilkUI
             var colorModifiers = variant != null && element.Variants.ContainsKey(variant) ? element.Variants[variant] : element;
             return colorModifiers;
         }
+
+        public string GetName() => Name;
     }
 }
