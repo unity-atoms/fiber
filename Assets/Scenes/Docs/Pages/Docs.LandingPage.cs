@@ -19,7 +19,7 @@ public class DocsLandingPageComponent : BaseComponent
         {
             var themeStore = C<ThemeStore>();
 
-            return F.View(
+            return F.ScrollView(
                 style: new Style(
                     mergedStyle: _style,
                     width: new Length(100, LengthUnit.Percent),
