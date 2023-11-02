@@ -11,13 +11,15 @@ namespace Fiber.UIElements
             this BaseComponent component,
             List<VirtualNode> children = null,
             float referenceDPI = ScalingProviderComponent.DEFAULT_REFERENCE_DPI,
-            float fallbackDPI = ScalingProviderComponent.DEFAULT_FALLBACK_DPI
+            float fallbackDPI = ScalingProviderComponent.DEFAULT_FALLBACK_DPI,
+            float multiplier = 1f
         )
         {
             return new ScalingProviderComponent(
                 children: children,
                 referenceDPI: referenceDPI,
-                fallbackDPI: fallbackDPI
+                fallbackDPI: fallbackDPI,
+                multiplier: multiplier
             );
         }
     }
@@ -127,11 +129,13 @@ namespace Fiber.UIElements
     {
         public float ReferenceDPI { get; private set; }
         public float FallbackDPI { get; private set; }
+        public float Multiplier { get; private set; }
 
-        public ScalingConfig(float referenceDPI, float fallbackDPI)
+        public ScalingConfig(float referenceDPI, float fallbackDPI, float multiplier)
         {
             ReferenceDPI = referenceDPI;
             FallbackDPI = fallbackDPI;
+            Multiplier = multiplier;
         }
     }
 
@@ -156,13 +160,16 @@ namespace Fiber.UIElements
         public const float DEFAULT_FALLBACK_DPI = 96f;
         private float _referenceDPI;
         private float _fallbackDPI;
+        private float _multiplier;
         public float ReferenceDPI => _referenceDPI;
+        public float Multiplier => _multiplier;
         public ScreenSizeSignal ScreenSizeSignal { get; private set; }
 
         public ScalingProviderComponent(
             List<VirtualNode> children,
             float referenceDPI = DEFAULT_REFERENCE_DPI,
-            float fallbackDPI = DEFAULT_FALLBACK_DPI
+            float fallbackDPI = DEFAULT_FALLBACK_DPI,
+            float multiplier = 1f
         ) : base(children)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -173,10 +180,11 @@ namespace Fiber.UIElements
             _referenceDPI = referenceDPI;
 #endif
             _fallbackDPI = fallbackDPI;
+            _multiplier = multiplier;
         }
         public override VirtualNode Render()
         {
-            var scalingConfig = G<ScalingConfig>(throwIfNotFound: false) ?? new ScalingConfig(referenceDPI: _referenceDPI, fallbackDPI: _fallbackDPI);
+            var scalingConfig = G<ScalingConfig>(throwIfNotFound: false) ?? new ScalingConfig(referenceDPI: _referenceDPI, fallbackDPI: _fallbackDPI, multiplier: _multiplier);
             ScreenSizeSignal = G<ScreenSizeSignal>(throwIfNotFound: false) ?? new ScreenSizeSignal(referenceDPI: scalingConfig.ReferenceDPI, fallbackDPI: scalingConfig.FallbackDPI);
             var context = new ScalingContext(screenSizeSignal: ScreenSizeSignal, config: scalingConfig);
 

@@ -4144,11 +4144,11 @@ namespace Fiber.UIElements
                     // From testing it seems like Screen.dpi returns 96 * window.devicePixelRatio. 
                     // In web builds Screen.width and Screen.height are in CSS pixels, which are density-independent
                     // By setting reference dpi to 96f, 1px in Unity Toolkit will be 1px in CSS pixels
-                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI;
+                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI / scalingProvider.Multiplier;
 #else
-                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI;
+                    uiDocument.panelSettings.referenceDpi = scalingProvider.ReferenceDPI / scalingProvider.Multiplier;
 #endif
-                    uiDocument.panelSettings.fallbackDpi = dpi;
+                    uiDocument.panelSettings.fallbackDpi = dpi / scalingProvider.Multiplier;
                 }
                 return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this);
             }
