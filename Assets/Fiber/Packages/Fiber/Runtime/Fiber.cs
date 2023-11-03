@@ -726,9 +726,18 @@ namespace Fiber
         }
     }
 
-    public abstract class BaseContextProvider : VirtualNode
+    public interface IBuiltInComponent
+    {
+        VirtualBody Render(FiberNode fiberNode);
+    }
+
+    public abstract class BaseContextProvider : VirtualNode, IBuiltInComponent
     {
         public BaseContextProvider(VirtualBody children) : base(children) { }
+        public VirtualBody Render(FiberNode fiberNode)
+        {
+            return children;
+        }
     }
 
     public class ContextProvider<C> : BaseContextProvider
@@ -1812,11 +1821,6 @@ namespace Fiber
                 return nativeNode;
             }
 
-            if (virtualNode is FragmentComponent || virtualNode is BaseContextProvider || virtualNode is MatchComponent)
-            {
-                return null;
-            }
-
             throw new Exception($"Unknown virtual node {virtualNode}.");
         }
 
@@ -2099,19 +2103,19 @@ namespace Fiber
             return null;
         }
 
-        public interface IBuiltInComponent
-        {
-            VirtualBody Render(FiberNode fiberNode);
-        }
 
         public VirtualNode Fragment(VirtualBody children)
         {
             return new FragmentComponent(children);
         }
 
-        private class FragmentComponent : VirtualNode
+        private class FragmentComponent : VirtualNode, IBuiltInComponent
         {
             public FragmentComponent(VirtualBody children) : base(children) { }
+            public VirtualBody Render(FiberNode fiberNode)
+            {
+                return children;
+            }
         }
 
         public VirtualNode Enable(ISignal<bool> whenSignal, VirtualBody children)
@@ -2681,7 +2685,7 @@ namespace Fiber
             return new MatchComponent(when, children);
         }
 
-        private class MatchComponent : VirtualNode
+        private class MatchComponent : VirtualNode, IBuiltInComponent
         {
             public ISignal<bool> When { get; private set; }
 
@@ -2691,7 +2695,7 @@ namespace Fiber
                 When = when;
             }
 
-            public VirtualBody Render()
+            public VirtualBody Render(FiberNode fiberNode)
             {
                 return children;
             }
