@@ -74,25 +74,23 @@ namespace SilkUI
 
             return F.RoleProvider(
                 role: role,
-                children: F.Children(
-                    F.View(
-                        children: children,
-                        style: new Style(
-                            mergedStyle: _style,
-                            width: new Length(100, LengthUnit.Percent),
-                            height: themeStore.Spacing(14),
-                            paddingBottom: themeStore.Spacing(2),
-                            paddingTop: themeStore.Spacing(2),
-                            paddingLeft: themeStore.Spacing(4),
-                            paddingRight: themeStore.Spacing(4),
-                            backgroundColor: themeStore.Color(role, ElementType.Background, _variant),
-                            display: DisplayStyle.Flex,
-                            flexGrow: 0,
-                            flexShrink: 0,
-                            flexDirection: FlexDirection.Row,
-                            alignItems: Align.Center,
-                            justifyContent: Justify.SpaceBetween
-                        )
+                children: F.View(
+                    children: children,
+                    style: new Style(
+                        mergedStyle: _style,
+                        width: new Length(100, LengthUnit.Percent),
+                        height: themeStore.Spacing(14),
+                        paddingBottom: themeStore.Spacing(2),
+                        paddingTop: themeStore.Spacing(2),
+                        paddingLeft: themeStore.Spacing(4),
+                        paddingRight: themeStore.Spacing(4),
+                        backgroundColor: themeStore.Color(role, ElementType.Background, _variant),
+                        display: DisplayStyle.Flex,
+                        flexGrow: 0,
+                        flexShrink: 0,
+                        flexDirection: FlexDirection.Row,
+                        alignItems: Align.Center,
+                        justifyContent: Justify.SpaceBetween
                     )
                 )
             );

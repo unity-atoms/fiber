@@ -111,17 +111,11 @@ namespace SilkUI
                         },
                         expandedItemIds: _expandedItemIds
                     ),
-                    children: F.Children(
-                        F.RoleProvider(
-                            role: _role,
-                            children: F.Children(
-                                F.ContextProvider(
-                                    value: new IndentiationLevelContext(indentiationLeve: 0),
-                                    children: F.Children(
-                                        new VisualContainer(children: children, role: _role, forwardRef: _forwardRef)
-                                    )
-                                )
-                            )
+                    children: F.RoleProvider(
+                        role: _role,
+                        children: F.ContextProvider(
+                            value: new IndentiationLevelContext(indentiationLeve: 0),
+                            children: new VisualContainer(children: children, role: _role, forwardRef: _forwardRef)
                         )
                     )
                 );
@@ -188,7 +182,7 @@ namespace SilkUI
                     treeViewStateContext.OnItemSelected(_id);
                 });
 
-                return F.Fragment(F.Children(
+                return F.Children(
                     new VisualItem(
                         label: _label,
                         identationLevel: identationLevel,
@@ -200,19 +194,17 @@ namespace SilkUI
                     ),
                     F.Active(
                         when: isExpanded,
-                        children: F.Children(
-                            F.ContextProvider(
-                                value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
-                                children: F.Children(new VisualItemGroup(
-                                    children: children,
-                                    identationLevel: identationLevel + 1,
-                                    role: _role,
-                                    isExpanded: isExpanded
-                                ))
+                        children: F.ContextProvider(
+                            value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
+                            children: new VisualItemGroup(
+                                children: children,
+                                identationLevel: identationLevel + 1,
+                                role: _role,
+                                isExpanded: isExpanded
                             )
                         )
                     )
-                ));
+                );
             }
         }
 
@@ -325,7 +317,7 @@ namespace SilkUI
                         ),
                         F.Visible(
                             when: new StaticSignal<bool>(_hasSubItems),
-                            children: F.Children(F.SilkIcon(iconName: iconName))
+                            children: F.SilkIcon(iconName: iconName)
                         )
                     )
                 );
