@@ -59,7 +59,7 @@ namespace Fiber.GameObjects
             OnClick = onClick;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var parentGO = F.GetParentGameObject();
 
@@ -79,7 +79,7 @@ namespace Fiber.GameObjects
                 };
             });
 
-            return null;
+            return VirtualBody.Empty;
         }
     }
 
@@ -147,7 +147,7 @@ namespace Fiber.GameObjects
             _context = new GameObjectPointerEventsContext();
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             F.CreateUpdateEffect(Update);
 

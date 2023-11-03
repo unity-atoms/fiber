@@ -53,7 +53,7 @@ namespace SilkUI
             _style = style;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateDrawer != null)

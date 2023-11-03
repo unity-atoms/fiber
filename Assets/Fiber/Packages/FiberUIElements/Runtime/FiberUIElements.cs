@@ -558,7 +558,7 @@ namespace Fiber.UIElements
             SortingOrder = !sortingOrder.IsEmpty ? sortingOrder : 0f;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var rootRef = new Ref<VisualElement>();
 

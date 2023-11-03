@@ -19,7 +19,7 @@ public static class DocsThemes
     {
         public Provider(VirtualBody children) : base(children) { }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ThemeProvider(
                 themeStore: new ThemeStore(

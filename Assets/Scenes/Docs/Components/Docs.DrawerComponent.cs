@@ -8,7 +8,7 @@ using Signals;
 
 public class DocsDrawerComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var router = C<Router>();
         var themeStore = C<ThemeStore>();
@@ -91,7 +91,7 @@ public class DocsDrawerContextProviderComponent : BaseComponent
 {
     public DocsDrawerContextProviderComponent(VirtualBody children = default) : base(children) { }
 
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var isOpen = new Signal<bool>(false);
 

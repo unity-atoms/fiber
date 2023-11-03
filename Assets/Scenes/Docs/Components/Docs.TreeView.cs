@@ -5,7 +5,7 @@ using Signals;
 
 public class DocsTreeViewComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var router = C<Router>();
         var drawerContext = C<DocsDrawerContext>();

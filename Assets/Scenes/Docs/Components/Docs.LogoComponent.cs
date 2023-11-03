@@ -54,7 +54,7 @@ public class DocsLogoComponent : BaseComponent
         };
     }
 
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var themeStore = C<ThemeStore>();
         var sizeSignal = F.WrapSignalProp(_size);

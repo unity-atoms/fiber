@@ -29,7 +29,7 @@ namespace SilkUI
             _themeStore = themeStore;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ContextProvider(
                 value: _themeStore,

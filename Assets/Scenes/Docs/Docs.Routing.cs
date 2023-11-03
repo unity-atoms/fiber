@@ -36,7 +36,7 @@ public static class DocsRouting
             _forwardRef = forwardRef;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.Text(_ref: _forwardRef, style: new Style(
                 height: 20,
@@ -48,7 +48,7 @@ public static class DocsRouting
 
     public class RootComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ScalingProvider(
                 children: F.OverrideVisualComponentsProvider(
@@ -71,7 +71,7 @@ public static class DocsRouting
 
     public class SideMenuComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
@@ -101,7 +101,7 @@ public static class DocsRouting
 
     public class MainLayoutComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
@@ -124,11 +124,11 @@ public static class DocsRouting
 
     public class DocsRootComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
-            return F.Fragment(F.Children(
+            return F.Children(
                 F.View(
                     style: new Style(
                         display: DisplayStyle.Flex,
@@ -154,7 +154,7 @@ public static class DocsRouting
                     )
                 ),
                 new DocsDrawerComponent()
-            ));
+            );
         }
     }
 
@@ -216,7 +216,7 @@ public static class DocsRouting
             _text = text;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
@@ -233,7 +233,7 @@ public static class DocsRouting
 
     public class RouterProvider : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.RouterProvider(new Router(ROUTER_TREE).Navigate(ROUTES.LANDING));
         }

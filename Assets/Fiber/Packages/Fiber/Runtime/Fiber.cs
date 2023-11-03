@@ -679,6 +679,7 @@ namespace Fiber
             VirtualNode = virtualNode;
         }
 
+        public static readonly VirtualBody Empty = new();
         public readonly bool IsList => VirtualNodes != null;
         public readonly bool IsSingleNode => VirtualNode != null;
         public readonly bool IsEmpty => !IsList && !IsSingleNode;
@@ -795,7 +796,7 @@ namespace Fiber
 
         public BaseComponent() : base(new()) { }
         public BaseComponent(VirtualBody children) : base(children) { }
-        public abstract VirtualNode Render();
+        public abstract VirtualBody Render();
 
         public VirtualNode ContextProvider<C>(C value, VirtualBody children) => Api.ContextProvider<C>(value, children);
         public VirtualNode ContextProvider<C>(VirtualBody children) => Api.ContextProvider<C>(children);
@@ -1505,19 +1506,8 @@ namespace Fiber
             {
                 component.Api = this;
                 component.FiberNode = _currentFiberNode;
-                var child = component.Render();
-                if (child != null)
-                {
-                    var childFiberNode = new FiberNode(
-                        renderer: this,
-                        nativeNode: null,
-                        virtualNode: child,
-                        parent: fiberNode,
-                        sibling: null
-                    );
-                    fiberNode.Child = childFiberNode;
-                    _renderQueue.Enqueue(childFiberNode);
-                }
+                var children = component.Render();
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is EnableComponent enableComponent)
             {
@@ -1531,19 +1521,8 @@ namespace Fiber
             }
             else if (fiberNode.VirtualNode is ActiveComponent activeComponent)
             {
-                var child = activeComponent.Render(fiberNode);
-                if (child != null)
-                {
-                    var childFiberNode = new FiberNode(
-                        renderer: this,
-                        nativeNode: null,
-                        virtualNode: child,
-                        parent: fiberNode,
-                        sibling: null
-                    );
-                    fiberNode.Child = childFiberNode;
-                    _renderQueue.Enqueue(childFiberNode);
-                }
+                var children = activeComponent.Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is MountComponent mountComponent)
             {
@@ -1559,19 +1538,8 @@ namespace Fiber
             }
             else if (fiberNode.VirtualNode is SwitchComponent switchComponent)
             {
-                var child = switchComponent.Render(fiberNode);
-                if (child != null)
-                {
-                    var childFiberNode = new FiberNode(
-                        renderer: this,
-                        nativeNode: null,
-                        virtualNode: child,
-                        parent: fiberNode,
-                        sibling: null
-                    );
-                    fiberNode.Child = childFiberNode;
-                    _renderQueue.Enqueue(childFiberNode);
-                }
+                var children = switchComponent.Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else
             {
@@ -2275,7 +2243,7 @@ namespace Fiber
                 _renderer = renderer;
             }
 
-            public VirtualNode Render(FiberNode fiberNode)
+            public VirtualBody Render(FiberNode fiberNode)
             {
                 return new VisibleComponent(
                     _whenSignal,
@@ -2679,7 +2647,7 @@ namespace Fiber
                 public override void Cleanup() { }
             }
 
-            public VirtualNode Render(FiberNode fiberNode)
+            public VirtualBody Render(FiberNode fiberNode)
             {
                 var _lastRenderedIndexRef = new Ref<int>(-1);
                 fiberNode.PushEffect(new SwitchEffect(_matchSignals, children, _fallback, fiberNode, _renderQueue, _operationsQueue, _renderer, _lastRenderedIndexRef));

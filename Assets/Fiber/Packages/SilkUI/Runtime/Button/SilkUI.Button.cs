@@ -48,7 +48,7 @@ namespace SilkUI
             _onPress = onPress;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: _onPress);
 

@@ -40,7 +40,7 @@ namespace SilkUI
             _variant = variant;
             _onClick = onClick;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateBackdrop != null)

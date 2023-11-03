@@ -100,7 +100,7 @@ namespace SilkUI
                 _forwardRef = forwardRef;
             }
 
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 return F.ContextProvider(
                     value: new TreeViewStateContext(
@@ -142,7 +142,7 @@ namespace SilkUI
                 _role = role;
                 _forwardRef = forwardRef;
             }
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
                 if (overrideVisualComponents?.CreateTreeViewContainer != null)
@@ -176,7 +176,7 @@ namespace SilkUI
                 _role = role;
             }
 
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var treeViewStateContext = F.GetContext<TreeViewStateContext>();
                 var isSelected = F.CreateComputedSignal((selectedItemId) => selectedItemId == _id, treeViewStateContext.SelectedItemId);
@@ -233,7 +233,7 @@ namespace SilkUI
                 _role = role;
                 _isExpanded = isExpanded;
             }
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
                 if (overrideVisualComponents?.CreateTreeViewItemGroup != null)
@@ -278,7 +278,7 @@ namespace SilkUI
                 _isSelected = isSelected;
                 _isExpanded = isExpanded;
             }
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
                 if (overrideVisualComponents?.CreateTreeViewItem != null)

@@ -13,7 +13,7 @@ namespace Fiber.Suite
         [SerializeField] private PanelSettings _defaultPanelSettings;
         public class CounterComponent : BaseComponent
         {
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var count = new Signal<int>(0);
 
@@ -40,7 +40,7 @@ namespace Fiber.Suite
         {
             IsKinematicSignal = isKinematicSignal;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var _ref = new Ref<GameObject>();
             CreateEffect((isKinematic) =>

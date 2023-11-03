@@ -69,7 +69,7 @@ namespace SilkUI
             _style = style;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             children.Add(F.SilkIcon(
                 iconName: _iconName,

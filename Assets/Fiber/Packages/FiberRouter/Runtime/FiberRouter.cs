@@ -429,7 +429,7 @@ namespace Fiber.Router
             Component = component;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return Mount(
                 when: ShowSignal,
@@ -465,7 +465,7 @@ namespace Fiber.Router
                 return currentValue;
             }
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var hasBeenTrueOnce = new HasBeenTrueOnceSignal(ShowSignal);
             return Mount(
@@ -633,7 +633,7 @@ namespace Fiber.Router
     public class OutletProvider : Component<VirtualNode>
     {
         public OutletProvider(VirtualNode virtualNode, VirtualBody children) : base(virtualNode, children) { }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return ContextProvider(
                 value: new OutletContext() { VirtualNode = Props },
@@ -644,7 +644,7 @@ namespace Fiber.Router
 
     public class OutletComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var outletContext = GetContext<OutletContext>();
             return outletContext.VirtualNode;
@@ -746,7 +746,7 @@ namespace Fiber.Router
             }
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             // Render component
             var routeSignal = new RouteAtCurrentIndexSignal(_router, _currentStackIndex);

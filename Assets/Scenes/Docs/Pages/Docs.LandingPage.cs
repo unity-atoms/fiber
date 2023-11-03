@@ -15,7 +15,7 @@ public class DocsLandingPageComponent : BaseComponent
         {
             _style = style;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
@@ -36,7 +36,7 @@ public class DocsLandingPageComponent : BaseComponent
         }
     }
 
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var themeStore = C<ThemeStore>();
         var logoSize = F.CreateComputedSignal((isSmall) => !isSmall ? DocsLogoSize.Large : DocsLogoSize.XL, themeStore.IsSmallScreen);

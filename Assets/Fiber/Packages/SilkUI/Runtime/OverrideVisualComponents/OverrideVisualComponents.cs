@@ -157,7 +157,7 @@ namespace SilkUI
             _overrideVisualComponents = overrideVisualComponents;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ContextProvider(
                 value: _overrideVisualComponents,

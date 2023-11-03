@@ -144,7 +144,7 @@ namespace SilkUI
             _roleContext = new(role);
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ContextProvider(
                 value: _roleContext,

@@ -27,7 +27,7 @@ public class RotatingCubesExample : MonoBehaviour
             _position = position;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var _ref = new Ref<GameObject>();
             F.CreateUpdateEffect((deltaTime) =>
@@ -63,7 +63,7 @@ public class RotatingCubesExample : MonoBehaviour
 
     public class RotatingCubesComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.GameObjectPointerEventsManager(F.Children(
                 new CubeComponent(new Vector3(1.2f, 0, 0)),

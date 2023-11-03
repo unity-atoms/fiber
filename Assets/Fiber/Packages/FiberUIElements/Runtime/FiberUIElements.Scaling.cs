@@ -182,7 +182,7 @@ namespace Fiber.UIElements
             _fallbackDPI = fallbackDPI;
             _multiplier = multiplier;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var scalingConfig = G<ScalingConfig>(throwIfNotFound: false) ?? new ScalingConfig(referenceDPI: _referenceDPI, fallbackDPI: _fallbackDPI, multiplier: _multiplier);
             ScreenSizeSignal = G<ScreenSizeSignal>(throwIfNotFound: false) ?? new ScreenSizeSignal(referenceDPI: scalingConfig.ReferenceDPI, fallbackDPI: scalingConfig.FallbackDPI);

@@ -4,7 +4,7 @@ using SilkUI;
 
 public class DocsIntroductionPageComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var themeStore = C<ThemeStore>();
 

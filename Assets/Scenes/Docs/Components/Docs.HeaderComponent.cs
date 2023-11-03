@@ -8,7 +8,7 @@ using Signals;
 
 public class DocsHeaderComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var router = C<Router>();
         var themeStore = C<ThemeStore>();

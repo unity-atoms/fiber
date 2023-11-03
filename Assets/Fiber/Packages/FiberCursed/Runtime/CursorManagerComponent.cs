@@ -30,7 +30,7 @@ namespace Fiber.Cursed
             _cursorDefinitionsStore = cursorDefinitionsStore;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             CursorManager cursorManager = null;
 

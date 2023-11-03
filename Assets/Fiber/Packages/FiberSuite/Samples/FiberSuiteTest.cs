@@ -55,7 +55,7 @@ namespace Fiber.Suite
                 }
             }
 
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var textSignal = new Signal<string>("red");
                 var isGreenSignal = new IsGreenSignal(textSignal);
@@ -106,7 +106,7 @@ namespace Fiber.Suite
                 }
             }
 
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var showSingal = new Signal<bool>(false);
                 var showNestedSingal = new Signal<bool>(false);

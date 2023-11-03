@@ -56,7 +56,7 @@ namespace SilkUI
             _style = style;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateHeaderContainer != null)
@@ -114,7 +114,7 @@ namespace SilkUI
             _style = style;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateHeaderItemGroup != null)
