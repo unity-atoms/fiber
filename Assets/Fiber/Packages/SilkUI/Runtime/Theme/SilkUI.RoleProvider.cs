@@ -113,7 +113,7 @@ namespace SilkUI
         public static RoleProvider RoleProvider(
             this BaseComponent component,
             string role,
-            List<VirtualNode> children
+            VirtualBody children
         )
         {
             return new RoleProvider(
@@ -138,7 +138,7 @@ namespace SilkUI
         public RoleContext _roleContext;
         public RoleProvider(
             string role,
-            List<VirtualNode> children
+            VirtualBody children
         ) : base(children)
         {
             _roleContext = new(role);

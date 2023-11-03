@@ -10,7 +10,7 @@ namespace SilkUI
     {
         public static SilkDrawerComponent SilkDrawer(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             BaseSignal<bool> isOpen,
             DrawerPosition position = DrawerPosition.Left,
@@ -40,7 +40,7 @@ namespace SilkUI
         private readonly DrawerPosition _position;
         private readonly Style _style;
         public SilkDrawerComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             BaseSignal<bool> isOpen,
             DrawerPosition position = DrawerPosition.Left,

@@ -19,7 +19,7 @@ namespace Fiber.GameObjects
             Action<GameObject> onMount = null,
             Func<GameObject, GameObject> getInstance = null,
             Action<GameObject> removeInstance = null,
-            List<VirtualNode> children = null
+            VirtualBody children = default
         )
         {
             return new GameObjectComponent(
@@ -72,8 +72,8 @@ namespace Fiber.GameObjects
         public Func<GameObject, GameObject> GetInstance { get; set; }
         public Action<GameObject> RemoveInstance { get; set; }
 
-        public GameObjectComponent() : base(null) { }
-        public GameObjectComponent(List<VirtualNode> children) : base(children) { }
+        public GameObjectComponent() : base() { }
+        public GameObjectComponent(VirtualBody children) : base(children) { }
 
         public GameObjectComponent(
             SignalProp<string> name = new(),
@@ -86,7 +86,7 @@ namespace Fiber.GameObjects
             Action<GameObject> onMount = null,
             Func<GameObject, GameObject> getInstance = null,
             Action<GameObject> removeInstance = null,
-            List<VirtualNode> children = null
+            VirtualBody children = new()
         ) : base(children)
         {
             Name = name;

@@ -25,6 +25,7 @@ namespace Signals
         T GetAt(int index);
     }
 
+    [Serializable]
     public abstract class BaseSignal : ISignal
     {
         // The deep dirty bit is used to track changes to the signal. Incrementing

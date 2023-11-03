@@ -632,10 +632,10 @@ namespace Fiber.Router
 
     public class OutletProvider : Component<VirtualNode>
     {
-        public OutletProvider(VirtualNode virtualNode, List<VirtualNode> children) : base(virtualNode, children) { }
+        public OutletProvider(VirtualNode virtualNode, VirtualBody children) : base(virtualNode, children) { }
         public override VirtualNode Render()
         {
-            return ContextProvider<OutletContext>(
+            return ContextProvider(
                 value: new OutletContext() { VirtualNode = Props },
                 children: children
             );

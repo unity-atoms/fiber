@@ -60,7 +60,7 @@ namespace SilkUI
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new()
-        ) : base(new()) // Create new instance of children
+        ) : base(new List<VirtualNode>()) // Create new instance of children
         {
             _text = text;
             _iconName = iconName;
@@ -95,7 +95,7 @@ namespace SilkUI
             }
             else if (_text.Children != null)
             {
-                children.AddRange(_text.Children);
+                children.Add(_text.Children);
             }
 
             return F.View(

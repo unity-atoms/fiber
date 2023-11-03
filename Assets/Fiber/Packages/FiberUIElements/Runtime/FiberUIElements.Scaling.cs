@@ -9,7 +9,7 @@ namespace Fiber.UIElements
     {
         public static ScalingProviderComponent ScalingProvider(
             this BaseComponent component,
-            List<VirtualNode> children = null,
+            VirtualBody children = default,
             float referenceDPI = ScalingProviderComponent.DEFAULT_REFERENCE_DPI,
             float fallbackDPI = ScalingProviderComponent.DEFAULT_FALLBACK_DPI,
             float multiplier = 1f
@@ -166,7 +166,7 @@ namespace Fiber.UIElements
         public ScreenSizeSignal ScreenSizeSignal { get; private set; }
 
         public ScalingProviderComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             float referenceDPI = DEFAULT_REFERENCE_DPI,
             float fallbackDPI = DEFAULT_FALLBACK_DPI,
             float multiplier = 1f

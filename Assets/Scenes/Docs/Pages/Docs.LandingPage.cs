@@ -11,7 +11,7 @@ public class DocsLandingPageComponent : BaseComponent
     public class FeatureComponent : BaseComponent
     {
         private readonly Style _style;
-        public FeatureComponent(List<VirtualNode> children, Style style = new()) : base(children)
+        public FeatureComponent(VirtualBody children, Style style = new()) : base(children)
         {
             _style = style;
         }

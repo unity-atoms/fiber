@@ -28,7 +28,7 @@ namespace Fiber.GameObjects
         public MeshRendererComponent(
             SignalProp<List<Material>> materials = new(),
             SignalProp<Material> material = new()
-        ) : base(null)
+        ) : base()
         {
             Materials = materials;
             Material = material;

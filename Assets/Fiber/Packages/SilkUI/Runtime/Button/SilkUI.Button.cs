@@ -10,7 +10,7 @@ namespace SilkUI
     {
         public static SilkButtonComponent SilkButton(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             string variant = null,
             Style style = new(),
@@ -35,7 +35,7 @@ namespace SilkUI
         private readonly Action _onPress;
 
         public SilkButtonComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             string variant = null,
             Style style = new(),

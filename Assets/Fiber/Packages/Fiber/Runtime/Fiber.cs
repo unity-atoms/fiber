@@ -34,8 +34,8 @@ namespace Fiber
 
     public interface IComponentAPI
     {
-        public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children);
-        public VirtualNode ContextProvider<C>(List<VirtualNode> children);
+        public VirtualNode ContextProvider<C>(C value, VirtualBody children);
+        public VirtualNode ContextProvider<C>(VirtualBody children);
         public T GetGlobal<T>(bool throwIfNotFound = true);
         public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public NativeNode GetParentNativeNode();
@@ -99,17 +99,17 @@ namespace Fiber
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
             Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         );
-        public VirtualNode Fragment(List<VirtualNode> children);
-        public VirtualNode Enable(ISignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode Visible(ISignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode Active(ISignal<bool> whenSignal, List<VirtualNode> children);
-        public VirtualNode Mount(ISignal<bool> whenSignal, List<VirtualNode> children);
+        public VirtualNode Fragment(VirtualBody children);
+        public VirtualNode Enable(ISignal<bool> whenSignal, VirtualBody children);
+        public VirtualNode Visible(ISignal<bool> whenSignal, VirtualBody children);
+        public VirtualNode Active(ISignal<bool> whenSignal, VirtualBody children);
+        public VirtualNode Mount(ISignal<bool> whenSignal, VirtualBody children);
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
         );
-        public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children);
-        public VirtualNode Match(ISignal<bool> when, List<VirtualNode> children);
+        public VirtualNode Switch(VirtualNode fallback, VirtualBody children);
+        public VirtualNode Match(ISignal<bool> when, VirtualBody children);
     }
 
     public interface IEffectAPI
@@ -661,26 +661,79 @@ namespace Fiber
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
+    // A wrapper that is either a single VirtualNode or a list of VirtualNodes
+    public struct VirtualBody
+    {
+        public List<VirtualNode> VirtualNodes { get; private set; }
+        public VirtualNode VirtualNode { get; private set; }
+
+        public VirtualBody(List<VirtualNode> virtualNodes)
+        {
+            VirtualNodes = virtualNodes;
+            VirtualNode = null;
+        }
+
+        public VirtualBody(VirtualNode virtualNode)
+        {
+            VirtualNodes = null;
+            VirtualNode = virtualNode;
+        }
+
+        public readonly bool IsList => VirtualNodes != null;
+        public readonly bool IsSingleNode => VirtualNode != null;
+        public readonly bool IsEmpty => !IsList && !IsSingleNode;
+        public readonly int Count => IsList ? VirtualNodes.Count : IsSingleNode ? 1 : 0;
+
+        public readonly VirtualNode this[int i]
+        {
+            get { return VirtualNodes[i]; }
+        }
+
+        public readonly void Add(VirtualNode virtualNode)
+        {
+            VirtualNodes.Add(virtualNode);
+        }
+
+        public readonly void Add(VirtualBody virtualBody)
+        {
+            if (virtualBody.IsList)
+            {
+                VirtualNodes.AddRange(virtualBody.VirtualNodes);
+            }
+            else if (virtualBody.IsSingleNode)
+            {
+                VirtualNodes.Add(virtualBody.VirtualNode);
+            }
+        }
+
+        public static implicit operator VirtualBody(List<VirtualNode> virtualNodes) => new(virtualNodes);
+        public static implicit operator VirtualBody(VirtualNode virtualNode) => new(virtualNode);
+    }
+
     public class VirtualNode
     {
-        private List<VirtualNode> _children;
-        public List<VirtualNode> children { get => _children; }
+        public VirtualBody children { get; private set; }
 
-        public VirtualNode(List<VirtualNode> children)
+        public VirtualNode()
         {
-            _children = children;
+            children = new();
+        }
+
+        public VirtualNode(VirtualBody children)
+        {
+            this.children = children;
         }
     }
 
     public abstract class BaseContextProvider : VirtualNode
     {
-        public BaseContextProvider(List<VirtualNode> children) : base(children) { }
+        public BaseContextProvider(VirtualBody children) : base(children) { }
     }
 
     public class ContextProvider<C> : BaseContextProvider
     {
         public C Value { get; private set; }
-        public ContextProvider(C value, List<VirtualNode> children) : base(children)
+        public ContextProvider(C value, VirtualBody children) : base(children)
         {
             Value = value;
         }
@@ -697,12 +750,12 @@ namespace Fiber
             _initialValue = initialValue;
         }
 
-        public ContextProvider<C> ContextProvider(C value, List<VirtualNode> children)
+        public ContextProvider<C> ContextProvider(C value, VirtualBody children)
         {
             return new ContextProvider<C>(value, children);
         }
 
-        public ContextProvider<C> ContextProvider(List<VirtualNode> children)
+        public ContextProvider<C> ContextProvider(VirtualBody children)
         {
             return new ContextProvider<C>(_initialValue, children);
         }
@@ -740,12 +793,12 @@ namespace Fiber
         public FiberNode FiberNode { private get; set; }
         public BaseComponent F { get => this; }
 
-        public BaseComponent() : base(null) { }
-        public BaseComponent(List<VirtualNode> children) : base(children) { }
+        public BaseComponent() : base(new()) { }
+        public BaseComponent(VirtualBody children) : base(children) { }
         public abstract VirtualNode Render();
 
-        public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children) => Api.ContextProvider<C>(value, children);
-        public VirtualNode ContextProvider<C>(List<VirtualNode> children) => Api.ContextProvider<C>(children);
+        public VirtualNode ContextProvider<C>(C value, VirtualBody children) => Api.ContextProvider<C>(value, children);
+        public VirtualNode ContextProvider<C>(VirtualBody children) => Api.ContextProvider<C>(children);
         public T GetGlobal<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
         public T G<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
         public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
@@ -820,11 +873,11 @@ namespace Fiber
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
             Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
-        public VirtualNode Fragment(List<VirtualNode> children) => Api.Fragment(children);
-        public VirtualNode Enable(ISignal<bool> when, List<VirtualNode> children) => Api.Enable(when, children);
-        public VirtualNode Visible(ISignal<bool> when, List<VirtualNode> children) => Api.Visible(when, children);
-        public VirtualNode Active(ISignal<bool> when, List<VirtualNode> children) => Api.Active(when, children);
-        public VirtualNode Mount(ISignal<bool> when, List<VirtualNode> children) => Api.Mount(when, children);
+        public VirtualNode Fragment(VirtualBody children) => Api.Fragment(children);
+        public VirtualNode Enable(ISignal<bool> when, VirtualBody children) => Api.Enable(when, children);
+        public VirtualNode Visible(ISignal<bool> when, VirtualBody children) => Api.Visible(when, children);
+        public VirtualNode Active(ISignal<bool> when, VirtualBody children) => Api.Active(when, children);
+        public VirtualNode Mount(ISignal<bool> when, VirtualBody children) => Api.Mount(when, children);
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
@@ -832,27 +885,27 @@ namespace Fiber
         {
             return Api.For<ItemType, KeyType>(each, children);
         }
-        public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children) => Api.Switch(fallback, children);
-        public VirtualNode Match(ISignal<bool> when, List<VirtualNode> children) => Api.Match(when, children);
-        public List<VirtualNode> Children()
+        public VirtualNode Switch(VirtualNode fallback, VirtualBody children) => Api.Switch(fallback, children);
+        public VirtualNode Match(ISignal<bool> when, VirtualBody children) => Api.Match(when, children);
+        public VirtualBody Children()
         {
             var children = new List<VirtualNode>();
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1)
+        public VirtualBody Children(VirtualNode c1)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
-            return children;
+            return c1;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
             children.Add(c2);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -860,7 +913,7 @@ namespace Fiber
             children.Add(c3);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -869,7 +922,7 @@ namespace Fiber
             children.Add(c4);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -879,7 +932,7 @@ namespace Fiber
             children.Add(c5);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -890,7 +943,7 @@ namespace Fiber
             children.Add(c6);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -902,7 +955,7 @@ namespace Fiber
             children.Add(c7);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -915,7 +968,7 @@ namespace Fiber
             children.Add(c8);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8, VirtualNode c9)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8, VirtualNode c9)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -929,7 +982,7 @@ namespace Fiber
             children.Add(c9);
             return children;
         }
-        public List<VirtualNode> Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8, VirtualNode c9, VirtualNode c10)
+        public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8, VirtualNode c9, VirtualNode c10)
         {
             var children = new List<VirtualNode>();
             children.Add(c1);
@@ -950,7 +1003,7 @@ namespace Fiber
     {
         public P Props { get; set; }
 
-        public Component(P props, List<VirtualNode> children = null) : base(children)
+        public Component(P props, VirtualBody children = new()) : base(children)
         {
             Props = props;
         }
@@ -1535,10 +1588,28 @@ namespace Fiber
             _operationsQueue.Enqueue(new MountOperation(node: fiberNode));
         }
 
-        public static void RenderChildren(Renderer renderer, FiberNode fiberNode, List<VirtualNode> children, Queue<FiberNode> renderQueue)
+        public static void RenderChildren(Renderer renderer, FiberNode fiberNode, VirtualBody children, Queue<FiberNode> renderQueue)
         {
+            if (children.IsEmpty)
+            {
+                return;
+            }
+            else if (children.IsSingleNode)
+            {
+                var childFiberNode = new FiberNode(
+                    renderer: renderer,
+                    nativeNode: null,
+                    virtualNode: children.VirtualNode,
+                    parent: fiberNode,
+                    sibling: null
+                );
+                fiberNode.Child = childFiberNode;
+                renderQueue.Enqueue(childFiberNode);
+                return;
+            }
+
             FiberNode previousChildFiberNode = null;
-            for (var i = 0; children != null && i < children.Count; ++i)
+            for (var i = 0; i < children.Count; ++i)
             {
                 var child = children[i];
                 if (child != null)
@@ -1797,12 +1868,12 @@ namespace Fiber
             return default;
         }
 
-        public VirtualNode ContextProvider<C>(C value, List<VirtualNode> children)
+        public VirtualNode ContextProvider<C>(C value, VirtualBody children)
         {
             return _contextsAPI.GetContext<C>().ContextProvider(value, children);
         }
 
-        public VirtualNode ContextProvider<C>(List<VirtualNode> children)
+        public VirtualNode ContextProvider<C>(VirtualBody children)
         {
             return _contextsAPI.GetContext<C>().ContextProvider(children);
         }
@@ -2060,17 +2131,17 @@ namespace Fiber
             return null;
         }
 
-        public VirtualNode Fragment(List<VirtualNode> children)
+        public VirtualNode Fragment(VirtualBody children)
         {
             return new FragmentComponent(children);
         }
 
         private class FragmentComponent : VirtualNode
         {
-            public FragmentComponent(List<VirtualNode> children) : base(children) { }
+            public FragmentComponent(VirtualBody children) : base(children) { }
         }
 
-        public VirtualNode Enable(ISignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Enable(ISignal<bool> whenSignal, VirtualBody children)
         {
             return new EnableComponent(whenSignal, children, this);
         }
@@ -2080,7 +2151,7 @@ namespace Fiber
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
 
-            public EnableComponent(ISignal<bool> whenSignal, List<VirtualNode> children, Renderer renderer) : base(children)
+            public EnableComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
                 _renderer = renderer;
@@ -2133,14 +2204,14 @@ namespace Fiber
                 public override void Cleanup() { }
             }
 
-            public List<VirtualNode> Render(FiberNode fiberNode)
+            public VirtualBody Render(FiberNode fiberNode)
             {
                 fiberNode.PushEffect(new EnabledEffect(_whenSignal, fiberNode, _renderer));
                 return children;
             }
         }
 
-        public VirtualNode Visible(ISignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Visible(ISignal<bool> whenSignal, VirtualBody children)
         {
             return new VisibleComponent(whenSignal, children);
         }
@@ -2149,7 +2220,7 @@ namespace Fiber
         {
             public bool IsVisible { get => _whenSignal.Get(); }
             private readonly ISignal<bool> _whenSignal;
-            public VisibleComponent(ISignal<bool> whenSignal, List<VirtualNode> children) : base(children)
+            public VisibleComponent(ISignal<bool> whenSignal, VirtualBody children) : base(children)
             {
                 _whenSignal = whenSignal;
             }
@@ -2182,14 +2253,14 @@ namespace Fiber
                 public override void Cleanup() { }
             }
 
-            public List<VirtualNode> Render(FiberNode fiberNode)
+            public VirtualBody Render(FiberNode fiberNode)
             {
                 fiberNode.PushEffect(new VisibleEffect(_whenSignal, fiberNode));
                 return children;
             }
         }
 
-        public VirtualNode Active(ISignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Active(ISignal<bool> whenSignal, VirtualBody children)
         {
             return new ActiveComponent(whenSignal, children, this);
         }
@@ -2198,7 +2269,7 @@ namespace Fiber
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
-            public ActiveComponent(ISignal<bool> whenSignal, List<VirtualNode> children, Renderer renderer) : base(children)
+            public ActiveComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
                 _renderer = renderer;
@@ -2208,18 +2279,16 @@ namespace Fiber
             {
                 return new VisibleComponent(
                     _whenSignal,
-                    new List<VirtualNode> {
-                        new EnableComponent(
-                            _whenSignal,
-                            children,
-                            _renderer
-                        )
-                    }
+                    new EnableComponent(
+                        _whenSignal,
+                        children,
+                        _renderer
+                    )
                 );
             }
         }
 
-        public VirtualNode Mount(ISignal<bool> whenSignal, List<VirtualNode> children)
+        public VirtualNode Mount(ISignal<bool> whenSignal, VirtualBody children)
         {
             return new MountComponent(whenSignal, children, _renderQueue, _operationsQueue, this);
         }
@@ -2233,7 +2302,7 @@ namespace Fiber
 
             public MountComponent(
                 ISignal<bool> whenSignal,
-                List<VirtualNode> children,
+                VirtualBody children,
                 Queue<FiberNode> renderQueue,
                 MixedQueue operationsQueue,
                 Renderer renderer
@@ -2251,12 +2320,12 @@ namespace Fiber
                 private readonly MixedQueue _operationsQueue;
                 private readonly Renderer _renderer;
                 private readonly FiberNode _mountFiberNode;
-                private readonly List<VirtualNode> _children;
+                private readonly VirtualBody _children;
                 private bool _valueLastTime;
 
                 public MountEffect(
                     ISignal<bool> whenSignal,
-                    List<VirtualNode> children,
+                    VirtualBody children,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
                     Renderer renderer,
@@ -2295,10 +2364,10 @@ namespace Fiber
                 public override void Cleanup() { }
             }
 
-            public List<VirtualNode> Render(FiberNode mountFiberNode)
+            public VirtualBody Render(FiberNode mountFiberNode)
             {
                 mountFiberNode.PushEffect(new MountEffect(_whenSignal, children, _renderQueue, _operationsQueue, _renderer, mountFiberNode));
-                return _whenSignal.Get() ? children : null;
+                return _whenSignal.Get() ? children : new();
             }
         }
 
@@ -2313,7 +2382,7 @@ namespace Fiber
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
         private abstract class BaseForComponent : VirtualNode
         {
-            protected BaseForComponent() : base(null) { }
+            protected BaseForComponent() : base(new()) { }
             public abstract void Render(FiberNode fiberNode);
         }
 
@@ -2481,7 +2550,7 @@ namespace Fiber
             }
         }
 
-        public VirtualNode Switch(VirtualNode fallback, List<VirtualNode> children)
+        public VirtualNode Switch(VirtualNode fallback, VirtualBody children)
         {
             return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue, this);
         }
@@ -2496,7 +2565,7 @@ namespace Fiber
 
             public SwitchComponent(
                 VirtualNode fallback,
-                List<VirtualNode> children,
+                VirtualBody children,
                 Queue<FiberNode> renderQueue,
                 MixedQueue operationsQueue,
                 Renderer renderer
@@ -2521,7 +2590,7 @@ namespace Fiber
 
             private class SwitchEffect : DynamicEffect<bool>
             {
-                private readonly List<VirtualNode> _children;
+                private readonly VirtualBody _children;
                 private readonly VirtualNode _fallback;
                 private readonly FiberNode _fiberNode;
                 private readonly Queue<FiberNode> _renderQueue;
@@ -2531,7 +2600,7 @@ namespace Fiber
 
                 public SwitchEffect(
                     SignalList<ISignal<bool>> matchSignals,
-                    List<VirtualNode> children,
+                    VirtualBody children,
                     VirtualNode fallback,
                     FiberNode fiberNode,
                     Queue<FiberNode> renderQueue,
@@ -2634,7 +2703,7 @@ namespace Fiber
             }
         }
 
-        public VirtualNode Match(ISignal<bool> when, List<VirtualNode> children)
+        public VirtualNode Match(ISignal<bool> when, VirtualBody children)
         {
             return new MatchComponent(when, children);
         }
@@ -2643,13 +2712,13 @@ namespace Fiber
         {
             public ISignal<bool> When { get; private set; }
 
-            public MatchComponent(ISignal<bool> when, List<VirtualNode> children)
+            public MatchComponent(ISignal<bool> when, VirtualBody children)
                 : base(children)
             {
                 When = when;
             }
 
-            public List<VirtualNode> Render()
+            public VirtualBody Render()
             {
                 return children;
             }

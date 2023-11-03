@@ -9,7 +9,7 @@ namespace SilkUI
     {
         public static SilkHeaderComponent SilkHeader(
             this BaseComponent component,
-                List<VirtualNode> children,
+                VirtualBody children,
                 string role = THEME_CONSTANTS.INHERIT_ROLE,
                 string variant = null,
                 Style style = new()
@@ -25,7 +25,7 @@ namespace SilkUI
 
         public static SilkHeaderItemGroupComponent SilkHeaderItemGroup(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             Justify justifyContent = Justify.FlexStart,
             Style style = new()
         )
@@ -45,7 +45,7 @@ namespace SilkUI
         private readonly Style _style;
 
         public SilkHeaderComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new()
@@ -105,7 +105,7 @@ namespace SilkUI
         private readonly Justify _justifyContent;
 
         public SilkHeaderItemGroupComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             Justify justifyContent = Justify.FlexStart,
             Style style = new()
         ) : base(children)

@@ -11,7 +11,7 @@ namespace SilkUI
     {
         public static SilkTreeViewComponent.Container SilkTreeViewContainer(
             this BaseComponent component,
-                List<VirtualNode> children,
+                VirtualBody children,
                 Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
@@ -33,7 +33,7 @@ namespace SilkUI
             this BaseComponent component,
                 SignalProp<string> label,
                 string id,
-                List<VirtualNode> children = null,
+                VirtualBody children = default,
                 string role = THEME_CONSTANTS.INHERIT_ROLE
         )
         {
@@ -85,7 +85,7 @@ namespace SilkUI
             private readonly Ref<VisualElement> _forwardRef;
 
             public Container(
-                List<VirtualNode> children,
+                VirtualBody children,
                 Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
@@ -134,7 +134,7 @@ namespace SilkUI
             private readonly Ref<VisualElement> _forwardRef;
 
             public VisualContainer(
-                List<VirtualNode> children,
+                VirtualBody children,
                 string role = THEME_CONSTANTS.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
@@ -167,7 +167,7 @@ namespace SilkUI
             public Item(
                 SignalProp<string> label,
                 string id,
-                List<VirtualNode> children = null,
+                VirtualBody children = default,
                 string role = THEME_CONSTANTS.INHERIT_ROLE
             ) : base(children)
             {
@@ -193,7 +193,7 @@ namespace SilkUI
                         label: _label,
                         identationLevel: identationLevel,
                         role: _role,
-                        hasSubItems: children != null && children.Count > 0,
+                        hasSubItems: children.Count > 0,
                         interactiveElement: interactiveElement,
                         isSelected: isSelected,
                         isExpanded: isExpanded
@@ -223,7 +223,7 @@ namespace SilkUI
             private readonly ISignal<bool> _isExpanded;
 
             public VisualItemGroup(
-                List<VirtualNode> children,
+                VirtualBody children,
                 int identationLevel,
                 string role,
                 ISignal<bool> isExpanded

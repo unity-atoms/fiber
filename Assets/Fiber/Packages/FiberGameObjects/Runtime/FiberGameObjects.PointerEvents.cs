@@ -12,7 +12,7 @@ namespace Fiber.GameObjects
     {
         public static GameObjectPointerEventsManager GameObjectPointerEventsManager(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             Ref<Camera> currentCameraRef = null
         )
         {
@@ -51,7 +51,7 @@ namespace Fiber.GameObjects
             Action onPointerExit = null,
             Action onPointerStay = null,
             Action onClick = null
-        ) : base(null)
+        ) : base()
         {
             OnPointerEnter = onPointerEnter;
             OnPointerExit = onPointerExit;
@@ -141,7 +141,7 @@ namespace Fiber.GameObjects
         private Ref<Camera> _currentCameraRef;
         private GameObjectPointerEventsContext _context;
 
-        public GameObjectPointerEventsManager(List<VirtualNode> children, Ref<Camera> currentCameraRef = null) : base(children)
+        public GameObjectPointerEventsManager(VirtualBody children, Ref<Camera> currentCameraRef = null) : base(children)
         {
             _currentCameraRef = currentCameraRef;
             _context = new GameObjectPointerEventsContext();

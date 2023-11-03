@@ -8,7 +8,7 @@ namespace Fiber.Cursed
         public static CursorManagerComponent CursorManager(
             this BaseComponent component,
             Store<ShallowSignalList<CursorDefinition>> cursorDefinitionsStore,
-            List<VirtualNode> children
+            VirtualBody children
         )
         {
             return new CursorManagerComponent(
@@ -24,8 +24,8 @@ namespace Fiber.Cursed
 
         public CursorManagerComponent(
             Store<ShallowSignalList<CursorDefinition>> cursorDefinitionsStore,
-            List<VirtualNode> children
-        ) : base(children: children)
+            VirtualBody children
+        ) : base(children)
         {
             _cursorDefinitionsStore = cursorDefinitionsStore;
         }

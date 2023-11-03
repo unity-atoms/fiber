@@ -93,7 +93,7 @@ public class DocsDrawerContext
 
 public class DocsDrawerContextProviderComponent : BaseComponent
 {
-    public DocsDrawerContextProviderComponent(List<VirtualNode> children = null) : base(children) { }
+    public DocsDrawerContextProviderComponent(VirtualBody children = default) : base(children) { }
 
     public override VirtualNode Render()
     {
