@@ -8,7 +8,7 @@ using Signals;
 
 public class DocsDrawerComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var router = C<Router>();
         var themeStore = C<ThemeStore>();
@@ -16,28 +16,25 @@ public class DocsDrawerComponent : BaseComponent
 
         return F.Mount(
             when: new NegatedBoolSignal(themeStore.IsMediumScreen),
-            children: F.Children(
+            children: F.Nodes(
                 F.Visible(
                     when: drawerContext.IsOpen,
-                    children: F.Children(
-                        F.SilkBackdrop(
-                            onClick: (e) =>
-                            {
-                                drawerContext.IsOpen.Value = false;
-                            }
-                        )
+                    children: F.SilkBackdrop(
+                        onClick: (e) =>
+                        {
+                            drawerContext.IsOpen.Value = false;
+                        }
                     )
                 ),
                 F.SilkDrawer(
                     role: DocsThemes.ROLES.DEEP_NEUTRAL,
                     isOpen: drawerContext.IsOpen,
-                    children: F.Children(
-                        F.View(
+                    children: F.View(
                             style: new Style(
                                 display: DisplayStyle.Flex,
                                 flexDirection: FlexDirection.Column
                             ),
-                            children: F.Children(
+                            children: F.Nodes(
                                 F.View(
                                     style: new Style(
                                         display: DisplayStyle.Flex,
@@ -53,7 +50,7 @@ public class DocsDrawerComponent : BaseComponent
                                         borderBottomWidth: themeStore.BorderWidth(),
                                         borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
                                     ),
-                                    children: F.Children(
+                                    children: F.Nodes(
                                         new DocsLogoComponent(
                                             size: DocsLogoSize.Small,
                                             onPress: () =>
@@ -72,7 +69,6 @@ public class DocsDrawerComponent : BaseComponent
                                 ),
                                 new DocsTreeViewComponent()
                             )
-                        )
                     ),
                     position: DrawerPosition.Left
                 )
@@ -93,15 +89,15 @@ public class DocsDrawerContext
 
 public class DocsDrawerContextProviderComponent : BaseComponent
 {
-    public DocsDrawerContextProviderComponent(List<VirtualNode> children = null) : base(children) { }
+    public DocsDrawerContextProviderComponent(VirtualBody children = default) : base(children) { }
 
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var isOpen = new Signal<bool>(false);
 
         return F.ContextProvider(
             value: new DocsDrawerContext(isOpen),
-            children: children
+            children: Children
         );
     }
 }

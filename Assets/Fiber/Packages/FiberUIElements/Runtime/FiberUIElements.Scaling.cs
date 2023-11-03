@@ -9,7 +9,7 @@ namespace Fiber.UIElements
     {
         public static ScalingProviderComponent ScalingProvider(
             this BaseComponent component,
-            List<VirtualNode> children = null,
+            VirtualBody children = default,
             float referenceDPI = ScalingProviderComponent.DEFAULT_REFERENCE_DPI,
             float fallbackDPI = ScalingProviderComponent.DEFAULT_FALLBACK_DPI,
             float multiplier = 1f
@@ -166,7 +166,7 @@ namespace Fiber.UIElements
         public ScreenSizeSignal ScreenSizeSignal { get; private set; }
 
         public ScalingProviderComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             float referenceDPI = DEFAULT_REFERENCE_DPI,
             float fallbackDPI = DEFAULT_FALLBACK_DPI,
             float multiplier = 1f
@@ -182,7 +182,7 @@ namespace Fiber.UIElements
             _fallbackDPI = fallbackDPI;
             _multiplier = multiplier;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var scalingConfig = G<ScalingConfig>(throwIfNotFound: false) ?? new ScalingConfig(referenceDPI: _referenceDPI, fallbackDPI: _fallbackDPI, multiplier: _multiplier);
             ScreenSizeSignal = G<ScreenSizeSignal>(throwIfNotFound: false) ?? new ScreenSizeSignal(referenceDPI: scalingConfig.ReferenceDPI, fallbackDPI: scalingConfig.FallbackDPI);
@@ -190,7 +190,7 @@ namespace Fiber.UIElements
 
             return F.ContextProvider(
                 value: context,
-                children: children
+                children: Children
             );
         }
     }

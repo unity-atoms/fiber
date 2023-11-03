@@ -429,11 +429,11 @@ namespace Fiber.Router
             Component = component;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return Mount(
                 when: ShowSignal,
-                children: Children(Component)
+                children: Nodes(Component)
             );
         }
     }
@@ -465,13 +465,13 @@ namespace Fiber.Router
                 return currentValue;
             }
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var hasBeenTrueOnce = new HasBeenTrueOnceSignal(ShowSignal);
             return Mount(
                 when: hasBeenTrueOnce,
-                children: Children(
-                    Active(ShowSignal, Children(Component))
+                children: Nodes(
+                    Active(ShowSignal, Nodes(Component))
                 )
             );
         }
@@ -632,19 +632,19 @@ namespace Fiber.Router
 
     public class OutletProvider : Component<VirtualNode>
     {
-        public OutletProvider(VirtualNode virtualNode, List<VirtualNode> children) : base(virtualNode, children) { }
-        public override VirtualNode Render()
+        public OutletProvider(VirtualNode virtualNode, VirtualBody children) : base(virtualNode, children) { }
+        public override VirtualBody Render()
         {
-            return ContextProvider<OutletContext>(
+            return ContextProvider(
                 value: new OutletContext() { VirtualNode = Props },
-                children: children
+                children: Children
             );
         }
     }
 
     public class OutletComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var outletContext = GetContext<OutletContext>();
             return outletContext.VirtualNode;
@@ -746,17 +746,17 @@ namespace Fiber.Router
             }
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             // Render component
             var routeSignal = new RouteAtCurrentIndexSignal(_router, _currentStackIndex);
             var isMatchSignal = new IsMatchSignal(_routeDefinition, _currentStackIndex, routeSignal);
-            var children = Children(
+            var children = Nodes(
                 _routeDefinition.Render(routeSignal, isMatchSignal)
             );
 
             // Render subpaths
-            var subPaths = Children();
+            var subPaths = Nodes();
             for (var i = 0; _routeDefinition.Children != null && i < _routeDefinition.Children.Count; ++i)
             {
                 var childDefinition = _routeDefinition.Children[i];
@@ -778,7 +778,7 @@ namespace Fiber.Router
 
             return ContextProvider<Router>(
                 value: _router,
-                children: Children(new OutletProvider(
+                children: Nodes(new OutletProvider(
                     virtualNode: Fragment(subPaths),
                     children: children
                 ))

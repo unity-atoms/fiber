@@ -4,11 +4,11 @@ using SilkUI;
 
 public class DocsIntroductionPageComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var themeStore = C<ThemeStore>();
 
-        return F.Fragment(F.Children(
+        return F.Fragment(F.Nodes(
             F.SilkTypography(
                 text: "Introduction",
                 type: TypographyType.Heading1,

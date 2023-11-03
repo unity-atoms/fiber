@@ -6,7 +6,7 @@ Fiber router is a declarative router solution. It is inspired by [react-router](
 ```csharp
 public class GameComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         return F.RouterProvider(GameRouting.ROUTER_TREE);
     }
@@ -96,7 +96,7 @@ Wrap your application in this provider to enable routing. It takes a router tree
 ```csharp
 public class GameComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         return F.RouterProvider(GameRouting.ROUTER_TREE);
     }
@@ -116,7 +116,7 @@ This component is used in parent routes to render the child routes. For example,
 ```csharp
 public class MyRootComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         return new MyProvider(F.Children(
             F.Outlet()

@@ -11,11 +11,11 @@ public class DocsLandingPageComponent : BaseComponent
     public class FeatureComponent : BaseComponent
     {
         private readonly Style _style;
-        public FeatureComponent(List<VirtualNode> children, Style style = new()) : base(children)
+        public FeatureComponent(VirtualBody children, Style style = new()) : base(children)
         {
             _style = style;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
@@ -31,12 +31,12 @@ public class DocsLandingPageComponent : BaseComponent
                     marginTop: themeStore.Spacing(7),
                     marginBottom: themeStore.Spacing(7)
                 ),
-                children: children
+                children: Children
             );
         }
     }
 
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var themeStore = C<ThemeStore>();
         var logoSize = F.CreateComputedSignal((isSmall) => !isSmall ? DocsLogoSize.Large : DocsLogoSize.XL, themeStore.IsSmallScreen);
@@ -44,10 +44,10 @@ public class DocsLandingPageComponent : BaseComponent
         var router = C<Router>();
 
         return F.Fragment(
-            children: F.Children(
+            children: F.Nodes(
                 new FeatureComponent(
                     style: new Style(marginTop: themeStore.Spacing(24)),
-                    children: F.Children(
+                    children: F.Nodes(
                         F.View(
                             style: new Style(
                                 display: DisplayStyle.Flex,
@@ -56,7 +56,7 @@ public class DocsLandingPageComponent : BaseComponent
                                 alignItems: Align.Center,
                                 marginBottom: themeStore.Spacing(6)
                             ),
-                            children: F.Children(
+                            children: F.Nodes(
                                 new DocsLogoComponent(
                                     size: logoSize,
                                     style: new Style(
@@ -70,7 +70,7 @@ public class DocsLandingPageComponent : BaseComponent
                             )
                         ),
                         F.SilkButton(
-                            children: F.Children(F.Text(text: "Get Started")),
+                            children: F.Text(text: "Get Started"),
                             role: DocsThemes.ROLES.PRIMARY,
                             onPress: () => { router.Navigate(DocsRouting.ROUTES.INTRODUCTION); }
                         )

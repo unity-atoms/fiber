@@ -42,7 +42,7 @@ public class RotatingCubesExample : MonoBehaviour
             _position = position;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var _ref = new Ref<GameObject>();
             F.CreateUpdateEffect((deltaTime) =>
@@ -78,7 +78,7 @@ public class RotatingCubesExample : MonoBehaviour
 
     public class RotatingCubesComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.GameObjectPointerEventsManager(F.Children(
                 new CubeComponent(new Vector3(1.2f, 0, 0)),
@@ -165,7 +165,7 @@ public class PhysicsObjectComponent : BaseComponent
     {
         IsKinematicSignal = isKinematicSignal;
     }
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var _ref = new Ref<GameObject>();
         CreateEffect((isKinematic) =>
@@ -218,7 +218,7 @@ public class PanelComponent : BaseComponent
 {
     public PanelComponent(List<VirtualNode> children) : base(children) { }
 
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         return F.View(
             style: new Style(marginRight: 10, marginBottom: 10, marginLeft: 10, marginTop: 10, backgroundColor: Color.magenta),
@@ -233,7 +233,7 @@ Example of using the above component adding different children to each instance 
 ```csharp
 public class MyPageComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         return F.Fragment(
             F.Children(

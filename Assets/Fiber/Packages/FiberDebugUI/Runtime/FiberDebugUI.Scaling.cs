@@ -19,7 +19,7 @@ namespace Fiber.DebugUI
     // TODO: Implement a generic solution for debug windows, which are toggelable via a shortcut keys and draggable by pointer.
     public class DebugWindowScalingComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var uiRootContext = C<UIRootContext>();
             var scalingContext = C<ScalingContext>();

@@ -36,7 +36,7 @@ public static class DocsRouting
             _forwardRef = forwardRef;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.Text(_ref: _forwardRef, style: new Style(
                 height: 20,
@@ -48,30 +48,30 @@ public static class DocsRouting
 
     public class RootComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ScalingProvider(
-                children: F.Children(F.OverrideVisualComponentsProvider(
+                children: F.OverrideVisualComponentsProvider(
                     overrideVisualComponents: new OverrideVisualComponents(),
-                    children: F.Children(new DocsThemes.Provider(
-                        children: F.Children(F.CursorManager(
+                    children: new DocsThemes.Provider(
+                        children: F.CursorManager(
                             cursorDefinitionsStore: new Store<ShallowSignalList<CursorDefinition>>(),
-                            children: F.Children(F.UIRoot(
+                            children: F.UIRoot(
                                 name: "DocsRootDocument",
-                                children: F.Children(new DocsDrawerContextProviderComponent(
-                                    children: F.Children(new MainLayoutComponent())
-                                ))
-                            ))
-                        ))
-                    ))
-                ))
+                                children: new DocsDrawerContextProviderComponent(
+                                    new MainLayoutComponent()
+                                )
+                            )
+                        )
+                    )
+                )
             );
         }
     }
 
     public class SideMenuComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
@@ -79,23 +79,21 @@ public static class DocsRouting
 
             return F.Mount(
                 when: themeStore.IsMediumScreen,
-                children: F.Children(
-                    F.View(
-                        style: new Style(
-                            width: 280,
-                            height: new Length(100, LengthUnit.Percent),
-                            backgroundColor: themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background),
-                            borderRightColor: deepBorderColor,
-                            borderTopColor: deepBorderColor,
-                            borderBottomColor: deepBorderColor,
-                            borderRightWidth: themeStore.BorderWidth(),
-                            borderTopWidth: themeStore.BorderWidth(),
-                            borderBottomWidth: themeStore.BorderWidth(),
-                            flexShrink: 0,
-                            flexGrow: 0
-                        ),
-                        children: F.Children(new DocsTreeViewComponent())
-                    )
+                children: F.View(
+                    style: new Style(
+                        width: 280,
+                        height: new Length(100, LengthUnit.Percent),
+                        backgroundColor: themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background),
+                        borderRightColor: deepBorderColor,
+                        borderTopColor: deepBorderColor,
+                        borderBottomColor: deepBorderColor,
+                        borderRightWidth: themeStore.BorderWidth(),
+                        borderTopWidth: themeStore.BorderWidth(),
+                        borderBottomWidth: themeStore.BorderWidth(),
+                        flexShrink: 0,
+                        flexGrow: 0
+                    ),
+                    children: new DocsTreeViewComponent()
                 )
             );
         }
@@ -103,7 +101,7 @@ public static class DocsRouting
 
     public class MainLayoutComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
@@ -116,7 +114,7 @@ public static class DocsRouting
                     flexDirection: FlexDirection.Column,
                     position: Position.Relative
                 ),
-                children: F.Children(
+                children: F.Nodes(
                     new DocsHeaderComponent(),
                     F.Outlet()
                 )
@@ -126,11 +124,11 @@ public static class DocsRouting
 
     public class DocsRootComponent : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
-            return F.Fragment(F.Children(
+            return F.Nodes(
                 F.View(
                     style: new Style(
                         display: DisplayStyle.Flex,
@@ -139,7 +137,7 @@ public static class DocsRouting
                         flexGrow: 1,
                         flexShrink: 1
                     ),
-                    children: F.Children(
+                    children: F.Nodes(
                         F.View(
                             style: new Style(
                                 backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
@@ -150,13 +148,13 @@ public static class DocsRouting
                                 paddingLeft: themeStore.Spacing(7),
                                 paddingRight: themeStore.Spacing(7)
                             ),
-                            children: F.Children(F.Outlet())
+                            children: F.Outlet()
                         ),
                         new SideMenuComponent()
                     )
                 ),
                 new DocsDrawerComponent()
-            ));
+            );
         }
     }
 
@@ -218,7 +216,7 @@ public static class DocsRouting
             _text = text;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
 
@@ -235,7 +233,7 @@ public static class DocsRouting
 
     public class RouterProvider : BaseComponent
     {
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.RouterProvider(new Router(ROUTER_TREE).Navigate(ROUTES.LANDING));
         }

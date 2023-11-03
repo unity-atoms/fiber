@@ -10,7 +10,7 @@ namespace SilkUI
     {
         public static SilkDrawerComponent SilkDrawer(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             BaseSignal<bool> isOpen,
             DrawerPosition position = DrawerPosition.Left,
@@ -40,7 +40,7 @@ namespace SilkUI
         private readonly DrawerPosition _position;
         private readonly Style _style;
         public SilkDrawerComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             BaseSignal<bool> isOpen,
             DrawerPosition position = DrawerPosition.Left,
@@ -53,13 +53,13 @@ namespace SilkUI
             _style = style;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateDrawer != null)
             {
                 return overrideVisualComponents.CreateDrawer(
-                    children: children,
+                    children: Children,
                     role: _role,
                     isOpen: _isOpen,
                     position: _position,
@@ -100,7 +100,7 @@ namespace SilkUI
                     borderBottomWidth: themeStore.BorderWidth()
                 ),
                 pickingMode: PickingMode.Position,
-                children: children
+                children: Children
             );
         }
     }

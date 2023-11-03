@@ -11,7 +11,7 @@ namespace SilkUI
     {
         public static SilkTreeViewComponent.Container SilkTreeViewContainer(
             this BaseComponent component,
-                List<VirtualNode> children,
+                VirtualBody children,
                 Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
@@ -33,7 +33,7 @@ namespace SilkUI
             this BaseComponent component,
                 SignalProp<string> label,
                 string id,
-                List<VirtualNode> children = null,
+                VirtualBody children = default,
                 string role = THEME_CONSTANTS.INHERIT_ROLE
         )
         {
@@ -85,7 +85,7 @@ namespace SilkUI
             private readonly Ref<VisualElement> _forwardRef;
 
             public Container(
-                List<VirtualNode> children,
+                VirtualBody children,
                 Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
@@ -100,7 +100,7 @@ namespace SilkUI
                 _forwardRef = forwardRef;
             }
 
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 return F.ContextProvider(
                     value: new TreeViewStateContext(
@@ -111,17 +111,11 @@ namespace SilkUI
                         },
                         expandedItemIds: _expandedItemIds
                     ),
-                    children: F.Children(
-                        F.RoleProvider(
-                            role: _role,
-                            children: F.Children(
-                                F.ContextProvider(
-                                    value: new IndentiationLevelContext(indentiationLeve: 0),
-                                    children: F.Children(
-                                        new VisualContainer(children: children, role: _role, forwardRef: _forwardRef)
-                                    )
-                                )
-                            )
+                    children: F.RoleProvider(
+                        role: _role,
+                        children: F.ContextProvider(
+                            value: new IndentiationLevelContext(indentiationLeve: 0),
+                            children: new VisualContainer(children: Children, role: _role, forwardRef: _forwardRef)
                         )
                     )
                 );
@@ -134,7 +128,7 @@ namespace SilkUI
             private readonly Ref<VisualElement> _forwardRef;
 
             public VisualContainer(
-                List<VirtualNode> children,
+                VirtualBody children,
                 string role = THEME_CONSTANTS.INHERIT_ROLE,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
@@ -142,19 +136,19 @@ namespace SilkUI
                 _role = role;
                 _forwardRef = forwardRef;
             }
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
                 if (overrideVisualComponents?.CreateTreeViewContainer != null)
                 {
                     return overrideVisualComponents.CreateTreeViewContainer(
-                        children: children,
+                        children: Children,
                         role: _role,
                         forwardRef: _forwardRef
                     );
                 }
 
-                return F.View(_ref: _forwardRef, children: children);
+                return F.View(_ref: _forwardRef, children: Children);
             }
         }
 
@@ -167,7 +161,7 @@ namespace SilkUI
             public Item(
                 SignalProp<string> label,
                 string id,
-                List<VirtualNode> children = null,
+                VirtualBody children = default,
                 string role = THEME_CONSTANTS.INHERIT_ROLE
             ) : base(children)
             {
@@ -176,7 +170,7 @@ namespace SilkUI
                 _role = role;
             }
 
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var treeViewStateContext = F.GetContext<TreeViewStateContext>();
                 var isSelected = F.CreateComputedSignal((selectedItemId) => selectedItemId == _id, treeViewStateContext.SelectedItemId);
@@ -188,31 +182,29 @@ namespace SilkUI
                     treeViewStateContext.OnItemSelected(_id);
                 });
 
-                return F.Fragment(F.Children(
+                return F.Nodes(
                     new VisualItem(
                         label: _label,
                         identationLevel: identationLevel,
                         role: _role,
-                        hasSubItems: children != null && children.Count > 0,
+                        hasSubItems: Children.Count > 0,
                         interactiveElement: interactiveElement,
                         isSelected: isSelected,
                         isExpanded: isExpanded
                     ),
                     F.Active(
                         when: isExpanded,
-                        children: F.Children(
-                            F.ContextProvider(
-                                value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
-                                children: F.Children(new VisualItemGroup(
-                                    children: children,
-                                    identationLevel: identationLevel + 1,
-                                    role: _role,
-                                    isExpanded: isExpanded
-                                ))
+                        children: F.ContextProvider(
+                            value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
+                            children: new VisualItemGroup(
+                                children: Children,
+                                identationLevel: identationLevel + 1,
+                                role: _role,
+                                isExpanded: isExpanded
                             )
                         )
                     )
-                ));
+                );
             }
         }
 
@@ -223,7 +215,7 @@ namespace SilkUI
             private readonly ISignal<bool> _isExpanded;
 
             public VisualItemGroup(
-                List<VirtualNode> children,
+                VirtualBody children,
                 int identationLevel,
                 string role,
                 ISignal<bool> isExpanded
@@ -233,20 +225,20 @@ namespace SilkUI
                 _role = role;
                 _isExpanded = isExpanded;
             }
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
                 if (overrideVisualComponents?.CreateTreeViewItemGroup != null)
                 {
                     return overrideVisualComponents.CreateTreeViewItemGroup(
-                        children: children,
+                        children: Children,
                         identationLevel: _identationLevel,
                         role: _role,
                         isExpanded: _isExpanded
                     );
                 }
 
-                return F.View(children: children);
+                return F.View(children: Children);
             }
 
         }
@@ -278,7 +270,7 @@ namespace SilkUI
                 _isSelected = isSelected;
                 _isExpanded = isExpanded;
             }
-            public override VirtualNode Render()
+            public override VirtualBody Render()
             {
                 var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
                 if (overrideVisualComponents?.CreateTreeViewItem != null)
@@ -317,7 +309,7 @@ namespace SilkUI
                         width: new Length(100, LengthUnit.Percent)
                     ),
                     pickingMode: PickingMode.Position,
-                    children: F.Children(
+                    children: F.Nodes(
                         F.SilkTypography(
                             text: _label,
                             type: TypographyType.Subtitle2,
@@ -325,7 +317,7 @@ namespace SilkUI
                         ),
                         F.Visible(
                             when: new StaticSignal<bool>(_hasSubItems),
-                            children: F.Children(F.SilkIcon(iconName: iconName))
+                            children: F.SilkIcon(iconName: iconName)
                         )
                     )
                 );

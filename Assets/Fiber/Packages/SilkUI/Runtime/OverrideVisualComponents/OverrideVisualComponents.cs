@@ -11,7 +11,7 @@ namespace SilkUI
     {
         public static OverrideVisualComponentsProvider OverrideVisualComponentsProvider(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             OverrideVisualComponents overrideVisualComponents
         )
         {
@@ -26,7 +26,7 @@ namespace SilkUI
     {
         // Backdrop component
         public delegate BaseComponent CreateBackdropDelegate(
-            List<VirtualNode> children = null,
+            VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             EventCallback<ClickEvent> onClick = null
@@ -35,7 +35,7 @@ namespace SilkUI
 
         // Drawer component
         public delegate BaseComponent CreateDrawerDelegate(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             BaseSignal<bool> isOpen,
             DrawerPosition position,
@@ -45,7 +45,7 @@ namespace SilkUI
 
         // Header component
         public delegate BaseComponent CreateHeaderContainerDelegate(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             string variant,
             Style style
@@ -53,7 +53,7 @@ namespace SilkUI
         public CreateHeaderContainerDelegate CreateHeaderContainer { get; private set; }
 
         public delegate BaseComponent CreateHeaderItemGroupDelegate(
-            List<VirtualNode> children,
+            VirtualBody children,
             Justify justifyContent,
             Style style
         );
@@ -83,7 +83,7 @@ namespace SilkUI
 
         // TreeView Container component
         public delegate BaseComponent CreateTreeViewContainerDelegate(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             Ref<VisualElement> forwardRef
         );
@@ -104,7 +104,7 @@ namespace SilkUI
 
         // TreeView Item group component
         public delegate BaseComponent CreateTreeViewItemGroupDelegate(
-            List<VirtualNode> children,
+            VirtualBody children,
             int identationLevel,
             string role,
             ISignal<bool> isExpanded
@@ -150,18 +150,18 @@ namespace SilkUI
     {
         private readonly OverrideVisualComponents _overrideVisualComponents;
         public OverrideVisualComponentsProvider(
-            List<VirtualNode> children,
+            VirtualBody children,
             OverrideVisualComponents overrideVisualComponents
         ) : base(children)
         {
             _overrideVisualComponents = overrideVisualComponents;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ContextProvider(
                 value: _overrideVisualComponents,
-                children: children
+                children: Children
             );
         }
     }

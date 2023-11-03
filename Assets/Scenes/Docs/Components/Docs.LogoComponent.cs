@@ -54,7 +54,7 @@ public class DocsLogoComponent : BaseComponent
         };
     }
 
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var themeStore = C<ThemeStore>();
         var sizeSignal = F.WrapSignalProp(_size);
@@ -72,7 +72,7 @@ public class DocsLogoComponent : BaseComponent
                 flexDirection: FlexDirection.Row,
                 alignItems: Align.Center
             ),
-            children: F.Children(
+            children: F.Nodes(
                 F.Image(
                     style: new Style(
                         height: StyleKeyword.Auto,

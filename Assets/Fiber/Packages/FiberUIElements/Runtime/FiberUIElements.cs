@@ -49,7 +49,7 @@ namespace Fiber.UIElements
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         )
         {
             return new ViewComponent(
@@ -75,7 +75,7 @@ namespace Fiber.UIElements
             Ref<ScrollView> scrollRef = null,
             Action<ScrollView> onCreateScrollRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         )
         {
             return new ScrollViewComponent(
@@ -105,7 +105,7 @@ namespace Fiber.UIElements
             Ref<Button> buttonRef = null,
             Action<Button> onCreateButtonRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         )
         {
             return new ButtonComponent(
@@ -136,7 +136,7 @@ namespace Fiber.UIElements
             Ref<TextElement> textRef = null,
             Action<TextElement> onCreateTextRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         )
         {
             return new TextComponent(
@@ -168,7 +168,7 @@ namespace Fiber.UIElements
             Ref<TextField> textFieldRef = null,
             Action<TextField> onCreateTextFieldRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         )
         {
             return new TextFieldComponent(
@@ -197,7 +197,7 @@ namespace Fiber.UIElements
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null,
+            VirtualBody children = default,
             Ref<Image> imageRef = null,
             Action<Image> onCreateImageRef = null,
             SignalProp<Texture> image = new(),
@@ -240,7 +240,7 @@ namespace Fiber.UIElements
             Action<GameObject> removeInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = new()
         )
         {
             return new UIDocumentComponent(
@@ -266,7 +266,7 @@ namespace Fiber.UIElements
             Action<GameObject> removeInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         )
         {
             return new UIRootComponent(
@@ -301,7 +301,7 @@ namespace Fiber.UIElements
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         ) : base(
                 children: children
             )
@@ -331,7 +331,7 @@ namespace Fiber.UIElements
             Ref<ScrollView> scrollRef = null,
             Action<ScrollView> onCreateScrollRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         ) : base(
                 style: style,
                 name: name,
@@ -367,7 +367,7 @@ namespace Fiber.UIElements
             Ref<Button> buttonRef = null,
             Action<Button> onCreateButtonRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         ) : base(
                 style: style,
                 name: name,
@@ -403,7 +403,7 @@ namespace Fiber.UIElements
             Ref<TextElement> textRef = null,
             Action<TextElement> onCreateTextRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         ) : base(
                 style: style,
                 name: name,
@@ -442,7 +442,7 @@ namespace Fiber.UIElements
             Ref<TextField> textFieldRef = null,
             Action<TextField> onCreateTextFieldRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         ) : base(
                 style: style,
                 name: name,
@@ -482,7 +482,7 @@ namespace Fiber.UIElements
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
             SignalProp<List<string>> className = new(),
-            List<VirtualNode> children = null,
+            VirtualBody children = default,
             Ref<Image> imageRef = null,
             Action<Image> onCreateImageRef = null,
             SignalProp<Texture> image = new(),
@@ -545,7 +545,7 @@ namespace Fiber.UIElements
             Action<GameObject> removeInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = default
         ) : base(children: children)
         {
             Name = name;
@@ -558,13 +558,13 @@ namespace Fiber.UIElements
             SortingOrder = !sortingOrder.IsEmpty ? sortingOrder : 0f;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var rootRef = new Ref<VisualElement>();
 
             return F.ContextProvider(
                 value: new UIRootContext(rootRef),
-                children: F.Children(
+                children: F.Nodes(
                     F.UIDocument(
                         name: Name,
                         active: Active,
@@ -579,7 +579,7 @@ namespace Fiber.UIElements
                         removeInstance: RemoveInstance,
                         panelSettings: PanelSettings,
                         sortingOrder: SortingOrder,
-                        children: children
+                        children: Children
                     )
                 )
             );
@@ -600,7 +600,7 @@ namespace Fiber.UIElements
             Action<GameObject> removeInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
-            List<VirtualNode> children = null
+            VirtualBody children = new()
         ) : base(
                 name: name,
                 active: active,

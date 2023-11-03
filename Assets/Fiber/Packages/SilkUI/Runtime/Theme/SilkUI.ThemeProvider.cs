@@ -8,7 +8,7 @@ namespace SilkUI
         public static ThemeProvider ThemeProvider(
             this BaseComponent component,
             ThemeStore themeStore,
-            List<VirtualNode> children
+            VirtualBody children
         )
         {
             return new ThemeProvider(
@@ -23,17 +23,17 @@ namespace SilkUI
         private readonly ThemeStore _themeStore;
         public ThemeProvider(
             ThemeStore themeStore,
-            List<VirtualNode> children
+            VirtualBody children
         ) : base(children)
         {
             _themeStore = themeStore;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ContextProvider(
                 value: _themeStore,
-                children: children
+                children: Children
             );
         }
     }

@@ -8,7 +8,7 @@ using Signals;
 
 public class DocsHeaderComponent : BaseComponent
 {
-    public override VirtualNode Render()
+    public override VirtualBody Render()
     {
         var router = C<Router>();
         var themeStore = C<ThemeStore>();
@@ -17,18 +17,16 @@ public class DocsHeaderComponent : BaseComponent
         var isLandingPageRoute = F.CreateComputedSignal((r) => r.PeekRoute().Id == DocsRouting.ROUTES.LANDING, router);
         var smallScreenNotLandingPage = F.CreateComputedSignal((isLandingPageRoute, isMediumScreen) => !isLandingPageRoute && !isMediumScreen, isLandingPageRoute, themeStore.IsMediumScreen);
 
-        return F.SilkHeader(children: F.Children(
-            F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
+        return F.SilkHeader(children: F.Nodes(
+            F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Nodes(
                 F.Visible(
                     when: smallScreenNotLandingPage,
-                    children: F.Children(
-                        F.SilkIconButton(
-                            iconName: "bars", onPress: () =>
-                            {
-                                drawerContext.IsOpen.Value = true;
-                            },
-                            style: new Style(marginRight: themeStore.Spacing(2))
-                        )
+                    children: F.SilkIconButton(
+                        iconName: "bars", onPress: () =>
+                        {
+                            drawerContext.IsOpen.Value = true;
+                        },
+                        style: new Style(marginRight: themeStore.Spacing(2))
                     )
                 ),
                 new DocsLogoComponent(
@@ -39,7 +37,7 @@ public class DocsHeaderComponent : BaseComponent
                     }
                 )
             )),
-            F.SilkHeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
+            F.SilkHeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Nodes(
                 F.SilkIconButton(variant: "github", iconName: "github", onPress: () =>
                 {
                     Application.OpenURL("https://github.com/unity-atoms/fiber");

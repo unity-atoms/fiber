@@ -9,7 +9,7 @@ namespace SilkUI
     {
         public static SilkBackdropComponent SilkBackdrop(
             this BaseComponent component,
-            List<VirtualNode> children = null,
+            VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             EventCallback<ClickEvent> onClick = null
@@ -30,7 +30,7 @@ namespace SilkUI
         private readonly string _variant;
         private readonly EventCallback<ClickEvent> _onClick;
         public SilkBackdropComponent(
-            List<VirtualNode> children = null,
+            VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             EventCallback<ClickEvent> onClick = null
@@ -40,13 +40,13 @@ namespace SilkUI
             _variant = variant;
             _onClick = onClick;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateBackdrop != null)
             {
                 return overrideVisualComponents.CreateBackdrop(
-                    children: children,
+                    children: Children,
                     role: _role,
                     variant: _variant,
                     onClick: _onClick
@@ -67,7 +67,7 @@ namespace SilkUI
                 ),
                 pickingMode: PickingMode.Position,
                 onClick: _onClick,
-                children: children
+                children: Children
             );
         }
     }

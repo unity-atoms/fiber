@@ -10,7 +10,7 @@ namespace SilkUI
     {
         public static SilkButtonComponent SilkButton(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             string variant = null,
             Style style = new(),
@@ -35,7 +35,7 @@ namespace SilkUI
         private readonly Action _onPress;
 
         public SilkButtonComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role,
             string variant = null,
             Style style = new(),
@@ -48,7 +48,7 @@ namespace SilkUI
             _onPress = onPress;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: _onPress);
 
@@ -102,7 +102,7 @@ namespace SilkUI
                     paddingLeft: themeStore.Spacing(6),
                     paddingRight: themeStore.Spacing(6)
                 ),
-                children: children,
+                children: Children,
                 pickingMode: PickingMode.Position
             );
         }

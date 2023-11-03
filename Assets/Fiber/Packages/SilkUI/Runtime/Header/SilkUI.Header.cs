@@ -9,7 +9,7 @@ namespace SilkUI
     {
         public static SilkHeaderComponent SilkHeader(
             this BaseComponent component,
-                List<VirtualNode> children,
+                VirtualBody children,
                 string role = THEME_CONSTANTS.INHERIT_ROLE,
                 string variant = null,
                 Style style = new()
@@ -25,7 +25,7 @@ namespace SilkUI
 
         public static SilkHeaderItemGroupComponent SilkHeaderItemGroup(
             this BaseComponent component,
-            List<VirtualNode> children,
+            VirtualBody children,
             Justify justifyContent = Justify.FlexStart,
             Style style = new()
         )
@@ -45,7 +45,7 @@ namespace SilkUI
         private readonly Style _style;
 
         public SilkHeaderComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
             string variant = null,
             Style style = new()
@@ -56,13 +56,13 @@ namespace SilkUI
             _style = style;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateHeaderContainer != null)
             {
                 return overrideVisualComponents.CreateHeaderContainer(
-                    children: children,
+                    children: Children,
                     role: _role,
                     variant: _variant,
                     style: _style
@@ -74,25 +74,23 @@ namespace SilkUI
 
             return F.RoleProvider(
                 role: role,
-                children: F.Children(
-                    F.View(
-                        children: children,
-                        style: new Style(
-                            mergedStyle: _style,
-                            width: new Length(100, LengthUnit.Percent),
-                            height: themeStore.Spacing(14),
-                            paddingBottom: themeStore.Spacing(2),
-                            paddingTop: themeStore.Spacing(2),
-                            paddingLeft: themeStore.Spacing(4),
-                            paddingRight: themeStore.Spacing(4),
-                            backgroundColor: themeStore.Color(role, ElementType.Background, _variant),
-                            display: DisplayStyle.Flex,
-                            flexGrow: 0,
-                            flexShrink: 0,
-                            flexDirection: FlexDirection.Row,
-                            alignItems: Align.Center,
-                            justifyContent: Justify.SpaceBetween
-                        )
+                children: F.View(
+                    children: Children,
+                    style: new Style(
+                        mergedStyle: _style,
+                        width: new Length(100, LengthUnit.Percent),
+                        height: themeStore.Spacing(14),
+                        paddingBottom: themeStore.Spacing(2),
+                        paddingTop: themeStore.Spacing(2),
+                        paddingLeft: themeStore.Spacing(4),
+                        paddingRight: themeStore.Spacing(4),
+                        backgroundColor: themeStore.Color(role, ElementType.Background, _variant),
+                        display: DisplayStyle.Flex,
+                        flexGrow: 0,
+                        flexShrink: 0,
+                        flexDirection: FlexDirection.Row,
+                        alignItems: Align.Center,
+                        justifyContent: Justify.SpaceBetween
                     )
                 )
             );
@@ -105,7 +103,7 @@ namespace SilkUI
         private readonly Justify _justifyContent;
 
         public SilkHeaderItemGroupComponent(
-            List<VirtualNode> children,
+            VirtualBody children,
             Justify justifyContent = Justify.FlexStart,
             Style style = new()
         ) : base(children)
@@ -114,20 +112,20 @@ namespace SilkUI
             _style = style;
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateHeaderItemGroup != null)
             {
                 return overrideVisualComponents.CreateHeaderItemGroup(
-                    children: children,
+                    children: Children,
                     justifyContent: _justifyContent,
                     style: _style
                 );
             }
 
             return F.View(
-                children: children,
+                children: Children,
                 style: new Style(
                     mergedStyle: _style,
                     display: DisplayStyle.Flex,

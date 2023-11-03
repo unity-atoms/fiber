@@ -54,7 +54,7 @@ namespace SilkUI
             _style = style;
             _forwardRef = forwardRef;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var interactiveElement = F.CreateInteractiveElement(_ref: _forwardRef, isDisabled: null, onPress: _onPress);
 

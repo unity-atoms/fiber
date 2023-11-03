@@ -54,7 +54,7 @@ namespace SilkUI
             _style = style;
             _forwardRef = forwardRef;
         }
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateIcon != null)

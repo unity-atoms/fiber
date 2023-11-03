@@ -17,16 +17,16 @@ public static class DocsThemes
 
     public class Provider : BaseComponent
     {
-        public Provider(List<VirtualNode> children) : base(children) { }
+        public Provider(VirtualBody children) : base(children) { }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             return F.ThemeProvider(
                 themeStore: new ThemeStore(
                     theme: DARK_THEME,
                     screenSizeSignal: C<ScalingContext>().ScreenSizeSignal
                 ),
-                children: children
+                children: Children
             );
         }
     }

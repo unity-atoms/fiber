@@ -28,7 +28,7 @@ namespace Fiber.GameObjects
         public MeshRendererComponent(
             SignalProp<List<Material>> materials = new(),
             SignalProp<Material> material = new()
-        ) : base(null)
+        ) : base()
         {
             Materials = materials;
             Material = material;
@@ -39,7 +39,7 @@ namespace Fiber.GameObjects
             }
         }
 
-        public override VirtualNode Render()
+        public override VirtualBody Render()
         {
             var parentGO = F.GetParentGameObject();
             var meshRenderer = parentGO.GetComponent<MeshRenderer>();
@@ -75,7 +75,7 @@ namespace Fiber.GameObjects
                 }
             }
 
-            return null;
+            return VirtualBody.Empty;
         }
     }
 }
