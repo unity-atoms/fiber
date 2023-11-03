@@ -895,107 +895,127 @@ namespace Fiber
         }
         public VirtualBody Children(VirtualNode c1)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            return c1;
+            var children = new List<VirtualNode>
+            {
+                c1
+            };
+            return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
-            children.Add(c4);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3,
+                c4
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
-            children.Add(c4);
-            children.Add(c5);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3,
+                c4,
+                c5
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
-            children.Add(c4);
-            children.Add(c5);
-            children.Add(c6);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3,
+                c4,
+                c5,
+                c6
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
-            children.Add(c4);
-            children.Add(c5);
-            children.Add(c6);
-            children.Add(c7);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3,
+                c4,
+                c5,
+                c6,
+                c7
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
-            children.Add(c4);
-            children.Add(c5);
-            children.Add(c6);
-            children.Add(c7);
-            children.Add(c8);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3,
+                c4,
+                c5,
+                c6,
+                c7,
+                c8
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8, VirtualNode c9)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
-            children.Add(c4);
-            children.Add(c5);
-            children.Add(c6);
-            children.Add(c7);
-            children.Add(c8);
-            children.Add(c9);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3,
+                c4,
+                c5,
+                c6,
+                c7,
+                c8,
+                c9
+            };
             return children;
         }
         public VirtualBody Children(VirtualNode c1, VirtualNode c2, VirtualNode c3, VirtualNode c4, VirtualNode c5, VirtualNode c6, VirtualNode c7, VirtualNode c8, VirtualNode c9, VirtualNode c10)
         {
-            var children = new List<VirtualNode>();
-            children.Add(c1);
-            children.Add(c2);
-            children.Add(c3);
-            children.Add(c4);
-            children.Add(c5);
-            children.Add(c6);
-            children.Add(c7);
-            children.Add(c8);
-            children.Add(c9);
-            children.Add(c10);
+            var children = new List<VirtualNode>
+            {
+                c1,
+                c2,
+                c3,
+                c4,
+                c5,
+                c6,
+                c7,
+                c8,
+                c9,
+                c10
+            };
             return children;
         }
     }
@@ -1509,24 +1529,9 @@ namespace Fiber
                 var children = component.Render();
                 RenderChildren(this, fiberNode, children, _renderQueue);
             }
-            else if (fiberNode.VirtualNode is EnableComponent enableComponent)
+            else if (fiberNode.VirtualNode is IBuiltInComponent builtInComponent)
             {
-                var children = enableComponent.Render(fiberNode);
-                RenderChildren(this, fiberNode, children, _renderQueue);
-            }
-            else if (fiberNode.VirtualNode is VisibleComponent visibleComponent)
-            {
-                var children = visibleComponent.Render(fiberNode);
-                RenderChildren(this, fiberNode, children, _renderQueue);
-            }
-            else if (fiberNode.VirtualNode is ActiveComponent activeComponent)
-            {
-                var children = activeComponent.Render(fiberNode);
-                RenderChildren(this, fiberNode, children, _renderQueue);
-            }
-            else if (fiberNode.VirtualNode is MountComponent mountComponent)
-            {
-                var children = mountComponent.Render(fiberNode);
+                var children = builtInComponent.Render(fiberNode);
                 RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is BaseForComponent forComponent)
@@ -1535,11 +1540,6 @@ namespace Fiber
                 // The reason is that it need to keep track of its children and their
                 // corresponding keys.
                 forComponent.Render(fiberNode);
-            }
-            else if (fiberNode.VirtualNode is SwitchComponent switchComponent)
-            {
-                var children = switchComponent.Render(fiberNode);
-                RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else
             {
@@ -2099,6 +2099,11 @@ namespace Fiber
             return null;
         }
 
+        public interface IBuiltInComponent
+        {
+            VirtualBody Render(FiberNode fiberNode);
+        }
+
         public VirtualNode Fragment(VirtualBody children)
         {
             return new FragmentComponent(children);
@@ -2114,7 +2119,7 @@ namespace Fiber
             return new EnableComponent(whenSignal, children, this);
         }
 
-        private class EnableComponent : VirtualNode
+        private class EnableComponent : VirtualNode, IBuiltInComponent
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
@@ -2184,7 +2189,7 @@ namespace Fiber
             return new VisibleComponent(whenSignal, children);
         }
 
-        private class VisibleComponent : VirtualNode
+        private class VisibleComponent : VirtualNode, IBuiltInComponent
         {
             public bool IsVisible { get => _whenSignal.Get(); }
             private readonly ISignal<bool> _whenSignal;
@@ -2233,7 +2238,7 @@ namespace Fiber
             return new ActiveComponent(whenSignal, children, this);
         }
 
-        private class ActiveComponent : VirtualNode
+        private class ActiveComponent : VirtualNode, IBuiltInComponent
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
@@ -2261,7 +2266,7 @@ namespace Fiber
             return new MountComponent(whenSignal, children, _renderQueue, _operationsQueue, this);
         }
 
-        private class MountComponent : VirtualNode
+        private class MountComponent : VirtualNode, IBuiltInComponent
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Queue<FiberNode> _renderQueue;
@@ -2523,7 +2528,7 @@ namespace Fiber
             return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue, this);
         }
 
-        private class SwitchComponent : VirtualNode
+        private class SwitchComponent : VirtualNode, IBuiltInComponent
         {
             private readonly VirtualNode _fallback;
             private readonly SignalList<ISignal<bool>> _matchSignals;
