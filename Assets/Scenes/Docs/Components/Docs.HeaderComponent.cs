@@ -21,14 +21,12 @@ public class DocsHeaderComponent : BaseComponent
             F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
                 F.Visible(
                     when: smallScreenNotLandingPage,
-                    children: F.Children(
-                        F.SilkIconButton(
-                            iconName: "bars", onPress: () =>
-                            {
-                                drawerContext.IsOpen.Value = true;
-                            },
-                            style: new Style(marginRight: themeStore.Spacing(2))
-                        )
+                    children: F.SilkIconButton(
+                        iconName: "bars", onPress: () =>
+                        {
+                            drawerContext.IsOpen.Value = true;
+                        },
+                        style: new Style(marginRight: themeStore.Spacing(2))
                     )
                 ),
                 new DocsLogoComponent(

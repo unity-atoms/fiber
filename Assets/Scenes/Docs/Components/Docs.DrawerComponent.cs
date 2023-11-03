@@ -19,20 +19,17 @@ public class DocsDrawerComponent : BaseComponent
             children: F.Children(
                 F.Visible(
                     when: drawerContext.IsOpen,
-                    children: F.Children(
-                        F.SilkBackdrop(
-                            onClick: (e) =>
-                            {
-                                drawerContext.IsOpen.Value = false;
-                            }
-                        )
+                    children: F.SilkBackdrop(
+                        onClick: (e) =>
+                        {
+                            drawerContext.IsOpen.Value = false;
+                        }
                     )
                 ),
                 F.SilkDrawer(
                     role: DocsThemes.ROLES.DEEP_NEUTRAL,
                     isOpen: drawerContext.IsOpen,
-                    children: F.Children(
-                        F.View(
+                    children: F.View(
                             style: new Style(
                                 display: DisplayStyle.Flex,
                                 flexDirection: FlexDirection.Column
@@ -72,7 +69,6 @@ public class DocsDrawerComponent : BaseComponent
                                 ),
                                 new DocsTreeViewComponent()
                             )
-                        )
                     ),
                     position: DrawerPosition.Left
                 )
