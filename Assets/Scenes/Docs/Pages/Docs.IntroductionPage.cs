@@ -8,7 +8,7 @@ public class DocsIntroductionPageComponent : BaseComponent
     {
         var themeStore = C<ThemeStore>();
 
-        return F.Fragment(F.Children(
+        return F.Fragment(F.Nodes(
             F.SilkTypography(
                 text: "Introduction",
                 type: TypographyType.Heading1,

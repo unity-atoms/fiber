@@ -31,7 +31,7 @@ public class DocsLandingPageComponent : BaseComponent
                     marginTop: themeStore.Spacing(7),
                     marginBottom: themeStore.Spacing(7)
                 ),
-                children: children
+                children: Children
             );
         }
     }
@@ -44,10 +44,10 @@ public class DocsLandingPageComponent : BaseComponent
         var router = C<Router>();
 
         return F.Fragment(
-            children: F.Children(
+            children: F.Nodes(
                 new FeatureComponent(
                     style: new Style(marginTop: themeStore.Spacing(24)),
-                    children: F.Children(
+                    children: F.Nodes(
                         F.View(
                             style: new Style(
                                 display: DisplayStyle.Flex,
@@ -56,7 +56,7 @@ public class DocsLandingPageComponent : BaseComponent
                                 alignItems: Align.Center,
                                 marginBottom: themeStore.Spacing(6)
                             ),
-                            children: F.Children(
+                            children: F.Nodes(
                                 new DocsLogoComponent(
                                     size: logoSize,
                                     style: new Style(

@@ -102,7 +102,7 @@ namespace SilkUI
                     paddingLeft: themeStore.Spacing(6),
                     paddingRight: themeStore.Spacing(6)
                 ),
-                children: children,
+                children: Children,
                 pickingMode: PickingMode.Position
             );
         }

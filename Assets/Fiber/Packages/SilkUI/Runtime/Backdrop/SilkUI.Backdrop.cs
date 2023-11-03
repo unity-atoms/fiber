@@ -46,7 +46,7 @@ namespace SilkUI
             if (overrideVisualComponents?.CreateBackdrop != null)
             {
                 return overrideVisualComponents.CreateBackdrop(
-                    children: children,
+                    children: Children,
                     role: _role,
                     variant: _variant,
                     onClick: _onClick
@@ -67,7 +67,7 @@ namespace SilkUI
                 ),
                 pickingMode: PickingMode.Position,
                 onClick: _onClick,
-                children: children
+                children: Children
             );
         }
     }

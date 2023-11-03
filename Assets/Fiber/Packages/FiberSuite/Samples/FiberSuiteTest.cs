@@ -63,7 +63,7 @@ namespace Fiber.Suite
 
                 return (
                     F.View(
-                        children: Children(
+                        children: Nodes(
                             F.TextField(
                                 style: new Style(
                                     color: Color.black,
@@ -78,9 +78,9 @@ namespace Fiber.Suite
                             ),
                             Switch(
                                 fallback: F.Text(text: "Red", style: new Style(color: Color.red)),
-                                children: Children(
-                                    Match(when: isGreenSignal, children: Children(F.Text(text: "Green", style: new Style(color: Color.green)))),
-                                    Match(when: isYellowSignal, children: Children(F.Text(text: "Yellow", style: new Style(color: Color.yellow))))
+                                children: Nodes(
+                                    Match(when: isGreenSignal, children: Nodes(F.Text(text: "Green", style: new Style(color: Color.green)))),
+                                    Match(when: isYellowSignal, children: Nodes(F.Text(text: "Yellow", style: new Style(color: Color.yellow))))
                                 )
                             )
                         )
@@ -115,14 +115,14 @@ namespace Fiber.Suite
 
                 return F.UIDocument(
                     name: "FiberTestUIDocument",
-                    children: Children(
+                    children: Nodes(
                         F.View(
                             style: new Style(
                                 backgroundColor: new Color(1f, 0f, 0f, 1f)
                             ),
                             pickingMode: PickingMode.Position,
                             name: "FiberTestRoot",
-                            children: Children(
+                            children: Nodes(
                                 F.TextField(
                                     style: new Style(
                                         color: Color.black,
@@ -228,7 +228,7 @@ namespace Fiber.Suite
                                 ),
                                 Mount(
                                     when: showSingal,
-                                    children: Children(
+                                    children: Nodes(
                                          F.Button(
                                             style: new Style(
                                                 color: Color.black,
@@ -243,7 +243,7 @@ namespace Fiber.Suite
                                         ),
                                         Mount(
                                             when: showNestedSingal,
-                                            children: Children(
+                                            children: Nodes(
                                                 F.Text(text: "Nested Text")
                                             )
                                         )

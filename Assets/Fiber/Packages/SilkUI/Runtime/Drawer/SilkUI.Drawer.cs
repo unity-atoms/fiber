@@ -59,7 +59,7 @@ namespace SilkUI
             if (overrideVisualComponents?.CreateDrawer != null)
             {
                 return overrideVisualComponents.CreateDrawer(
-                    children: children,
+                    children: Children,
                     role: _role,
                     isOpen: _isOpen,
                     position: _position,
@@ -100,7 +100,7 @@ namespace SilkUI
                     borderBottomWidth: themeStore.BorderWidth()
                 ),
                 pickingMode: PickingMode.Position,
-                children: children
+                children: Children
             );
         }
     }

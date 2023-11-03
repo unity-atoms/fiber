@@ -49,10 +49,10 @@ public class DocsTreeViewComponent : BaseComponent
                 }
             },
             expandedItemIds: expandedItemIds,
-            children: F.Children(
+            children: F.Nodes(
                 F.SilkTreeViewItem(id: DocsRouting.ROUTES.INTRODUCTION, label: $"Introduction"),
                 F.SilkTreeViewItem(id: DocsRouting.ROUTES.INSTALLATION, label: $"Installation"),
-                F.SilkTreeViewItem(id: DocsRouting.ROUTES.PACKAGES, label: $"Packages", children: F.Children(
+                F.SilkTreeViewItem(id: DocsRouting.ROUTES.PACKAGES, label: $"Packages", children: F.Nodes(
                     F.SilkTreeViewItem(id: DocsRouting.ROUTES.ROUTER, label: $"Router"),
                     F.SilkTreeViewItem(id: DocsRouting.ROUTES.UI, label: $"UI")
                 ))

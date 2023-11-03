@@ -153,7 +153,7 @@ namespace Fiber.GameObjects
 
             return ContextProvider<GameObjectPointerEventsContext>(
                 value: _context,
-                children: children
+                children: Children
             );
         }
 

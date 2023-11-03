@@ -190,7 +190,7 @@ namespace Fiber.UIElements
 
             return F.ContextProvider(
                 value: context,
-                children: children
+                children: Children
             );
         }
     }

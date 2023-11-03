@@ -433,7 +433,7 @@ namespace Fiber.Router
         {
             return Mount(
                 when: ShowSignal,
-                children: Children(Component)
+                children: Nodes(Component)
             );
         }
     }
@@ -470,8 +470,8 @@ namespace Fiber.Router
             var hasBeenTrueOnce = new HasBeenTrueOnceSignal(ShowSignal);
             return Mount(
                 when: hasBeenTrueOnce,
-                children: Children(
-                    Active(ShowSignal, Children(Component))
+                children: Nodes(
+                    Active(ShowSignal, Nodes(Component))
                 )
             );
         }
@@ -637,7 +637,7 @@ namespace Fiber.Router
         {
             return ContextProvider(
                 value: new OutletContext() { VirtualNode = Props },
-                children: children
+                children: Children
             );
         }
     }
@@ -751,12 +751,12 @@ namespace Fiber.Router
             // Render component
             var routeSignal = new RouteAtCurrentIndexSignal(_router, _currentStackIndex);
             var isMatchSignal = new IsMatchSignal(_routeDefinition, _currentStackIndex, routeSignal);
-            var children = Children(
+            var children = Nodes(
                 _routeDefinition.Render(routeSignal, isMatchSignal)
             );
 
             // Render subpaths
-            var subPaths = Children();
+            var subPaths = Nodes();
             for (var i = 0; _routeDefinition.Children != null && i < _routeDefinition.Children.Count; ++i)
             {
                 var childDefinition = _routeDefinition.Children[i];
@@ -778,7 +778,7 @@ namespace Fiber.Router
 
             return ContextProvider<Router>(
                 value: _router,
-                children: Children(new OutletProvider(
+                children: Nodes(new OutletProvider(
                     virtualNode: Fragment(subPaths),
                     children: children
                 ))

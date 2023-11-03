@@ -16,7 +16,7 @@ public class DocsDrawerComponent : BaseComponent
 
         return F.Mount(
             when: new NegatedBoolSignal(themeStore.IsMediumScreen),
-            children: F.Children(
+            children: F.Nodes(
                 F.Visible(
                     when: drawerContext.IsOpen,
                     children: F.SilkBackdrop(
@@ -34,7 +34,7 @@ public class DocsDrawerComponent : BaseComponent
                                 display: DisplayStyle.Flex,
                                 flexDirection: FlexDirection.Column
                             ),
-                            children: F.Children(
+                            children: F.Nodes(
                                 F.View(
                                     style: new Style(
                                         display: DisplayStyle.Flex,
@@ -50,7 +50,7 @@ public class DocsDrawerComponent : BaseComponent
                                         borderBottomWidth: themeStore.BorderWidth(),
                                         borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
                                     ),
-                                    children: F.Children(
+                                    children: F.Nodes(
                                         new DocsLogoComponent(
                                             size: DocsLogoSize.Small,
                                             onPress: () =>
@@ -97,7 +97,7 @@ public class DocsDrawerContextProviderComponent : BaseComponent
 
         return F.ContextProvider(
             value: new DocsDrawerContext(isOpen),
-            children: children
+            children: Children
         );
     }
 }

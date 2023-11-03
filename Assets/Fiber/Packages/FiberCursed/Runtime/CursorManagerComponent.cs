@@ -60,7 +60,7 @@ namespace Fiber.Cursed
 
             return F.ContextProvider(
                 value: cursorManager,
-                children: children
+                children: Children
             );
         }
     }

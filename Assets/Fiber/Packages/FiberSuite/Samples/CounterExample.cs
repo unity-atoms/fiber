@@ -18,7 +18,7 @@ namespace Fiber.Suite
                 var count = new Signal<int>(0);
 
                 return F.UIDocument(
-                    children: F.Children(
+                    children: F.Nodes(
                         F.Button(text: "Increment", onClick: (e) => { count.Value += 1; }),
                         F.Text(text: new IntToStringSignal(count))
                     )

@@ -26,7 +26,7 @@ public static class DocsThemes
                     theme: DARK_THEME,
                     screenSizeSignal: C<ScalingContext>().ScreenSizeSignal
                 ),
-                children: children
+                children: Children
             );
         }
     }

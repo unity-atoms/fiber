@@ -17,8 +17,8 @@ public class DocsHeaderComponent : BaseComponent
         var isLandingPageRoute = F.CreateComputedSignal((r) => r.PeekRoute().Id == DocsRouting.ROUTES.LANDING, router);
         var smallScreenNotLandingPage = F.CreateComputedSignal((isLandingPageRoute, isMediumScreen) => !isLandingPageRoute && !isMediumScreen, isLandingPageRoute, themeStore.IsMediumScreen);
 
-        return F.SilkHeader(children: F.Children(
-            F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Children(
+        return F.SilkHeader(children: F.Nodes(
+            F.SilkHeaderItemGroup(justifyContent: Justify.FlexStart, children: F.Nodes(
                 F.Visible(
                     when: smallScreenNotLandingPage,
                     children: F.SilkIconButton(
@@ -37,7 +37,7 @@ public class DocsHeaderComponent : BaseComponent
                     }
                 )
             )),
-            F.SilkHeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Children(
+            F.SilkHeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Nodes(
                 F.SilkIconButton(variant: "github", iconName: "github", onPress: () =>
                 {
                     Application.OpenURL("https://github.com/unity-atoms/fiber");

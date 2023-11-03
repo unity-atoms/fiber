@@ -564,7 +564,7 @@ namespace Fiber.UIElements
 
             return F.ContextProvider(
                 value: new UIRootContext(rootRef),
-                children: F.Children(
+                children: F.Nodes(
                     F.UIDocument(
                         name: Name,
                         active: Active,
@@ -579,7 +579,7 @@ namespace Fiber.UIElements
                         removeInstance: RemoveInstance,
                         panelSettings: PanelSettings,
                         sortingOrder: SortingOrder,
-                        children: children
+                        children: Children
                     )
                 )
             );

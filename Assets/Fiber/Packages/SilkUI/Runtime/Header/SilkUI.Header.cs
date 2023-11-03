@@ -62,7 +62,7 @@ namespace SilkUI
             if (overrideVisualComponents?.CreateHeaderContainer != null)
             {
                 return overrideVisualComponents.CreateHeaderContainer(
-                    children: children,
+                    children: Children,
                     role: _role,
                     variant: _variant,
                     style: _style
@@ -75,7 +75,7 @@ namespace SilkUI
             return F.RoleProvider(
                 role: role,
                 children: F.View(
-                    children: children,
+                    children: Children,
                     style: new Style(
                         mergedStyle: _style,
                         width: new Length(100, LengthUnit.Percent),
@@ -118,14 +118,14 @@ namespace SilkUI
             if (overrideVisualComponents?.CreateHeaderItemGroup != null)
             {
                 return overrideVisualComponents.CreateHeaderItemGroup(
-                    children: children,
+                    children: Children,
                     justifyContent: _justifyContent,
                     style: _style
                 );
             }
 
             return F.View(
-                children: children,
+                children: Children,
                 style: new Style(
                     mergedStyle: _style,
                     display: DisplayStyle.Flex,

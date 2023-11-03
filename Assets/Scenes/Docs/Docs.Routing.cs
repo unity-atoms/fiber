@@ -114,7 +114,7 @@ public static class DocsRouting
                     flexDirection: FlexDirection.Column,
                     position: Position.Relative
                 ),
-                children: F.Children(
+                children: F.Nodes(
                     new DocsHeaderComponent(),
                     F.Outlet()
                 )
@@ -128,7 +128,7 @@ public static class DocsRouting
         {
             var themeStore = C<ThemeStore>();
 
-            return F.Children(
+            return F.Nodes(
                 F.View(
                     style: new Style(
                         display: DisplayStyle.Flex,
@@ -137,7 +137,7 @@ public static class DocsRouting
                         flexGrow: 1,
                         flexShrink: 1
                     ),
-                    children: F.Children(
+                    children: F.Nodes(
                         F.View(
                             style: new Style(
                                 backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),

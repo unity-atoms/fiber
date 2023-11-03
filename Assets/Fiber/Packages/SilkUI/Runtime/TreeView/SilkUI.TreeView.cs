@@ -115,7 +115,7 @@ namespace SilkUI
                         role: _role,
                         children: F.ContextProvider(
                             value: new IndentiationLevelContext(indentiationLeve: 0),
-                            children: new VisualContainer(children: children, role: _role, forwardRef: _forwardRef)
+                            children: new VisualContainer(children: Children, role: _role, forwardRef: _forwardRef)
                         )
                     )
                 );
@@ -142,13 +142,13 @@ namespace SilkUI
                 if (overrideVisualComponents?.CreateTreeViewContainer != null)
                 {
                     return overrideVisualComponents.CreateTreeViewContainer(
-                        children: children,
+                        children: Children,
                         role: _role,
                         forwardRef: _forwardRef
                     );
                 }
 
-                return F.View(_ref: _forwardRef, children: children);
+                return F.View(_ref: _forwardRef, children: Children);
             }
         }
 
@@ -182,12 +182,12 @@ namespace SilkUI
                     treeViewStateContext.OnItemSelected(_id);
                 });
 
-                return F.Children(
+                return F.Nodes(
                     new VisualItem(
                         label: _label,
                         identationLevel: identationLevel,
                         role: _role,
-                        hasSubItems: children.Count > 0,
+                        hasSubItems: Children.Count > 0,
                         interactiveElement: interactiveElement,
                         isSelected: isSelected,
                         isExpanded: isExpanded
@@ -197,7 +197,7 @@ namespace SilkUI
                         children: F.ContextProvider(
                             value: new IndentiationLevelContext(indentiationLeve: identationLevel + 1),
                             children: new VisualItemGroup(
-                                children: children,
+                                children: Children,
                                 identationLevel: identationLevel + 1,
                                 role: _role,
                                 isExpanded: isExpanded
@@ -231,14 +231,14 @@ namespace SilkUI
                 if (overrideVisualComponents?.CreateTreeViewItemGroup != null)
                 {
                     return overrideVisualComponents.CreateTreeViewItemGroup(
-                        children: children,
+                        children: Children,
                         identationLevel: _identationLevel,
                         role: _role,
                         isExpanded: _isExpanded
                     );
                 }
 
-                return F.View(children: children);
+                return F.View(children: Children);
             }
 
         }
@@ -309,7 +309,7 @@ namespace SilkUI
                         width: new Length(100, LengthUnit.Percent)
                     ),
                     pickingMode: PickingMode.Position,
-                    children: F.Children(
+                    children: F.Nodes(
                         F.SilkTypography(
                             text: _label,
                             type: TypographyType.Subtitle2,

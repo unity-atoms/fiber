@@ -161,7 +161,7 @@ namespace SilkUI
         {
             return F.ContextProvider(
                 value: _overrideVisualComponents,
-                children: children
+                children: Children
             );
         }
     }

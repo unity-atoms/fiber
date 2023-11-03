@@ -148,7 +148,7 @@ namespace SilkUI
         {
             return F.ContextProvider(
                 value: _roleContext,
-                children: children
+                children: Children
             );
         }
     }

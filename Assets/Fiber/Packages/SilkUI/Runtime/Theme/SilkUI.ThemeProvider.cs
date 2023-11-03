@@ -33,7 +33,7 @@ namespace SilkUI
         {
             return F.ContextProvider(
                 value: _themeStore,
-                children: children
+                children: Children
             );
         }
     }

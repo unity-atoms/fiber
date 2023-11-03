@@ -71,7 +71,7 @@ namespace SilkUI
 
         public override VirtualBody Render()
         {
-            children.Add(F.SilkIcon(
+            Children.Add(F.SilkIcon(
                 iconName: _iconName,
                 size: IconSize.Tiny,
                 role: _role,
@@ -86,7 +86,7 @@ namespace SilkUI
 
             if (!string.IsNullOrWhiteSpace(_text.Text))
             {
-                children.Add(F.SilkTypography(
+                Children.Add(F.SilkTypography(
                     type: TypographyType.Body1,
                     text: _text.Text,
                     role: _role,
@@ -95,7 +95,7 @@ namespace SilkUI
             }
             else if (_text.Children != null)
             {
-                children.Add(_text.Children);
+                Children.Add(_text.Children);
             }
 
             return F.View(
@@ -107,7 +107,7 @@ namespace SilkUI
                     justifyContent: Justify.FlexStart,
                     marginBottom: C<ThemeStore>().Spacing(2)
                 ),
-                children: children
+                children: Children
             );
         }
     }
