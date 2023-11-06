@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Signals;
+using UnityEngine;
 
 namespace Fiber.Router
 {
@@ -42,9 +43,10 @@ namespace Fiber.Router
             }
         }
 
+        [Serializable]
         public class Route : BaseSignal
         {
-            public string Id { get; private set; }
+            public string Id;
             public bool IsLayoutRoute { get; private set; }
             public List<ModalRoute> Modals { get; private set; }
 
@@ -136,7 +138,7 @@ namespace Fiber.Router
         }
 
         public RouteDefinition RouterTree { get; private set; }
-        public SignalList<Route> RouteStack { get; private set; }
+        public SignalList<Route> RouteStack;
         private readonly ISignal _parent;
 
         public Router(RouteDefinition routerTree, ISignal parent = null)
