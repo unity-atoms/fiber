@@ -28,7 +28,7 @@ namespace SilkUI
         public delegate BaseComponent CreateBackdropDelegate(
             VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         );
         public CreateBackdropDelegate CreateBackdrop { get; private set; }
@@ -47,7 +47,7 @@ namespace SilkUI
         public delegate BaseComponent CreateHeaderContainerDelegate(
             VirtualBody children,
             string role,
-            string variant,
+            SignalProp<string> variant,
             Style style
         );
         public CreateHeaderContainerDelegate CreateHeaderContainer { get; private set; }
@@ -63,7 +63,7 @@ namespace SilkUI
         public delegate BaseComponent CreateIconDelegate(
             SignalProp<string> iconName,
             string role,
-            string variant,
+            SignalProp<string> variant,
             Style style,
             Ref<VisualElement> forwardRef
         );
@@ -75,7 +75,7 @@ namespace SilkUI
             Action onPress,
             InteractiveElement interactiveRef,
             string role,
-            string variant,
+            SignalProp<string> variant,
             Style style,
             Ref<VisualElement> forwardRef
         );
@@ -116,7 +116,7 @@ namespace SilkUI
             SignalProp<TypographyType> type,
             SignalProp<string> text,
             string role,
-            string variant,
+            SignalProp<string> variant,
             Style style,
             Ref<VisualElement> forwardRef
         );

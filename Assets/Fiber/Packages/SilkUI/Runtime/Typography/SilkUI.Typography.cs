@@ -12,7 +12,7 @@ namespace SilkUI
             SignalProp<TypographyType> type,
             SignalProp<string> text = new(),
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
         )
@@ -30,9 +30,9 @@ namespace SilkUI
     public class SilkTypographyComponent : BaseComponent
     {
         private readonly SignalProp<TypographyType> _type;
-        private SignalProp<string> _text;
+        private readonly SignalProp<string> _text;
         private readonly string _role;
-        private readonly string _variant;
+        private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
 
@@ -40,7 +40,7 @@ namespace SilkUI
             SignalProp<TypographyType> type,
             SignalProp<string> text = new(),
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
         )

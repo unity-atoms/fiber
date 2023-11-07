@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
+using Signals;
 
 namespace SilkUI
 {
@@ -11,7 +11,7 @@ namespace SilkUI
             this BaseComponent component,
             VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         )
         {
@@ -27,12 +27,12 @@ namespace SilkUI
     public class SilkBackdropComponent : BaseComponent
     {
         private readonly string _role;
-        private readonly string _variant;
+        private readonly SignalProp<string> _variant;
         private readonly EventCallback<ClickEvent> _onClick;
         public SilkBackdropComponent(
             VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         ) : base(children)
         {

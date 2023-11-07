@@ -82,19 +82,19 @@ namespace SilkUI
         }
         #endregion
         #region Color
-        private readonly Dictionary<ValueTuple<string, ElementType, string>, BaseSignal<StyleColor>> _nonInteractiveColorSignalsCache;
-        public BaseSignal<StyleColor> Color(string role, ElementType elementType, string variant = null)
+        private readonly Dictionary<ValueTuple<string, ElementType, SignalProp<string>>, BaseSignal<StyleColor>> _nonInteractiveColorSignalsCache;
+        public BaseSignal<StyleColor> Color(string role, ElementType elementType, SignalProp<string> variant = new())
         {
             if (_nonInteractiveColorSignalsCache.ContainsKey((role, elementType, variant)))
             {
                 return _nonInteractiveColorSignalsCache[(role, elementType, variant)];
             }
 
-            var signal = new InlineComputedSignal<Theme, StyleColor>((theme) =>
+            var signal = new InlineComputedSignal<Theme, string, StyleColor>((theme, variant) =>
             {
                 var colorModifiers = theme.GetColorModifiers(role, elementType, variant);
                 return colorModifiers.Default.Get();
-            }, this);
+            }, this, variant.IsSignal ? variant.Signal : new StaticSignal<string>(variant.Value));
             _nonInteractiveColorSignalsCache.Add((role, elementType, variant), signal);
 
             return signal;
@@ -106,10 +106,10 @@ namespace SilkUI
             ISignal<bool> isPressed,
             ISignal<bool> isHovered,
             ISignal<bool> isSelected = null,
-            string variant = null
+            SignalProp<string> variant = new()
         )
         {
-            var signal = new InlineComputedSignal<Theme, bool, bool, bool, StyleColor>((theme, isPressed, isHovered, isSelected) =>
+            var signal = new InlineComputedSignal<Theme, bool, bool, bool, string, StyleColor>((theme, isPressed, isHovered, isSelected, variant) =>
             {
                 var colorModifiers = theme.GetColorModifiers(role, elementType, variant);
                 if (isPressed && colorModifiers.Pressed.Get().keyword != StyleKeyword.Null)
@@ -125,7 +125,7 @@ namespace SilkUI
                     return colorModifiers.Selected.Get();
                 }
                 return colorModifiers.Default.Get();
-            }, this, isPressed, isHovered, isSelected ?? new StaticSignal<bool>(false));
+            }, this, isPressed, isHovered, isSelected ?? new StaticSignal<bool>(false), variant.IsSignal ? variant.Signal : new StaticSignal<string>(variant.Value));
 
             return signal;
         }

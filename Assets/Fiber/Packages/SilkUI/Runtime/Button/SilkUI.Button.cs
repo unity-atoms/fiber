@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
+using Signals;
 
 namespace SilkUI
 {
@@ -12,7 +12,7 @@ namespace SilkUI
             this BaseComponent component,
             VirtualBody children,
             string role,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new(),
             Action onPress = null
         )
@@ -30,14 +30,14 @@ namespace SilkUI
     public class SilkButtonComponent : BaseComponent
     {
         private readonly string _role;
-        private readonly string _variant;
+        private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Action _onPress;
 
         public SilkButtonComponent(
             VirtualBody children,
             string role,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new(),
             Action onPress = null
         ) : base(children)

@@ -1,7 +1,7 @@
-using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
+using Signals;
 
 namespace SilkUI
 {
@@ -11,7 +11,7 @@ namespace SilkUI
             this BaseComponent component,
                 VirtualBody children,
                 string role = THEME_CONSTANTS.INHERIT_ROLE,
-                string variant = null,
+                SignalProp<string> variant = new(),
                 Style style = new()
         )
         {
@@ -41,13 +41,13 @@ namespace SilkUI
     public class SilkHeaderComponent : BaseComponent
     {
         private readonly string _role;
-        private readonly string _variant;
+        private readonly SignalProp<string> _variant;
         private readonly Style _style;
 
         public SilkHeaderComponent(
             VirtualBody children,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new()
         ) : base(children)
         {

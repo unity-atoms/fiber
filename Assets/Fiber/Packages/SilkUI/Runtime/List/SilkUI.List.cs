@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using UnityEngine;
+using Signals;
 
 namespace SilkUI
 {
@@ -12,7 +13,7 @@ namespace SilkUI
             this BaseComponent component,
             ListItemText text,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new()
         )
         {
@@ -51,14 +52,14 @@ namespace SilkUI
         private readonly ListItemText _text;
         private readonly string _role;
         private readonly string _iconName;
-        private readonly string _variant;
+        private readonly SignalProp<string> _variant;
         private readonly Style _style;
 
         public SilkListItemComponent(
             ListItemText text,
             string iconName = "circle",
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new()
         ) : base(new List<VirtualNode>()) // Create new instance of children
         {

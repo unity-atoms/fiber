@@ -13,7 +13,7 @@ namespace SilkUI
             SignalProp<string> iconName,
             Action onPress,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
         )
@@ -34,7 +34,7 @@ namespace SilkUI
         private readonly SignalProp<string> _iconName;
         private readonly Action _onPress;
         private readonly string _role;
-        private readonly string _variant;
+        private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
 
@@ -42,7 +42,7 @@ namespace SilkUI
             SignalProp<string> iconName,
             Action onPress,
             string role = THEME_CONSTANTS.INHERIT_ROLE,
-            string variant = null,
+            SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
         )
