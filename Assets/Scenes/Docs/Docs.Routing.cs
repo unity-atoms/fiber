@@ -233,9 +233,14 @@ public static class DocsRouting
 
     public class RouterProvider : BaseComponent
     {
+        private readonly Router _router;
+        public RouterProvider(Router router)
+        {
+            _router = router;
+        }
         public override VirtualBody Render()
         {
-            return F.RouterProvider(new Router(ROUTER_TREE).Navigate(ROUTES.LANDING));
+            return F.RouterProvider(_router);
         }
     }
 }
