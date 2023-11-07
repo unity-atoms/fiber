@@ -1128,6 +1128,13 @@ namespace Fiber
 
         public void Update()
         {
+            // Node needs to be mounted and enabled in order to run effects.
+            // The exception is built in components, which are always updated.
+            if (Phase != FiberNodePhase.Mounted || (!IsEnabled && VirtualNode is not IBuiltInComponent))
+            {
+                return;
+            }
+
             RunEffects();
 
             if (NativeNode != null)
@@ -1328,10 +1335,9 @@ namespace Fiber
 
         protected override sealed void OnNotifySignalUpdate()
         {
-            if (Phase == FiberNodePhase.Mounted && IsEnabled)
-            {
-                _renderer.AddFiberNodeToUpdateQueue(this);
-            }
+            // OPEN POINT: We could optimize this to see if already in queue.
+            // Keeping it like this for now for simplicity reasons.
+            _renderer.AddFiberNodeToUpdateQueue(this);
         }
         public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
@@ -1505,11 +1511,7 @@ namespace Fiber
                 else if (_fiberNodesToUpdate.Count > 0)
                 {
                     var fiberNode = _fiberNodesToUpdate.Dequeue();
-
-                    if (fiberNode.Phase == FiberNodePhase.Mounted && fiberNode.IsEnabled)
-                    {
-                        fiberNode.Update();
-                    }
+                    fiberNode.Update();
                 }
                 else
                 {
@@ -2163,19 +2165,11 @@ namespace Fiber
                 {
                     // We need to enable / disable the children instead of this node since 
                     // this effect won't otherwise run (since its node is disabled...)
-                    var child = _fiberNode.Child;
-                    while (child != null)
+                    _fiberNode.IsEnabled = enabled;
+                    _renderer.AddFiberNodeToUpdateQueue(_fiberNode);
+                    for (var node = _fiberNode.Child; node != null; node = node.NextNode(root: _fiberNode, skipChildren: false))
                     {
-                        var valueBeforeChange = child.IsEnabled;
-                        child.IsEnabled = enabled;
-                        if (!valueBeforeChange && enabled)
-                        {
-                            // Some props in the sub tree might have become dirty while the node was disabled.
-                            // Just rehydrate the whole sub tree to be sure. We could optimize this in the future,
-                            // but it is questionable if that will be worth it.
-                            RehydrateSubTree(child);
-                        }
-                        child = child.Sibling;
+                        _renderer.AddFiberNodeToUpdateQueue(node);
                     }
                 }
                 public override void Cleanup() { }
@@ -2193,7 +2187,7 @@ namespace Fiber
             return new VisibleComponent(whenSignal, children);
         }
 
-        private class VisibleComponent : VirtualNode, IBuiltInComponent
+        public class VisibleComponent : VirtualNode, IBuiltInComponent
         {
             public bool IsVisible { get => _whenSignal.Get(); }
             private readonly ISignal<bool> _whenSignal;
@@ -2246,6 +2240,7 @@ namespace Fiber
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
+
             public ActiveComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
@@ -2344,7 +2339,7 @@ namespace Fiber
             public VirtualBody Render(FiberNode mountFiberNode)
             {
                 mountFiberNode.PushEffect(new MountEffect(_whenSignal, Children, _renderQueue, _operationsQueue, _renderer, mountFiberNode));
-                return _whenSignal.Get() ? Children : new();
+                return _whenSignal.Get() ? Children : VirtualBody.Empty;
             }
         }
 
@@ -2359,7 +2354,7 @@ namespace Fiber
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
         private abstract class BaseForComponent : VirtualNode
         {
-            protected BaseForComponent() : base(new()) { }
+            protected BaseForComponent() : base(VirtualBody.Empty) { }
             public abstract void Render(FiberNode fiberNode);
         }
 
