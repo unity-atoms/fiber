@@ -985,6 +985,7 @@ namespace Fiber.UIElements
         private WorkLoopStyleTranslateProp _translateWorkLoopItem;
         private WorkLoopStyleScaleProp _scaleWorkLoopItem;
         private WorkLoopStyleRotateProp _rotateWorkLoopItem;
+        private WorkLoopStyleFloatProp _opacityWorkLoopItem;
 
         #endregion
         private WorkLoopSignalProp<string> _nameWorkLoopItem;
@@ -1558,6 +1559,16 @@ namespace Fiber.UIElements
                 }
                 _rotateWorkLoopItem = new(style.Rotate);
 
+                if (!style.Opacity.IsEmpty)
+                {
+                    Instance.style.opacity = style.Opacity.Get();
+                    if (style.Opacity.IsSignal)
+                    {
+                        style.Opacity.SignalProp.Signal.RegisterDependent(this);
+                    }
+                }
+                _opacityWorkLoopItem = new(style.Opacity);
+
             }
             if (!virtualNode.Name.IsEmpty)
             {
@@ -1749,6 +1760,7 @@ namespace Fiber.UIElements
             // Translate
             // Scale
             // Rotate
+            // Opacity
             if (!_styleWorkLoopItem.IsEmpty)
             {
                 if (_styleWorkLoopItem.IsSignal && !_styleWorkLoopItem.Check())
@@ -3722,6 +3734,42 @@ namespace Fiber.UIElements
                     }
                 }
 
+                // Opacity - Update instance value
+                if (style.Opacity.IsSignal)
+                {
+                    if (_opacityWorkLoopItem.Check())
+                    {
+                        Instance.style.opacity = _opacityWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Opacity.IsValue)
+                {
+                    var value = style.Opacity.Get();
+                    if (Instance.style.opacity != value)
+                    {
+                        Instance.style.opacity = value;
+                    }
+                }
+                else if (style.Opacity.IsEmpty && !_lastStyleFromSignal.Opacity.IsEmpty)
+                {
+                    Instance.style.opacity = StyleKeyword.Initial;
+                }
+                // Opacity - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Opacity.SignalProp.Signal != style.Opacity.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Opacity.IsSignal)
+                        {
+                            _lastStyleFromSignal.Opacity.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Opacity.IsSignal)
+                        {
+                            style.Opacity.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
+                }
+
 
                 _lastStyleFromSignal = style;
             }
@@ -3994,6 +4042,10 @@ namespace Fiber.UIElements
             if (_rotateWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
                 _rotateWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_opacityWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _opacityWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             // end style
             if (_nameWorkLoopItem.IsSignal)

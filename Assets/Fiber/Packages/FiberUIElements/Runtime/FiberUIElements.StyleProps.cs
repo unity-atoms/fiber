@@ -979,6 +979,7 @@ namespace Fiber.UIElements
         public StyleTranslateProp Translate { get; private set; }
         public StyleScaleProp Scale { get; private set; }
         public StyleRotateProp Rotate { get; private set; }
+        public StyleFloatProp Opacity { get; private set; }
 
         public Style(
             PositionProp position = new(),
@@ -1035,7 +1036,8 @@ namespace Fiber.UIElements
             StyleTransformOriginProp transformOrigin = new(),
             StyleTranslateProp translate = new(),
             StyleScaleProp scale = new(),
-            StyleRotateProp rotate = new()
+            StyleRotateProp rotate = new(),
+            StyleFloatProp opacity = new()
         )
         {
             Position = position;
@@ -1093,6 +1095,7 @@ namespace Fiber.UIElements
             Translate = translate;
             Scale = scale;
             Rotate = rotate;
+            Opacity = opacity;
         }
 
         public Style(
@@ -1151,7 +1154,8 @@ namespace Fiber.UIElements
             StyleTransformOriginProp transformOrigin = new(),
             StyleTranslateProp translate = new(),
             StyleScaleProp scale = new(),
-            StyleRotateProp rotate = new()
+            StyleRotateProp rotate = new(),
+            StyleFloatProp opacity = new()
         )
         {
             Position = mergedStyle.Position.IsEmpty ? position : mergedStyle.Position;
@@ -1209,6 +1213,7 @@ namespace Fiber.UIElements
             Translate = mergedStyle.Translate.IsEmpty ? translate : mergedStyle.Translate;
             Scale = mergedStyle.Scale.IsEmpty ? scale : mergedStyle.Scale;
             Rotate = mergedStyle.Rotate.IsEmpty ? rotate : mergedStyle.Rotate;
+            Opacity = mergedStyle.Opacity.IsEmpty ? opacity : mergedStyle.Opacity;
         }
     }
 }
