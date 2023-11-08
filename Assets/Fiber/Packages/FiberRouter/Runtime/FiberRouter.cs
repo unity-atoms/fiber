@@ -487,12 +487,14 @@ namespace Fiber.Router
         // not add a segment to the path / URL.
         public bool IsLayoutRoute { get; private set; }
         public BaseRouteComponent Component { get; private set; }
+        public Func<VirtualBody, BaseComponent> Wrapper { get; private set; }
         public List<RouteDefinition> Children { get; private set; }
         public List<ModalRouteDefinition> Modals { get; private set; }
         public RouteDefinition(
             string id,
             bool isLayoutRoute,
             BaseRouteComponent component,
+            Func<VirtualBody, BaseComponent> wrapper = null,
             List<RouteDefinition> children = null,
             List<ModalRouteDefinition> modals = null
         )
@@ -500,6 +502,7 @@ namespace Fiber.Router
             Id = id;
             IsLayoutRoute = isLayoutRoute;
             Component = component;
+            Wrapper = wrapper;
             Children = children;
             Modals = modals;
         }
@@ -556,9 +559,10 @@ namespace Fiber.Router
         public RouteDefinition(
             string id,
             BaseRouteComponent component,
+            Func<VirtualBody, BaseComponent> wrapper = null,
             List<RouteDefinition> children = null,
             List<ModalRouteDefinition> modals = null
-        ) : base(id, isLayoutRoute: false, component, children, modals)
+        ) : base(id, isLayoutRoute: false, component, wrapper, children, modals)
         {
         }
 
@@ -585,7 +589,7 @@ namespace Fiber.Router
             var contextSignal = new ContextSignal(routeAtCurrentIndexSignal);
             Component.ShowSignal = isMatchSignal;
 
-            return new Fiber.ContextProvider<BaseSignal<C>>(
+            return new ContextProvider<BaseSignal<C>>(
                 value: contextSignal,
                 children: Component
             );
@@ -776,12 +780,15 @@ namespace Fiber.Router
                 children.Add(modalComponent);
             }
 
+            var outletProvider = new OutletProvider(
+                virtualBody: subPaths,
+                children: children
+            );
+
             return ContextProvider(
                 value: _router,
-                children: new OutletProvider(
-                    virtualBody: subPaths,
-                    children: children
-                )
+                children: _routeDefinition.Wrapper != null ?
+                    _routeDefinition.Wrapper.Invoke(outletProvider) : outletProvider
             );
         }
     }
