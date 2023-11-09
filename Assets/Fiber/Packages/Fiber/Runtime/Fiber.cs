@@ -108,7 +108,7 @@ namespace Fiber
             ISignalList<ItemType> each,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
         );
-        public VirtualNode Switch(VirtualNode fallback, VirtualBody children);
+        public VirtualNode Switch(VirtualBody fallback, VirtualBody children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children);
     }
 
@@ -906,7 +906,7 @@ namespace Fiber
         {
             return Api.For<ItemType, KeyType>(each, children);
         }
-        public VirtualNode Switch(VirtualNode fallback, VirtualBody children) => Api.Switch(fallback, children);
+        public VirtualNode Switch(VirtualBody fallback, VirtualBody children) => Api.Switch(fallback, children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children) => Api.Match(when, children);
         public VirtualBody Nodes()
         {
@@ -2538,21 +2538,21 @@ namespace Fiber
             }
         }
 
-        public VirtualNode Switch(VirtualNode fallback, VirtualBody children)
+        public VirtualNode Switch(VirtualBody fallback, VirtualBody children)
         {
             return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue, this);
         }
 
         private class SwitchComponent : VirtualNode, IBuiltInComponent
         {
-            private readonly VirtualNode _fallback;
+            private readonly VirtualBody _fallback;
             private readonly SignalList<ISignal<bool>> _matchSignals;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
             private readonly Renderer _renderer;
 
             public SwitchComponent(
-                VirtualNode fallback,
+                VirtualBody fallback,
                 VirtualBody children,
                 Queue<FiberNode> renderQueue,
                 MixedQueue operationsQueue,
@@ -2579,7 +2579,7 @@ namespace Fiber
             private class SwitchEffect : DynamicEffect<bool>
             {
                 private readonly VirtualBody _children;
-                private readonly VirtualNode _fallback;
+                private readonly VirtualBody _fallback;
                 private readonly FiberNode _fiberNode;
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
@@ -2589,7 +2589,7 @@ namespace Fiber
                 public SwitchEffect(
                     SignalList<ISignal<bool>> matchSignals,
                     VirtualBody children,
-                    VirtualNode fallback,
+                    VirtualBody fallback,
                     FiberNode fiberNode,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
@@ -2650,17 +2650,33 @@ namespace Fiber
                         _fiberNode.Child.RemoveSelfFromTree();
                         _operationsQueue.Enqueue(new UnmountOperation(_fiberNode, childNode));
                     }
-                    if (_fallback != null)
+                    if (!_fallback.IsEmpty)
                     {
-                        var childFiberNode = new FiberNode(
-                            renderer: _renderer,
-                            nativeNode: null,
-                            virtualNode: _fallback,
-                            parent: _fiberNode,
-                            sibling: null
-                        );
-                        _fiberNode.Child = childFiberNode;
-                        _renderQueue.Enqueue(childFiberNode);
+                        for (var i = 0; i < _fallback.Count; ++i)
+                        {
+                            var child = _fallback[i];
+                            var childFiberNode = new FiberNode(
+                                renderer: _renderer,
+                                nativeNode: null,
+                                virtualNode: child,
+                                parent: _fiberNode,
+                                sibling: null
+                            );
+                            if (i == 0)
+                            {
+                                _fiberNode.Child = childFiberNode;
+                            }
+                            else
+                            {
+                                var previousChild = _fiberNode.Child;
+                                while (previousChild.Sibling != null)
+                                {
+                                    previousChild = previousChild.Sibling;
+                                }
+                                previousChild.Sibling = childFiberNode;
+                            }
+                            _renderQueue.Enqueue(childFiberNode);
+                        }
                     }
                     _lastRenderedIndexRef.Current = -1;
                 }
