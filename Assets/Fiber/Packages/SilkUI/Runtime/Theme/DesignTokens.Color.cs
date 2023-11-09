@@ -41,7 +41,8 @@ namespace SilkUI
         Border = 1,
         Text = 2,
         TextOutline = 3,
-        Overlay = 4
+        Overlay = 4,
+        Outline = 5
     }
 
     public class Role : BaseSignal<Role>
@@ -51,13 +52,15 @@ namespace SilkUI
         public Element Text;
         public Element TextOutline;
         public Element Overlay;
+        public Element Outline;
 
         public Role(
             Element background = null,
             Element border = null,
             Element text = null,
             Element textOutline = null,
-            Element overlay = null
+            Element overlay = null,
+            Element outline = null
         )
         {
             Background = background ?? new();
@@ -70,6 +73,8 @@ namespace SilkUI
             TextOutline.RegisterDependent(this);
             Overlay = overlay ?? new();
             Overlay.RegisterDependent(this);
+            Outline = outline ?? new();
+            Outline.RegisterDependent(this);
         }
 
         ~Role()
@@ -79,6 +84,7 @@ namespace SilkUI
             Text.UnregisterDependent(this);
             TextOutline.UnregisterDependent(this);
             Overlay.UnregisterDependent(this);
+            Outline.UnregisterDependent(this);
         }
 
         public override Role Get() => this;
@@ -96,6 +102,7 @@ namespace SilkUI
                 ElementType.Text => Text,
                 ElementType.TextOutline => TextOutline,
                 ElementType.Overlay => Overlay,
+                ElementType.Outline => Outline,
                 _ => null,
             };
         }

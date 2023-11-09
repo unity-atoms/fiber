@@ -14,7 +14,8 @@ namespace SilkUI
             string role,
             BaseSignal<bool> isOpen,
             DrawerPosition position = DrawerPosition.Left,
-            Style style = new()
+            Style style = new(),
+            float outsideScreenPercentage = 100f
         )
         {
             return new SilkDrawerComponent(
@@ -22,7 +23,8 @@ namespace SilkUI
                 role: role,
                 isOpen: isOpen,
                 position: position,
-                style: style
+                style: style,
+                outsideScreenPercentage: outsideScreenPercentage
             );
         }
     }
@@ -39,18 +41,21 @@ namespace SilkUI
         private readonly BaseSignal<bool> _isOpen;
         private readonly DrawerPosition _position;
         private readonly Style _style;
+        private readonly float _outsideScreenPercentage;
         public SilkDrawerComponent(
             VirtualBody children,
             string role,
             BaseSignal<bool> isOpen,
             DrawerPosition position = DrawerPosition.Left,
-            Style style = new()
+            Style style = new(),
+            float outsideScreenPercentage = 100f
         ) : base(children)
         {
             _role = role;
             _isOpen = isOpen;
             _position = position;
             _style = style;
+            _outsideScreenPercentage = outsideScreenPercentage;
         }
 
         public override VirtualBody Render()
@@ -74,7 +79,7 @@ namespace SilkUI
             {
                 return isOpen ?
                     new Translate(new Length(0, LengthUnit.Percent), new Length(0, LengthUnit.Pixel)) :
-                    new Translate(new Length(_position == DrawerPosition.Left ? -100 : 100, LengthUnit.Percent), new Length(0, LengthUnit.Pixel));
+                    new Translate(new Length(_position == DrawerPosition.Left ? -_outsideScreenPercentage : _outsideScreenPercentage, LengthUnit.Percent), new Length(0, LengthUnit.Pixel));
             }, _isOpen);
 
             return F.View(

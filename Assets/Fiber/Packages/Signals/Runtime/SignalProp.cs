@@ -53,6 +53,11 @@ namespace Signals
                 throw new Exception($"SignalProp<{typeof(T)}> is empty");
             }
         }
+
+        public readonly BaseSignal<T> ToSignal()
+        {
+            return Type == SignalPropType.Signal ? Signal : new StaticSignal<T>(Value);
+        }
     }
 
     // Struct used by nodes in work loop when updating properties via signals

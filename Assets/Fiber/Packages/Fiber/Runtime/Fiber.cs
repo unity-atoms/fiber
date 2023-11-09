@@ -687,7 +687,18 @@ namespace Fiber
 
         public readonly VirtualNode this[int i]
         {
-            get { return VirtualNodes[i]; }
+            get
+            {
+                if (IsList)
+                {
+                    return VirtualNodes[i];
+                }
+                if (i == 0 && IsSingleNode)
+                {
+                    return VirtualNode;
+                }
+                throw new IndexOutOfRangeException($"Can't get index {i} from VirtualBody");
+            }
         }
 
         public readonly void Add(VirtualNode virtualNode)
