@@ -2499,6 +2499,11 @@ namespace Fiber
 
             public override void Render(FiberNode fiberNode)
             {
+                // We need to clear cache in case this instance has already been rendered before (mounted -> unmounted -> mounted again in for example a MatchComponent)
+                _currentKeyToIdMap.Clear();
+                _currentIdToKeyMap.Clear();
+
+
                 fiberNode.PushEffect(new ForEffect(_eachSignal, _children, _renderQueue, _operationsQueue, _renderer, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
 
                 var each = _eachSignal.Get();
