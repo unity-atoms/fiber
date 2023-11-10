@@ -12,7 +12,7 @@ namespace SilkUI
         public static SilkListItemComponent SilkListItem(
             this BaseComponent component,
             ListItemText text,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new()
         )
@@ -58,7 +58,7 @@ namespace SilkUI
         public SilkListItemComponent(
             ListItemText text,
             string iconName = "circle",
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new()
         ) : base(new List<VirtualNode>()) // Create new instance of children

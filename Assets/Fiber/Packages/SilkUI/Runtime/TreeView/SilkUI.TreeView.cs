@@ -15,7 +15,7 @@ namespace SilkUI
                 Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
-                string role = THEME_CONSTANTS.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT,
                 Ref<VisualElement> forwardRef = null
         )
         {
@@ -34,7 +34,7 @@ namespace SilkUI
                 SignalProp<string> label,
                 string id,
                 VirtualBody children = default,
-                string role = THEME_CONSTANTS.INHERIT_ROLE
+                string role = THEME_CONSTANTS.INHERIT
         )
         {
             return new SilkTreeViewComponent.Item(
@@ -89,7 +89,7 @@ namespace SilkUI
                 Action<string> onItemSelected,
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
-                string role = THEME_CONSTANTS.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
             {
@@ -129,7 +129,7 @@ namespace SilkUI
 
             public VisualContainer(
                 VirtualBody children,
-                string role = THEME_CONSTANTS.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
             {
@@ -162,7 +162,7 @@ namespace SilkUI
                 SignalProp<string> label,
                 string id,
                 VirtualBody children = default,
-                string role = THEME_CONSTANTS.INHERIT_ROLE
+                string role = THEME_CONSTANTS.INHERIT
             ) : base(children)
             {
                 _label = label;

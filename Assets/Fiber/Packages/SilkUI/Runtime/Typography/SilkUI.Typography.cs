@@ -11,7 +11,7 @@ namespace SilkUI
             this BaseComponent component,
             SignalProp<TypographyType> type,
             SignalProp<string> text = new(),
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -39,7 +39,7 @@ namespace SilkUI
         public SilkTypographyComponent(
             SignalProp<TypographyType> type,
             SignalProp<string> text = new(),
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null

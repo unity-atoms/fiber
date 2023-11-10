@@ -10,7 +10,7 @@ namespace SilkUI
         public static SilkBackdropComponent SilkBackdrop(
             this BaseComponent component,
             VirtualBody children = default,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         )
@@ -31,7 +31,7 @@ namespace SilkUI
         private readonly EventCallback<ClickEvent> _onClick;
         public SilkBackdropComponent(
             VirtualBody children = default,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         ) : base(children)

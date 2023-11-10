@@ -27,7 +27,7 @@ namespace SilkUI
         // Backdrop component
         public delegate BaseComponent CreateBackdropDelegate(
             VirtualBody children = default,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         );

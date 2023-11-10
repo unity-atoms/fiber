@@ -3,6 +3,12 @@ using FiberUtils;
 
 namespace SilkUI
 {
+    public static class THEME_CONSTANTS
+    {
+        public const string INHERIT = "inherit";
+    }
+
+
     public class Theme : BaseSignal<Theme>, IGetName
     {
         public string Name;

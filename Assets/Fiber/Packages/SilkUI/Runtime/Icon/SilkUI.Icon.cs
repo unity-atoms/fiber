@@ -12,7 +12,7 @@ namespace SilkUI
             this BaseComponent component,
             SignalProp<string> iconName,
             IconSize size = IconSize.Medium,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -41,7 +41,7 @@ namespace SilkUI
         public SilkIconComponent(
             SignalProp<string> iconName,
             IconSize size = IconSize.Medium,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -70,6 +70,7 @@ namespace SilkUI
 
             var themeStore = C<ThemeStore>();
             var role = F.ResolveRole(_role);
+
             var color = themeStore.Color(role, ElementType.Text, _variant);
             var fontAwesomeSolid = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
             var fontAwesomeBrands = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-brands");

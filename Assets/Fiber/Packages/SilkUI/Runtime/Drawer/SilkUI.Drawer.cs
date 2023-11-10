@@ -11,8 +11,9 @@ namespace SilkUI
         public static SilkDrawerComponent SilkDrawer(
             this BaseComponent component,
             VirtualBody children,
-            string role,
             BaseSignal<bool> isOpen,
+            string role = THEME_CONSTANTS.INHERIT,
+            SignalProp<string> variant = new(),
             DrawerPosition position = DrawerPosition.Left,
             Style style = new(),
             float outsideScreenPercentage = 100f
@@ -22,6 +23,7 @@ namespace SilkUI
                 children: children,
                 role: role,
                 isOpen: isOpen,
+                variant: variant,
                 position: position,
                 style: style,
                 outsideScreenPercentage: outsideScreenPercentage
@@ -39,13 +41,15 @@ namespace SilkUI
     {
         private readonly string _role;
         private readonly BaseSignal<bool> _isOpen;
+        private readonly SignalProp<string> _variant;
         private readonly DrawerPosition _position;
         private readonly Style _style;
         private readonly float _outsideScreenPercentage;
         public SilkDrawerComponent(
             VirtualBody children,
-            string role,
             BaseSignal<bool> isOpen,
+            string role = THEME_CONSTANTS.INHERIT,
+            SignalProp<string> variant = new(),
             DrawerPosition position = DrawerPosition.Left,
             Style style = new(),
             float outsideScreenPercentage = 100f
@@ -53,6 +57,7 @@ namespace SilkUI
         {
             _role = role;
             _isOpen = isOpen;
+            _variant = variant;
             _position = position;
             _style = style;
             _outsideScreenPercentage = outsideScreenPercentage;
@@ -73,8 +78,9 @@ namespace SilkUI
             }
 
             var themeStore = C<ThemeStore>();
-            var backgroundColor = themeStore.Color(_role, ElementType.Background);
-            var borderColor = themeStore.Color(_role, ElementType.Border);
+            var role = F.ResolveRole(_role);
+            var backgroundColor = themeStore.Color(role, ElementType.Background, _variant);
+            var borderColor = themeStore.Color(role, ElementType.Border, _variant);
             var translate = F.CreateComputedSignal<bool, StyleTranslate>((isOpen) =>
             {
                 return isOpen ?

@@ -10,7 +10,7 @@ namespace SilkUI
         public static SilkHeaderComponent SilkHeader(
             this BaseComponent component,
                 VirtualBody children,
-                string role = THEME_CONSTANTS.INHERIT_ROLE,
+                string role = THEME_CONSTANTS.INHERIT,
                 SignalProp<string> variant = new(),
                 Style style = new()
         )
@@ -46,7 +46,7 @@ namespace SilkUI
 
         public SilkHeaderComponent(
             VirtualBody children,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new()
         ) : base(children)

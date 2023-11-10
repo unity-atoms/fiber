@@ -12,7 +12,7 @@ namespace SilkUI
             this BaseComponent component,
             SignalProp<string> iconName,
             Action onPress,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -41,7 +41,7 @@ namespace SilkUI
         public SilkIconButtonComponent(
             SignalProp<string> iconName,
             Action onPress,
-            string role = THEME_CONSTANTS.INHERIT_ROLE,
+            string role = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -74,6 +74,7 @@ namespace SilkUI
 
             var themeStore = C<ThemeStore>();
             var role = F.ResolveRole(_role);
+
             var color = themeStore.Color(
                 role: role,
                 elementType: ElementType.Text,
