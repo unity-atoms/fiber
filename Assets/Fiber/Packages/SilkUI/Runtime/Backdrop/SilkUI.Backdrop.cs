@@ -11,6 +11,7 @@ namespace SilkUI
             this BaseComponent component,
             VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         )
@@ -18,6 +19,7 @@ namespace SilkUI
             return new SilkBackdropComponent(
                 children: children,
                 role: role,
+                subRole: subRole,
                 variant: variant,
                 onClick: onClick
             );
@@ -27,16 +29,19 @@ namespace SilkUI
     public class SilkBackdropComponent : BaseComponent
     {
         private readonly string _role;
+        private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly EventCallback<ClickEvent> _onClick;
         public SilkBackdropComponent(
             VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             EventCallback<ClickEvent> onClick = null
         ) : base(children)
         {
             _role = role;
+            _subRole = subRole;
             _variant = variant;
             _onClick = onClick;
         }
@@ -48,13 +53,15 @@ namespace SilkUI
                 return overrideVisualComponents.CreateBackdrop(
                     children: Children,
                     role: _role,
+                    subRole: _subRole,
                     variant: _variant,
                     onClick: _onClick
                 );
             }
 
             var themeStore = C<ThemeStore>();
-            var backgroundColor = themeStore.Color(role: _role, ElementType.Overlay, variant: _variant);
+            var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
+            var backgroundColor = themeStore.Color(role: role, ElementType.Overlay, subRole: subRole, variant: _variant);
 
             return F.View(
                 style: new Style(

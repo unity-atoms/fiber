@@ -88,7 +88,7 @@ public class DocsLogoComponent : BaseComponent
                         fontSize: fontSize,
                         unityFont: Resources.Load<Font>("Fonts/Pacifico/Pacifico-Regular"),
                         unityFontDefinition: StyleKeyword.None,
-                        color: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Text),
+                        color: themeStore.Color(DocsThemes.ROLE.NEUTRAL, ElementType.Text),
                         unityTextAlign: TextAnchor.MiddleCenter
                     )
                 )

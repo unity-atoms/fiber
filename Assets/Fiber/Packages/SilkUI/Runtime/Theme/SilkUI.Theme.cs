@@ -62,10 +62,25 @@ namespace SilkUI
             _dirtyBit++;
         }
 
-        public ColorModifiers GetColorModifiers(string role, ElementType elementType, string variant = null)
+        public ColorModifiers GetColorModifiers(string role, ElementType elementType, string subRole, string variant = null)
         {
-            role = Color.ContainsKey(role) ? role : FallbackRole;
-            var element = Color[role].GetElement(elementType);
+            Element element;
+            if (Color.ContainsKey(role))
+            {
+                if (subRole != null && Color[role].SubRoles.ContainsKey(subRole) && !Color[role].SubRoles[subRole].IsElementEmpty(elementType))
+                {
+                    element = Color[role].SubRoles[subRole].GetElement(elementType);
+                }
+                else
+                {
+                    element = Color[role].GetElement(elementType);
+                }
+            }
+            else
+            {
+                element = Color[FallbackRole].GetElement(elementType);
+            }
+
             var colorModifiers = variant != null && element.Variants.ContainsKey(variant) ? element.Variants[variant] : element;
             return colorModifiers;
         }

@@ -13,6 +13,7 @@ namespace SilkUI
             this BaseComponent component,
             ListItemText text,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new()
         )
@@ -20,6 +21,7 @@ namespace SilkUI
             return new SilkListItemComponent(
                 text: text,
                 role: role,
+                subRole: subRole,
                 variant: variant,
                 style: style
             );
@@ -51,6 +53,7 @@ namespace SilkUI
     {
         private readonly ListItemText _text;
         private readonly string _role;
+        private readonly string _subRole;
         private readonly string _iconName;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
@@ -59,6 +62,7 @@ namespace SilkUI
             ListItemText text,
             string iconName = "circle",
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new()
         ) : base(new List<VirtualNode>()) // Create new instance of children
@@ -66,6 +70,7 @@ namespace SilkUI
             _text = text;
             _iconName = iconName;
             _role = role;
+            _subRole = subRole;
             _variant = variant;
             _style = style;
         }
@@ -76,9 +81,10 @@ namespace SilkUI
                 iconName: _iconName,
                 size: IconSize.Tiny,
                 role: _role,
+                subRole: _subRole,
                 variant: _variant,
                 style: new Style(
-                    height: C<ThemeStore>().Spacing(5.5f), // Naughty to use fractions, but necessary to get it to align with the text
+                    height: C<ThemeStore>().Spacing(5.5f),
                     marginRight: C<ThemeStore>().Spacing(1),
                     marginLeft: C<ThemeStore>().Spacing(1),
                     unityTextAlign: TextAnchor.MiddleCenter
@@ -91,6 +97,7 @@ namespace SilkUI
                     type: TypographyType.Body1,
                     text: _text.Text,
                     role: _role,
+                    subRole: _subRole,
                     variant: _variant
                 ));
             }

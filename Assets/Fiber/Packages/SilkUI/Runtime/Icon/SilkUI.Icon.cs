@@ -13,6 +13,7 @@ namespace SilkUI
             SignalProp<string> iconName,
             IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -22,6 +23,7 @@ namespace SilkUI
                 iconName: iconName,
                 size: size,
                 role: role,
+                subRole: subRole,
                 variant: variant,
                 style: style,
                 forwardRef: forwardRef
@@ -34,6 +36,7 @@ namespace SilkUI
         private readonly SignalProp<string> _iconName;
         private readonly IconSize _size;
         private readonly string _role;
+        private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
@@ -42,6 +45,7 @@ namespace SilkUI
             SignalProp<string> iconName,
             IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -50,6 +54,7 @@ namespace SilkUI
             _iconName = iconName;
             _size = size;
             _role = role;
+            _subRole = subRole;
             _variant = variant;
             _style = style;
             _forwardRef = forwardRef;
@@ -62,6 +67,7 @@ namespace SilkUI
                 return overrideVisualComponents.CreateIcon(
                     iconName: _iconName,
                     role: _role,
+                    subRole: _subRole,
                     variant: _variant,
                     style: _style,
                     forwardRef: _forwardRef
@@ -69,9 +75,9 @@ namespace SilkUI
             }
 
             var themeStore = C<ThemeStore>();
-            var role = F.ResolveRole(_role);
+            var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
-            var color = themeStore.Color(role, ElementType.Text, _variant);
+            var color = themeStore.Color(role, ElementType.Text, subRole, _variant);
             var fontAwesomeSolid = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
             var fontAwesomeBrands = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-brands");
 

@@ -26,20 +26,24 @@ namespace SilkUI
     {
         // Backdrop component
         public delegate BaseComponent CreateBackdropDelegate(
-            VirtualBody children = default,
-            string role = THEME_CONSTANTS.INHERIT,
-            SignalProp<string> variant = new(),
-            EventCallback<ClickEvent> onClick = null
+            VirtualBody children,
+            string role,
+            string subRole,
+            SignalProp<string> variant,
+            EventCallback<ClickEvent> onClick
         );
         public CreateBackdropDelegate CreateBackdrop { get; private set; }
 
         // Drawer component
         public delegate BaseComponent CreateDrawerDelegate(
             VirtualBody children,
-            string role,
             BaseSignal<bool> isOpen,
+            string role,
+            string subRole,
+            SignalProp<string> variant,
             DrawerPosition position,
-            Style style
+            Style style,
+            float outsideScreenPercentage = 100f
         );
         public CreateDrawerDelegate CreateDrawer { get; private set; }
 
@@ -47,6 +51,7 @@ namespace SilkUI
         public delegate BaseComponent CreateHeaderContainerDelegate(
             VirtualBody children,
             string role,
+            string subRole,
             SignalProp<string> variant,
             Style style
         );
@@ -63,6 +68,7 @@ namespace SilkUI
         public delegate BaseComponent CreateIconDelegate(
             SignalProp<string> iconName,
             string role,
+            string subRole,
             SignalProp<string> variant,
             Style style,
             Ref<VisualElement> forwardRef
@@ -75,6 +81,7 @@ namespace SilkUI
             Action onPress,
             InteractiveElement interactiveRef,
             string role,
+            string subRole,
             SignalProp<string> variant,
             Style style,
             Ref<VisualElement> forwardRef
@@ -85,6 +92,7 @@ namespace SilkUI
         public delegate BaseComponent CreateTreeViewContainerDelegate(
             VirtualBody children,
             string role,
+            string subRole,
             Ref<VisualElement> forwardRef
         );
         public CreateTreeViewContainerDelegate CreateTreeViewContainer { get; private set; }
@@ -95,6 +103,7 @@ namespace SilkUI
             SignalProp<string> label,
             int identationLevel,
             string role,
+            string subRole,
             bool hasSubItems,
             InteractiveElement interactiveElement,
             ISignal<bool> isSelected,
@@ -107,6 +116,7 @@ namespace SilkUI
             VirtualBody children,
             int identationLevel,
             string role,
+            string subRole,
             ISignal<bool> isExpanded
         );
         public CreateTreeViewItemGroupDelegate CreateTreeViewItemGroup { get; private set; }
@@ -116,6 +126,7 @@ namespace SilkUI
             SignalProp<TypographyType> type,
             SignalProp<string> text,
             string role,
+            string subRole,
             SignalProp<string> variant,
             Style style,
             Ref<VisualElement> forwardRef

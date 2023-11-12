@@ -13,6 +13,7 @@ namespace SilkUI
             SignalProp<string> iconName,
             Action onPress,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -22,6 +23,7 @@ namespace SilkUI
                 iconName: iconName,
                 onPress: onPress,
                 role: role,
+                subRole: subRole,
                 variant: variant,
                 style: style,
                 forwardRef: forwardRef
@@ -34,6 +36,7 @@ namespace SilkUI
         private readonly SignalProp<string> _iconName;
         private readonly Action _onPress;
         private readonly string _role;
+        private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
@@ -42,6 +45,7 @@ namespace SilkUI
             SignalProp<string> iconName,
             Action onPress,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -50,6 +54,7 @@ namespace SilkUI
             _iconName = iconName;
             _onPress = onPress;
             _role = role;
+            _subRole = subRole;
             _variant = variant;
             _style = style;
             _forwardRef = forwardRef;
@@ -66,6 +71,7 @@ namespace SilkUI
                     onPress: _onPress,
                     interactiveRef: interactiveElement,
                     role: _role,
+                    subRole: _subRole,
                     variant: _variant,
                     style: _style,
                     forwardRef: _forwardRef
@@ -73,11 +79,12 @@ namespace SilkUI
             }
 
             var themeStore = C<ThemeStore>();
-            var role = F.ResolveRole(_role);
+            var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
             var color = themeStore.Color(
                 role: role,
                 elementType: ElementType.Text,
+                subRole: subRole,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,
                 isSelected: null,
@@ -86,6 +93,7 @@ namespace SilkUI
             var backgroundColor = themeStore.Color(
                 role: role,
                 elementType: ElementType.Background,
+                subRole: subRole,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,
                 isSelected: null,

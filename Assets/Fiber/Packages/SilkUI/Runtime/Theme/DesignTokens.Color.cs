@@ -57,6 +57,7 @@ namespace SilkUI
         public Element Outline;
         public Element Shine;
         public Element Gloom;
+        public SignalDictionary<string, Role> SubRoles;
 
         public Role(
             Element background = null,
@@ -66,7 +67,8 @@ namespace SilkUI
             Element overlay = null,
             Element outline = null,
             Element shine = null,
-            Element gloom = null
+            Element gloom = null,
+            SignalDictionary<string, Role> subRoles = null
         )
         {
             Background = background ?? new();
@@ -85,6 +87,9 @@ namespace SilkUI
             Shine.RegisterDependent(this);
             Gloom = gloom ?? new();
             Gloom.RegisterDependent(this);
+
+            SubRoles = subRoles ?? new();
+            SubRoles.RegisterDependent(this);
         }
 
         ~Role()
@@ -97,6 +102,8 @@ namespace SilkUI
             Outline.UnregisterDependent(this);
             Shine.UnregisterDependent(this);
             Gloom.UnregisterDependent(this);
+
+            SubRoles.UnregisterDependent(this);
         }
 
         public override Role Get() => this;
@@ -119,6 +126,11 @@ namespace SilkUI
                 ElementType.Gloom => Gloom,
                 _ => null,
             };
+        }
+
+        public bool IsElementEmpty(ElementType elementType)
+        {
+            return GetElement(elementType).IsEmpty();
         }
 
         protected override sealed void OnNotifySignalUpdate()
@@ -230,5 +242,15 @@ namespace SilkUI
             disabled: disabled.IsInitialized ? new(disabled.Value) : new(StyleKeyword.Null)
         )
         { }
+
+        public bool IsEmpty()
+        {
+            return Default.Value == StyleKeyword.Null
+                && Selected.Value == StyleKeyword.Null
+                && Focused.Value == StyleKeyword.Null
+                && Hovered.Value == StyleKeyword.Null
+                && Pressed.Value == StyleKeyword.Null
+                && Disabled.Value == StyleKeyword.Null;
+        }
     }
 }

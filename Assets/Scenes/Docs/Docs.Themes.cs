@@ -6,13 +6,17 @@ using UnityEngine;
 
 public static class DocsThemes
 {
-    public static class ROLES
+    public static class ROLE
     {
         public const string PRIMARY = "primary";
         public const string SECONDARY = "secondary";
         public const string NEUTRAL = "neutral";
-        public const string DEEP_NEUTRAL = "deepNeutral";
         public const string DEBUG = "debug";
+    }
+
+    public static class SUBROLE
+    {
+        public const string DEEP = "deep";
     }
 
     public class Provider : BaseComponent
@@ -89,11 +93,11 @@ public static class DocsThemes
 
     public static readonly Theme DARK_THEME = new Theme(
         name: "dark",
-        fallbackRole: ROLES.NEUTRAL,
+        fallbackRole: ROLE.NEUTRAL,
         spacing: new(),
         color: new()
         {
-            { ROLES.NEUTRAL, new(
+            { ROLE.NEUTRAL, new(
                 background: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_13,
                     selected: FIBER_COLOR_PALETTE.GRAY_20,
@@ -127,24 +131,27 @@ public static class DocsThemes
                 ),
                 overlay: new(
                     @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
-                )
-            ) },
-            { ROLES.DEEP_NEUTRAL, new(
-                background: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_7,
-                    selected: FIBER_COLOR_PALETTE.GRAY_13,
-                    hovered: FIBER_COLOR_PALETTE.GRAY_13,
-                    pressed: FIBER_COLOR_PALETTE.GRAY_0
                 ),
-                border: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_0
-                ),
-                text: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.SKY_56
-                )
+                subRoles: new()
+                {
+                    { SUBROLE.DEEP, new(
+                        background: new(
+                            @default: FIBER_COLOR_PALETTE.GRAY_7,
+                            selected: FIBER_COLOR_PALETTE.GRAY_13,
+                            hovered: FIBER_COLOR_PALETTE.GRAY_13,
+                            pressed: FIBER_COLOR_PALETTE.GRAY_0
+                        ),
+                        border: new(
+                            @default: FIBER_COLOR_PALETTE.GRAY_0
+                        ),
+                        text: new(
+                            @default: FIBER_COLOR_PALETTE.GRAY_100,
+                            selected: FIBER_COLOR_PALETTE.SKY_56
+                        )
+                    ) }
+                }
             ) },
-            { ROLES.DEBUG, new(
+            { ROLE.DEBUG, new(
                 background: new(
                     @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
                 ),
@@ -152,7 +159,7 @@ public static class DocsThemes
                     @default: FIBER_COLOR_PALETTE.RED_41
                 )
             ) },
-            { ROLES.PRIMARY, new(
+            { ROLE.PRIMARY, new(
                 background: new(
                     @default: FIBER_COLOR_PALETTE.SKY_56,
                     selected: FIBER_COLOR_PALETTE.SKY_74,
@@ -175,11 +182,11 @@ public static class DocsThemes
 
     public static readonly Theme LIGHT_THEME = new Theme(
         name: "light",
-        fallbackRole: ROLES.NEUTRAL,
+        fallbackRole: ROLE.NEUTRAL,
         spacing: new(),
         color: new()
         {
-            { ROLES.NEUTRAL, new(
+            { ROLE.NEUTRAL, new(
                 background: new(
                     @default: FIBER_COLOR_PALETTE.GRAY_100,
                     selected: FIBER_COLOR_PALETTE.GRAY_93,
@@ -196,25 +203,28 @@ public static class DocsThemes
                 ),
                 overlay: new(
                     @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
-                )
-            ) },
-            { ROLES.DEEP_NEUTRAL, new(
-                background: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_93,
-                    selected: FIBER_COLOR_PALETTE.GRAY_87,
-                    hovered: FIBER_COLOR_PALETTE.GRAY_87,
-                    pressed: FIBER_COLOR_PALETTE.GRAY_80
                 ),
-                border: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_80
-                ),
-                text: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_0,
-                    selected: FIBER_COLOR_PALETTE.SKY_37,
-                    hovered: FIBER_COLOR_PALETTE.SKY_37
-                )
+                subRoles: new()
+                {
+                    { SUBROLE.DEEP, new(
+                        background: new(
+                            @default: FIBER_COLOR_PALETTE.GRAY_93,
+                            selected: FIBER_COLOR_PALETTE.GRAY_87,
+                            hovered: FIBER_COLOR_PALETTE.GRAY_87,
+                            pressed: FIBER_COLOR_PALETTE.GRAY_80
+                        ),
+                        border: new(
+                            @default: FIBER_COLOR_PALETTE.GRAY_80
+                        ),
+                        text: new(
+                            @default: FIBER_COLOR_PALETTE.GRAY_0,
+                            selected: FIBER_COLOR_PALETTE.SKY_37,
+                            hovered: FIBER_COLOR_PALETTE.SKY_37
+                        )
+                    ) }
+                }
             ) },
-            { ROLES.PRIMARY, new(
+            { ROLE.PRIMARY, new(
                 background: new(
                     @default: FIBER_COLOR_PALETTE.SKY_56,
                     selected: FIBER_COLOR_PALETTE.SKY_74,
@@ -237,11 +247,11 @@ public static class DocsThemes
 
     public static readonly Theme ICE_PIXEL = new Theme(
         name: "icePixel",
-        fallbackRole: ROLES.NEUTRAL,
+        fallbackRole: ROLE.NEUTRAL,
         spacing: new(),
         color: new()
         {
-            { ROLES.NEUTRAL, new(
+            { ROLE.NEUTRAL, new(
                 background: new(
                     @default: FIBER_COLOR_PALETTE.SKY_37,
                     selected: FIBER_COLOR_PALETTE.SKY_45,
@@ -258,23 +268,26 @@ public static class DocsThemes
                 ),
                 overlay: new(
                     @default: FIBER_COLOR_PALETTE.BLACK_ALPHA_40
-                )
-            ) },
-            { ROLES.DEEP_NEUTRAL, new(
-                background: new(
-                    @default: FIBER_COLOR_PALETTE.SKY_27,
-                    selected: FIBER_COLOR_PALETTE.SKY_37,
-                    hovered: FIBER_COLOR_PALETTE.SKY_37,
-                    pressed: FIBER_COLOR_PALETTE.SKY_19
                 ),
-                border: new(
-                    @default: FIBER_COLOR_PALETTE.SKY_23
-                ),
-                text: new(
-                    @default: FIBER_COLOR_PALETTE.GRAY_100,
-                    selected: FIBER_COLOR_PALETTE.SKY_85,
-                    hovered: FIBER_COLOR_PALETTE.SKY_85
-                )
+                subRoles: new()
+                {
+                    { SUBROLE.DEEP, new(
+                        background: new(
+                            @default: FIBER_COLOR_PALETTE.SKY_27,
+                            selected: FIBER_COLOR_PALETTE.SKY_37,
+                            hovered: FIBER_COLOR_PALETTE.SKY_37,
+                            pressed: FIBER_COLOR_PALETTE.SKY_19
+                        ),
+                        border: new(
+                            @default: FIBER_COLOR_PALETTE.SKY_23
+                        ),
+                        text: new(
+                            @default: FIBER_COLOR_PALETTE.GRAY_100,
+                            selected: FIBER_COLOR_PALETTE.SKY_85,
+                            hovered: FIBER_COLOR_PALETTE.SKY_85
+                        )
+                    ) }
+                }
             ) },
         },
         typography: PIXEL_TYPOGRAPHY_TOKENS

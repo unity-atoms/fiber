@@ -12,6 +12,7 @@ namespace SilkUI
             SignalProp<TypographyType> type,
             SignalProp<string> text = new(),
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -21,6 +22,7 @@ namespace SilkUI
                 type: type,
                 text: text,
                 role: role,
+                subRole: subRole,
                 variant: variant,
                 style: style,
                 forwardRef: forwardRef
@@ -32,6 +34,7 @@ namespace SilkUI
         private readonly SignalProp<TypographyType> _type;
         private readonly SignalProp<string> _text;
         private readonly string _role;
+        private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
@@ -40,6 +43,7 @@ namespace SilkUI
             SignalProp<TypographyType> type,
             SignalProp<string> text = new(),
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             Ref<VisualElement> forwardRef = null
@@ -48,6 +52,7 @@ namespace SilkUI
             _type = type;
             _text = text;
             _role = role;
+            _subRole = subRole;
             _variant = variant;
             _style = style;
             _forwardRef = forwardRef;
@@ -62,6 +67,7 @@ namespace SilkUI
                     type: _type,
                     text: _text,
                     role: _role,
+                    subRole: _subRole,
                     variant: _variant,
                     style: _style,
                     forwardRef: _forwardRef
@@ -69,7 +75,7 @@ namespace SilkUI
             }
 
             var themeStore = C<ThemeStore>();
-            var role = F.ResolveRole(_role);
+            var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
             return F.Text(
                 _ref: _forwardRef,
@@ -80,9 +86,9 @@ namespace SilkUI
                     unityFontDefinition: StyleKeyword.None,
                     fontSize: themeStore.FontSize(_type),
                     unityFontStyle: themeStore.FontStyle(_type),
-                    color: themeStore.Color(role, ElementType.Text, _variant),
+                    color: themeStore.Color(role, ElementType.Text, subRole: subRole, _variant),
                     unityTextOutlineWidth: themeStore.OutlineWidth(_type),
-                    unityTextOutlineColor: themeStore.Color(role, ElementType.TextOutline, _variant)
+                    unityTextOutlineColor: themeStore.Color(role, ElementType.TextOutline, subRole: subRole, _variant)
                 )
             );
         }

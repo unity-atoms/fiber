@@ -13,6 +13,7 @@ namespace SilkUI
             VirtualBody children,
             BaseSignal<bool> isOpen,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             DrawerPosition position = DrawerPosition.Left,
             Style style = new(),
@@ -22,6 +23,7 @@ namespace SilkUI
             return new SilkDrawerComponent(
                 children: children,
                 role: role,
+                subRole: subRole,
                 isOpen: isOpen,
                 variant: variant,
                 position: position,
@@ -40,6 +42,7 @@ namespace SilkUI
     public class SilkDrawerComponent : BaseComponent
     {
         private readonly string _role;
+        private readonly string _subRole;
         private readonly BaseSignal<bool> _isOpen;
         private readonly SignalProp<string> _variant;
         private readonly DrawerPosition _position;
@@ -49,6 +52,7 @@ namespace SilkUI
             VirtualBody children,
             BaseSignal<bool> isOpen,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             DrawerPosition position = DrawerPosition.Left,
             Style style = new(),
@@ -56,6 +60,7 @@ namespace SilkUI
         ) : base(children)
         {
             _role = role;
+            _subRole = subRole;
             _isOpen = isOpen;
             _variant = variant;
             _position = position;
@@ -70,17 +75,20 @@ namespace SilkUI
             {
                 return overrideVisualComponents.CreateDrawer(
                     children: Children,
-                    role: _role,
                     isOpen: _isOpen,
+                    role: _role,
+                    subRole: _subRole,
+                    variant: _variant,
                     position: _position,
-                    style: _style
+                    style: _style,
+                    outsideScreenPercentage: _outsideScreenPercentage
                 );
             }
 
             var themeStore = C<ThemeStore>();
-            var role = F.ResolveRole(_role);
-            var backgroundColor = themeStore.Color(role, ElementType.Background, _variant);
-            var borderColor = themeStore.Color(role, ElementType.Border, _variant);
+            var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
+            var backgroundColor = themeStore.Color(role, ElementType.Background, subRole, _variant);
+            var borderColor = themeStore.Color(role, ElementType.Border, subRole, _variant);
             var translate = F.CreateComputedSignal<bool, StyleTranslate>((isOpen) =>
             {
                 return isOpen ?

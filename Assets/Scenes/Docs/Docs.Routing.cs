@@ -74,8 +74,8 @@ public static class DocsRouting
         public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
-            var backgroundColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background);
-            var deepBorderColor = themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Border);
+            var backgroundColor = themeStore.Color(DocsThemes.ROLE.NEUTRAL, ElementType.Background, DocsThemes.SUBROLE.DEEP);
+            var deepBorderColor = themeStore.Color(DocsThemes.ROLE.NEUTRAL, ElementType.Border, DocsThemes.SUBROLE.DEEP);
 
             return F.Mount(
                 when: themeStore.IsMediumScreen,
@@ -83,7 +83,7 @@ public static class DocsRouting
                     style: new Style(
                         width: 280,
                         height: new Length(100, LengthUnit.Percent),
-                        backgroundColor: themeStore.Color(DocsThemes.ROLES.DEEP_NEUTRAL, ElementType.Background),
+                        backgroundColor: themeStore.Color(DocsThemes.ROLE.NEUTRAL, ElementType.Background, DocsThemes.SUBROLE.DEEP),
                         borderRightColor: deepBorderColor,
                         borderTopColor: deepBorderColor,
                         borderBottomColor: deepBorderColor,
@@ -108,7 +108,7 @@ public static class DocsRouting
             return F.View(
                 style: new Style(
                     display: DisplayStyle.Flex,
-                    backgroundColor: C<ThemeStore>().Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
+                    backgroundColor: C<ThemeStore>().Color(DocsThemes.ROLE.NEUTRAL, ElementType.Background),
                     height: new Length(100, LengthUnit.Percent),
                     width: new Length(100, LengthUnit.Percent),
                     flexDirection: FlexDirection.Column,
@@ -140,7 +140,7 @@ public static class DocsRouting
                     children: F.Nodes(
                         F.View(
                             style: new Style(
-                                backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
+                                backgroundColor: themeStore.Color(DocsThemes.ROLE.NEUTRAL, ElementType.Background),
                                 minHeight: new Length(100, LengthUnit.Percent),
                                 flexShrink: 1,
                                 flexGrow: 1,

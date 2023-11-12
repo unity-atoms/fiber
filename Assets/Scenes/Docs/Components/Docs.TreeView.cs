@@ -26,7 +26,8 @@ public class DocsTreeViewComponent : BaseComponent
         }
 
         return F.SilkTreeViewContainer(
-            role: DocsThemes.ROLES.DEEP_NEUTRAL,
+            role: DocsThemes.ROLE.NEUTRAL,
+            subRole: DocsThemes.SUBROLE.DEEP,
             selectedItemId: selectedItemId,
             onItemSelected: (string id) =>
             {

@@ -16,6 +16,7 @@ namespace SilkUI
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
                 string role = THEME_CONSTANTS.INHERIT,
+                string subRole = THEME_CONSTANTS.INHERIT,
                 Ref<VisualElement> forwardRef = null
         )
         {
@@ -25,6 +26,7 @@ namespace SilkUI
                 selectedItemId: selectedItemId,
                 expandedItemIds: expandedItemIds,
                 role: role,
+                subRole: subRole,
                 forwardRef: forwardRef
             );
         }
@@ -34,14 +36,16 @@ namespace SilkUI
                 SignalProp<string> label,
                 string id,
                 VirtualBody children = default,
-                string role = THEME_CONSTANTS.INHERIT
+                string role = THEME_CONSTANTS.INHERIT,
+                string subRole = THEME_CONSTANTS.INHERIT
         )
         {
             return new SilkTreeViewComponent.Item(
                 label: label,
                 id: id,
                 children: children,
-                role: role
+                role: role,
+                subRole: subRole
             );
         }
     }
@@ -82,6 +86,7 @@ namespace SilkUI
             private readonly ISignal<string> _selectedItemId;
             private readonly ISignalList<string> _expandedItemIds;
             private readonly string _role;
+            private readonly string _subRole;
             private readonly Ref<VisualElement> _forwardRef;
 
             public Container(
@@ -90,10 +95,12 @@ namespace SilkUI
                 ISignal<string> selectedItemId,
                 ISignalList<string> expandedItemIds,
                 string role = THEME_CONSTANTS.INHERIT,
+                string subRole = THEME_CONSTANTS.INHERIT,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
             {
                 _role = role;
+                _subRole = subRole;
                 _onItemSelected = onItemSelected;
                 _selectedItemId = selectedItemId;
                 _expandedItemIds = expandedItemIds;
@@ -113,6 +120,7 @@ namespace SilkUI
                     ),
                     children: F.RoleProvider(
                         role: _role,
+                        subRole: _subRole,
                         children: F.ContextProvider(
                             value: new IndentiationLevelContext(indentiationLeve: 0),
                             children: new VisualContainer(children: Children, role: _role, forwardRef: _forwardRef)
@@ -125,15 +133,18 @@ namespace SilkUI
         private class VisualContainer : BaseComponent
         {
             private readonly string _role;
+            private readonly string _subRole;
             private readonly Ref<VisualElement> _forwardRef;
 
             public VisualContainer(
                 VirtualBody children,
                 string role = THEME_CONSTANTS.INHERIT,
+                string subRole = THEME_CONSTANTS.INHERIT,
                 Ref<VisualElement> forwardRef = null
             ) : base(children)
             {
                 _role = role;
+                _subRole = subRole;
                 _forwardRef = forwardRef;
             }
             public override VirtualBody Render()
@@ -144,6 +155,7 @@ namespace SilkUI
                     return overrideVisualComponents.CreateTreeViewContainer(
                         children: Children,
                         role: _role,
+                        subRole: _subRole,
                         forwardRef: _forwardRef
                     );
                 }
@@ -157,17 +169,20 @@ namespace SilkUI
             private SignalProp<string> _label;
             private readonly string _id;
             private readonly string _role;
+            private readonly string _subRole;
 
             public Item(
                 SignalProp<string> label,
                 string id,
                 VirtualBody children = default,
-                string role = THEME_CONSTANTS.INHERIT
+                string role = THEME_CONSTANTS.INHERIT,
+                string subRole = THEME_CONSTANTS.INHERIT
             ) : base(children)
             {
                 _label = label;
                 _id = id;
                 _role = role;
+                _subRole = subRole;
             }
 
             public override VirtualBody Render()
@@ -187,6 +202,7 @@ namespace SilkUI
                         label: _label,
                         identationLevel: identationLevel,
                         role: _role,
+                        subRole: _subRole,
                         hasSubItems: Children.Count > 0,
                         interactiveElement: interactiveElement,
                         isSelected: isSelected,
@@ -200,6 +216,7 @@ namespace SilkUI
                                 children: Children,
                                 identationLevel: identationLevel + 1,
                                 role: _role,
+                                subRole: _subRole,
                                 isExpanded: isExpanded
                             )
                         )
@@ -212,17 +229,20 @@ namespace SilkUI
         {
             private readonly int _identationLevel;
             private readonly string _role;
+            private readonly string _subRole;
             private readonly ISignal<bool> _isExpanded;
 
             public VisualItemGroup(
                 VirtualBody children,
                 int identationLevel,
                 string role,
+                string subRole,
                 ISignal<bool> isExpanded
             ) : base(children)
             {
                 _identationLevel = identationLevel;
                 _role = role;
+                _subRole = subRole;
                 _isExpanded = isExpanded;
             }
             public override VirtualBody Render()
@@ -234,6 +254,7 @@ namespace SilkUI
                         children: Children,
                         identationLevel: _identationLevel,
                         role: _role,
+                        subRole: _subRole,
                         isExpanded: _isExpanded
                     );
                 }
@@ -247,6 +268,7 @@ namespace SilkUI
             private readonly SignalProp<string> _label;
             private readonly int _identationLevel;
             private readonly string _role;
+            private readonly string _subRole;
             private readonly bool _hasSubItems;
             private readonly InteractiveElement _interactiveElement;
             private readonly ISignal<bool> _isSelected;
@@ -256,6 +278,7 @@ namespace SilkUI
                 SignalProp<string> label,
                 int identationLevel,
                 string role,
+                string subRole,
                 bool hasSubItems,
                 InteractiveElement interactiveElement,
                 ISignal<bool> isSelected,
@@ -265,6 +288,7 @@ namespace SilkUI
                 _label = label;
                 _identationLevel = identationLevel;
                 _role = role;
+                _subRole = subRole;
                 _hasSubItems = hasSubItems;
                 _interactiveElement = interactiveElement;
                 _isSelected = isSelected;
@@ -279,6 +303,7 @@ namespace SilkUI
                         label: _label,
                         identationLevel: _identationLevel,
                         role: _role,
+                        subRole: _subRole,
                         hasSubItems: _hasSubItems,
                         interactiveElement: _interactiveElement,
                         isSelected: _isSelected,
@@ -287,10 +312,10 @@ namespace SilkUI
                 }
 
                 var themeStore = C<ThemeStore>();
-                var role = F.ResolveRole(_role);
+                var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
-                var color = themeStore.Color(role, ElementType.Text, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
-                var backgroundColor = themeStore.Color(role, ElementType.Background, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected);
+                var color = themeStore.Color(role, ElementType.Text, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected, subRole: subRole);
+                var backgroundColor = themeStore.Color(role, ElementType.Background, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected, subRole: subRole);
 
                 var iconName = CreateComputedSignal((isExpanded) => isExpanded ? "chevron-down" : "chevron-right", _isExpanded);
 

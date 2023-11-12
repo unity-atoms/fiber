@@ -10,11 +10,13 @@ namespace SilkUI
         public static DividerComponent Divider(
             this BaseComponent component,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new()
         )
         {
             return new DividerComponent(
                 role: role,
+                subRole: subRole,
                 variant: variant
             );
         }
@@ -24,10 +26,12 @@ namespace SilkUI
     public class DividerComponent : BaseComponent
     {
         private readonly string _role;
+        private readonly string _subRole;
         private readonly SignalProp<string> _variant;
 
         public DividerComponent(
-            string role,
+            string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new()
         ) : base()
         {
@@ -38,9 +42,9 @@ namespace SilkUI
         public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
-            var role = F.ResolveRole(_role);
-            var shine = themeStore.Color(role, elementType: ElementType.Gloom, variant: _variant);
-            var gloom = themeStore.Color(role, elementType: ElementType.Shine, variant: _variant);
+            var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
+            var shine = themeStore.Color(role, elementType: ElementType.Gloom, subRole: subRole, variant: _variant);
+            var gloom = themeStore.Color(role, elementType: ElementType.Shine, subRole: subRole, variant: _variant);
 
             return F.Nodes(
                 F.View(

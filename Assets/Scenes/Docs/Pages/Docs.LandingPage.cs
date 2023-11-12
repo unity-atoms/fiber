@@ -71,7 +71,7 @@ public class DocsLandingPageComponent : BaseComponent
                         ),
                         F.SilkButton(
                             children: F.Text(text: "Get Started"),
-                            role: DocsThemes.ROLES.PRIMARY,
+                            role: DocsThemes.ROLE.PRIMARY,
                             onPress: () => { router.Navigate(DocsRouting.ROUTES.INTRODUCTION); }
                         )
                     )

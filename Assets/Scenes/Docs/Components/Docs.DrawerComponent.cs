@@ -27,7 +27,8 @@ public class DocsDrawerComponent : BaseComponent
                     )
                 ),
                 F.SilkDrawer(
-                    role: DocsThemes.ROLES.DEEP_NEUTRAL,
+                    role: DocsThemes.ROLE.NEUTRAL,
+                    subRole: DocsThemes.SUBROLE.DEEP,
                     isOpen: drawerContext.IsOpen,
                     children: F.View(
                             style: new Style(
@@ -46,9 +47,9 @@ public class DocsDrawerComponent : BaseComponent
                                         paddingTop: themeStore.Spacing(2),
                                         paddingLeft: themeStore.Spacing(4),
                                         paddingRight: themeStore.Spacing(4),
-                                        backgroundColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Background),
+                                        backgroundColor: themeStore.Color(DocsThemes.ROLE.NEUTRAL, ElementType.Background),
                                         borderBottomWidth: themeStore.BorderWidth(),
-                                        borderBottomColor: themeStore.Color(DocsThemes.ROLES.NEUTRAL, ElementType.Border)
+                                        borderBottomColor: themeStore.Color(DocsThemes.ROLE.NEUTRAL, ElementType.Border)
                                     ),
                                     children: F.Nodes(
                                         new DocsLogoComponent(

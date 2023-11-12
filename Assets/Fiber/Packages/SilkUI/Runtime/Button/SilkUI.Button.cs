@@ -12,6 +12,7 @@ namespace SilkUI
             this BaseComponent component,
             VirtualBody children,
             string role,
+            string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
             Action onPress = null
@@ -20,6 +21,7 @@ namespace SilkUI
             return new SilkButtonComponent(
                 children: children,
                 role: role,
+                subRole: subRole,
                 variant: variant,
                 style: style,
                 onPress: onPress
@@ -30,6 +32,7 @@ namespace SilkUI
     public class SilkButtonComponent : BaseComponent
     {
         private readonly string _role;
+        private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Action _onPress;
@@ -37,12 +40,14 @@ namespace SilkUI
         public SilkButtonComponent(
             VirtualBody children,
             string role,
+            string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
             Action onPress = null
         ) : base(children)
         {
             _role = role;
+            _subRole = subRole;
             _variant = variant;
             _style = style;
             _onPress = onPress;
@@ -55,6 +60,7 @@ namespace SilkUI
             var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(
                 role: _role,
+                subRole: _subRole,
                 elementType: ElementType.Background,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,
@@ -62,6 +68,7 @@ namespace SilkUI
             );
             var borderColor = themeStore.Color(
                 role: _role,
+                subRole: _subRole,
                 elementType: ElementType.Border,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,
@@ -69,6 +76,7 @@ namespace SilkUI
             );
             var textColor = themeStore.Color(
                 role: _role,
+                subRole: _subRole,
                 elementType: ElementType.Text,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,

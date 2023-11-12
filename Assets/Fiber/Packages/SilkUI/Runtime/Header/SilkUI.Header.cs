@@ -11,6 +11,7 @@ namespace SilkUI
             this BaseComponent component,
                 VirtualBody children,
                 string role = THEME_CONSTANTS.INHERIT,
+                string subRole = THEME_CONSTANTS.INHERIT,
                 SignalProp<string> variant = new(),
                 Style style = new()
         )
@@ -18,6 +19,7 @@ namespace SilkUI
             return new SilkHeaderComponent(
                 children: children,
                 role: role,
+                subRole: subRole,
                 variant: variant,
                 style: style
             );
@@ -41,17 +43,20 @@ namespace SilkUI
     public class SilkHeaderComponent : BaseComponent
     {
         private readonly string _role;
+        private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
 
         public SilkHeaderComponent(
             VirtualBody children,
             string role = THEME_CONSTANTS.INHERIT,
+            string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new()
         ) : base(children)
         {
             _role = role;
+            _subRole = subRole;
             _variant = variant;
             _style = style;
         }
@@ -64,16 +69,18 @@ namespace SilkUI
                 return overrideVisualComponents.CreateHeaderContainer(
                     children: Children,
                     role: _role,
+                    subRole: _subRole,
                     variant: _variant,
                     style: _style
                 );
             }
 
             var themeStore = C<ThemeStore>();
-            var role = F.ResolveRole(_role);
+            var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
             return F.RoleProvider(
                 role: role,
+                subRole: subRole,
                 children: F.View(
                     children: Children,
                     style: new Style(
@@ -84,7 +91,7 @@ namespace SilkUI
                         paddingTop: themeStore.Spacing(2),
                         paddingLeft: themeStore.Spacing(4),
                         paddingRight: themeStore.Spacing(4),
-                        backgroundColor: themeStore.Color(role, ElementType.Background, _variant),
+                        backgroundColor: themeStore.Color(role, ElementType.Background, subRole, _variant),
                         display: DisplayStyle.Flex,
                         flexGrow: 0,
                         flexShrink: 0,
