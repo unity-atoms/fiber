@@ -14,6 +14,18 @@ public static class FIBER_COLOR_PALETTE
     public static readonly Color BLACK_ALPHA_10 = new(0, 0, 0, 0.1f);
     public static readonly Color BLACK_ALPHA_0 = new(0, 0, 0, 0);
 
+    public static readonly Color WHITE_ALPHA_100 = new(1f, 1f, 1f, 1);
+    public static readonly Color WHITE_ALPHA_90 = new(1f, 1f, 1f, 0.9f);
+    public static readonly Color WHITE_ALPHA_80 = new(1f, 1f, 1f, 0.8f);
+    public static readonly Color WHITE_ALPHA_70 = new(1f, 1f, 1f, 0.7f);
+    public static readonly Color WHITE_ALPHA_60 = new(1f, 1f, 1f, 0.6f);
+    public static readonly Color WHITE_ALPHA_50 = new(1f, 1f, 1f, 0.5f);
+    public static readonly Color WHITE_ALPHA_40 = new(1f, 1f, 1f, 0.4f);
+    public static readonly Color WHITE_ALPHA_30 = new(1f, 1f, 1f, 0.3f);
+    public static readonly Color WHITE_ALPHA_20 = new(1f, 1f, 1f, 0.2f);
+    public static readonly Color WHITE_ALPHA_10 = new(1f, 1f, 1f, 0.1f);
+    public static readonly Color WHITE_ALPHA_0 = new(1f, 1f, 1f, 0);
+
 
     public const string GRAY_0 = "#000000";
     public const string GRAY_7 = "#111111";
