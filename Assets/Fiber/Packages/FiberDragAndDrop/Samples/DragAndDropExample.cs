@@ -10,13 +10,6 @@ using Signals;
 using Fiber.DragAndDrop;
 
 
-// START HERE...
-// Create test components
-// Create DragAndDropProvder
-// Fiber.MoveToTheFront() / MoveToPosition()
-// RegisterDragable() / UnregisterDragable()
-// OnDrag()
-
 public class DragAndDropExample : MonoBehaviour
 {
     [SerializeField] private PanelSettings _defaultPanelSettings;
@@ -88,7 +81,7 @@ public class DragAndDropExample : MonoBehaviour
                     children: F.View(
                         style: new Style(
                             flexDirection: FlexDirection.Row,
-                            justifyContent: Justify.FlexStart,
+                            justifyContent: Justify.Center,
                             alignItems: Align.Center,
                             width: 400,
                             height: 400,

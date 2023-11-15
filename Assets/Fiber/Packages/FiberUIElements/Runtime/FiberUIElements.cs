@@ -1686,17 +1686,7 @@ namespace Fiber.UIElements
         {
             if (node.NativeNode is VisualElementNativeNode visualElementChildNode)
             {
-                var currentIndex = Instance.IndexOf(visualElementChildNode.Instance);
-                if (currentIndex > index)
-                {
-                    var currentElementAtIndex = Instance.ElementAt(index);
-                    visualElementChildNode.Instance.PlaceBehind(currentElementAtIndex);
-                }
-                else if (currentIndex < index)
-                {
-                    var currentElementBeforeIndex = Instance.ElementAt(index - 1);
-                    visualElementChildNode.Instance.PlaceInFront(currentElementBeforeIndex);
-                }
+                visualElementChildNode.Instance.MoveToIndex(index);
                 return;
             }
 

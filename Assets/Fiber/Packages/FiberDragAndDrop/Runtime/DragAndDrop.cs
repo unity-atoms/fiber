@@ -82,25 +82,65 @@ namespace Fiber.DragAndDrop
 
         public void RegisterDraggable(VisualElement element)
         {
+            int itemIndex = _draggables.Count;
+            VisualElement tempElement = null;
+
             var draggable = new Draggable(
                 element: element,
                 onPointerDown: (PointerDownEvent evt) =>
                 {
-                    _targetStartPosition = element.transform.position;
                     _pointerStartPosition = evt.position;
+
+                    Vector3 targetFlexedWorldBound = element.worldBound.center;
+                    Vector3 targetAbsoluteWorldBound = element.parent.worldBound.center;
+
+                    Vector3 deltaTargetWorldBound = targetFlexedWorldBound - targetAbsoluteWorldBound;
+
+                    _targetStartPosition = deltaTargetWorldBound;
+                    element.transform.position = _targetStartPosition;
+
                     _draggedElement = element;
                     element.CapturePointer(evt.pointerId);
+                    element.style.position = Position.Absolute;
+
+                    var width = element.resolvedStyle.width;
+                    var height = element.resolvedStyle.height;
+                    var marginLeft = element.resolvedStyle.marginLeft;
+                    var marginTop = element.resolvedStyle.marginTop;
+                    var marginRight = element.resolvedStyle.marginRight;
+                    var marginBottom = element.resolvedStyle.marginBottom;
+
+                    tempElement ??= new VisualElement();
+                    tempElement.style.width = width;
+                    tempElement.style.height = height;
+                    tempElement.style.marginLeft = marginLeft;
+                    tempElement.style.marginTop = marginTop;
+                    tempElement.style.marginRight = marginRight;
+                    tempElement.style.marginBottom = marginBottom;
+                    tempElement.style.backgroundColor = Color.red;
+
+                    element.parent.Insert(itemIndex, tempElement);
+
+                    element.MoveToBack();
+                    // var currentIndex = element.parent.IndexOf(element);
+                    // var targetIndex = element.parent.childCount;
+                    // if (currentIndex > targetIndex)
+                    // {
+                    //     var currentElementAtIndex = element.parent.ElementAt(targetIndex);
+                    //     element.PlaceBehind(currentElementAtIndex);
+                    // }
+                    // else if (currentIndex < targetIndex)
+                    // {
+                    //     var currentElementBeforeIndex = element.parent.ElementAt(targetIndex - 1);
+                    //     element.PlaceInFront(currentElementBeforeIndex);
+                    // }
                 },
                 onPointerMove: (PointerMoveEvent evt) =>
                 {
                     if (_draggedElement == element && element.HasPointerCapture(evt.pointerId))
                     {
                         var delta = evt.position - _pointerStartPosition;
-
                         element.transform.position = new Vector2(_targetStartPosition.x + delta.x, _targetStartPosition.y + delta.y);
-                        // element.transform.position = new Vector2(
-                        //     Mathf.Clamp(_targetStartPosition.x + delta.x, 0, element.panel.visualTree.worldBound.width),
-                        //     Mathf.Clamp(_targetStartPosition.y + delta.y, 0, element.panel.visualTree.worldBound.height));
                     }
                 },
                 onPointerUp: (PointerUpEvent evt) =>
@@ -108,16 +148,22 @@ namespace Fiber.DragAndDrop
                     if (_draggedElement == element && element.HasPointerCapture(evt.pointerId))
                     {
                         _draggedElement.ReleasePointer(evt.pointerId);
-                        _draggedElement.transform.position = _targetStartPosition;
+                        _draggedElement.transform.position = Vector3.zero;
                         _draggedElement = null;
+                        element.style.position = Position.Relative;
+                        tempElement.parent.Remove(tempElement);
+                        element.MoveToIndex(itemIndex);
                     }
                 },
                 onPointerCaptureOut: (PointerCaptureOutEvent evt) =>
                 {
                     if (_draggedElement == element)
                     {
-                        _draggedElement.transform.position = _targetStartPosition;
+                        _draggedElement.transform.position = Vector3.zero;
                         _draggedElement = null;
+                        element.style.position = Position.Relative;
+                        tempElement.parent.Remove(tempElement);
+                        element.MoveToIndex(itemIndex);
                     }
                 }
             );
