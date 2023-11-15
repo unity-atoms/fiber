@@ -19,23 +19,60 @@ namespace Fiber.DragAndDrop
             );
         }
 
-        public static void CreateDraggable(
+        public static DraggableComponent Draggable(
             this BaseComponent component,
-            Ref<VisualElement> _ref
+            VirtualBody children,
+            Ref<VisualElement> draggableRef
         )
         {
-            var context = component.GetContext<DragAndDropContext>();
-            component.CreateEffect(() =>
+            return new DraggableComponent(
+                children: children,
+                draggableRef: draggableRef
+            );
+        }
+    }
+
+    public class DraggableContext
+    {
+        public Ref<VisualElement> DraggableRef { get; private set; }
+        public DraggableContext(
+            Ref<VisualElement> draggableRef
+        )
+        {
+            DraggableRef = draggableRef;
+        }
+    }
+
+    public class DraggableComponent : BaseComponent
+    {
+        private readonly Ref<VisualElement> _draggableRef;
+        public DraggableComponent(
+            VirtualBody children,
+            Ref<VisualElement> draggableRef
+        ) : base(children)
+        {
+            _draggableRef = draggableRef;
+        }
+
+        public override VirtualBody Render()
+        {
+            var context = F.GetContext<DragAndDropContext>();
+            F.CreateEffect(() =>
             {
-                context.RegisterDraggable(_ref.Current);
-                return () => context.UnregisterDraggable(_ref.Current);
+                context.RegisterDraggable(_draggableRef.Current);
+                return () => context.UnregisterDraggable(_draggableRef.Current);
             });
+
+            return F.ContextProvider(
+                value: new DraggableContext(_draggableRef),
+                children: Children
+            );
         }
     }
 
     public class DragAndDropContext
     {
-        private class Draggable
+        private class DraggableElement
         {
             public VisualElement Element { get; private set; }
             public EventCallback<PointerDownEvent> OnPointerDown { get; private set; }
@@ -43,7 +80,7 @@ namespace Fiber.DragAndDrop
             public EventCallback<PointerUpEvent> OnPointerUp { get; private set; }
             public EventCallback<PointerCaptureOutEvent> OnPointerCaptureOut { get; private set; }
 
-            public Draggable(
+            public DraggableElement(
                 VisualElement element,
                 EventCallback<PointerDownEvent> onPointerDown,
                 EventCallback<PointerMoveEvent> onPointerMove,
@@ -78,14 +115,14 @@ namespace Fiber.DragAndDrop
         private Vector3 _targetStartPosition;
         private Vector3 _pointerStartPosition;
         private VisualElement _draggedElement;
-        private List<Draggable> _draggables = new();
+        private List<DraggableElement> _draggableElements = new();
 
         public void RegisterDraggable(VisualElement element)
         {
-            int itemIndex = _draggables.Count;
+            int itemIndex = _draggableElements.Count;
             VisualElement tempElement = null;
 
-            var draggable = new Draggable(
+            var draggable = new DraggableElement(
                 element: element,
                 onPointerDown: (PointerDownEvent evt) =>
                 {
@@ -122,18 +159,6 @@ namespace Fiber.DragAndDrop
                     element.parent.Insert(itemIndex, tempElement);
 
                     element.MoveToBack();
-                    // var currentIndex = element.parent.IndexOf(element);
-                    // var targetIndex = element.parent.childCount;
-                    // if (currentIndex > targetIndex)
-                    // {
-                    //     var currentElementAtIndex = element.parent.ElementAt(targetIndex);
-                    //     element.PlaceBehind(currentElementAtIndex);
-                    // }
-                    // else if (currentIndex < targetIndex)
-                    // {
-                    //     var currentElementBeforeIndex = element.parent.ElementAt(targetIndex - 1);
-                    //     element.PlaceInFront(currentElementBeforeIndex);
-                    // }
                 },
                 onPointerMove: (PointerMoveEvent evt) =>
                 {
@@ -148,6 +173,7 @@ namespace Fiber.DragAndDrop
                     if (_draggedElement == element && element.HasPointerCapture(evt.pointerId))
                     {
                         _draggedElement.ReleasePointer(evt.pointerId);
+
                         _draggedElement.transform.position = Vector3.zero;
                         _draggedElement = null;
                         element.style.position = Position.Relative;
@@ -167,21 +193,31 @@ namespace Fiber.DragAndDrop
                     }
                 }
             );
-            _draggables.Add(draggable);
+            _draggableElements.Add(draggable);
             draggable.Register();
         }
 
         public void UnregisterDraggable(VisualElement element)
         {
-            for (var i = 0; i < _draggables.Count; i++)
+            for (var i = 0; i < _draggableElements.Count; i++)
             {
-                if (_draggables[i].Element == element)
+                if (_draggableElements[i].Element == element)
                 {
-                    _draggables[i].Unregister();
-                    _draggables.RemoveAt(i);
+                    _draggableElements[i].Unregister();
+                    _draggableElements.RemoveAt(i);
                     break;
                 }
             }
+        }
+
+        public void RegisterDragHandle(Ref<VisualElement> dragHandle)
+        {
+
+        }
+
+        public void UnregisterDragHandle(Ref<VisualElement> dragHandle)
+        {
+
         }
     }
 
