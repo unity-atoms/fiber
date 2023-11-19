@@ -1199,7 +1199,7 @@ namespace Fiber
             return current?.VirtualNode as V;
         }
 
-        public bool IsAncestorOf(FiberNode node, FiberNode root = null, bool includeSelf = true)
+        public bool IsDescendentOf(FiberNode node, FiberNode root = null, bool includeSelf = true)
         {
             var currentNode = includeSelf ? this : Parent;
             while (currentNode != root && currentNode != null)
@@ -1212,21 +1212,6 @@ namespace Fiber
             }
 
             return false;
-        }
-
-        public FiberNode FindClosestCommonAncestor(FiberNode other)
-        {
-            var currentNode = Parent;
-            while (currentNode != null)
-            {
-                if (other.IsAncestorOf(currentNode, null, false))
-                {
-                    return currentNode;
-                }
-                currentNode = currentNode.Parent;
-            }
-
-            return null;
         }
 
         public FiberNode FindChild(int id)
@@ -1757,21 +1742,61 @@ namespace Fiber
                         moveOperation.Child.Sibling = siblingAfter;
                     }
 
-                    // Move all children with native nodes (including self) that is an ancestor of the moved node
+                    // Figure out what native nodes need to be moved.
+                    // There can be more than one native node being a descendent of the node being moved,
+                    // so a consecutive chunk of native nodes (0-n) might need to be moved. 
                     var closestParentWithNativeNode = moveOperation.Child.FindClosestAncestorWithNativeNode();
-                    var nativeNodeIndex = closestParentWithNativeNode.FindNativeNodeIndex(moveOperation.Child);
+
+                    var moveCount = 0;
+                    var moveFromIndex = -1;
+                    var moveToFirstChunkIndex = -1;
 
                     for (var i = 0; i < closestParentWithNativeNode.NativeNodeChildren.Count; ++i)
                     {
                         var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[i];
-                        if (moveOperation.Child.IsAncestorOf(nativeNodeChild))
+                        if (nativeNodeChild.IsDescendentOf(moveOperation.Child))
                         {
-                            closestParentWithNativeNode.NativeNode.MoveChild(moveOperation.Child, nativeNodeIndex);
-                            nativeNodeIndex++;
+                            if (moveCount == 0)
+                            {
+                                moveFromIndex = i;
+                                // Calling FindNativeNodeIndex to get the first index here works 
+                                //since we have already updated the virtual tree above.
+                                moveToFirstChunkIndex = closestParentWithNativeNode.FindNativeNodeIndex(moveOperation.Child);
+                            }
+
+                            moveCount++;
+                        }
+                        else if (moveCount != 0)
+                        {
+                            // If we have found at least one native node to move, but this sibling native node
+                            // isn't a descendent, then no other native nodes should be moved.
+                            break;
+                        }
+                    }
+
+                    // Do the actual move and update the order of the list of native node children in the closest parent with native node.
+                    var isMovingForward = moveToFirstChunkIndex > moveFromIndex;
+
+                    for (var i = 0; i < moveCount; ++i)
+                    {
+                        if (isMovingForward)
+                        {
+                            // Since we are moving items further down in the list, then that means that the next item to
+                            // move will be pushed back, meaning that the move from index never changes.
+                            var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[moveFromIndex];
+                            closestParentWithNativeNode.NativeNode.MoveChild(nativeNodeChild, moveToFirstChunkIndex + moveCount - 1);
+                            closestParentWithNativeNode.NativeNodeChildren.Move(moveFromIndex, moveToFirstChunkIndex + moveCount);
+                        }
+                        else
+                        {
+                            var moveTo = moveToFirstChunkIndex + i;
+                            var moveFrom = moveFromIndex + i;
+                            var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[moveFrom];
+                            closestParentWithNativeNode.NativeNode.MoveChild(nativeNodeChild, moveTo);
+                            closestParentWithNativeNode.NativeNodeChildren.Move(moveFrom, moveTo);
                         }
                     }
                 }
-
             }
         }
 

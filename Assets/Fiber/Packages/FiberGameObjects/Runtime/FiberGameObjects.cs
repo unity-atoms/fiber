@@ -109,17 +109,15 @@ namespace Fiber.GameObjects
     public class GameObjectNativeNode : NativeNode
     {
         public GameObject Instance { get; private set; }
-        private GameObjectsRendererExtension _rendererExtension;
         private WorkLoopSignalProp<string> _nameWorkLoopItem;
         private WorkLoopSignalProp<bool> _activeWorkLoopItem;
         private WorkLoopSignalProp<Vector3> _positionWorkLoopItem;
         private WorkLoopSignalProp<Vector3> _localScaleWorkLoopItem;
         protected bool IsVisible_SetByFiber { get; set; }
 
-        public GameObjectNativeNode(GameObjectComponent virtualNode, GameObject instance, GameObjectsRendererExtension rendererExtension)
+        public GameObjectNativeNode(GameObjectComponent virtualNode, GameObject instance)
         {
             Instance = instance;
-            _rendererExtension = rendererExtension;
 
             if (!virtualNode.Name.IsEmpty)
             {
@@ -308,7 +306,7 @@ namespace Fiber.GameObjects
             if (virtualNode is GameObjectComponent gameObjectVirtualNode)
             {
                 var gameObject = GetOrCreateGameObject(fiberNode, gameObjectVirtualNode);
-                return new GameObjectNativeNode(gameObjectVirtualNode, gameObject, this);
+                return new GameObjectNativeNode(gameObjectVirtualNode, gameObject);
             }
             if (virtualNode is GameObjectPointerEventsComponent)
             {

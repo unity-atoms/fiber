@@ -4070,9 +4070,8 @@ namespace Fiber.UIElements
 
         public UIDocumentNativeNode(
             UIDocumentComponent component,
-            UIDocument uiDocument,
-            GameObjectsRendererExtension rendererExtension
-        ) : base(component, uiDocument.gameObject, rendererExtension)
+            UIDocument uiDocument
+        ) : base(component, uiDocument.gameObject)
         {
             _uiDocument = uiDocument;
 
@@ -4202,7 +4201,7 @@ namespace Fiber.UIElements
 #endif
                     uiDocument.panelSettings.fallbackDpi = dpi / scalingProvider.Multiplier;
                 }
-                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this);
+                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument);
             }
             else if (virtualNode is ScrollViewComponent scrollViewComponent)
             {

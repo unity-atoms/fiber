@@ -33,7 +33,7 @@ namespace Fiber.Suite
                 autonomousWorkLoop: autonomousWorkLoop,
                 workLoopTimeBudgetMs: workLoopTimeBudgetMs
             );
-            _rootGameObjectNativeNode = new GameObjectNativeNode(new GameObjectComponent(), rootGameObject, gameObjectRendererExtension);
+            _rootGameObjectNativeNode = new GameObjectNativeNode(new GameObjectComponent(), rootGameObject);
         }
 
         public void Render(VirtualNode component)

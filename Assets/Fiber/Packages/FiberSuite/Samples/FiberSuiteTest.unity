@@ -273,6 +273,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FiberSuiteTest
       objectReference: {fileID: 0}
+    - target: {fileID: 6886895286714436606, guid: 7401fcf03271e4d85918b986351bb4a7, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
