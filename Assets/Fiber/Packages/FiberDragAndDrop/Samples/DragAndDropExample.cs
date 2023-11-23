@@ -28,64 +28,59 @@ public class DragAndDropExample : MonoBehaviour
 
         public override VirtualBody Render()
         {
-            var draggableRef = new Ref<VisualElement>();
-            var dragHandleRef = new Ref<VisualElement>();
             var themeStore = C<ThemeStore>();
             var borderColor = themeStore.Color(DEBUG_ROLE, ElementType.Border);
             var backgroundColor = themeStore.Color(DEBUG_ROLE, ElementType.Background);
 
-            return F.Draggable(
-                draggableRef: draggableRef,
-                isDragHandle: false,
-                initialIndex: _index,
-                children: F.View(
-                    _ref: draggableRef,
-                    style: new Style(
-                        display: DisplayStyle.Flex,
-                        flexDirection: FlexDirection.Row,
-                        justifyContent: Justify.Center,
-                        alignItems: Align.Center
-                    ),
-                    children: F.Nodes(
-                        F.DragHandle(
-                            dragHandleRef: dragHandleRef,
-                            children: F.SilkIcon(
-                                forwardRef: dragHandleRef,
-                                iconName: "grip-vertical",
-                                size: IconSize.Small,
-                                style: new Style()
-                            )
+            return F.Droppable(
+                children: F.Draggable(
+                    isDragHandle: false,
+                    children: F.View(
+                        style: new Style(
+                            display: DisplayStyle.Flex,
+                            flexDirection: FlexDirection.Row,
+                            justifyContent: Justify.Center,
+                            alignItems: Align.Center
                         ),
-                        F.View(
-                            pickingMode: PickingMode.Position,
-                            style: new Style(
-                                width: 32,
-                                height: 32,
-                                paddingBottom: themeStore.Spacing(1),
-                                paddingLeft: themeStore.Spacing(1),
-                                paddingRight: themeStore.Spacing(1),
-                                paddingTop: themeStore.Spacing(1),
-                                backgroundColor: backgroundColor,
-                                borderRightColor: borderColor,
-                                borderLeftColor: borderColor,
-                                borderTopColor: borderColor,
-                                borderBottomColor: borderColor,
-                                borderRightWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                borderLeftWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                borderTopWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                borderBottomWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                display: DisplayStyle.Flex,
-                                justifyContent: Justify.Center,
-                                alignItems: Align.Center,
-                                marginRight: themeStore.Spacing(1),
-                                marginBottom: themeStore.Spacing(1),
-                                marginTop: themeStore.Spacing(1),
-                                marginLeft: themeStore.Spacing(1)
+                        children: F.Nodes(
+                            F.DragHandle(
+                                children: F.SilkIcon(
+                                    iconName: "grip-vertical",
+                                    size: IconSize.Small,
+                                    style: new Style()
+                                )
                             ),
-                            children: F.SilkTypography(
-                                role: DEBUG_ROLE,
-                                type: TypographyType.Body1,
-                                text: $"{_id}"
+                            F.View(
+                                pickingMode: PickingMode.Position,
+                                style: new Style(
+                                    width: 32,
+                                    height: 32,
+                                    paddingBottom: themeStore.Spacing(1),
+                                    paddingLeft: themeStore.Spacing(1),
+                                    paddingRight: themeStore.Spacing(1),
+                                    paddingTop: themeStore.Spacing(1),
+                                    backgroundColor: backgroundColor,
+                                    borderRightColor: borderColor,
+                                    borderLeftColor: borderColor,
+                                    borderTopColor: borderColor,
+                                    borderBottomColor: borderColor,
+                                    borderRightWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                                    borderLeftWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                                    borderTopWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                                    borderBottomWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                                    display: DisplayStyle.Flex,
+                                    justifyContent: Justify.Center,
+                                    alignItems: Align.Center,
+                                    marginRight: themeStore.Spacing(1),
+                                    marginBottom: themeStore.Spacing(1),
+                                    marginTop: themeStore.Spacing(1),
+                                    marginLeft: themeStore.Spacing(1)
+                                ),
+                                children: F.SilkTypography(
+                                    role: DEBUG_ROLE,
+                                    type: TypographyType.Body1,
+                                    text: $"{_id}"
+                                )
                             )
                         )
                     )
@@ -113,12 +108,14 @@ public class DragAndDropExample : MonoBehaviour
                             backgroundColor: themeStore.Color(DEBUG_ROLE, ElementType.Background)
                         ),
                         children: F.DragAndDropProvider(
-                            F.For(
-                                each: items,
-                                children: (item, index) =>
-                                {
-                                    return (item, new ItemComponent(item, index));
-                                }
+                            F.Nodes(
+                                F.For(
+                                    each: items,
+                                    children: (item, index) =>
+                                    {
+                                        return (item, new ItemComponent(item, index));
+                                    }
+                                )
                             )
                         )
                     )

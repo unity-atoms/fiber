@@ -110,6 +110,7 @@ namespace Fiber
         );
         public VirtualNode Switch(VirtualBody fallback, VirtualBody children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children);
+        public VirtualNode Portal(SignalProp<string> destinationId, VirtualBody children);
     }
 
     public interface IEffectAPI
@@ -908,6 +909,7 @@ namespace Fiber
         }
         public VirtualNode Switch(VirtualBody fallback, VirtualBody children) => Api.Switch(fallback, children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children) => Api.Match(when, children);
+        public VirtualNode Portal(SignalProp<string> destinationId, VirtualBody children) => Api.Portal(destinationId, children);
         public VirtualBody Nodes()
         {
             var nodes = new List<VirtualNode>();
@@ -1077,6 +1079,7 @@ namespace Fiber
         private static IntIdGenerator _idGenerator = new IntIdGenerator();
 
         public NativeNode NativeNode { get; set; }
+        public FiberNode PortalDestination { get; set; }
         public VirtualNode VirtualNode { get; private set; }
         public FiberNode Parent { get; private set; }
         public FiberNode Sibling { get; set; }
@@ -1112,6 +1115,7 @@ namespace Fiber
 
         private List<BaseEffect> _effects = new List<BaseEffect>();
         private Renderer _renderer;
+        public ShallowSignalDictionary<string, FiberNode> PortalDestinations { get => _renderer.PortalDestinations; }
 
         public FiberNode(
             Renderer renderer,
@@ -1175,6 +1179,27 @@ namespace Fiber
                 _effects[i].Cleanup();
                 _effects[i].UnregisterDependent(this);
             }
+        }
+
+        public void RegisterPortalDestination(string id, FiberNode fiberNode)
+        {
+            _renderer.PortalDestinations.Add(id, fiberNode);
+        }
+
+        public void UnregisterPortalDestination(string id)
+        {
+            _renderer.PortalDestinations.Remove(id);
+        }
+
+        public FiberNode FindClosestAncestorWithNativeNodeOrPortalDestination(bool includeSelf = false)
+        {
+            var nativeNodeParentFiber = includeSelf ? this : Parent;
+            while (nativeNodeParentFiber != null && nativeNodeParentFiber.NativeNode == null && nativeNodeParentFiber.PortalDestination == null)
+            {
+                nativeNodeParentFiber = nativeNodeParentFiber.Parent;
+            }
+
+            return nativeNodeParentFiber;
         }
 
         public FiberNode FindClosestAncestorWithNativeNode(bool includeSelf = false)
@@ -1362,6 +1387,8 @@ namespace Fiber
         private bool _isUnmountingRoot = false;
         public bool IsMounted => _root != null;
 
+        public ShallowSignalDictionary<string, FiberNode> PortalDestinations { get; private set; } = new();
+
         private struct MountOperation
         {
             public FiberNode Node;
@@ -1395,6 +1422,18 @@ namespace Fiber
                 Parent = parent;
                 Child = child;
                 Index = index;
+            }
+        }
+
+        private struct SetPortalDestinationOperation
+        {
+            public FiberNode PortalDestination;
+            public FiberNode Node;
+
+            public SetPortalDestinationOperation(FiberNode node, FiberNode portalDestination)
+            {
+                Node = node;
+                PortalDestination = portalDestination;
             }
         }
 
@@ -1642,12 +1681,11 @@ namespace Fiber
                 // Only the root should have a null parent
                 if (parent != null && mountOperation.Node.NativeNode != null)
                 {
-                    var closestParentWithNativeNode = mountOperation.Node.FindClosestAncestorWithNativeNode();
+                    var closestParentWithNativeNode = mountOperation.Node.FindClosestAncestorWithNativeNodeOrPortalDestination();
 
                     if (closestParentWithNativeNode.NativeNodeChildren == null)
                     {
-                        closestParentWithNativeNode.NativeNodeChildren = new();
-                        closestParentWithNativeNode.NativeNodeChildren.Add(mountOperation.Node);
+                        closestParentWithNativeNode.NativeNodeChildren = new() { mountOperation.Node };
                         closestParentWithNativeNode.NativeNode.AddChild(mountOperation.Node, 0);
                     }
                     else
@@ -1745,7 +1783,7 @@ namespace Fiber
                     // Figure out what native nodes need to be moved.
                     // There can be more than one native node being a descendent of the node being moved,
                     // so a consecutive chunk of native nodes (0-n) might need to be moved. 
-                    var closestParentWithNativeNode = moveOperation.Child.FindClosestAncestorWithNativeNode();
+                    var closestParentWithNativeNode = moveOperation.Child.FindClosestAncestorWithNativeNodeOrPortalDestination();
 
                     var moveCount = 0;
                     var moveFromIndex = -1;
@@ -1798,6 +1836,77 @@ namespace Fiber
                     }
                 }
             }
+            else if (operationType == typeof(SetPortalDestinationOperation))
+            {
+                var setPortalDestinationOperation = _operationsQueue.Dequeue<SetPortalDestinationOperation>();
+
+                // A node might have been deleted already if it for example was a child of a node that was deleted
+                if (setPortalDestinationOperation.Node.Phase != FiberNodePhase.Mounted)
+                {
+                    return;
+                }
+
+                var node = setPortalDestinationOperation.Node;
+                if (setPortalDestinationOperation.PortalDestination == node.PortalDestination)
+                {
+                    return;
+                }
+
+                var portalDestinationBefore = node.PortalDestination;
+                node.PortalDestination = setPortalDestinationOperation.PortalDestination;
+
+                if (portalDestinationBefore == null)
+                {
+                    // Remove old native node references from parent and remove from parent native node 
+                    var closestParentWithNativeNode = node.FindClosestAncestorWithNativeNodeOrPortalDestination(includeSelf: false);
+                    for (var i = closestParentWithNativeNode.NativeNodeChildren.Count - 1; i >= 0; --i)
+                    {
+                        var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[i];
+                        if (nativeNodeChild.IsDescendentOf(node))
+                        {
+                            closestParentWithNativeNode.NativeNodeChildren.RemoveAt(i);
+                            closestParentWithNativeNode.NativeNode.RemoveChild(nativeNodeChild);
+                        }
+                    }
+
+                    // Add to new destination
+                    node.PortalDestination.NativeNode.AddChild(node, 0);
+                    // We currently don't care about the ordering of the native node children in the portal destination
+                    if (node.PortalDestination.NativeNodeChildren == null)
+                    {
+                        node.PortalDestination.NativeNodeChildren = new() { node };
+                    }
+                    else
+                    {
+                        node.PortalDestination.NativeNodeChildren.Add(node);
+                    }
+                }
+                else
+                {
+                    portalDestinationBefore.NativeNode.RemoveChild(node);
+                    portalDestinationBefore.NativeNodeChildren.Remove(node);
+
+                    if (node.PortalDestination == null)
+                    {
+                        var closestParentWithNativeNode = node.FindClosestAncestorWithNativeNodeOrPortalDestination();
+                        var index = closestParentWithNativeNode.FindNativeNodeIndex(node);
+                        closestParentWithNativeNode.NativeNodeChildren.Insert(index, node);
+                        closestParentWithNativeNode.NativeNode.AddChild(node, index);
+                    }
+                    else
+                    {
+                        node.PortalDestination.NativeNode.AddChild(node, 0);
+                        if (node.PortalDestination.NativeNodeChildren == null)
+                        {
+                            node.PortalDestination.NativeNodeChildren = new() { node };
+                        }
+                        else
+                        {
+                            node.PortalDestination.NativeNodeChildren.Add(node);
+                        }
+                    }
+                }
+            }
         }
 
         void CleanupNode(FiberNode fiberNode)
@@ -1819,6 +1928,21 @@ namespace Fiber
             {
                 if (fiberNode.Phase == FiberNodePhase.RemovedFromVirtualTree || fiberNode.Phase == FiberNodePhase.Mounted)
                 {
+                    if (fiberNode.VirtualNode is PortalDestinationBaseComponent && fiberNode.NativeNodeChildren != null)
+                    {
+                        // Give back all the native nodes to its original parents
+                        for (var i = fiberNode.NativeNodeChildren.Count - 1; i >= 0; --i)
+                        {
+                            var nativeNodeChild = fiberNode.NativeNodeChildren[i];
+                            nativeNodeChild.PortalDestination = null;
+
+                            var closestParentWithNativeNode = nativeNodeChild.FindClosestAncestorWithNativeNodeOrPortalDestination();
+                            var index = closestParentWithNativeNode.FindNativeNodeIndex(nativeNodeChild);
+                            closestParentWithNativeNode.NativeNodeChildren.Insert(index, nativeNodeChild);
+                            closestParentWithNativeNode.NativeNode.AddChild(nativeNodeChild, index);
+                        }
+                    }
+
                     var closestAncestor = parent.FindClosestAncestorWithNativeNode(includeSelf: true);
                     closestAncestor.NativeNode.RemoveChild(fiberNode);
                     closestAncestor.NativeNodeChildren.Remove(fiberNode);
@@ -1910,7 +2034,7 @@ namespace Fiber
 
         public NativeNode GetParentNativeNode()
         {
-            var closestAncesorWithNativeNode = _currentFiberNode.FindClosestAncestorWithNativeNode();
+            var closestAncesorWithNativeNode = _currentFiberNode.FindClosestAncestorWithNativeNodeOrPortalDestination();
             if (closestAncesorWithNativeNode == null)
             {
                 return null;
@@ -2751,6 +2875,169 @@ namespace Fiber
             {
                 return Children;
             }
+        }
+
+        public VirtualNode Portal(SignalProp<string> destinationId, VirtualBody children)
+        {
+            return new PortalComponent(children: children, destinationId: destinationId, _operationsQueue);
+        }
+
+        private class PortalComponent : VirtualNode, IBuiltInComponent
+        {
+            private readonly SignalProp<string> _destinationId;
+            private readonly MixedQueue _operationsQueue;
+            public PortalComponent(
+                VirtualBody children,
+                SignalProp<string> destinationId,
+                MixedQueue operationsQueue
+            ) : base(children)
+            {
+                _destinationId = destinationId;
+                _operationsQueue = operationsQueue;
+            }
+
+            private class PortalEffect : Effect<string, ShallowSignalDictionary<string, FiberNode>>
+            {
+                private readonly FiberNode _fiberNode;
+                private readonly MixedQueue _operationsQueue;
+                public PortalEffect(
+                    BaseSignal<string> id,
+                    ShallowSignalDictionary<string, FiberNode> portalDestinations,
+                    FiberNode fiberNode,
+                    MixedQueue operationsQueue
+                ) : base(id, portalDestinations)
+                {
+                    _fiberNode = fiberNode;
+                    _operationsQueue = operationsQueue;
+                }
+
+                protected override void Run(string id, ShallowSignalDictionary<string, FiberNode> portalDestinations)
+                {
+                    FiberNode portalDestination = string.IsNullOrWhiteSpace(id) || !portalDestinations.ContainsKey(id) ? null : portalDestinations[id];
+                    var node = _fiberNode.NextNode(root: _fiberNode);
+                    while (node != null)
+                    {
+                        if (node.NativeNode != null)
+                        {
+                            _operationsQueue.Enqueue(new SetPortalDestinationOperation(node: node, portalDestination: portalDestination));
+                            node = node.NextNode(root: _fiberNode, skipChildren: true);
+                        }
+                        else if (node.PortalDestination != null)
+                        {
+                            node = node.NextNode(root: _fiberNode, skipChildren: true);
+                        }
+                        else
+                        {
+                            node = node.NextNode(root: _fiberNode, skipChildren: false);
+                        }
+                    }
+                }
+
+                public override void Cleanup()
+                {
+                    var node = _fiberNode.NextNode(root: _fiberNode);
+                    while (node != null)
+                    {
+                        if (node.NativeNode != null)
+                        {
+                            _operationsQueue.Enqueue(new SetPortalDestinationOperation(node: node, portalDestination: null));
+                            node = node.NextNode(root: _fiberNode, skipChildren: true);
+                        }
+                        else if (node.PortalDestination != null)
+                        {
+                            node = node.NextNode(root: _fiberNode, skipChildren: true);
+                        }
+                        else
+                        {
+                            node = node.NextNode(root: _fiberNode, skipChildren: false);
+                        }
+                    }
+                }
+            }
+
+            private class PortalMoveBeforeRemovalEffect : Effect
+            {
+                private readonly FiberNode _fiberNode;
+                private readonly BaseSignal<string> _id;
+                private readonly ShallowSignalDictionary<string, FiberNode> _portalDestinations;
+                public PortalMoveBeforeRemovalEffect(
+                    FiberNode fiberNode,
+                    BaseSignal<string> id,
+                    ShallowSignalDictionary<string, FiberNode> portalDestinations
+                ) : base()
+                {
+                    _fiberNode = fiberNode;
+                    _id = id;
+                    _portalDestinations = portalDestinations;
+                }
+
+                protected override void Run() { }
+
+                public override void Cleanup()
+                {
+                    var id = _id.Get();
+                    if (_fiberNode.PortalDestination == null || string.IsNullOrWhiteSpace(id) || !_portalDestinations.ContainsKey(id))
+                    {
+                        return;
+                    }
+
+                    // Move the native node back to the its original parent. Before being removed again by Fiber.
+                    _fiberNode.PortalDestination.NativeNode.RemoveChild(_fiberNode);
+                    _fiberNode.PortalDestination.NativeNodeChildren.Remove(_fiberNode);
+
+                    var closestParentWithNativeNode = _fiberNode.FindClosestAncestorWithNativeNodeOrPortalDestination();
+                    var index = closestParentWithNativeNode.FindNativeNodeIndex(_fiberNode);
+                    closestParentWithNativeNode.NativeNodeChildren.Insert(index, _fiberNode);
+                    closestParentWithNativeNode.NativeNode.AddChild(_fiberNode, index);
+                }
+            }
+
+            public VirtualBody Render(FiberNode fiberNode)
+            {
+                var idSignal = _destinationId.ToSignal();
+                fiberNode.PushEffect(new PortalEffect(idSignal, fiberNode.PortalDestinations, fiberNode, _operationsQueue));
+                fiberNode.PushEffect(new PortalMoveBeforeRemovalEffect(fiberNode, idSignal, fiberNode.PortalDestinations));
+                return Children;
+            }
+        }
+    }
+
+
+    public abstract class PortalDestinationBaseComponent : VirtualNode
+    {
+        private readonly string _id;
+        public PortalDestinationBaseComponent(
+            string id
+        ) : base(VirtualBody.Empty)
+        {
+            _id = id;
+        }
+
+        private class PortalDefinitionEffect : Effect
+        {
+            private readonly string _id;
+            private readonly FiberNode _fiberNode;
+            public PortalDefinitionEffect(string id, FiberNode fiberNode) : base()
+            {
+                _id = id;
+                _fiberNode = fiberNode;
+            }
+
+            protected override void Run()
+            {
+                var child = _fiberNode.Child;
+                _fiberNode.RegisterPortalDestination(_id, child);
+            }
+
+            public override void Cleanup()
+            {
+                _fiberNode.UnregisterPortalDestination(_id);
+            }
+        }
+
+        protected void BaseImplementation(FiberNode fiberNode)
+        {
+            fiberNode.PushEffect(new PortalDefinitionEffect(_id, fiberNode));
         }
     }
 }
