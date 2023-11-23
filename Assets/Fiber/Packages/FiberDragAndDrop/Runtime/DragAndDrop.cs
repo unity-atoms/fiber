@@ -24,13 +24,15 @@ namespace Fiber.DragAndDrop
             this BaseComponent component,
             T value,
             VirtualBody children,
-            Style style = new()
+            Style style = new(),
+            Ref<VisualElement> forwardRef = null
         )
         {
             return new DroppableComponent<T>(
                 children: children,
                 value: value,
-                style: style
+                style: style,
+                forwardRef: forwardRef
             );
         }
 
@@ -235,19 +237,22 @@ namespace Fiber.DragAndDrop
     {
         private readonly T _value;
         private readonly Style _style;
+        private readonly Ref<VisualElement> _forwardRef;
         public DroppableComponent(
             VirtualBody children,
             T value,
-            Style style = new()
+            Style style = new(),
+            Ref<VisualElement> forwardRef = null
         ) : base(children)
         {
             _value = value;
             _style = style;
+            _forwardRef = forwardRef;
         }
 
         public override VirtualBody Render()
         {
-            var droppableRef = new Ref<VisualElement>();
+            var droppableRef = _forwardRef ?? new Ref<VisualElement>();
             var context = F.GetContext<DragAndDropContext<T>>();
             F.CreateEffect(() =>
             {

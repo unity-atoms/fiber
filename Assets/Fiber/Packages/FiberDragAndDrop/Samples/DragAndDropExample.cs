@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Fiber.Suite;
@@ -8,7 +7,7 @@ using Fiber.UIElements;
 using SilkUI;
 using Signals;
 using Fiber.DragAndDrop;
-
+using FiberUtils;
 
 public class DragAndDropExample : MonoBehaviour
 {
@@ -33,6 +32,7 @@ public class DragAndDropExample : MonoBehaviour
             var backgroundColor = themeStore.Color(DEBUG_ROLE, ElementType.Background);
             var dndContext = C<DragAndDropContext<int>>();
 
+            // Effect to change position of item when closer to another droppable.
             F.CreateEffect((closestDroppable, currentlyDragged) =>
             {
                 if (closestDroppable != null && currentlyDragged != null && closestDroppable.Value == _id && currentlyDragged.Value != _id && currentlyDragged.Value != closestDroppable.Value)
@@ -45,7 +45,58 @@ public class DragAndDropExample : MonoBehaviour
                 return null;
             }, dndContext.ClosestDroppable, dndContext.CurrentlyDragged);
 
+            // Effect that inverts changes of the droppable's position from flexbox in order to be able to animate it (see next hook)
+            var droppableRef = new Ref<VisualElement>();
+            F.CreateEffect(() =>
+            {
+                var mountTime = Time.fixedUnscaledTime;
+                EventCallback<GeometryChangedEvent> onGeometryChanged = new((e) =>
+                {
+                    if (mountTime + 1f > Time.fixedUnscaledTime)
+                    {
+                        return;
+                    }
+
+                    var oldCenter = e.oldRect.center;
+                    var newCenter = e.newRect.center;
+                    if (oldCenter != newCenter)
+                    {
+                        var delta = oldCenter - newCenter;
+                        droppableRef.Current.transform.position = (Vector3)delta;
+                    }
+                });
+                droppableRef.Current.RegisterCallback(onGeometryChanged);
+                return () =>
+                {
+                    droppableRef.Current.UnregisterCallback(onGeometryChanged);
+                };
+            });
+
+            // Very simple linear animation of transform that always moves towards 0,0
+            F.CreateEffect(() =>
+            {
+                void Update(float deltaTime)
+                {
+                    var currentPos = droppableRef.Current.transform.position;
+                    if (currentPos == Vector3.zero)
+                    {
+                        return;
+                    }
+
+                    var newPosition = currentPos - currentPos.normalized * 500f * deltaTime;
+                    var overreachedX = currentPos.x > 0 && newPosition.x < 0 || currentPos.x < 0 && newPosition.x > 0;
+                    var overreachedY = currentPos.y > 0 && newPosition.y < 0 || currentPos.y < 0 && newPosition.y > 0;
+                    droppableRef.Current.transform.position = overreachedX || overreachedY ? Vector3.zero : newPosition;
+                }
+                var updateLoopSubId = MonoBehaviourHelper.AddOnUpdateHandler(Update);
+                return () =>
+                {
+                    MonoBehaviourHelper.RemoveOnUpdateHandler(updateLoopSubId);
+                };
+            });
+
             return F.Droppable(
+                forwardRef: droppableRef,
                 value: _id,
                 children: F.Draggable(
                     value: _id,
