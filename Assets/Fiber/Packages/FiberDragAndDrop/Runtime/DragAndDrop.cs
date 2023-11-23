@@ -10,65 +10,78 @@ namespace Fiber.DragAndDrop
 {
     public static partial class BaseComponentExtensions
     {
-        public static DragAndDropProviderComponent DragAndDropProvider(
+        public static DragAndDropProviderComponent<T> DragAndDropProvider<T>(
             this BaseComponent component,
             VirtualBody children
         )
         {
-            return new DragAndDropProviderComponent(
+            return new DragAndDropProviderComponent<T>(
                 children: children
             );
         }
 
-        public static DroppableComponent Droppable(
+        public static DroppableComponent<T> Droppable<T>(
             this BaseComponent component,
+            T value,
             VirtualBody children,
             Style style = new()
         )
         {
-            return new DroppableComponent(
+            return new DroppableComponent<T>(
                 children: children,
+                value: value,
                 style: style
             );
         }
 
-        public static DraggableComponent Draggable(
+        public static DraggableComponent<T> Draggable<T>(
             this BaseComponent component,
             VirtualBody children,
+            T value,
             Style style = new(),
-            bool isDragHandle = false
+            bool isDragHandle = false,
+            Action onDragStart = null,
+            Action onDragEnd = null,
+            Action onDragMove = null
         )
         {
-            return new DraggableComponent(
+            return new DraggableComponent<T>(
                 children: children,
+                value: value,
                 style: style,
-                isDragHandle: isDragHandle
+                isDragHandle: isDragHandle,
+                onDragStart: onDragStart,
+                onDragEnd: onDragEnd,
+                onDragMove: onDragMove
             );
         }
 
-        public static DragHandleComponent DragHandle(
+        public static DragHandleComponent<T> DragHandle<T>(
             this BaseComponent component,
             VirtualBody children
         )
         {
-            return new DragHandleComponent(
+            return new DragHandleComponent<T>(
                 children: children
             );
         }
     }
 
-    public class DraggableContext
+    public class DraggableContext<T>
     {
+        public T Value { get; private set; }
         public Ref<VisualElement> DraggableRef { get; private set; }
         public DraggableContext(
+            T value,
             Ref<VisualElement> draggableRef
         )
         {
+            Value = value;
             DraggableRef = draggableRef;
         }
     }
 
-    public class DragAndDropListItem : BaseComponent
+    public class DragAndDropListItem<T> : BaseComponent
     {
         public override VirtualBody Render()
         {
@@ -76,7 +89,7 @@ namespace Fiber.DragAndDrop
         }
     }
 
-    public class DragHandleComponent : BaseComponent
+    public class DragHandleComponent<T> : BaseComponent
     {
         public DragHandleComponent(
             VirtualBody children
@@ -87,8 +100,8 @@ namespace Fiber.DragAndDrop
         public override VirtualBody Render()
         {
             var dragHandleRef = new Ref<VisualElement>();
-            var context = F.GetContext<DragAndDropContext>();
-            var dragableContext = F.GetContext<DraggableContext>();
+            var context = F.GetContext<DragAndDropContext<T>>();
+            var dragableContext = F.GetContext<DraggableContext<T>>();
             F.CreateEffect(() =>
             {
                 context.RegisterDragHandle(dragableContext.DraggableRef, dragHandleRef);
@@ -105,8 +118,9 @@ namespace Fiber.DragAndDrop
         }
     }
 
-    public class DraggableComponent : BaseComponent
+    public class DraggableComponent<T> : BaseComponent
     {
+        private readonly T _value;
         private readonly bool _isDragHandle;
         private readonly Style _style;
         private Action _onDragStart;
@@ -115,6 +129,7 @@ namespace Fiber.DragAndDrop
 
         public DraggableComponent(
             VirtualBody children,
+            T value,
             Style style = new(),
             bool isDragHandle = false,
             Action onDragStart = null,
@@ -122,6 +137,7 @@ namespace Fiber.DragAndDrop
             Action onDragMove = null
         ) : base(children)
         {
+            _value = value;
             _style = style;
 
             if (!_style.Position.IsEmpty)
@@ -143,12 +159,13 @@ namespace Fiber.DragAndDrop
             var position = new Signal<StyleEnum<Position>>(Position.Relative);
             var parentRef = new Ref<VisualElement>();
             var draggableRef = new Ref<VisualElement>();
-            var context = F.GetContext<DragAndDropContext>();
+            var context = F.GetContext<DragAndDropContext<T>>();
             var destinationId = new Signal<string>(null);
 
             F.CreateEffect(() =>
             {
                 context.RegisterDraggable(
+                    value: _value,
                     draggableRef: draggableRef,
                     isDragHandle: _isDragHandle,
                     positionSignal: position,
@@ -181,7 +198,7 @@ namespace Fiber.DragAndDrop
             });
 
             return F.ContextProvider(
-                value: new DraggableContext(draggableRef),
+                value: new DraggableContext<T>(_value, draggableRef),
                 children: F.View(
                     _ref: parentRef,
                     style: new Style(
@@ -214,24 +231,27 @@ namespace Fiber.DragAndDrop
         }
     }
 
-    public class DroppableComponent : BaseComponent
+    public class DroppableComponent<T> : BaseComponent
     {
+        private readonly T _value;
         private readonly Style _style;
         public DroppableComponent(
             VirtualBody children,
+            T value,
             Style style = new()
         ) : base(children)
         {
+            _value = value;
             _style = style;
         }
 
         public override VirtualBody Render()
         {
             var droppableRef = new Ref<VisualElement>();
-            var context = F.GetContext<DragAndDropContext>();
+            var context = F.GetContext<DragAndDropContext<T>>();
             F.CreateEffect(() =>
             {
-                context.RegisterDroppable(droppableRef);
+                context.RegisterDroppable(_value, droppableRef);
                 return () =>
                 {
                     context.UnregisterDroppable(droppableRef);
@@ -246,18 +266,18 @@ namespace Fiber.DragAndDrop
         }
     }
 
-    public class DragAndDropContext
+    public class DragAndDropContext<T>
     {
         private class DragHandle
         {
             public Ref<VisualElement> Ref { get; private set; }
             public Draggable Draggable { get; private set; }
-            public DragAndDropContext Context { get; private set; }
+            public DragAndDropContext<T> Context { get; private set; }
 
             public DragHandle(
                 Ref<VisualElement> _ref,
                 Draggable draggable,
-                DragAndDropContext context
+                DragAndDropContext<T> context
             )
             {
                 Ref = _ref;
@@ -283,14 +303,14 @@ namespace Fiber.DragAndDrop
 
             private void OnPointerDown(PointerDownEvent evt)
             {
-                if (Context.DraggedElement != null)
+                if (Context.CurrentlyDragged.Value != null)
                 {
                     return;
                 }
 
                 Context.PointerStartPosition = evt.position;
 
-                Context.DraggedElement = Draggable.Ref.Current;
+                Context.CurrentlyDragged.Value = Draggable;
                 Ref.Current.CapturePointer(evt.pointerId);
 
                 // The portal destination transition might not happen directly, but we want to keep the dragged
@@ -318,25 +338,36 @@ namespace Fiber.DragAndDrop
                 portalDestination.style.width = draggableWidth;
                 portalDestination.style.height = draggableHeight;
 
+                Context.ClosestDroppable.Value = GetClosestDroppable();
+
                 Draggable.OnDragStart?.Invoke();
             }
 
             private void OnPointerMove(PointerMoveEvent evt)
             {
-                if (Context.DraggedElement == Draggable.Ref.Current && Ref.Current.HasPointerCapture(evt.pointerId))
+                if (Context.CurrentlyDragged.Value == Draggable && Ref.Current.HasPointerCapture(evt.pointerId))
                 {
+                    var portalDestination = Draggable.Context.PortalDestinationRef.Current;
                     var deltaMousePos = evt.position - Context.PointerStartPosition;
-                    Draggable.Context.PortalDestinationRef.Current.transform.position = new Vector2(
+                    var newPos = new Vector2(
                         Context.TargetStartPosition.x + deltaMousePos.x,
                         Context.TargetStartPosition.y + deltaMousePos.y
                     );
+                    portalDestination.transform.position = newPos;
+
+                    var closestDroppable = GetClosestDroppable();
+                    if (closestDroppable != Context.ClosestDroppable.Value)
+                    {
+                        Context.ClosestDroppable.Value = closestDroppable;
+                    }
+
                     Draggable.OnDragMove?.Invoke();
                 }
             }
 
             private void OnPointerUp(PointerUpEvent evt)
             {
-                if (Context.DraggedElement == Draggable.Ref.Current && Ref.Current.HasPointerCapture(evt.pointerId))
+                if (Context.CurrentlyDragged.Value == Draggable && Ref.Current.HasPointerCapture(evt.pointerId))
                 {
                     Ref.Current.ReleasePointer(evt.pointerId);
                     Release();
@@ -345,33 +376,52 @@ namespace Fiber.DragAndDrop
 
             private void OnPointerCaptureOut(PointerCaptureOutEvent evt)
             {
-                if (Context.DraggedElement == Draggable.Ref.Current)
+                if (Context.CurrentlyDragged.Value == Draggable)
                 {
                     Release();
                 }
             }
 
+            private Droppable GetClosestDroppable()
+            {
+                var portalDestination = Draggable.Context.PortalDestinationRef.Current;
+                Droppable droppable = null;
+
+                Vector3 smallestDelta = Vector2.one * float.MaxValue;
+                for (var i = 0; i < Context.Droppables.Count; ++i)
+                {
+                    var currentDroppable = Context.Droppables[i];
+                    var droppableWorldPos = currentDroppable.Ref.Current.worldBound.center;
+                    var delta = droppableWorldPos - portalDestination.worldBound.center;
+
+                    if (delta.magnitude < smallestDelta.magnitude)
+                    {
+                        smallestDelta = delta;
+                        droppable = currentDroppable;
+                    }
+                }
+
+                return droppable;
+            }
+
             private void Release()
             {
-                Context.DraggedElement.transform.position = Vector3.zero;
-                Context.DraggedElement = null;
+                Context.CurrentlyDragged.Value.Ref.Current.transform.position = Vector3.zero;
+                Context.CurrentlyDragged.Value = null;
+                Context.ClosestDroppable.Value = null;
                 Draggable.DestinationIdSignal.Value = null;
                 Draggable.PositionSignal.Value = Position.Relative;
                 Draggable.OnDragEnd?.Invoke();
             }
         }
 
-        private class Draggable
+        public class Draggable
         {
+            public T Value { get; private set; }
             public Ref<VisualElement> Ref { get; private set; }
             private readonly bool _isDragHandle;
-            public Ref<int> IndexRef { get; private set; }
             private List<DragHandle> DragHandles { get; set; } = new();
-            public Vector3 TargetStartPosition;
-            public Vector3 PointerStartPosition;
-            public VisualElement TempElement;
-            public VisualElement DraggedElement;
-            public DragAndDropContext Context { get; private set; }
+            public DragAndDropContext<T> Context { get; private set; }
             public Action OnDragStart { get; private set; }
             public Action OnDragEnd { get; private set; }
             public Action OnDragMove { get; private set; }
@@ -379,8 +429,9 @@ namespace Fiber.DragAndDrop
             public Signal<string> DestinationIdSignal { get; set; }
 
             public Draggable(
+                T value,
                 Ref<VisualElement> _ref,
-                DragAndDropContext context,
+                DragAndDropContext<T> context,
                 bool isDragHandle,
                 Signal<StyleEnum<Position>> positionSignal,
                 Signal<string> destinationIdSignal,
@@ -389,6 +440,7 @@ namespace Fiber.DragAndDrop
                 Action onDragMove
             )
             {
+                Value = value;
                 Ref = _ref;
                 Context = context;
                 _isDragHandle = isDragHandle;
@@ -415,7 +467,7 @@ namespace Fiber.DragAndDrop
             }
 
 
-            public void RegisterDragHandle(Ref<VisualElement> dragHandle, DragAndDropContext context)
+            public void RegisterDragHandle(Ref<VisualElement> dragHandle, DragAndDropContext<T> context)
             {
                 var dragHandleElement = new DragHandle(
                     _ref: dragHandle,
@@ -441,15 +493,18 @@ namespace Fiber.DragAndDrop
             }
         }
 
-        private class Droppable
+        public class Droppable
         {
+            public T Value { get; private set; }
             public Ref<VisualElement> Ref { get; private set; }
-            public DragAndDropContext Context { get; private set; }
+            public DragAndDropContext<T> Context { get; private set; }
             public Droppable(
+                T value,
                 Ref<VisualElement> _ref,
-                DragAndDropContext context
+                DragAndDropContext<T> context
             )
             {
+                Value = value;
                 Ref = _ref;
                 Context = context;
             }
@@ -459,9 +514,10 @@ namespace Fiber.DragAndDrop
         public Ref<VisualElement> PortalDestinationRef { get; private set; }
         public Vector3 TargetStartPosition { get; set; }
         public Vector3 PointerStartPosition { get; set; }
-        public VisualElement DraggedElement { get; set; }
-        private List<Draggable> _draggables = new();
-        private List<Droppable> _droppables = new();
+        public Signal<Draggable> CurrentlyDragged { get; set; } = new();
+        public List<Draggable> Draggables { get; private set; } = new();
+        public List<Droppable> Droppables = new();
+        public Signal<Droppable> ClosestDroppable { get; private set; } = new();
 
         public DragAndDropContext(
             string portalDestinationId,
@@ -472,28 +528,30 @@ namespace Fiber.DragAndDrop
             PortalDestinationRef = portalDestinationRef;
         }
 
-        public void RegisterDroppable(Ref<VisualElement> droppableRef)
+        public void RegisterDroppable(T value, Ref<VisualElement> droppableRef)
         {
             var droppable = new Droppable(
+                value: value,
                 _ref: droppableRef,
                 context: this
             );
-            _droppables.Add(droppable);
+            Droppables.Add(droppable);
         }
 
         public void UnregisterDroppable(Ref<VisualElement> droppableRef)
         {
-            for (var i = 0; i < _droppables.Count; i++)
+            for (var i = 0; i < Droppables.Count; i++)
             {
-                if (_droppables[i].Ref == droppableRef)
+                if (Droppables[i].Ref == droppableRef)
                 {
-                    _droppables.RemoveAt(i);
+                    Droppables.RemoveAt(i);
                     break;
                 }
             }
         }
 
         public void RegisterDraggable(
+            T value,
             Ref<VisualElement> draggableRef,
             bool isDragHandle,
             Signal<StyleEnum<Position>> positionSignal,
@@ -504,6 +562,7 @@ namespace Fiber.DragAndDrop
         )
         {
             var draggable = new Draggable(
+                value: value,
                 _ref: draggableRef,
                 context: this,
                 positionSignal: positionSignal,
@@ -513,17 +572,17 @@ namespace Fiber.DragAndDrop
                 onDragEnd: onDragEnd,
                 onDragMove: onDragMove
             );
-            _draggables.Add(draggable);
+            Draggables.Add(draggable);
         }
 
         public void UnregisterDraggable(Ref<VisualElement> draggableRef)
         {
-            for (var i = 0; i < _draggables.Count; i++)
+            for (var i = 0; i < Draggables.Count; i++)
             {
-                if (_draggables[i].Ref == draggableRef)
+                if (Draggables[i].Ref == draggableRef)
                 {
-                    _draggables[i].Unregister();
-                    _draggables.RemoveAt(i);
+                    Draggables[i].Unregister();
+                    Draggables.RemoveAt(i);
                     break;
                 }
             }
@@ -531,28 +590,28 @@ namespace Fiber.DragAndDrop
 
         public void RegisterDragHandle(Ref<VisualElement> draggableRef, Ref<VisualElement> dragHandle)
         {
-            for (var i = 0; i < _draggables.Count; i++)
+            for (var i = 0; i < Draggables.Count; i++)
             {
-                if (_draggables[i].Ref == draggableRef)
+                if (Draggables[i].Ref == draggableRef)
                 {
-                    _draggables[i].RegisterDragHandle(dragHandle, this);
+                    Draggables[i].RegisterDragHandle(dragHandle, this);
                 }
             }
         }
 
         public void UnregisterDragHandle(Ref<VisualElement> draggableRef, Ref<VisualElement> dragHandle)
         {
-            for (var i = 0; i < _draggables.Count; i++)
+            for (var i = 0; i < Draggables.Count; i++)
             {
-                if (_draggables[i].Ref == draggableRef)
+                if (Draggables[i].Ref == draggableRef)
                 {
-                    _draggables[i].UnregisterDragHandle(dragHandle);
+                    Draggables[i].UnregisterDragHandle(dragHandle);
                 }
             }
         }
     }
 
-    public class DragAndDropProviderComponent : BaseComponent
+    public class DragAndDropProviderComponent<T> : BaseComponent
     {
         private readonly string PORTAL_DESTINATION_BASE_ID = "drag-and-drop-provider";
         private static IntIdGenerator _intIdGenerator = new();
@@ -565,7 +624,7 @@ namespace Fiber.DragAndDrop
             var portalDestinationRef = new Ref<VisualElement>();
 
             return F.ContextProvider(
-                value: new DragAndDropContext(portalDestinationId, portalDestinationRef),
+                value: new DragAndDropContext<T>(portalDestinationId, portalDestinationRef),
                 children: F.Nodes(
                     F.Fragment(Children),
                     F.UIPortalDestination(id: portalDestinationId, forwardRef: portalDestinationRef)
