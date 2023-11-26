@@ -7,7 +7,6 @@ using Fiber.UIElements;
 using SilkUI;
 using Signals;
 using Fiber.DragAndDrop;
-using FiberUtils;
 
 public class DragAndDropExample : MonoBehaviour
 {
@@ -106,7 +105,8 @@ public class DragAndDropExample : MonoBehaviour
                             {
                                 return (item, new ItemComponent(item));
                             },
-                            animationType: DragAndDropListAnimationType.Linear
+                            animationType: DragAndDropListAnimationType.Linear,
+                            isItemDragHandle: false
                         )
                     )
                 )

@@ -72,13 +72,15 @@ namespace Fiber.DragAndDrop
             this BaseComponent component,
             ISignalList<ItemType> items,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
-            DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear
+            DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
+            bool isItemDragHandle = true
         ) where ItemType : IEquatable<ItemType>
         {
             return new DragAndDropListComponent<ItemType, KeyType>(
                 items: items,
                 children: children,
-                animationType: animationType
+                animationType: animationType,
+                isItemDragHandle: isItemDragHandle
             );
         }
     }
@@ -108,16 +110,19 @@ namespace Fiber.DragAndDrop
         private readonly ISignalList<ItemType> _items;
         private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
         private readonly DragAndDropListAnimationType _animationType;
+        private readonly bool _isItemDragHandle;
 
         public DragAndDropListComponent(
             ISignalList<ItemType> items,
             Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
-            DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear
+            DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
+            bool isItemDragHandle = true
         ) : base(VirtualBody.Empty)
         {
             _items = items;
             _children = children;
             _animationType = animationType;
+            _isItemDragHandle = isItemDragHandle;
         }
 
         public override VirtualBody Render()
@@ -126,7 +131,8 @@ namespace Fiber.DragAndDrop
                 children: new DragAndDropListInner(
                     items: _items,
                     children: _children,
-                    animationType: _animationType
+                    animationType: _animationType,
+                    isItemDragHandle: _isItemDragHandle
                 )
             );
         }
@@ -136,16 +142,19 @@ namespace Fiber.DragAndDrop
             private readonly ISignalList<ItemType> _items;
             private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
             private readonly DragAndDropListAnimationType _animationType;
+            private readonly bool _isItemDragHandle;
 
             public DragAndDropListInner(
                 ISignalList<ItemType> items,
                 Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
-                DragAndDropListAnimationType animationType
+                DragAndDropListAnimationType animationType,
+                bool isItemDragHandle
             ) : base(VirtualBody.Empty)
             {
                 _items = items;
                 _children = children;
                 _animationType = animationType;
+                _isItemDragHandle = isItemDragHandle;
             }
 
             public override VirtualBody Render()
@@ -174,7 +183,8 @@ namespace Fiber.DragAndDrop
                         return (key, new DragAndDropListItemComponent(
                             item: item,
                             children: child,
-                            animationType: _animationType
+                            animationType: _animationType,
+                            isItemDragHandle: _isItemDragHandle
                         ));
                     }
                 );
@@ -185,15 +195,18 @@ namespace Fiber.DragAndDrop
         {
             private readonly ItemType _item;
             private readonly DragAndDropListAnimationType _animationType;
+            private readonly bool _isItemDragHandle;
 
             public DragAndDropListItemComponent(
                 VirtualBody children,
                 ItemType item,
-                DragAndDropListAnimationType animationType
+                DragAndDropListAnimationType animationType,
+                bool isItemDragHandle
             ) : base(children)
             {
                 _item = item;
                 _animationType = animationType;
+                _isItemDragHandle = isItemDragHandle;
             }
 
             public override VirtualBody Render()
@@ -258,7 +271,7 @@ namespace Fiber.DragAndDrop
                     value: _item,
                     children: F.Draggable(
                         value: _item,
-                        isDragHandle: false,
+                        isDragHandle: _isItemDragHandle,
                         children: Children
                     )
                 );
