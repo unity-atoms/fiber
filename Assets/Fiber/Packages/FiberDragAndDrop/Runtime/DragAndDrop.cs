@@ -67,6 +67,20 @@ namespace Fiber.DragAndDrop
                 children: children
             );
         }
+
+        public static DragAndDropListComponent<ItemType, KeyType> DragAndDropList<ItemType, KeyType>(
+            this BaseComponent component,
+            ISignalList<ItemType> items,
+            Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+            DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear
+        ) where ItemType : IEquatable<ItemType>
+        {
+            return new DragAndDropListComponent<ItemType, KeyType>(
+                items: items,
+                children: children,
+                animationType: animationType
+            );
+        }
     }
 
     public class DraggableContext<T>
@@ -83,11 +97,172 @@ namespace Fiber.DragAndDrop
         }
     }
 
-    public class DragAndDropListItem<T> : BaseComponent
+    public enum DragAndDropListAnimationType
     {
+        None,
+        Linear
+    }
+
+    public class DragAndDropListComponent<ItemType, KeyType> : BaseComponent where ItemType : IEquatable<ItemType>
+    {
+        private readonly ISignalList<ItemType> _items;
+        private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
+        private readonly DragAndDropListAnimationType _animationType;
+
+        public DragAndDropListComponent(
+            ISignalList<ItemType> items,
+            Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+            DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear
+        ) : base(VirtualBody.Empty)
+        {
+            _items = items;
+            _children = children;
+            _animationType = animationType;
+        }
+
         public override VirtualBody Render()
         {
-            throw new System.NotImplementedException();
+            return F.DragAndDropProvider<ItemType>(
+                children: new DragAndDropListInner(
+                    items: _items,
+                    children: _children,
+                    animationType: _animationType
+                )
+            );
+        }
+
+        private class DragAndDropListInner : BaseComponent
+        {
+            private readonly ISignalList<ItemType> _items;
+            private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
+            private readonly DragAndDropListAnimationType _animationType;
+
+            public DragAndDropListInner(
+                ISignalList<ItemType> items,
+                Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+                DragAndDropListAnimationType animationType
+            ) : base(VirtualBody.Empty)
+            {
+                _items = items;
+                _children = children;
+                _animationType = animationType;
+            }
+
+            public override VirtualBody Render()
+            {
+                var dndContext = C<DragAndDropContext<ItemType>>();
+
+                // Effect to change position of item when closer to another droppable.
+                F.CreateEffect((closestDroppable, currentlyDragged) =>
+                {
+                    if (closestDroppable != null && currentlyDragged != null && !currentlyDragged.Value.Equals(closestDroppable.Value))
+                    {
+                        var items = _items.Get();
+                        var closestDroppableIndex = items.IndexOf(closestDroppable.Value);
+                        var currentlyDraggedIndex = items.IndexOf(currentlyDragged.Value);
+                        items.Remove(currentlyDragged.Value);
+                        items.Insert(closestDroppableIndex, currentlyDragged.Value);
+                    }
+                    return null;
+                }, dndContext.ClosestDroppable, dndContext.CurrentlyDragged);
+
+                return F.For(
+                    each: _items,
+                    children: (item, index) =>
+                    {
+                        var (key, child) = _children(item, index);
+                        return (key, new DragAndDropListItemComponent(
+                            item: item,
+                            children: child,
+                            animationType: _animationType
+                        ));
+                    }
+                );
+            }
+        }
+
+        private class DragAndDropListItemComponent : BaseComponent
+        {
+            private readonly ItemType _item;
+            private readonly DragAndDropListAnimationType _animationType;
+
+            public DragAndDropListItemComponent(
+                VirtualBody children,
+                ItemType item,
+                DragAndDropListAnimationType animationType
+            ) : base(children)
+            {
+                _item = item;
+                _animationType = animationType;
+            }
+
+            public override VirtualBody Render()
+            {
+                var dndContext = C<DragAndDropContext<int>>();
+                var droppableRef = new Ref<VisualElement>();
+
+                if (_animationType != DragAndDropListAnimationType.None)
+                {
+                    // Effect that inverts changes of the droppable's position from flexbox in order to be able to animate it (see next hook)
+                    F.CreateEffect(() =>
+                    {
+                        var mountTime = Time.fixedUnscaledTime;
+                        EventCallback<GeometryChangedEvent> onGeometryChanged = new((e) =>
+                        {
+                            if (mountTime + 1f > Time.fixedUnscaledTime)
+                            {
+                                return;
+                            }
+
+                            var oldCenter = e.oldRect.center;
+                            var newCenter = e.newRect.center;
+                            if (oldCenter != newCenter)
+                            {
+                                var delta = oldCenter - newCenter;
+                                droppableRef.Current.transform.position = (Vector3)delta;
+                            }
+                        });
+                        droppableRef.Current.RegisterCallback(onGeometryChanged);
+                        return () =>
+                        {
+                            droppableRef.Current.UnregisterCallback(onGeometryChanged);
+                        };
+                    });
+
+                    // Very simple linear animation of transform that always moves towards 0,0
+                    F.CreateEffect(() =>
+                    {
+                        void Update(float deltaTime)
+                        {
+                            var currentPos = droppableRef.Current.transform.position;
+                            if (currentPos == Vector3.zero)
+                            {
+                                return;
+                            }
+
+                            var newPosition = currentPos - 500f * deltaTime * currentPos.normalized;
+                            var overreachedX = currentPos.x > 0 && newPosition.x < 0 || currentPos.x < 0 && newPosition.x > 0;
+                            var overreachedY = currentPos.y > 0 && newPosition.y < 0 || currentPos.y < 0 && newPosition.y > 0;
+                            droppableRef.Current.transform.position = overreachedX || overreachedY ? Vector3.zero : newPosition;
+                        }
+                        var updateLoopSubId = MonoBehaviourHelper.AddOnUpdateHandler(Update);
+                        return () =>
+                        {
+                            MonoBehaviourHelper.RemoveOnUpdateHandler(updateLoopSubId);
+                        };
+                    });
+                }
+
+                return F.Droppable(
+                    forwardRef: droppableRef,
+                    value: _item,
+                    children: F.Draggable(
+                        value: _item,
+                        isDragHandle: false,
+                        children: Children
+                    )
+                );
+            }
         }
     }
 

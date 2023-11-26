@@ -18,11 +18,9 @@ public class DragAndDropExample : MonoBehaviour
     public class ItemComponent : BaseComponent
     {
         private readonly int _id;
-        private readonly ShallowSignalList<int> _items;
-        public ItemComponent(int id, ShallowSignalList<int> items) : base()
+        public ItemComponent(int id) : base()
         {
             _id = id;
-            _items = items;
         }
 
         public override VirtualBody Render()
@@ -30,122 +28,53 @@ public class DragAndDropExample : MonoBehaviour
             var themeStore = C<ThemeStore>();
             var borderColor = themeStore.Color(DEBUG_ROLE, ElementType.Border);
             var backgroundColor = themeStore.Color(DEBUG_ROLE, ElementType.Background);
-            var dndContext = C<DragAndDropContext<int>>();
 
-            // Effect to change position of item when closer to another droppable.
-            F.CreateEffect((closestDroppable, currentlyDragged) =>
-            {
-                if (closestDroppable != null && currentlyDragged != null && closestDroppable.Value == _id && currentlyDragged.Value != _id && currentlyDragged.Value != closestDroppable.Value)
-                {
-                    var closestDroppableIndex = _items.IndexOf(closestDroppable.Value);
-                    var currentlyDraggedIndex = _items.IndexOf(currentlyDragged.Value);
-                    _items.Remove(currentlyDragged.Value);
-                    _items.Insert(closestDroppableIndex, currentlyDragged.Value);
-                }
-                return null;
-            }, dndContext.ClosestDroppable, dndContext.CurrentlyDragged);
 
-            // Effect that inverts changes of the droppable's position from flexbox in order to be able to animate it (see next hook)
-            var droppableRef = new Ref<VisualElement>();
-            F.CreateEffect(() =>
-            {
-                var mountTime = Time.fixedUnscaledTime;
-                EventCallback<GeometryChangedEvent> onGeometryChanged = new((e) =>
-                {
-                    if (mountTime + 1f > Time.fixedUnscaledTime)
-                    {
-                        return;
-                    }
-
-                    var oldCenter = e.oldRect.center;
-                    var newCenter = e.newRect.center;
-                    if (oldCenter != newCenter)
-                    {
-                        var delta = oldCenter - newCenter;
-                        droppableRef.Current.transform.position = (Vector3)delta;
-                    }
-                });
-                droppableRef.Current.RegisterCallback(onGeometryChanged);
-                return () =>
-                {
-                    droppableRef.Current.UnregisterCallback(onGeometryChanged);
-                };
-            });
-
-            // Very simple linear animation of transform that always moves towards 0,0
-            F.CreateEffect(() =>
-            {
-                void Update(float deltaTime)
-                {
-                    var currentPos = droppableRef.Current.transform.position;
-                    if (currentPos == Vector3.zero)
-                    {
-                        return;
-                    }
-
-                    var newPosition = currentPos - currentPos.normalized * 500f * deltaTime;
-                    var overreachedX = currentPos.x > 0 && newPosition.x < 0 || currentPos.x < 0 && newPosition.x > 0;
-                    var overreachedY = currentPos.y > 0 && newPosition.y < 0 || currentPos.y < 0 && newPosition.y > 0;
-                    droppableRef.Current.transform.position = overreachedX || overreachedY ? Vector3.zero : newPosition;
-                }
-                var updateLoopSubId = MonoBehaviourHelper.AddOnUpdateHandler(Update);
-                return () =>
-                {
-                    MonoBehaviourHelper.RemoveOnUpdateHandler(updateLoopSubId);
-                };
-            });
-
-            return F.Droppable(
-                forwardRef: droppableRef,
-                value: _id,
-                children: F.Draggable(
-                    value: _id,
-                    style: new Style(
-                        display: DisplayStyle.Flex,
-                        flexDirection: FlexDirection.Row,
-                        justifyContent: Justify.Center,
-                        alignItems: Align.Center
+            return F.View(
+                style: new Style(
+                    display: DisplayStyle.Flex,
+                    flexDirection: FlexDirection.Row,
+                    justifyContent: Justify.Center,
+                    alignItems: Align.Center
+                ),
+                children: F.Nodes(
+                    F.DragHandle<int>(
+                        children: F.SilkIcon(
+                            iconName: "grip-vertical",
+                            size: IconSize.Small,
+                            style: new Style()
+                        )
                     ),
-                    isDragHandle: false,
-                    children: F.Nodes(
-                        F.DragHandle<int>(
-                            children: F.SilkIcon(
-                                iconName: "grip-vertical",
-                                size: IconSize.Small,
-                                style: new Style()
-                            )
+                    F.View(
+                        pickingMode: PickingMode.Position,
+                        style: new Style(
+                            width: 32,
+                            height: 32,
+                            paddingBottom: themeStore.Spacing(1),
+                            paddingLeft: themeStore.Spacing(1),
+                            paddingRight: themeStore.Spacing(1),
+                            paddingTop: themeStore.Spacing(1),
+                            backgroundColor: backgroundColor,
+                            borderRightColor: borderColor,
+                            borderLeftColor: borderColor,
+                            borderTopColor: borderColor,
+                            borderBottomColor: borderColor,
+                            borderRightWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                            borderLeftWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                            borderTopWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                            borderBottomWidth: themeStore.BorderWidth(BorderWidthType.Thick),
+                            display: DisplayStyle.Flex,
+                            justifyContent: Justify.Center,
+                            alignItems: Align.Center,
+                            marginRight: themeStore.Spacing(1),
+                            marginBottom: themeStore.Spacing(1),
+                            marginTop: themeStore.Spacing(1),
+                            marginLeft: themeStore.Spacing(1)
                         ),
-                        F.View(
-                            pickingMode: PickingMode.Position,
-                            style: new Style(
-                                width: 32,
-                                height: 32,
-                                paddingBottom: themeStore.Spacing(1),
-                                paddingLeft: themeStore.Spacing(1),
-                                paddingRight: themeStore.Spacing(1),
-                                paddingTop: themeStore.Spacing(1),
-                                backgroundColor: backgroundColor,
-                                borderRightColor: borderColor,
-                                borderLeftColor: borderColor,
-                                borderTopColor: borderColor,
-                                borderBottomColor: borderColor,
-                                borderRightWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                borderLeftWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                borderTopWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                borderBottomWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                                display: DisplayStyle.Flex,
-                                justifyContent: Justify.Center,
-                                alignItems: Align.Center,
-                                marginRight: themeStore.Spacing(1),
-                                marginBottom: themeStore.Spacing(1),
-                                marginTop: themeStore.Spacing(1),
-                                marginLeft: themeStore.Spacing(1)
-                            ),
-                            children: F.SilkTypography(
-                                role: DEBUG_ROLE,
-                                type: TypographyType.Body1,
-                                text: $"{_id}"
-                            )
+                        children: F.SilkTypography(
+                            role: DEBUG_ROLE,
+                            type: TypographyType.Body1,
+                            text: $"{_id}"
                         )
                     )
                 )
@@ -171,16 +100,13 @@ public class DragAndDropExample : MonoBehaviour
                             height: 400,
                             backgroundColor: themeStore.Color(DEBUG_ROLE, ElementType.Background)
                         ),
-                        children: F.DragAndDropProvider<int>(
-                            F.Nodes(
-                                F.For(
-                                    each: items,
-                                    children: (item, index) =>
-                                    {
-                                        return (item, new ItemComponent(item, items));
-                                    }
-                                )
-                            )
+                        children: F.DragAndDropList(
+                            items: items,
+                            children: (item, index) =>
+                            {
+                                return (item, new ItemComponent(item));
+                            },
+                            animationType: DragAndDropListAnimationType.Linear
                         )
                     )
                 )
