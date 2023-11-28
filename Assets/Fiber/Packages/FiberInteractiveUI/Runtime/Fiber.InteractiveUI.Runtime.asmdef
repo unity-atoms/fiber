@@ -1,5 +1,5 @@
 {
-    "name": "Fiber.InteractiveElement.Runtime",
+    "name": "Fiber.InteractiveUI.Runtime",
     "rootNamespace": "",
     "references": [
         "GUID:98d3c4a469c914c208eaed136a59b26c",

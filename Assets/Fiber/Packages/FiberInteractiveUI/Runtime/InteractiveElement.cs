@@ -1,20 +1,51 @@
 using System;
 using UnityEngine.UIElements;
-using Fiber;
 using Signals;
 using Fiber.Cursed;
 
-namespace SilkUI
+namespace Fiber.InteractiveUI
 {
+    public struct InteractiveCursorTypes
+    {
+        public CursorType OnHover;
+        public CursorType OnPressedDown;
+        public CursorType OnDisabled;
+
+        public InteractiveCursorTypes(CursorType onHover, CursorType onPressedDown, CursorType onDisabled)
+        {
+            OnHover = onHover;
+            OnPressedDown = onPressedDown;
+            OnDisabled = onDisabled;
+        }
+
+        public static InteractiveCursorTypes Default = new(
+            CursorType.Pointer,
+            CursorType.Pointer,
+            CursorType.NotAllowed
+        );
+
+        public readonly bool IsEmpty()
+        {
+            return OnHover == CursorType.Default && OnPressedDown == CursorType.Default && OnDisabled == CursorType.Default;
+        }
+    }
+
     public static partial class BaseComponentExtensions
     {
         public static InteractiveElement CreateInteractiveElement(
             this BaseComponent component,
             Ref<VisualElement> _ref = null,
             ISignal<bool> isDisabled = null,
-            Action onPress = null
+            Action<PointerUpEvent> onPressUp = null,
+            Action<PointerDownEvent> onPressDown = null,
+            InteractiveCursorTypes cursorType = new()
         )
         {
+            if (cursorType.IsEmpty())
+            {
+                cursorType = InteractiveCursorTypes.Default;
+            }
+
             var interactiveElement = new InteractiveElement(
                 _ref: _ref,
                 isDisabled: isDisabled
@@ -34,6 +65,10 @@ namespace SilkUI
                 interactiveElement.Ref.Current.RegisterCallback<PointerDownEvent>(evt =>
                 {
                     interactiveElement.IsPressed.Value = true;
+                    if (onPressDown != null && (isDisabled == null || !isDisabled.Get()))
+                    {
+                        onPressDown(evt);
+                    }
                     // Need to specify useTrickleDown in order to catch the event for buttons
                     // See this thread for more info: https://forum.unity.com/threads/pointerdownevent-on-buttons-not-working.1211238/
                 }, useTrickleDown: TrickleDown.TrickleDown);
@@ -42,9 +77,9 @@ namespace SilkUI
                     if (interactiveElement.IsPressed.Value)
                     {
                         interactiveElement.IsPressed.Value = false;
-                        if (onPress != null && (isDisabled == null || !isDisabled.Get()))
+                        if (onPressUp != null && (isDisabled == null || !isDisabled.Get()))
                         {
-                            onPress();
+                            onPressUp(evt);
                         }
                     }
                 });
@@ -57,15 +92,15 @@ namespace SilkUI
             {
                 if (isDisabled)
                 {
-                    cursorManager.WishCursor(id, CursorType.NotAllowed);
+                    cursorManager.WishCursor(id, cursorType.OnDisabled);
                 }
                 else if (isHovered)
                 {
-                    cursorManager.WishCursor(id, CursorType.Pointer);
+                    cursorManager.WishCursor(id, cursorType.OnHover);
                 }
                 else if (isPressed)
                 {
-                    cursorManager.WishCursor(id, CursorType.Pointer);
+                    cursorManager.WishCursor(id, cursorType.OnPressedDown);
                 }
                 else
                 {

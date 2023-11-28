@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Signals;
 using Fiber.UIElements;
 using FiberUtils;
+using Fiber.Cursed;
+using Fiber.InteractiveUI;
 
 namespace Fiber.DragAndDrop
 {
@@ -60,12 +62,58 @@ namespace Fiber.DragAndDrop
 
         public static DragHandleComponent<T> DragHandle<T>(
             this BaseComponent component,
-            VirtualBody children
+            VirtualBody children,
+            Style style = new()
         )
         {
             return new DragHandleComponent<T>(
-                children: children
+                children: children,
+                style: style
             );
+        }
+
+        public static DragHandleElement<T> CreateDragHandleElement<T>(
+            this BaseComponent component,
+            Ref<VisualElement> _ref = null
+        )
+        {
+            var dndContext = component.GetContext<DragAndDropContext<T>>();
+            var draggableContext = component.GetContext<DraggableContext<T>>();
+
+            _ref = _ref ?? new Ref<VisualElement>();
+            var dragHandleElement = new DragHandleElement<T>(
+                _ref: _ref,
+                dragAndDropContext: dndContext,
+                draggableContext: draggableContext
+            );
+
+            var interactiveDragHandle = component.CreateInteractiveElement(
+                _ref: _ref,
+                cursorType: new InteractiveCursorTypes(
+                    onHover: CursorType.Grab,
+                    onPressedDown: CursorType.Grabbing,
+                    onDisabled: CursorType.NotAllowed
+                ),
+                onPressDown: (evt) =>
+                {
+                    dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.position, evt.pointerId);
+                }
+            );
+
+            component.CreateEffect(() =>
+            {
+                _ref.Current.RegisterCallback<PointerMoveEvent>(dragHandleElement.OnPointerMove);
+                _ref.Current.RegisterCallback<PointerCaptureOutEvent>(dragHandleElement.OnPointerCaptureOut);
+                _ref.Current.RegisterCallback<PointerUpEvent>(dragHandleElement.OnPointerUp);
+                return () =>
+                {
+                    _ref.Current.UnregisterCallback<PointerMoveEvent>(dragHandleElement.OnPointerMove);
+                    _ref.Current.UnregisterCallback<PointerCaptureOutEvent>(dragHandleElement.OnPointerCaptureOut);
+                    _ref.Current.UnregisterCallback<PointerUpEvent>(dragHandleElement.OnPointerUp);
+                };
+            });
+
+            return dragHandleElement;
         }
 
         public static DragAndDropListComponent<ItemType, KeyType> DragAndDropList<ItemType, KeyType>(
@@ -87,14 +135,11 @@ namespace Fiber.DragAndDrop
 
     public class DraggableContext<T>
     {
-        public T Value { get; private set; }
-        public Ref<VisualElement> DraggableRef { get; private set; }
+        public Ref<DragAndDropContext<T>.Draggable> DraggableRef { get; private set; }
         public DraggableContext(
-            T value,
-            Ref<VisualElement> draggableRef
+            Ref<DragAndDropContext<T>.Draggable> draggableRef
         )
         {
-            Value = value;
             DraggableRef = draggableRef;
         }
     }
@@ -281,30 +326,69 @@ namespace Fiber.DragAndDrop
 
     public class DragHandleComponent<T> : BaseComponent
     {
+        private readonly Style _style;
         public DragHandleComponent(
-            VirtualBody children
+            VirtualBody children,
+            Style style = new()
         ) : base(children)
         {
+            _style = style;
         }
 
         public override VirtualBody Render()
         {
-            var dragHandleRef = new Ref<VisualElement>();
-            var context = F.GetContext<DragAndDropContext<T>>();
-            var dragableContext = F.GetContext<DraggableContext<T>>();
-            F.CreateEffect(() =>
-            {
-                context.RegisterDragHandle(dragableContext.DraggableRef, dragHandleRef);
-                return () =>
-                {
-                    context.UnregisterDragHandle(dragableContext.DraggableRef, dragHandleRef);
-                };
-            });
+            var dragHandleElement = F.CreateDragHandleElement<T>();
 
             return F.View(
-                _ref: dragHandleRef,
+                _ref: dragHandleElement.Ref,
+                style: _style,
                 children: Children
             );
+        }
+    }
+
+    public class DragHandleElement<T>
+    {
+        public Ref<VisualElement> Ref { get; private set; }
+        public DragAndDropContext<T> DragAndDropContext { get; private set; }
+        public DraggableContext<T> DraggableContext { get; private set; }
+
+        public DragHandleElement(
+            Ref<VisualElement> _ref,
+            DragAndDropContext<T> dragAndDropContext,
+            DraggableContext<T> draggableContext
+        )
+        {
+            Ref = _ref ?? new Ref<VisualElement>();
+            DragAndDropContext = dragAndDropContext;
+            DraggableContext = draggableContext;
+        }
+
+        public void OnPointerMove(PointerMoveEvent evt)
+        {
+            var draggable = DraggableContext.DraggableRef.Current;
+            if (DragAndDropContext.CurrentlyDragged.Value == draggable && Ref.Current.HasPointerCapture(evt.pointerId))
+            {
+                DragAndDropContext.MoveDragged(evt.position);
+            }
+        }
+
+        public void OnPointerCaptureOut(PointerCaptureOutEvent evt)
+        {
+            var draggable = DraggableContext.DraggableRef.Current;
+            if (DragAndDropContext.CurrentlyDragged.Value == draggable)
+            {
+                DragAndDropContext.EndDrag();
+            }
+        }
+
+        public void OnPointerUp(PointerUpEvent evt)
+        {
+            var draggable = DraggableContext.DraggableRef.Current;
+            if (DragAndDropContext.CurrentlyDragged.Value == draggable)
+            {
+                DragAndDropContext.EndDrag();
+            }
         }
     }
 
@@ -348,25 +432,29 @@ namespace Fiber.DragAndDrop
         {
             var position = new Signal<StyleEnum<Position>>(Position.Relative);
             var parentRef = new Ref<VisualElement>();
-            var draggableRef = new Ref<VisualElement>();
-            var context = F.GetContext<DragAndDropContext<T>>();
+            var dndContext = F.GetContext<DragAndDropContext<T>>();
             var destinationId = new Signal<string>(null);
+
+            var draggableElementRef = new Ref<VisualElement>();
+            DragHandleElement<T> dragHandleElement = _isDragHandle ? F.CreateDragHandleElement<T>(draggableElementRef) : null;
+            var draggableRef = new Ref<DragAndDropContext<T>.Draggable>();
 
             F.CreateEffect(() =>
             {
-                context.RegisterDraggable(
+                var draggable = dndContext.RegisterDraggable(
                     value: _value,
-                    draggableRef: draggableRef,
-                    isDragHandle: _isDragHandle,
+                    draggableRef: draggableElementRef,
                     positionSignal: position,
                     destinationIdSignal: destinationId,
                     onDragStart: _onDragStart,
                     onDragEnd: _onDragEnd,
                     onDragMove: _onDragMove
                 );
+                draggableRef.Current = draggable;
+
                 return () =>
                 {
-                    context.UnregisterDraggable(draggableRef);
+                    dndContext.UnregisterDraggable(draggable);
                 };
             });
 
@@ -378,17 +466,17 @@ namespace Fiber.DragAndDrop
                     var resolvedStyle = parentRef.Current.resolvedStyle;
                     parentRef.Current.style.width = resolvedStyle.width;
                     parentRef.Current.style.height = resolvedStyle.height;
-                    draggableRef.Current.UnregisterCallback(onGeometryChanged);
+                    draggableElementRef.Current.UnregisterCallback(onGeometryChanged);
                 });
-                draggableRef.Current.RegisterCallback(onGeometryChanged);
+                draggableElementRef.Current.RegisterCallback(onGeometryChanged);
                 return () =>
                 {
-                    draggableRef.Current.UnregisterCallback(onGeometryChanged);
+                    draggableElementRef.Current.UnregisterCallback(onGeometryChanged);
                 };
             });
 
             return F.ContextProvider(
-                value: new DraggableContext<T>(_value, draggableRef),
+                value: new DraggableContext<T>(draggableRef),
                 children: F.View(
                     _ref: parentRef,
                     style: new Style(
@@ -408,7 +496,7 @@ namespace Fiber.DragAndDrop
                     children: F.Portal(
                         destinationId: destinationId,
                         children: F.View(
-                            _ref: draggableRef,
+                            _ref: draggableElementRef,
                             style: new Style(
                                 mergedStyle: _style,
                                 position: position
@@ -461,159 +549,10 @@ namespace Fiber.DragAndDrop
 
     public class DragAndDropContext<T>
     {
-        private class DragHandle
-        {
-            public Ref<VisualElement> Ref { get; private set; }
-            public Draggable Draggable { get; private set; }
-            public DragAndDropContext<T> Context { get; private set; }
-
-            public DragHandle(
-                Ref<VisualElement> _ref,
-                Draggable draggable,
-                DragAndDropContext<T> context
-            )
-            {
-                Ref = _ref;
-                Draggable = draggable;
-                Context = context;
-            }
-
-            public void RegisterCallbacks()
-            {
-                Ref.Current.RegisterCallback<PointerDownEvent>(OnPointerDown);
-                Ref.Current.RegisterCallback<PointerMoveEvent>(OnPointerMove);
-                Ref.Current.RegisterCallback<PointerUpEvent>(OnPointerUp);
-                Ref.Current.RegisterCallback<PointerCaptureOutEvent>(OnPointerCaptureOut);
-            }
-
-            public void UnregisterCallbacks()
-            {
-                Ref.Current.UnregisterCallback<PointerDownEvent>(OnPointerDown);
-                Ref.Current.UnregisterCallback<PointerMoveEvent>(OnPointerMove);
-                Ref.Current.UnregisterCallback<PointerUpEvent>(OnPointerUp);
-                Ref.Current.UnregisterCallback<PointerCaptureOutEvent>(OnPointerCaptureOut);
-            }
-
-            private void OnPointerDown(PointerDownEvent evt)
-            {
-                if (Context.CurrentlyDragged.Value != null)
-                {
-                    return;
-                }
-
-                Context.PointerStartPosition = evt.position;
-
-                Context.CurrentlyDragged.Value = Draggable;
-                Ref.Current.CapturePointer(evt.pointerId);
-
-                // The portal destination transition might not happen directly, but we want to keep the dragged
-                // element's position. We do that by: 
-                // 1) Making the parent of the dragged element always be kept in placen with the same dimensions.
-                // 2) Absolute position the portal destination, set it's size to the same as that of the draggable,
-                //  and move it to the exact same location as the draggable.
-
-                // Absolute position the dragged element and change its parent using the portal destination id.
-                Draggable.PositionSignal.Value = Position.Absolute;
-                Draggable.DestinationIdSignal.Value = Draggable.Context.PortalDestinationId;
-
-                // Get the width, height and world position of the draggable
-                var draggableElement = Draggable.Ref.Current;
-                var draggableWidth = draggableElement.resolvedStyle.width;
-                var draggableHeight = draggableElement.resolvedStyle.height;
-                var draggableWorldPosition = draggableElement.worldBound.center;
-
-                // Place portal destination at the same position as the dragged element and make it the same size
-                var portalDestination = Draggable.Context.PortalDestinationRef.Current;
-                var portalWorldPosition = portalDestination.worldBound.center;
-                var portalDestinationStartPosition = (Vector3)draggableWorldPosition - (Vector3)portalWorldPosition + portalDestination.transform.position;
-                Context.TargetStartPosition = portalDestinationStartPosition;
-                portalDestination.transform.position = portalDestinationStartPosition;
-                portalDestination.style.width = draggableWidth;
-                portalDestination.style.height = draggableHeight;
-
-                Context.ClosestDroppable.Value = GetClosestDroppable();
-
-                Draggable.OnDragStart?.Invoke();
-            }
-
-            private void OnPointerMove(PointerMoveEvent evt)
-            {
-                if (Context.CurrentlyDragged.Value == Draggable && Ref.Current.HasPointerCapture(evt.pointerId))
-                {
-                    var portalDestination = Draggable.Context.PortalDestinationRef.Current;
-                    var deltaMousePos = evt.position - Context.PointerStartPosition;
-                    var newPos = new Vector2(
-                        Context.TargetStartPosition.x + deltaMousePos.x,
-                        Context.TargetStartPosition.y + deltaMousePos.y
-                    );
-                    portalDestination.transform.position = newPos;
-
-                    var closestDroppable = GetClosestDroppable();
-                    if (closestDroppable != Context.ClosestDroppable.Value)
-                    {
-                        Context.ClosestDroppable.Value = closestDroppable;
-                    }
-
-                    Draggable.OnDragMove?.Invoke();
-                }
-            }
-
-            private void OnPointerUp(PointerUpEvent evt)
-            {
-                if (Context.CurrentlyDragged.Value == Draggable && Ref.Current.HasPointerCapture(evt.pointerId))
-                {
-                    Ref.Current.ReleasePointer(evt.pointerId);
-                    Release();
-                }
-            }
-
-            private void OnPointerCaptureOut(PointerCaptureOutEvent evt)
-            {
-                if (Context.CurrentlyDragged.Value == Draggable)
-                {
-                    Release();
-                }
-            }
-
-            private Droppable GetClosestDroppable()
-            {
-                var portalDestination = Draggable.Context.PortalDestinationRef.Current;
-                Droppable droppable = null;
-
-                Vector3 smallestDelta = Vector2.one * float.MaxValue;
-                for (var i = 0; i < Context.Droppables.Count; ++i)
-                {
-                    var currentDroppable = Context.Droppables[i];
-                    var droppableWorldPos = currentDroppable.Ref.Current.worldBound.center;
-                    var delta = droppableWorldPos - portalDestination.worldBound.center;
-
-                    if (delta.magnitude < smallestDelta.magnitude)
-                    {
-                        smallestDelta = delta;
-                        droppable = currentDroppable;
-                    }
-                }
-
-                return droppable;
-            }
-
-            private void Release()
-            {
-                Context.CurrentlyDragged.Value.Ref.Current.transform.position = Vector3.zero;
-                Context.CurrentlyDragged.Value = null;
-                Context.ClosestDroppable.Value = null;
-                Draggable.DestinationIdSignal.Value = null;
-                Draggable.PositionSignal.Value = Position.Relative;
-                Draggable.OnDragEnd?.Invoke();
-            }
-        }
-
         public class Draggable
         {
             public T Value { get; private set; }
             public Ref<VisualElement> Ref { get; private set; }
-            private readonly bool _isDragHandle;
-            private List<DragHandle> DragHandles { get; set; } = new();
             public DragAndDropContext<T> Context { get; private set; }
             public Action OnDragStart { get; private set; }
             public Action OnDragEnd { get; private set; }
@@ -625,7 +564,6 @@ namespace Fiber.DragAndDrop
                 T value,
                 Ref<VisualElement> _ref,
                 DragAndDropContext<T> context,
-                bool isDragHandle,
                 Signal<StyleEnum<Position>> positionSignal,
                 Signal<string> destinationIdSignal,
                 Action onDragStart,
@@ -636,53 +574,12 @@ namespace Fiber.DragAndDrop
                 Value = value;
                 Ref = _ref;
                 Context = context;
-                _isDragHandle = isDragHandle;
                 PositionSignal = positionSignal;
                 DestinationIdSignal = destinationIdSignal;
-
-                if (_isDragHandle)
-                {
-                    RegisterDragHandle(_ref, context);
-                }
 
                 OnDragStart = onDragStart;
                 OnDragEnd = onDragEnd;
                 OnDragMove = onDragMove;
-            }
-
-            public void Unregister()
-            {
-                for (var i = DragHandles.Count - 1; i >= 0; --i)
-                {
-                    DragHandles[i].UnregisterCallbacks();
-                    DragHandles.RemoveAt(i);
-                }
-            }
-
-
-            public void RegisterDragHandle(Ref<VisualElement> dragHandle, DragAndDropContext<T> context)
-            {
-                var dragHandleElement = new DragHandle(
-                    _ref: dragHandle,
-                    draggable: this,
-                    context: context
-                );
-                dragHandleElement.RegisterCallbacks();
-                DragHandles.Add(dragHandleElement);
-            }
-
-            public void UnregisterDragHandle(Ref<VisualElement> dragHandle)
-            {
-                for (var i = 0; i < DragHandles.Count; ++i)
-                {
-                    if (DragHandles[i].Ref == dragHandle)
-                    {
-                        DragHandles[i].UnregisterCallbacks();
-                        DragHandles.RemoveAt(i);
-                        break;
-                    }
-
-                }
             }
         }
 
@@ -708,6 +605,8 @@ namespace Fiber.DragAndDrop
         public Vector3 TargetStartPosition { get; set; }
         public Vector3 PointerStartPosition { get; set; }
         public Signal<Draggable> CurrentlyDragged { get; set; } = new();
+        public Signal<VisualElement> CurrentDragHandle { get; set; } = new();
+        private int CurrentPointerId { get; set; }
         public List<Draggable> Draggables { get; private set; } = new();
         public List<Droppable> Droppables = new();
         public Signal<Droppable> ClosestDroppable { get; private set; } = new();
@@ -743,10 +642,9 @@ namespace Fiber.DragAndDrop
             }
         }
 
-        public void RegisterDraggable(
+        public Draggable RegisterDraggable(
             T value,
             Ref<VisualElement> draggableRef,
-            bool isDragHandle,
             Signal<StyleEnum<Position>> positionSignal,
             Signal<string> destinationIdSignal,
             Action onDragStart,
@@ -760,47 +658,134 @@ namespace Fiber.DragAndDrop
                 context: this,
                 positionSignal: positionSignal,
                 destinationIdSignal: destinationIdSignal,
-                isDragHandle: isDragHandle,
                 onDragStart: onDragStart,
                 onDragEnd: onDragEnd,
                 onDragMove: onDragMove
             );
             Draggables.Add(draggable);
+            return draggable;
         }
 
-        public void UnregisterDraggable(Ref<VisualElement> draggableRef)
+        public void UnregisterDraggable(Draggable draggable)
         {
-            for (var i = 0; i < Draggables.Count; i++)
-            {
-                if (Draggables[i].Ref == draggableRef)
-                {
-                    Draggables[i].Unregister();
-                    Draggables.RemoveAt(i);
-                    break;
-                }
-            }
+            Draggables.Remove(draggable);
         }
 
-        public void RegisterDragHandle(Ref<VisualElement> draggableRef, Ref<VisualElement> dragHandle)
+        // OPEN POINT: When implementing focus input (gamepad / keyboard), then we might want to break 
+        // this out into several different methods, one for the base functionality, one for pointer 
+        // specific functionality, and one for gamepad / keyboard.
+        public bool StartDrag(Draggable draggable, VisualElement dragHandle, Vector3 pointerPosition, int pointerId)
         {
-            for (var i = 0; i < Draggables.Count; i++)
+            if (CurrentlyDragged.Value != null)
             {
-                if (Draggables[i].Ref == draggableRef)
-                {
-                    Draggables[i].RegisterDragHandle(dragHandle, this);
-                }
+                return false;
             }
+
+            PointerStartPosition = pointerPosition;
+
+            CurrentlyDragged.Value = draggable;
+            CurrentDragHandle.Value = dragHandle;
+            CurrentPointerId = pointerId;
+            dragHandle.CapturePointer(pointerId);
+
+            // The portal destination transition might not happen directly, but we want to keep the dragged
+            // element's position. We do that by: 
+            // 1) Making the parent of the dragged element always be kept in placen with the same dimensions.
+            // 2) Absolute position the portal destination, set it's size to the same as that of the draggable,
+            //  and move it to the exact same location as the draggable.
+
+            // Absolute position the dragged element and change its parent using the portal destination id.
+            draggable.PositionSignal.Value = Position.Absolute;
+            draggable.DestinationIdSignal.Value = PortalDestinationId;
+
+            // Get the width, height and world position of the draggable
+            var draggableElement = draggable.Ref.Current;
+            var draggableWidth = draggableElement.resolvedStyle.width;
+            var draggableHeight = draggableElement.resolvedStyle.height;
+            var draggableWorldPosition = draggableElement.worldBound.center;
+
+            // Place portal destination at the same position as the dragged element and make it the same size
+            var portalDestination = PortalDestinationRef.Current;
+            var portalWorldPosition = portalDestination.worldBound.center;
+            var portalDestinationStartPosition = (Vector3)draggableWorldPosition - (Vector3)portalWorldPosition + portalDestination.transform.position;
+            TargetStartPosition = portalDestinationStartPosition;
+            portalDestination.transform.position = portalDestinationStartPosition;
+            portalDestination.style.width = draggableWidth;
+            portalDestination.style.height = draggableHeight;
+
+            ClosestDroppable.Value = GetClosestDroppable();
+
+            draggable.OnDragStart?.Invoke();
+
+            return true;
         }
 
-        public void UnregisterDragHandle(Ref<VisualElement> draggableRef, Ref<VisualElement> dragHandle)
+        public void EndDrag()
         {
-            for (var i = 0; i < Draggables.Count; i++)
+            Release();
+        }
+
+        public void MoveDragged(Vector3 pointerPosition)
+        {
+            var deltaPointerPos = pointerPosition - PointerStartPosition;
+            var portalDestination = PortalDestinationRef.Current;
+            var newPos = new Vector2(
+                TargetStartPosition.x + deltaPointerPos.x,
+                TargetStartPosition.y + deltaPointerPos.y
+            );
+            portalDestination.transform.position = newPos;
+
+            var closestDroppable = GetClosestDroppable();
+            if (closestDroppable != ClosestDroppable.Value)
             {
-                if (Draggables[i].Ref == draggableRef)
+                ClosestDroppable.Value = closestDroppable;
+            }
+
+            CurrentlyDragged.Value.OnDragMove?.Invoke();
+        }
+
+        private Droppable GetClosestDroppable()
+        {
+            var portalDestination = PortalDestinationRef.Current;
+            Droppable droppable = null;
+
+            Vector3 smallestDelta = Vector2.one * float.MaxValue;
+            for (var i = 0; i < Droppables.Count; ++i)
+            {
+                var currentDroppable = Droppables[i];
+                var droppableWorldPos = currentDroppable.Ref.Current.worldBound.center;
+                var delta = droppableWorldPos - portalDestination.worldBound.center;
+
+                if (delta.magnitude < smallestDelta.magnitude)
                 {
-                    Draggables[i].UnregisterDragHandle(dragHandle);
+                    smallestDelta = delta;
+                    droppable = currentDroppable;
                 }
             }
+
+            return droppable;
+        }
+
+        private void Release()
+        {
+            if (CurrentlyDragged.Value == null)
+            {
+                Debug.LogWarning($"DragAndDropContext: Trying to release draggable, but no draggable is currently being dragged.");
+                return;
+            }
+
+            CurrentDragHandle.Value.ReleasePointer(CurrentPointerId);
+            var draggable = CurrentlyDragged.Value;
+            draggable.DestinationIdSignal.Value = null;
+            draggable.PositionSignal.Value = Position.Relative;
+
+            CurrentlyDragged.Value.Ref.Current.transform.position = Vector3.zero;
+            CurrentlyDragged.Value = null;
+            ClosestDroppable.Value = null;
+            CurrentDragHandle.Value = null;
+            CurrentPointerId = -1;
+
+            draggable.OnDragEnd?.Invoke();
         }
     }
 

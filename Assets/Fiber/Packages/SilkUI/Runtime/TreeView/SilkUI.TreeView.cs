@@ -4,6 +4,7 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using Signals;
+using Fiber.InteractiveUI;
 
 namespace SilkUI
 {
@@ -192,7 +193,7 @@ namespace SilkUI
                 var isExpanded = F.CreateComputedSignal((expandedItemIds) => expandedItemIds.Contains(_id), treeViewStateContext.ExapndedItemIds);
                 var identationLevel = F.GetContext<IndentiationLevelContext>().IndentiationLevel;
 
-                var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: () =>
+                var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPressUp: (evt) =>
                 {
                     treeViewStateContext.OnItemSelected(_id);
                 });

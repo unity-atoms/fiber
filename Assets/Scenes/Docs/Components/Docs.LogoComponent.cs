@@ -2,6 +2,7 @@ using System;
 using Fiber;
 using SilkUI;
 using Fiber.UIElements;
+using Fiber.InteractiveUI;
 using UnityEngine;
 using UnityEngine.UIElements;
 using Signals;
@@ -17,11 +18,11 @@ public enum DocsLogoSize
 public class DocsLogoComponent : BaseComponent
 {
     private readonly SignalProp<DocsLogoSize> _size;
-    private readonly Action _onPress;
+    private readonly Action<PointerUpEvent> _onPress;
     private readonly Style _style;
     public DocsLogoComponent(
         SignalProp<DocsLogoSize> size,
-        Action onPress = null,
+        Action<PointerUpEvent> onPress = null,
         Style style = new()
     )
     {
@@ -62,7 +63,7 @@ public class DocsLogoComponent : BaseComponent
         var fontSize = F.CreateComputedSignal(GetFontSize, sizeSignal);
 
         var isInteractive = _onPress != null;
-        var interactiveElement = isInteractive ? F.CreateInteractiveElement(isDisabled: null, onPress: _onPress) : null;
+        var interactiveElement = isInteractive ? F.CreateInteractiveElement(isDisabled: null, onPressUp: _onPress) : null;
 
         return F.View(
             _ref: interactiveElement?.Ref,
