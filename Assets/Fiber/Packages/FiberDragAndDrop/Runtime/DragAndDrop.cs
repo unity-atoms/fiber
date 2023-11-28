@@ -133,7 +133,7 @@ namespace Fiber.DragAndDrop
         public static DragAndDropListComponent<ItemType, KeyType> DragAndDropList<ItemType, KeyType>(
             this BaseComponent component,
             ISignalList<ItemType> items,
-            Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+            Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true
         ) where ItemType : IEquatable<ItemType>
@@ -173,13 +173,13 @@ namespace Fiber.DragAndDrop
     public class DragAndDropListComponent<ItemType, KeyType> : BaseComponent where ItemType : IEquatable<ItemType>
     {
         private readonly ISignalList<ItemType> _items;
-        private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
+        private readonly Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> _children;
         private readonly DragAndDropListAnimationType _animationType;
         private readonly bool _isItemDragHandle;
 
         public DragAndDropListComponent(
             ISignalList<ItemType> items,
-            Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+            Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true
         ) : base(VirtualBody.Empty)
@@ -205,13 +205,13 @@ namespace Fiber.DragAndDrop
         private class DragAndDropListInner : BaseComponent
         {
             private readonly ISignalList<ItemType> _items;
-            private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
+            private readonly Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> _children;
             private readonly DragAndDropListAnimationType _animationType;
             private readonly bool _isItemDragHandle;
 
             public DragAndDropListInner(
                 ISignalList<ItemType> items,
-                Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+                Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
                 DragAndDropListAnimationType animationType,
                 bool isItemDragHandle
             ) : base(VirtualBody.Empty)
@@ -244,7 +244,11 @@ namespace Fiber.DragAndDrop
                     each: _items,
                     children: (item, index) =>
                     {
-                        var (key, child) = _children(item, index);
+                        var isDraggedSignal = F.CreateComputedSignal((currentlyDragged) =>
+                        {
+                            return currentlyDragged != null && currentlyDragged.Value != null && currentlyDragged.Value.Equals(item);
+                        }, dndContext.CurrentlyDragged);
+                        var (key, child) = _children(item, index, isDraggedSignal);
                         return (key, new DragAndDropListItemComponent(
                             item: item,
                             children: child,
@@ -402,7 +406,6 @@ namespace Fiber.DragAndDrop
             if (DragAndDropContext.CurrentlyDragged.Value == draggable)
             {
                 DragAndDropContext.EndDrag();
-                Debug.Log("OnPointerCaptureOut EndDrag");
             }
         }
 
@@ -412,7 +415,6 @@ namespace Fiber.DragAndDrop
             if (DragAndDropContext.CurrentlyDragged.Value == draggable)
             {
                 DragAndDropContext.EndDrag();
-                Debug.Log("OnPointerUp EndDrag");
             }
         }
     }

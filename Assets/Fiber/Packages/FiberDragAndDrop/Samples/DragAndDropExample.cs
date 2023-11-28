@@ -17,9 +17,11 @@ public class DragAndDropExample : MonoBehaviour
     public class ItemComponent : BaseComponent
     {
         private readonly int _id;
-        public ItemComponent(int id) : base()
+        private readonly BaseSignal<bool> _isDraggedSignal;
+        public ItemComponent(int id, BaseSignal<bool> isDraggedSignal) : base()
         {
             _id = id;
+            _isDraggedSignal = isDraggedSignal;
         }
 
         public override VirtualBody Render()
@@ -27,6 +29,7 @@ public class DragAndDropExample : MonoBehaviour
             var themeStore = C<ThemeStore>();
             var borderColor = themeStore.Color(DEBUG_ROLE, ElementType.Border);
             var backgroundColor = themeStore.Color(DEBUG_ROLE, ElementType.Background);
+            var color = F.CreateComputedSignal((isDragged, background) => isDragged ? Color.red : background, _isDraggedSignal, backgroundColor);
 
 
             return F.View(
@@ -54,7 +57,7 @@ public class DragAndDropExample : MonoBehaviour
                             paddingLeft: themeStore.Spacing(1),
                             paddingRight: themeStore.Spacing(1),
                             paddingTop: themeStore.Spacing(1),
-                            backgroundColor: backgroundColor,
+                            backgroundColor: color,
                             borderRightColor: borderColor,
                             borderLeftColor: borderColor,
                             borderTopColor: borderColor,
@@ -102,9 +105,9 @@ public class DragAndDropExample : MonoBehaviour
                         ),
                         children: F.DragAndDropList(
                             items: items,
-                            children: (item, index) =>
+                            children: (item, index, isDraggedSignal) =>
                             {
-                                return (item, new ItemComponent(item));
+                                return (item, new ItemComponent(item, isDraggedSignal));
                             },
                             animationType: DragAndDropListAnimationType.Linear,
                             isItemDragHandle: false
