@@ -38,6 +38,7 @@ public class DragAndDropExample : MonoBehaviour
                 ),
                 children: F.Nodes(
                     F.DragHandle<int>(
+                        pointerMode: DragHandlePointerMode.HoldToDrag,
                         children: F.SilkIcon(
                             iconName: "grip-vertical",
                             size: IconSize.Small,

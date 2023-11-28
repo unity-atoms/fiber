@@ -63,18 +63,21 @@ namespace Fiber.DragAndDrop
         public static DragHandleComponent<T> DragHandle<T>(
             this BaseComponent component,
             VirtualBody children,
-            Style style = new()
+            Style style = new(),
+            DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag
         )
         {
             return new DragHandleComponent<T>(
                 children: children,
-                style: style
+                style: style,
+                pointerMode: pointerMode
             );
         }
 
         public static DragHandleElement<T> CreateDragHandleElement<T>(
             this BaseComponent component,
-            Ref<VisualElement> _ref = null
+            Ref<VisualElement> _ref = null,
+            DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag
         )
         {
             var dndContext = component.GetContext<DragAndDropContext<T>>();
@@ -96,7 +99,18 @@ namespace Fiber.DragAndDrop
                 ),
                 onPressDown: (evt) =>
                 {
-                    dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.position, evt.pointerId);
+                    if (pointerMode == DragHandlePointerMode.HoldToDrag && !dndContext.IsDragging())
+                    {
+                        dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.position, evt.pointerId);
+                    }
+                },
+                onPressUp: (evt) =>
+                {
+                    if (pointerMode == DragHandlePointerMode.PressToDrag && !dndContext.IsDragging())
+                    {
+                        dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.position, evt.pointerId);
+                        evt.StopImmediatePropagation();
+                    }
                 }
             );
 
@@ -131,6 +145,12 @@ namespace Fiber.DragAndDrop
                 isItemDragHandle: isItemDragHandle
             );
         }
+    }
+
+    public enum DragHandlePointerMode
+    {
+        HoldToDrag = 0,
+        PressToDrag = 1
     }
 
     public class DraggableContext<T>
@@ -327,17 +347,20 @@ namespace Fiber.DragAndDrop
     public class DragHandleComponent<T> : BaseComponent
     {
         private readonly Style _style;
+        private readonly DragHandlePointerMode _pointerMode;
         public DragHandleComponent(
             VirtualBody children,
-            Style style = new()
+            Style style = new(),
+            DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag
         ) : base(children)
         {
             _style = style;
+            _pointerMode = pointerMode;
         }
 
         public override VirtualBody Render()
         {
-            var dragHandleElement = F.CreateDragHandleElement<T>();
+            var dragHandleElement = F.CreateDragHandleElement<T>(pointerMode: _pointerMode);
 
             return F.View(
                 _ref: dragHandleElement.Ref,
@@ -379,6 +402,7 @@ namespace Fiber.DragAndDrop
             if (DragAndDropContext.CurrentlyDragged.Value == draggable)
             {
                 DragAndDropContext.EndDrag();
+                Debug.Log("OnPointerCaptureOut EndDrag");
             }
         }
 
@@ -388,6 +412,7 @@ namespace Fiber.DragAndDrop
             if (DragAndDropContext.CurrentlyDragged.Value == draggable)
             {
                 DragAndDropContext.EndDrag();
+                Debug.Log("OnPointerUp EndDrag");
             }
         }
     }
@@ -396,6 +421,7 @@ namespace Fiber.DragAndDrop
     {
         private readonly T _value;
         private readonly bool _isDragHandle;
+        private readonly DragHandlePointerMode _dragHandlePointerMode;
         private readonly Style _style;
         private Action _onDragStart;
         private Action _onDragEnd;
@@ -406,6 +432,7 @@ namespace Fiber.DragAndDrop
             T value,
             Style style = new(),
             bool isDragHandle = false,
+            DragHandlePointerMode dragHandlePointerMode = DragHandlePointerMode.HoldToDrag,
             Action onDragStart = null,
             Action onDragEnd = null,
             Action onDragMove = null
@@ -413,6 +440,8 @@ namespace Fiber.DragAndDrop
         {
             _value = value;
             _style = style;
+            _isDragHandle = isDragHandle;
+            _dragHandlePointerMode = dragHandlePointerMode;
 
             if (!_style.Position.IsEmpty)
             {
@@ -436,7 +465,7 @@ namespace Fiber.DragAndDrop
             var destinationId = new Signal<string>(null);
 
             var draggableElementRef = new Ref<VisualElement>();
-            DragHandleElement<T> dragHandleElement = _isDragHandle ? F.CreateDragHandleElement<T>(draggableElementRef) : null;
+            DragHandleElement<T> dragHandleElement = _isDragHandle ? F.CreateDragHandleElement<T>(draggableElementRef, _dragHandlePointerMode) : null;
             var draggableRef = new Ref<DragAndDropContext<T>.Draggable>();
 
             F.CreateEffect(() =>
@@ -620,6 +649,11 @@ namespace Fiber.DragAndDrop
             PortalDestinationRef = portalDestinationRef;
         }
 
+        public bool IsDragging()
+        {
+            return CurrentlyDragged.Value != null;
+        }
+
         public void RegisterDroppable(T value, Ref<VisualElement> droppableRef)
         {
             var droppable = new Droppable(
@@ -676,7 +710,7 @@ namespace Fiber.DragAndDrop
         // specific functionality, and one for gamepad / keyboard.
         public bool StartDrag(Draggable draggable, VisualElement dragHandle, Vector3 pointerPosition, int pointerId)
         {
-            if (CurrentlyDragged.Value != null)
+            if (IsDragging())
             {
                 return false;
             }
@@ -768,7 +802,7 @@ namespace Fiber.DragAndDrop
 
         private void Release()
         {
-            if (CurrentlyDragged.Value == null)
+            if (!IsDragging())
             {
                 Debug.LogWarning($"DragAndDropContext: Trying to release draggable, but no draggable is currently being dragged.");
                 return;
