@@ -281,7 +281,7 @@ namespace Fiber.DragAndDrop
 
             public override VirtualBody Render()
             {
-                var dndContext = C<DragAndDropContext<int>>();
+                var dndContext = C<DragAndDropContext<ItemType>>();
                 var droppableRef = new Ref<VisualElement>();
 
                 if (_animationType != DragAndDropListAnimationType.None)
