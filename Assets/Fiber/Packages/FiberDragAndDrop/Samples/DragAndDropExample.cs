@@ -7,9 +7,19 @@ using Fiber.UIElements;
 using SilkUI;
 using Signals;
 using Fiber.DragAndDrop;
+using FiberUtils;
 
 public class DragAndDropExample : MonoBehaviour
 {
+    public static class Colors
+    {
+        public static ColorToken Dark = new("#212424");
+        public static ColorToken Gray = new("#373B3B");
+        public static ColorToken NeonBlue = new("#20B8C1");
+        public static ColorToken NeonYellow = new("#FBEC37");
+        public static ColorToken NeonRed = new("#FA0F38");
+    }
+
     [SerializeField] private PanelSettings _defaultPanelSettings;
 
     private const string DEBUG_ROLE = "debug";
@@ -27,10 +37,90 @@ public class DragAndDropExample : MonoBehaviour
         public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
-            var borderColor = themeStore.Color(DEBUG_ROLE, ElementType.Border);
-            var backgroundColor = themeStore.Color(DEBUG_ROLE, ElementType.Background);
-            var color = F.CreateComputedSignal((isDragged, background) => isDragged ? Color.red : background, _isDraggedSignal, backgroundColor);
+            var dragHandleElement = C<DragHandleElement<int>>();
+            var delayedIsDragged = new Signal<bool>(false);
+            F.CreateEffect((isDragged) =>
+            {
+                MonoBehaviourHelper.Instance.SetTimeout(() =>
+                {
+                    delayedIsDragged.Value = isDragged;
+                }, 0.025f);
+                return null;
+            }, _isDraggedSignal);
 
+            var borderColor = F.CreateComputedSignal<bool, bool, StyleColor>((isDragged, isHovered) =>
+            {
+                if (isDragged)
+                {
+                    return Colors.NeonYellow.Value;
+                }
+                else if (isHovered)
+                {
+                    return Colors.NeonBlue.Value;
+                }
+
+                return Colors.Gray.Value;
+            }, delayedIsDragged, dragHandleElement.InteractiveElement.IsHovered);
+            var textColor = F.CreateComputedSignal<bool, bool, StyleColor>((isDragged, isHovered) =>
+            {
+                if (isDragged)
+                {
+                    return Colors.NeonYellow.Value;
+                }
+                else if (isHovered)
+                {
+                    return Colors.NeonBlue.Value;
+                }
+
+                return Colors.NeonBlue.Value;
+            }, delayedIsDragged, dragHandleElement.InteractiveElement.IsHovered);
+            var statusTextBackgroundColor = F.CreateComputedSignal<bool, bool, StyleColor>((isDragged, isHovered) =>
+            {
+                if (isDragged)
+                {
+                    return Colors.NeonYellow.Value;
+                }
+                else if (isHovered)
+                {
+                    return Colors.NeonBlue.Value;
+                }
+
+                return Colors.Gray.Value;
+            }, delayedIsDragged, dragHandleElement.InteractiveElement.IsHovered);
+            var statusText = F.CreateComputedSignal((isDragged, isHovered) =>
+            {
+                if (isDragged)
+                {
+                    return "DRAGGING";
+                }
+                else if (isHovered)
+                {
+                    return "HOVERED";
+                }
+
+                return "IDLE";
+            }, delayedIsDragged, dragHandleElement.InteractiveElement.IsHovered);
+            var firaMono = Resources.Load<Font>("FiraMono/FiraMonoNerdFont-Regular");
+
+            var dragDecaleSize = F.CreateComputedSignal<bool, StyleLength>((isDragged) =>
+            {
+                if (isDragged)
+                {
+                    return new Length(90, LengthUnit.Percent);
+                }
+
+                return new Length(40, LengthUnit.Percent);
+            }, delayedIsDragged);
+
+            var dragDecaleRotate = F.CreateComputedSignal<bool, StyleRotate>((isDragged) =>
+            {
+                if (isDragged)
+                {
+                    return new Rotate(45f + 1f * 360f);
+                }
+
+                return new Rotate(0f);
+            }, delayedIsDragged);
 
             return F.View(
                 style: new Style(
@@ -40,24 +130,33 @@ public class DragAndDropExample : MonoBehaviour
                     alignItems: Align.Center
                 ),
                 children: F.Nodes(
-                    F.DragHandle<int>(
-                        pointerMode: DragHandlePointerMode.HoldToDrag,
-                        children: F.SilkIcon(
-                            iconName: "grip-vertical",
-                            size: IconSize.Small,
-                            style: new Style()
+                    F.View(
+                        style: new Style(
+                            position: Position.Absolute,
+                            width: dragDecaleSize,
+                            height: dragDecaleSize,
+                            backgroundColor: Colors.Dark.Value,
+                            transitionProperty: new List<StylePropertyName>() { new("all") },
+                            transitionDuration: new List<TimeValue>() { new(0.5f, TimeUnit.Second) },
+                            borderRightColor: Colors.NeonRed.Value,
+                            borderLeftColor: Colors.NeonRed.Value,
+                            borderTopColor: Colors.NeonRed.Value,
+                            borderBottomColor: Colors.NeonRed.Value,
+                            borderRightWidth: 4,
+                            borderLeftWidth: 4,
+                            borderTopWidth: 4,
+                            borderBottomWidth: 4,
+                            rotate: dragDecaleRotate
                         )
                     ),
                     F.View(
                         pickingMode: PickingMode.Position,
                         style: new Style(
-                            width: 32,
-                            height: 32,
-                            paddingBottom: themeStore.Spacing(1),
-                            paddingLeft: themeStore.Spacing(1),
-                            paddingRight: themeStore.Spacing(1),
-                            paddingTop: themeStore.Spacing(1),
-                            backgroundColor: color,
+                            transitionProperty: new List<StylePropertyName>() { new("all") },
+                            transitionDuration: new List<TimeValue>() { new(0.3f, TimeUnit.Second) },
+                            width: 88,
+                            height: 88,
+                            backgroundColor: Colors.Dark.Value,
                             borderRightColor: borderColor,
                             borderLeftColor: borderColor,
                             borderTopColor: borderColor,
@@ -66,18 +165,47 @@ public class DragAndDropExample : MonoBehaviour
                             borderLeftWidth: themeStore.BorderWidth(BorderWidthType.Thick),
                             borderTopWidth: themeStore.BorderWidth(BorderWidthType.Thick),
                             borderBottomWidth: themeStore.BorderWidth(BorderWidthType.Thick),
-                            display: DisplayStyle.Flex,
-                            justifyContent: Justify.Center,
-                            alignItems: Align.Center,
                             marginRight: themeStore.Spacing(1),
                             marginBottom: themeStore.Spacing(1),
                             marginTop: themeStore.Spacing(1),
-                            marginLeft: themeStore.Spacing(1)
+                            marginLeft: themeStore.Spacing(1),
+                            display: DisplayStyle.Flex,
+                            justifyContent: Justify.Center,
+                            alignItems: Align.Center
                         ),
-                        children: F.SilkTypography(
-                            role: DEBUG_ROLE,
-                            type: TypographyType.Body1,
-                            text: $"{_id}"
+                        children: F.Nodes(
+                            F.Text(
+                                text: $"{_id}",
+                                style: new Style(
+                                    transitionProperty: new List<StylePropertyName>() { new("all") },
+                                    transitionDuration: new List<TimeValue>() { new(0.3f, TimeUnit.Second) },
+                                    color: textColor,
+                                    unityFont: firaMono,
+                                    unityFontDefinition: StyleKeyword.None,
+                                    unityTextAlign: TextAnchor.MiddleCenter,
+                                    fontSize: 32
+                                )
+                            ),
+                            F.Text(
+                                text: statusText,
+                                style: new Style(
+                                    transitionProperty: new List<StylePropertyName>() { new("all") },
+                                    transitionDuration: new List<TimeValue>() { new(0.3f, TimeUnit.Second) },
+                                    backgroundColor: statusTextBackgroundColor,
+                                    color: Colors.Dark.Value,
+                                    unityFont: firaMono,
+                                    unityFontDefinition: StyleKeyword.None,
+                                    unityTextAlign: TextAnchor.MiddleCenter,
+                                    fontSize: 9,
+                                    paddingBottom: 1,
+                                    paddingLeft: 1,
+                                    paddingRight: 1,
+                                    paddingTop: 1,
+                                    position: Position.Absolute,
+                                    bottom: 0,
+                                    right: 0
+                                )
+                            )
                         )
                     )
                 )
@@ -90,27 +218,48 @@ public class DragAndDropExample : MonoBehaviour
         public override VirtualBody Render()
         {
             var items = new ShallowSignalList<int>(new List<int> { 1, 2, 3, 4, 5 });
-            var themeStore = C<ThemeStore>();
 
             return F.SilkUIProvider(
                 children: F.UIDocument(
                     children: F.View(
                         style: new Style(
-                            flexDirection: FlexDirection.Row,
+                            flexDirection: FlexDirection.Column,
                             justifyContent: Justify.Center,
                             alignItems: Align.Center,
-                            width: 400,
-                            height: 400,
-                            backgroundColor: themeStore.Color(DEBUG_ROLE, ElementType.Background)
+                            width: new Length(100, LengthUnit.Percent),
+                            height: new Length(100, LengthUnit.Percent),
+                            backgroundColor: Colors.Dark.Value
                         ),
-                        children: F.DragAndDropList(
-                            items: items,
-                            children: (item, index, isDraggedSignal) =>
-                            {
-                                return (item, new ItemComponent(item, isDraggedSignal));
-                            },
-                            animationType: DragAndDropListAnimationType.Linear,
-                            isItemDragHandle: false
+                        children: F.Nodes(
+                            F.View(
+                                style: new Style(
+                                    display: DisplayStyle.Flex,
+                                    flexDirection: FlexDirection.Row,
+                                    justifyContent: Justify.Center,
+                                    alignItems: Align.Center,
+                                    width: new Length(100, LengthUnit.Percent),
+                                    height: new Length(120, LengthUnit.Pixel)
+                                ),
+                                children: F.DragAndDropList(
+                                    items: items,
+                                    children: (item, index, isDraggedSignal) =>
+                                    {
+                                        return (item, new ItemComponent(item, isDraggedSignal));
+                                    },
+                                    animationType: DragAndDropListAnimationType.Linear,
+                                    isItemDragHandle: true
+                                )
+                            ),
+                            F.Text(
+                                text: "Fiber drag and drop demo",
+                                style: new Style(
+                                    color: Colors.NeonBlue.Value,
+                                    unityFont: Resources.Load<Font>("FiraMono/FiraMonoNerdFont-Regular"),
+                                    unityFontDefinition: StyleKeyword.None,
+                                    unityTextAlign: TextAnchor.MiddleCenter,
+                                    fontSize: 32
+                                )
+                            )
                         )
                     )
                 )

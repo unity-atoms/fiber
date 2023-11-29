@@ -76,20 +76,14 @@ namespace Fiber.DragAndDrop
 
         public static DragHandleElement<T> CreateDragHandleElement<T>(
             this BaseComponent component,
+            DraggableContext<T> draggableContext,
             Ref<VisualElement> _ref = null,
             DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag
         )
         {
             var dndContext = component.GetContext<DragAndDropContext<T>>();
-            var draggableContext = component.GetContext<DraggableContext<T>>();
 
             _ref = _ref ?? new Ref<VisualElement>();
-            var dragHandleElement = new DragHandleElement<T>(
-                _ref: _ref,
-                dragAndDropContext: dndContext,
-                draggableContext: draggableContext
-            );
-
             var interactiveDragHandle = component.CreateInteractiveElement(
                 _ref: _ref,
                 cursorType: new InteractiveCursorTypes(
@@ -112,6 +106,13 @@ namespace Fiber.DragAndDrop
                         evt.StopImmediatePropagation();
                     }
                 }
+            );
+
+            var dragHandleElement = new DragHandleElement<T>(
+                _ref: _ref,
+                interactiveElement: interactiveDragHandle,
+                dragAndDropContext: dndContext,
+                draggableContext: draggableContext
             );
 
             component.CreateEffect(() =>
@@ -364,12 +365,16 @@ namespace Fiber.DragAndDrop
 
         public override VirtualBody Render()
         {
-            var dragHandleElement = F.CreateDragHandleElement<T>(pointerMode: _pointerMode);
+            var draggableContext = F.GetContext<DraggableContext<T>>();
+            var dragHandleElement = F.CreateDragHandleElement<T>(draggableContext: draggableContext, pointerMode: _pointerMode);
 
-            return F.View(
-                _ref: dragHandleElement.Ref,
-                style: _style,
-                children: Children
+            return F.ContextProvider(
+                value: dragHandleElement,
+                children: F.View(
+                    _ref: dragHandleElement.Ref,
+                    style: _style,
+                    children: Children
+                )
             );
         }
     }
@@ -377,16 +382,19 @@ namespace Fiber.DragAndDrop
     public class DragHandleElement<T>
     {
         public Ref<VisualElement> Ref { get; private set; }
+        public InteractiveElement InteractiveElement { get; private set; }
         public DragAndDropContext<T> DragAndDropContext { get; private set; }
         public DraggableContext<T> DraggableContext { get; private set; }
 
         public DragHandleElement(
             Ref<VisualElement> _ref,
+            InteractiveElement interactiveElement,
             DragAndDropContext<T> dragAndDropContext,
             DraggableContext<T> draggableContext
         )
         {
             Ref = _ref ?? new Ref<VisualElement>();
+            InteractiveElement = interactiveElement;
             DragAndDropContext = dragAndDropContext;
             DraggableContext = draggableContext;
         }
@@ -467,8 +475,9 @@ namespace Fiber.DragAndDrop
             var destinationId = new Signal<string>(null);
 
             var draggableElementRef = new Ref<VisualElement>();
-            DragHandleElement<T> dragHandleElement = _isDragHandle ? F.CreateDragHandleElement<T>(draggableElementRef, _dragHandlePointerMode) : null;
             var draggableRef = new Ref<DragAndDropContext<T>.Draggable>();
+            var draggableContext = new DraggableContext<T>(draggableRef);
+            DragHandleElement<T> dragHandleElement = _isDragHandle ? F.CreateDragHandleElement<T>(draggableContext: draggableContext, _ref: draggableElementRef, pointerMode: _dragHandlePointerMode) : null;
 
             F.CreateEffect(() =>
             {
@@ -507,32 +516,35 @@ namespace Fiber.DragAndDrop
             });
 
             return F.ContextProvider(
-                value: new DraggableContext<T>(draggableRef),
-                children: F.View(
-                    _ref: parentRef,
-                    style: new Style(
-                        paddingBottom: 0,
-                        paddingLeft: 0,
-                        paddingRight: 0,
-                        paddingTop: 0,
-                        marginBottom: 0,
-                        marginLeft: 0,
-                        marginRight: 0,
-                        marginTop: 0,
-                        borderBottomWidth: 0,
-                        borderLeftWidth: 0,
-                        borderRightWidth: 0,
-                        borderTopWidth: 0
-                    ),
-                    children: F.Portal(
-                        destinationId: destinationId,
-                        children: F.View(
-                            _ref: draggableElementRef,
-                            style: new Style(
-                                mergedStyle: _style,
-                                position: position
-                            ),
-                            children: Children
+                value: draggableContext,
+                children: F.ContextProvider(
+                    value: dragHandleElement,
+                    children: F.View(
+                        _ref: parentRef,
+                        style: new Style(
+                            paddingBottom: 0,
+                            paddingLeft: 0,
+                            paddingRight: 0,
+                            paddingTop: 0,
+                            marginBottom: 0,
+                            marginLeft: 0,
+                            marginRight: 0,
+                            marginTop: 0,
+                            borderBottomWidth: 0,
+                            borderLeftWidth: 0,
+                            borderRightWidth: 0,
+                            borderTopWidth: 0
+                        ),
+                        children: F.Portal(
+                            destinationId: destinationId,
+                            children: F.View(
+                                _ref: draggableElementRef,
+                                style: new Style(
+                                    mergedStyle: _style,
+                                    position: position
+                                ),
+                                children: Children
+                            )
                         )
                     )
                 )
