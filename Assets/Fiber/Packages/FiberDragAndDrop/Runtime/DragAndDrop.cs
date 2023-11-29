@@ -136,14 +136,16 @@ namespace Fiber.DragAndDrop
             ISignalList<ItemType> items,
             Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
-            bool isItemDragHandle = true
+            bool isItemDragHandle = true,
+            Action<int, int> moveItem = null
         ) where ItemType : IEquatable<ItemType>
         {
             return new DragAndDropListComponent<ItemType, KeyType>(
                 items: items,
                 children: children,
                 animationType: animationType,
-                isItemDragHandle: isItemDragHandle
+                isItemDragHandle: isItemDragHandle,
+                moveItem: moveItem
             );
         }
     }
@@ -177,18 +179,21 @@ namespace Fiber.DragAndDrop
         private readonly Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> _children;
         private readonly DragAndDropListAnimationType _animationType;
         private readonly bool _isItemDragHandle;
+        private readonly Action<int, int> _moveItem;
 
         public DragAndDropListComponent(
             ISignalList<ItemType> items,
             Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
-            bool isItemDragHandle = true
+            bool isItemDragHandle = true,
+            Action<int, int> moveItem = null
         ) : base(VirtualBody.Empty)
         {
             _items = items;
             _children = children;
             _animationType = animationType;
             _isItemDragHandle = isItemDragHandle;
+            _moveItem = moveItem;
         }
 
         public override VirtualBody Render()
@@ -198,7 +203,8 @@ namespace Fiber.DragAndDrop
                     items: _items,
                     children: _children,
                     animationType: _animationType,
-                    isItemDragHandle: _isItemDragHandle
+                    isItemDragHandle: _isItemDragHandle,
+                    moveItem: _moveItem
                 )
             );
         }
@@ -209,18 +215,21 @@ namespace Fiber.DragAndDrop
             private readonly Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> _children;
             private readonly DragAndDropListAnimationType _animationType;
             private readonly bool _isItemDragHandle;
+            private readonly Action<int, int> _moveItem;
 
             public DragAndDropListInner(
                 ISignalList<ItemType> items,
                 Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
                 DragAndDropListAnimationType animationType,
-                bool isItemDragHandle
+                bool isItemDragHandle,
+                Action<int, int> moveItem
             ) : base(VirtualBody.Empty)
             {
                 _items = items;
                 _children = children;
                 _animationType = animationType;
                 _isItemDragHandle = isItemDragHandle;
+                _moveItem = moveItem;
             }
 
             public override VirtualBody Render()
@@ -235,8 +244,16 @@ namespace Fiber.DragAndDrop
                         var items = _items.Get();
                         var closestDroppableIndex = items.IndexOf(closestDroppable.Value);
                         var currentlyDraggedIndex = items.IndexOf(currentlyDragged.Value);
-                        items.Remove(currentlyDragged.Value);
-                        items.Insert(closestDroppableIndex, currentlyDragged.Value);
+
+                        if (_moveItem != null)
+                        {
+                            _moveItem(currentlyDraggedIndex, closestDroppableIndex);
+                        }
+                        else
+                        {
+                            items.Remove(currentlyDragged.Value);
+                            items.Insert(closestDroppableIndex, currentlyDragged.Value);
+                        }
                     }
                     return null;
                 }, dndContext.ClosestDroppable, dndContext.CurrentlyDragged);
