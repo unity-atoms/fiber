@@ -36,6 +36,7 @@ namespace SilkUI
         ) : base()
         {
             _role = role;
+            _subRole = subRole;
             _variant = variant;
         }
 
