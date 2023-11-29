@@ -40,6 +40,18 @@ namespace Fiber.UIElements
             return result;
         }
 
+        public static UIPortalDestinationComponent UIPortalDestination(
+            this BaseComponent component,
+            string id,
+            Ref<VisualElement> forwardRef = null
+        )
+        {
+            return new UIPortalDestinationComponent(
+                id: id,
+                forwardRef: forwardRef
+            );
+        }
+
         public static ViewComponent View(
             this BaseComponent component,
             SignalProp<Style> style = new(),
@@ -280,6 +292,23 @@ namespace Fiber.UIElements
                 sortingOrder: sortingOrder,
                 children: children
             );
+        }
+    }
+
+    public class UIPortalDestinationComponent : PortalDestinationBaseComponent, IBuiltInComponent
+    {
+        private readonly Ref<VisualElement> _forwardRef;
+        public UIPortalDestinationComponent(
+            string id,
+            Ref<VisualElement> forwardRef = null
+        ) : base(id)
+        {
+            _forwardRef = forwardRef;
+        }
+        public VirtualBody Render(FiberNode fiberNode)
+        {
+            BaseImplementation(fiberNode);
+            return new ViewComponent(_ref: _forwardRef, style: new Style(position: Position.Absolute));
         }
     }
 
@@ -1686,17 +1715,7 @@ namespace Fiber.UIElements
         {
             if (node.NativeNode is VisualElementNativeNode visualElementChildNode)
             {
-                var currentIndex = Instance.IndexOf(visualElementChildNode.Instance);
-                if (currentIndex > index)
-                {
-                    var currentElementAtIndex = Instance.ElementAt(index);
-                    visualElementChildNode.Instance.PlaceBehind(currentElementAtIndex);
-                }
-                else if (currentIndex < index)
-                {
-                    var currentElementBeforeIndex = Instance.ElementAt(index - 1);
-                    visualElementChildNode.Instance.PlaceInFront(currentElementBeforeIndex);
-                }
+                visualElementChildNode.Instance.MoveToIndex(index);
                 return;
             }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
+using Fiber.InteractiveUI;
 using Signals;
 
 namespace SilkUI
@@ -78,7 +79,7 @@ namespace SilkUI
         // Icon button component
         public delegate BaseComponent CreateIconButtonDelegate(
             SignalProp<string> iconName,
-            Action onPress,
+            Action<PointerUpEvent> onPress,
             InteractiveElement interactiveRef,
             string role,
             string subRole,

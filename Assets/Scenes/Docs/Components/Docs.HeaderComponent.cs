@@ -22,7 +22,7 @@ public class DocsHeaderComponent : BaseComponent
                 F.Visible(
                     when: smallScreenNotLandingPage,
                     children: F.SilkIconButton(
-                        iconName: "bars", onPress: () =>
+                        iconName: "bars", onPress: (evt) =>
                         {
                             drawerContext.IsOpen.Value = true;
                         },
@@ -31,22 +31,22 @@ public class DocsHeaderComponent : BaseComponent
                 ),
                 new DocsLogoComponent(
                     size: DocsLogoSize.Small,
-                    onPress: () =>
+                    onPress: (evt) =>
                     {
                         router.Navigate(DocsRouting.ROUTES.LANDING);
                     }
                 )
             )),
             F.SilkHeaderItemGroup(justifyContent: Justify.FlexEnd, children: F.Nodes(
-                F.SilkIconButton(variant: "github", iconName: "github", onPress: () =>
+                F.SilkIconButton(variant: "github", iconName: "github", onPress: (evt) =>
                 {
                     Application.OpenURL("https://github.com/unity-atoms/fiber");
                 }),
-                F.SilkIconButton(variant: "discord", iconName: "discord", onPress: () =>
+                F.SilkIconButton(variant: "discord", iconName: "discord", onPress: (evt) =>
                 {
                     Application.OpenURL("https://discord.gg/Jw2hRhEB");
                 }),
-                F.SilkIconButton(variant: "sun", iconName: iconName, onPress: () =>
+                F.SilkIconButton(variant: "sun", iconName: iconName, onPress: (evt) =>
                 {
                     if (themeStore.Value == DocsThemes.LIGHT_THEME)
                     {

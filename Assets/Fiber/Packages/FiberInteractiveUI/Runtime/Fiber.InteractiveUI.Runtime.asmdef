@@ -1,0 +1,19 @@
+{
+    "name": "Fiber.InteractiveUI.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:98d3c4a469c914c208eaed136a59b26c",
+        "GUID:7d4df59988a124f1092a78e2f7af90fd",
+        "GUID:a3c713fc88b2e468cb383ff8d4fbf47a",
+        "GUID:037827e7e295a46f3833ca23e0249f49"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

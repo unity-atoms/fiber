@@ -54,14 +54,14 @@ public class DocsDrawerComponent : BaseComponent
                                     children: F.Nodes(
                                         new DocsLogoComponent(
                                             size: DocsLogoSize.Small,
-                                            onPress: () =>
+                                            onPress: (evt) =>
                                             {
                                                 router.Navigate(DocsRouting.ROUTES.LANDING);
                                             }
                                         ),
                                         F.SilkIconButton(
                                             iconName: "xmark",
-                                            onPress: () =>
+                                            onPress: (evt) =>
                                             {
                                                 drawerContext.IsOpen.Value = false;
                                             }

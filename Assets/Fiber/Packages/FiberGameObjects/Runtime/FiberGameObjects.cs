@@ -7,6 +7,14 @@ namespace Fiber.GameObjects
 {
     public static partial class BaseComponentExtensions
     {
+        public static GameObjectPortalDestinationComponent GameObjectPortalDestination(
+            this BaseComponent component,
+            string id
+        )
+        {
+            return new GameObjectPortalDestinationComponent(id: id);
+        }
+
         public static GameObjectComponent GameObject(
             this BaseComponent component,
             string name = null,
@@ -48,6 +56,16 @@ namespace Fiber.GameObjects
             }
 
             return null;
+        }
+    }
+
+    public class GameObjectPortalDestinationComponent : PortalDestinationBaseComponent, IBuiltInComponent
+    {
+        public GameObjectPortalDestinationComponent(string id) : base(id) { }
+        public VirtualBody Render(FiberNode fiberNode)
+        {
+            BaseImplementation(fiberNode);
+            return new GameObjectComponent();
         }
     }
 
@@ -280,7 +298,7 @@ namespace Fiber.GameObjects
             // Try get GameObject using GetInstance prop
             if (gameObject == null && virtualNode.GetInstance != null)
             {
-                var parentNode = fiberNode.FindClosestAncestorWithNativeNode();
+                var parentNode = fiberNode.FindClosestAncestorWithNativeNodeOrPortalDestination();
                 gameObject = virtualNode.GetInstance(parentNode != null ? (parentNode.NativeNode as GameObjectNativeNode).Instance : null);
             }
 

@@ -146,7 +146,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, StyleFont>((theme) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return typographyTokens.Font.Get();
+                    return typographyTokens?.Font?.Get() ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); // Default Unity font
                 }, this);
                 _fontSignalsCache.Add(typographyType, signal);
 
@@ -157,7 +157,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, TypographyType, StyleFont>((theme, typographyType) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return typographyTokens.Font.Get();
+                    return typographyTokens?.Font?.Get() ?? new StyleFont();
                 }, this, typographyTypeProp.Signal);
                 return signal;
             }
@@ -179,7 +179,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, StyleLength>((theme) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return typographyTokens.FontSize.Get();
+                    return typographyTokens?.FontSize?.Get() ?? 16;
                 }, this);
                 _fontSizeSignalsCache.Add(typographyType, signal);
 
@@ -190,7 +190,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, TypographyType, StyleLength>((theme, typographyType) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return typographyTokens.FontSize.Get();
+                    return typographyTokens?.FontSize?.Get() ?? 16;
                 }, this, typographyTypeProp.Signal);
                 return signal;
             }
@@ -211,7 +211,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, StyleEnum<FontStyle>>((theme) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return typographyTokens.FontStyle.Get();
+                    return typographyTokens?.FontStyle?.Get() ?? UnityEngine.FontStyle.Normal;
                 }, this);
                 _fontStyleSignalsCache.Add(typographyType, signal);
 
@@ -222,7 +222,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, TypographyType, StyleEnum<FontStyle>>((theme, typographyType) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return typographyTokens.FontStyle.Get();
+                    return typographyTokens?.FontStyle?.Get() ?? UnityEngine.FontStyle.Normal;
                 }, this, typographyTypeProp.Signal);
                 return signal;
             }
@@ -243,7 +243,7 @@ namespace SilkUI
                 var signal = new InlineComputedSignal<Theme, StyleFloat>((theme) =>
                 {
                     var typographyTokens = theme.Typography.GetTypographyTypeTokens(typographyType);
-                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens.OutlineWidth.Get()).Get();
+                    return theme.Spacing.TextOutline.GetTextOutlineSignal(typographyTokens?.OutlineWidth?.Get() ?? TextOutlineType.Default).Get();
                 }, this);
                 _outlineWidthSignalsCache.Add(typographyType, signal);
 

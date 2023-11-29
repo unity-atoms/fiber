@@ -1,0 +1,22 @@
+{
+    "name": "Fiber.DragAndDrop.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "GUID:7d4df59988a124f1092a78e2f7af90fd",
+        "GUID:98d3c4a469c914c208eaed136a59b26c",
+        "GUID:a3c713fc88b2e468cb383ff8d4fbf47a",
+        "GUID:75469ad4d38634e559750d17036d5f7c",
+        "GUID:713f7d393b1d7468e94a98ac79d07465",
+        "GUID:037827e7e295a46f3833ca23e0249f49",
+        "GUID:b8ff2e2721e104e348869a2cf6fe19c4"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using Signals;
+using Fiber.InteractiveUI;
 
 namespace SilkUI
 {
@@ -15,7 +16,7 @@ namespace SilkUI
             string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Action onPress = null
+            Action<PointerUpEvent> onPress = null
         )
         {
             return new SilkButtonComponent(
@@ -35,7 +36,7 @@ namespace SilkUI
         private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
-        private readonly Action _onPress;
+        private readonly Action<PointerUpEvent> _onPress;
 
         public SilkButtonComponent(
             VirtualBody children,
@@ -43,7 +44,7 @@ namespace SilkUI
             string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Action onPress = null
+            Action<PointerUpEvent> onPress = null
         ) : base(children)
         {
             _role = role;
@@ -55,7 +56,7 @@ namespace SilkUI
 
         public override VirtualBody Render()
         {
-            var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPress: _onPress);
+            var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPressUp: _onPress);
 
             var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(
