@@ -32,4 +32,16 @@ public static class VisualElementExtensions
     {
         element.MoveToIndex(0);
     }
+
+    public static int GetParentCount(this VisualElement element)
+    {
+        var count = 0;
+        var current = element.parent;
+        while (current != null)
+        {
+            count++;
+            current = current.parent;
+        }
+        return count;
+    }
 }

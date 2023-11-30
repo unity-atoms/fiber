@@ -11,5 +11,17 @@ namespace FiberUtils
 
             return IsAncestor(transform, other.parent);
         }
+
+        public static int GetParentCount(this Transform transform)
+        {
+            var count = 0;
+            var current = transform.parent;
+            while (current != null)
+            {
+                count++;
+                current = current.parent;
+            }
+            return count;
+        }
     }
 }

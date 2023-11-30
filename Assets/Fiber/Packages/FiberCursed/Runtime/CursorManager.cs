@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using FiberUtils;
+using UnityEngine.UIElements;
 #if UNITY_WEBGL && !UNITY_EDITOR
 using System.Runtime.InteropServices;
 #endif
@@ -132,19 +133,6 @@ namespace Fiber.Cursed
         [SerializeField]
         [FiberReadOnly]
         private IndexedDictionary<int, CursorWish> _cursorWishesById = new();
-        private int _prio = 0;
-        private int GetPrio()
-        {
-            _prio++;
-            return _prio;
-        }
-
-
-        private static IntIdGenerator _idGenerator = new IntIdGenerator();
-        public int GetUniqueID()
-        {
-            return _idGenerator.NextId();
-        }
 
         private struct CursorWish
         {
@@ -160,7 +148,6 @@ namespace Fiber.Cursed
 
         public void Reset()
         {
-            _prio = 0;
             _cursorWishesById.Clear();
         }
 
@@ -177,15 +164,27 @@ namespace Fiber.Cursed
             UpdateCursor();
         }
 
-        public void WishCursor(int id, CursorType cursor)
+        public void WishCursorUIElements(int id, CursorType cursor, VisualElement visualElement)
+        {
+            var prio = visualElement.GetParentCount();
+            WishCursor(id, cursor, prio);
+        }
+
+        public void WishCursorGameObject(CursorType cursor, GameObject gameObject)
+        {
+            var prio = gameObject.transform.GetParentCount();
+            WishCursor(gameObject.GetInstanceID(), cursor, prio);
+        }
+
+        public void WishCursor(int id, CursorType cursor, int prio = 0)
         {
             if (IsWishingCursor(id))
             {
-                _cursorWishesById.SetByKey(id, new CursorWish(GetPrio(), cursor));
+                _cursorWishesById.SetByKey(id, new CursorWish(prio, cursor));
             }
             else
             {
-                _cursorWishesById.Add(id, new CursorWish(GetPrio(), cursor));
+                _cursorWishesById.Add(id, new CursorWish(prio, cursor));
             }
             UpdateCursor();
         }
@@ -205,12 +204,12 @@ namespace Fiber.Cursed
         public void UpdateCursor()
         {
             int pickedCursorWishKey = -1;
-            int pickedCursorWishPrio = int.MaxValue;
+            int pickedCursorWishPrio = -1;
 
             for (var i = 0; i < _cursorWishesById.Count; ++i)
             {
                 var cursorWish = _cursorWishesById.GetKVPAt(i);
-                if (cursorWish.Value.Prio < pickedCursorWishPrio)
+                if (cursorWish.Value.Prio > pickedCursorWishPrio)
                 {
                     pickedCursorWishPrio = cursorWish.Value.Prio;
                     pickedCursorWishKey = cursorWish.Key;
@@ -233,12 +232,12 @@ namespace Fiber.Cursed
                 {
                     var texture = cursorDefinition.Texture;
                     var hotspot = cursorDefinition.Hotspot;
-                    Cursor.SetCursor(texture, hotspot, CursorMode.Auto);
+                    UnityEngine.Cursor.SetCursor(texture, hotspot, CursorMode.Auto);
                     return;
                 }
             }
 
-            Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
+            UnityEngine.Cursor.SetCursor(null, Vector2.zero, CursorMode.Auto);
 #endif
         }
     }

@@ -2,6 +2,7 @@ using System;
 using UnityEngine.UIElements;
 using Signals;
 using Fiber.Cursed;
+using FiberUtils;
 
 namespace Fiber.InteractiveUI
 {
@@ -32,6 +33,9 @@ namespace Fiber.InteractiveUI
 
     public static partial class BaseComponentExtensions
     {
+
+        private static IntIdGenerator _idGenerator = new IntIdGenerator();
+
         public static InteractiveElement CreateInteractiveElement(
             this BaseComponent component,
             Ref<VisualElement> _ref = null,
@@ -87,20 +91,20 @@ namespace Fiber.InteractiveUI
             });
 
             var cursorManager = component.C<CursorManager>();
-            var id = cursorManager.GetUniqueID();
+            var id = _idGenerator.NextId();
             component.CreateEffect((isHovered, isPressed, isDisabled) =>
             {
                 if (isDisabled)
                 {
-                    cursorManager.WishCursor(id, cursorType.OnDisabled);
+                    cursorManager.WishCursorUIElements(id, cursorType.OnDisabled, interactiveElement.Ref.Current);
                 }
                 else if (isHovered)
                 {
-                    cursorManager.WishCursor(id, cursorType.OnHover);
+                    cursorManager.WishCursorUIElements(id, cursorType.OnHover, interactiveElement.Ref.Current);
                 }
                 else if (isPressed)
                 {
-                    cursorManager.WishCursor(id, cursorType.OnPressedDown);
+                    cursorManager.WishCursorUIElements(id, cursorType.OnPressedDown, interactiveElement.Ref.Current);
                 }
                 else
                 {
