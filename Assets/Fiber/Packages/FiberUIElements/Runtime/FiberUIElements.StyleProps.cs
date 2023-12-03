@@ -922,6 +922,132 @@ namespace Fiber.UIElements
         public StyleEnum<TextAnchor> Get() => WorkLoopSignalProp.Get();
     }
 
+    public struct OverflowProp
+    {
+        public SignalProp<StyleEnum<Overflow>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public OverflowProp(StyleEnum<Overflow> value)
+        {
+            SignalProp = value;
+        }
+
+        public OverflowProp(BaseSignal<StyleEnum<Overflow>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator OverflowProp(Overflow value)
+        {
+            return new OverflowProp(value);
+        }
+
+        public static implicit operator OverflowProp(StyleKeyword keyword)
+        {
+            return new OverflowProp(keyword);
+        }
+
+        public StyleEnum<Overflow> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopOverflowProp
+    {
+        public WorkLoopSignalProp<StyleEnum<Overflow>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopOverflowProp(OverflowProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleEnum<Overflow> Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct TextOverflowProp
+    {
+        public SignalProp<StyleEnum<TextOverflow>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public TextOverflowProp(StyleEnum<TextOverflow> value)
+        {
+            SignalProp = value;
+        }
+
+        public TextOverflowProp(BaseSignal<StyleEnum<TextOverflow>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator TextOverflowProp(TextOverflow value)
+        {
+            return new TextOverflowProp(value);
+        }
+
+        public static implicit operator TextOverflowProp(StyleKeyword keyword)
+        {
+            return new TextOverflowProp(keyword);
+        }
+
+        public StyleEnum<TextOverflow> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopTextOverflowProp
+    {
+        public WorkLoopSignalProp<StyleEnum<TextOverflow>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopTextOverflowProp(TextOverflowProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleEnum<TextOverflow> Get() => WorkLoopSignalProp.Get();
+    }
+
+    public struct WhiteSpaceProp
+    {
+        public SignalProp<StyleEnum<WhiteSpace>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public WhiteSpaceProp(StyleEnum<WhiteSpace> value)
+        {
+            SignalProp = value;
+        }
+
+        public WhiteSpaceProp(BaseSignal<StyleEnum<WhiteSpace>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator WhiteSpaceProp(WhiteSpace value)
+        {
+            return new WhiteSpaceProp(value);
+        }
+
+        public static implicit operator WhiteSpaceProp(StyleKeyword keyword)
+        {
+            return new WhiteSpaceProp(keyword);
+        }
+
+        public StyleEnum<WhiteSpace> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopWhiteSpaceProp
+    {
+        public WorkLoopSignalProp<StyleEnum<WhiteSpace>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopWhiteSpaceProp(WhiteSpaceProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleEnum<WhiteSpace> Get() => WorkLoopSignalProp.Get();
+    }
+
     public struct Style
     {
         public PositionProp Position { get; private set; }
@@ -980,6 +1106,9 @@ namespace Fiber.UIElements
         public StyleScaleProp Scale { get; private set; }
         public StyleRotateProp Rotate { get; private set; }
         public StyleFloatProp Opacity { get; private set; }
+        public OverflowProp Overflow { get; private set; }
+        public TextOverflowProp TextOverflow { get; private set; }
+        public WhiteSpaceProp WhiteSpace { get; private set; }
 
         public Style(
             PositionProp position = new(),
@@ -1037,7 +1166,10 @@ namespace Fiber.UIElements
             StyleTranslateProp translate = new(),
             StyleScaleProp scale = new(),
             StyleRotateProp rotate = new(),
-            StyleFloatProp opacity = new()
+            StyleFloatProp opacity = new(),
+            OverflowProp overflow = new(),
+            TextOverflowProp textOverflow = new(),
+            WhiteSpaceProp whiteSpace = new()
         )
         {
             Position = position;
@@ -1096,6 +1228,9 @@ namespace Fiber.UIElements
             Scale = scale;
             Rotate = rotate;
             Opacity = opacity;
+            Overflow = overflow;
+            TextOverflow = textOverflow;
+            WhiteSpace = whiteSpace;
         }
 
         public Style(
@@ -1155,7 +1290,10 @@ namespace Fiber.UIElements
             StyleTranslateProp translate = new(),
             StyleScaleProp scale = new(),
             StyleRotateProp rotate = new(),
-            StyleFloatProp opacity = new()
+            StyleFloatProp opacity = new(),
+            OverflowProp overflow = new(),
+            TextOverflowProp textOverflow = new(),
+            WhiteSpaceProp whiteSpace = new()
         )
         {
             Position = mergedStyle.Position.IsEmpty ? position : mergedStyle.Position;
@@ -1214,6 +1352,9 @@ namespace Fiber.UIElements
             Scale = mergedStyle.Scale.IsEmpty ? scale : mergedStyle.Scale;
             Rotate = mergedStyle.Rotate.IsEmpty ? rotate : mergedStyle.Rotate;
             Opacity = mergedStyle.Opacity.IsEmpty ? opacity : mergedStyle.Opacity;
+            Overflow = mergedStyle.Overflow.IsEmpty ? overflow : mergedStyle.Overflow;
+            TextOverflow = mergedStyle.TextOverflow.IsEmpty ? textOverflow : mergedStyle.TextOverflow;
+            WhiteSpace = mergedStyle.WhiteSpace.IsEmpty ? whiteSpace : mergedStyle.WhiteSpace;
         }
     }
 }
