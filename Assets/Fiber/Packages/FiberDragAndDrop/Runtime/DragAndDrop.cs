@@ -46,7 +46,8 @@ namespace Fiber.DragAndDrop
             bool isDragHandle = false,
             Action onDragStart = null,
             Action onDragEnd = null,
-            Action onDragMove = null
+            Action onDragMove = null,
+            Ref<VisualElement> wrapperRef = null
         )
         {
             return new DraggableComponent<T>(
@@ -56,7 +57,8 @@ namespace Fiber.DragAndDrop
                 isDragHandle: isDragHandle,
                 onDragStart: onDragStart,
                 onDragEnd: onDragEnd,
-                onDragMove: onDragMove
+                onDragMove: onDragMove,
+                wrapperRef: wrapperRef
             );
         }
 
@@ -353,13 +355,33 @@ namespace Fiber.DragAndDrop
                     });
                 }
 
+                var isFirstDrag = true;
+                var droppableWrapperRef = new Ref<VisualElement>();
+
                 return F.Droppable(
                     forwardRef: droppableRef,
                     value: _item,
                     children: F.Draggable(
+                        wrapperRef: droppableWrapperRef,
                         value: _item,
                         isDragHandle: _isItemDragHandle,
-                        children: Children
+                        children: Children,
+                        onDragStart: () =>
+                        {
+                            // This is a hack since we currently are not supporting suspense in Fiber.
+                            // If we supported suspense we would have set width and height when the suspension
+                            // was resolved. Now we wait until first drag to calculate it, which works fine. 
+                            // The reason why we want to keep the height is that we re-parent the dragged element
+                            // when dragging it, but we still want to keep the dimenstions of the container, which
+                            // is not dragged around. 
+                            if (isFirstDrag)
+                            {
+                                isFirstDrag = false;
+                                var resolvedStyle = droppableWrapperRef.Current.resolvedStyle;
+                                droppableWrapperRef.Current.style.width = resolvedStyle.width;
+                                droppableWrapperRef.Current.style.height = resolvedStyle.height;
+                            }
+                        }
                     )
                 );
             }
@@ -450,9 +472,10 @@ namespace Fiber.DragAndDrop
         private readonly bool _isDragHandle;
         private readonly DragHandlePointerMode _dragHandlePointerMode;
         private readonly Style _style;
-        private Action _onDragStart;
-        private Action _onDragEnd;
-        private Action _onDragMove;
+        private readonly Action _onDragStart;
+        private readonly Action _onDragEnd;
+        private readonly Action _onDragMove;
+        private readonly Ref<VisualElement> _wrapperRef;
 
         public DraggableComponent(
             VirtualBody children,
@@ -462,7 +485,8 @@ namespace Fiber.DragAndDrop
             DragHandlePointerMode dragHandlePointerMode = DragHandlePointerMode.HoldToDrag,
             Action onDragStart = null,
             Action onDragEnd = null,
-            Action onDragMove = null
+            Action onDragMove = null,
+            Ref<VisualElement> wrapperRef = null
         ) : base(children)
         {
             _value = value;
@@ -481,13 +505,18 @@ namespace Fiber.DragAndDrop
                 _style = new();
             }
 
+            _onDragStart = onDragStart;
+            _onDragEnd = onDragEnd;
+            _onDragMove = onDragMove;
+            _wrapperRef = wrapperRef;
+
             _isDragHandle = isDragHandle;
         }
 
         public override VirtualBody Render()
         {
             var position = new Signal<StyleEnum<Position>>(Position.Relative);
-            var parentRef = new Ref<VisualElement>();
+            var wrapperRef = _wrapperRef ?? new Ref<VisualElement>();
             var dndContext = F.GetContext<DragAndDropContext<T>>();
             var destinationId = new Signal<string>(null);
 
@@ -515,29 +544,12 @@ namespace Fiber.DragAndDrop
                 };
             });
 
-            F.CreateEffect(() =>
-            {
-                EventCallback<GeometryChangedEvent> onGeometryChanged = null;
-                onGeometryChanged = new((e) =>
-                {
-                    var resolvedStyle = parentRef.Current.resolvedStyle;
-                    parentRef.Current.style.width = resolvedStyle.width;
-                    parentRef.Current.style.height = resolvedStyle.height;
-                    draggableElementRef.Current.UnregisterCallback(onGeometryChanged);
-                });
-                draggableElementRef.Current.RegisterCallback(onGeometryChanged);
-                return () =>
-                {
-                    draggableElementRef.Current.UnregisterCallback(onGeometryChanged);
-                };
-            });
-
             return F.ContextProvider(
                 value: draggableContext,
                 children: F.ContextProvider(
                     value: dragHandleElement,
                     children: F.View(
-                        _ref: parentRef,
+                        _ref: wrapperRef,
                         style: new Style(
                             paddingBottom: 0,
                             paddingLeft: 0,
