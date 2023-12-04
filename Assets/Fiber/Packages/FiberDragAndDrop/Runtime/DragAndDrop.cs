@@ -775,20 +775,17 @@ namespace Fiber.DragAndDrop
             draggable.PositionSignal.Value = Position.Absolute;
             draggable.DestinationIdSignal.Value = PortalDestinationId;
 
-            // Get the width, height and world position of the draggable
+            // Get position of draggable and portal destination
             var draggableElement = draggable.Ref.Current;
-            var draggableWidth = draggableElement.resolvedStyle.width;
-            var draggableHeight = draggableElement.resolvedStyle.height;
-            var draggableWorldPosition = draggableElement.worldBound.center;
+            var draggableWorldPosition = draggableElement.worldBound.position;
 
-            // Place portal destination at the same position as the dragged element and make it the same size
             var portalDestination = PortalDestinationRef.Current;
-            var portalWorldPosition = portalDestination.worldBound.center;
+            var portalWorldPosition = portalDestination.worldBound.position;
+
+            // Place portal destination at the same position as the dragged element
             var portalDestinationStartPosition = (Vector3)draggableWorldPosition - (Vector3)portalWorldPosition + portalDestination.transform.position;
             TargetStartPosition = portalDestinationStartPosition;
             portalDestination.transform.position = portalDestinationStartPosition;
-            portalDestination.style.width = draggableWidth;
-            portalDestination.style.height = draggableHeight;
 
             ClosestDroppable.Value = GetClosestDroppable();
 
@@ -823,7 +820,7 @@ namespace Fiber.DragAndDrop
 
         private Droppable GetClosestDroppable()
         {
-            var portalDestination = PortalDestinationRef.Current;
+            var dragged = CurrentlyDragged.Value.Ref.Current;
             Droppable droppable = null;
 
             Vector3 smallestDelta = Vector2.one * float.MaxValue;
@@ -831,7 +828,7 @@ namespace Fiber.DragAndDrop
             {
                 var currentDroppable = Droppables[i];
                 var droppableWorldPos = currentDroppable.Ref.Current.worldBound.center;
-                var delta = droppableWorldPos - portalDestination.worldBound.center;
+                var delta = droppableWorldPos - dragged.worldBound.center;
 
                 if (delta.magnitude < smallestDelta.magnitude)
                 {
