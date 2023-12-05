@@ -41,11 +41,14 @@ public class DragAndDropExample : MonoBehaviour
             var delayedIsDragged = new Signal<bool>(false);
             F.CreateEffect((isDragged) =>
             {
-                MonoBehaviourHelper.Instance.SetTimeout(() =>
+                var timeoutId = MonoBehaviourHelper.Instance.SetTimeout(() =>
                 {
                     delayedIsDragged.Value = isDragged;
                 }, 0.025f);
-                return null;
+                return () =>
+                {
+                    MonoBehaviourHelper.Instance.ClearTimeout(timeoutId);
+                };
             }, _isDraggedSignal);
 
             var borderColor = F.CreateComputedSignal<bool, bool, StyleColor>((isDragged, isHovered) =>

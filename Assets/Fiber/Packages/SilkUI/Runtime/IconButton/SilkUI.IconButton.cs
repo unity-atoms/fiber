@@ -12,7 +12,7 @@ namespace SilkUI
         public static SilkIconButtonComponent SilkIconButton(
             this BaseComponent component,
             SignalProp<string> iconName,
-            Action<PointerUpEvent> onPress,
+            Action<PointerData> onPress,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
@@ -35,7 +35,7 @@ namespace SilkUI
     public class SilkIconButtonComponent : BaseComponent
     {
         private readonly SignalProp<string> _iconName;
-        private readonly Action<PointerUpEvent> _onPress;
+        private readonly Action<PointerData> _onPress;
         private readonly string _role;
         private readonly string _subRole;
         private readonly SignalProp<string> _variant;
@@ -44,7 +44,7 @@ namespace SilkUI
 
         public SilkIconButtonComponent(
             SignalProp<string> iconName,
-            Action<PointerUpEvent> onPress,
+            Action<PointerData> onPress,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),

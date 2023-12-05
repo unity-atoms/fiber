@@ -16,7 +16,7 @@ namespace SilkUI
             string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Action<PointerUpEvent> onPress = null
+            Action<PointerData> onPress = null
         )
         {
             return new SilkButtonComponent(
@@ -36,7 +36,7 @@ namespace SilkUI
         private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
-        private readonly Action<PointerUpEvent> _onPress;
+        private readonly Action<PointerData> _onPress;
 
         public SilkButtonComponent(
             VirtualBody children,
@@ -44,7 +44,7 @@ namespace SilkUI
             string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Action<PointerUpEvent> onPress = null
+            Action<PointerData> onPress = null
         ) : base(children)
         {
             _role = role;

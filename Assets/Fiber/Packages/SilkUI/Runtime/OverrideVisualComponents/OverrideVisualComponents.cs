@@ -79,7 +79,7 @@ namespace SilkUI
         // Icon button component
         public delegate BaseComponent CreateIconButtonDelegate(
             SignalProp<string> iconName,
-            Action<PointerUpEvent> onPress,
+            Action<PointerData> onPress,
             InteractiveElement interactiveRef,
             string role,
             string subRole,

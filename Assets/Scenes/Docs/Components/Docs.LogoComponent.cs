@@ -18,11 +18,11 @@ public enum DocsLogoSize
 public class DocsLogoComponent : BaseComponent
 {
     private readonly SignalProp<DocsLogoSize> _size;
-    private readonly Action<PointerUpEvent> _onPress;
+    private readonly Action<PointerData> _onPress;
     private readonly Style _style;
     public DocsLogoComponent(
         SignalProp<DocsLogoSize> size,
-        Action<PointerUpEvent> onPress = null,
+        Action<PointerData> onPress = null,
         Style style = new()
     )
     {

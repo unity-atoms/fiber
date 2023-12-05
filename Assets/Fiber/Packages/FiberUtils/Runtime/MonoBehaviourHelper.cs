@@ -139,11 +139,24 @@ namespace FiberUtils
         }
 
         private Dictionary<int, Coroutine> _runningCoroutines = new Dictionary<int, Coroutine>();
-        public void SetTimeout(Action callback, float delay)
+        public int SetTimeout(Action callback, float delay)
         {
             var coroutineId = _idGenerator.NextId();
             var coroutine = StartCoroutine(SetTimeoutCoroutine(callback, delay, coroutineId));
             _runningCoroutines.Add(coroutineId, coroutine);
+            return coroutineId;
+        }
+
+        public bool ClearTimeout(int coroutineId)
+        {
+            if (_runningCoroutines.ContainsKey(coroutineId))
+            {
+                StopCoroutine(_runningCoroutines[coroutineId]);
+                _runningCoroutines.Remove(coroutineId);
+                return true;
+            }
+
+            return false;
         }
 
         private IEnumerator SetTimeoutCoroutine(Action callback, float delay, int coroutineId)

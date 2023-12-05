@@ -47,7 +47,8 @@ namespace Fiber.DragAndDrop
             Action onDragStart = null,
             Action onDragEnd = null,
             Action onDragMove = null,
-            Ref<VisualElement> wrapperRef = null
+            Ref<VisualElement> wrapperRef = null,
+            Action<PointerData> onClick = null
         )
         {
             return new DraggableComponent<T>(
@@ -58,7 +59,8 @@ namespace Fiber.DragAndDrop
                 onDragStart: onDragStart,
                 onDragEnd: onDragEnd,
                 onDragMove: onDragMove,
-                wrapperRef: wrapperRef
+                wrapperRef: wrapperRef,
+                onClick: onClick
             );
         }
 
@@ -66,12 +68,14 @@ namespace Fiber.DragAndDrop
             this BaseComponent component,
             VirtualBody children,
             Style style = new(),
-            DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag
+            DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag,
+            Action<PointerData> onClick = null
         )
         {
             return new DragHandleComponent<T>(
                 children: children,
                 style: style,
+                onClick: onClick,
                 pointerMode: pointerMode
             );
         }
@@ -80,10 +84,12 @@ namespace Fiber.DragAndDrop
             this BaseComponent component,
             DraggableContext<T> draggableContext,
             Ref<VisualElement> _ref = null,
+            Action<PointerData> onClick = null,
             DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag
         )
         {
             var dndContext = component.GetContext<DragAndDropContext<T>>();
+            // int timeoutId = -1;
 
             _ref = _ref ?? new Ref<VisualElement>();
             var interactiveDragHandle = component.CreateInteractiveElement(
@@ -93,18 +99,19 @@ namespace Fiber.DragAndDrop
                     onPressedDown: CursorType.Grabbing,
                     onDisabled: CursorType.NotAllowed
                 ),
+                onClick: onClick,
                 onPressDown: (evt) =>
                 {
                     if (pointerMode == DragHandlePointerMode.HoldToDrag && !dndContext.IsDragging())
                     {
-                        dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.position, evt.pointerId);
+                        dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.Position, evt.PointerId);
                     }
                 },
                 onPressUp: (evt) =>
                 {
                     if (pointerMode == DragHandlePointerMode.PressToDrag && !dndContext.IsDragging())
                     {
-                        dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.position, evt.pointerId);
+                        dndContext.StartDrag(draggable: draggableContext.DraggableRef.Current, dragHandle: _ref.Current, evt.Position, evt.PointerId);
                         evt.StopImmediatePropagation();
                     }
                 }
@@ -139,7 +146,8 @@ namespace Fiber.DragAndDrop
             Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true,
-            Action<int, int> moveItem = null
+            Action<int, int> moveItem = null,
+            Action<ItemType> onClick = null
         ) where ItemType : IEquatable<ItemType>
         {
             return new DragAndDropListComponent<ItemType, KeyType>(
@@ -147,7 +155,8 @@ namespace Fiber.DragAndDrop
                 children: children,
                 animationType: animationType,
                 isItemDragHandle: isItemDragHandle,
-                moveItem: moveItem
+                moveItem: moveItem,
+                onClick: onClick
             );
         }
     }
@@ -182,13 +191,15 @@ namespace Fiber.DragAndDrop
         private readonly DragAndDropListAnimationType _animationType;
         private readonly bool _isItemDragHandle;
         private readonly Action<int, int> _moveItem;
+        private readonly Action<ItemType> _onClick;
 
         public DragAndDropListComponent(
             ISignalList<ItemType> items,
             Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true,
-            Action<int, int> moveItem = null
+            Action<int, int> moveItem = null,
+            Action<ItemType> onClick = null
         ) : base(VirtualBody.Empty)
         {
             _items = items;
@@ -196,6 +207,7 @@ namespace Fiber.DragAndDrop
             _animationType = animationType;
             _isItemDragHandle = isItemDragHandle;
             _moveItem = moveItem;
+            _onClick = onClick;
         }
 
         public override VirtualBody Render()
@@ -206,7 +218,8 @@ namespace Fiber.DragAndDrop
                     children: _children,
                     animationType: _animationType,
                     isItemDragHandle: _isItemDragHandle,
-                    moveItem: _moveItem
+                    moveItem: _moveItem,
+                    onClick: _onClick
                 )
             );
         }
@@ -218,13 +231,15 @@ namespace Fiber.DragAndDrop
             private readonly DragAndDropListAnimationType _animationType;
             private readonly bool _isItemDragHandle;
             private readonly Action<int, int> _moveItem;
+            private readonly Action<ItemType> _onClick;
 
             public DragAndDropListInner(
                 ISignalList<ItemType> items,
                 Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
                 DragAndDropListAnimationType animationType,
                 bool isItemDragHandle,
-                Action<int, int> moveItem
+                Action<int, int> moveItem,
+                Action<ItemType> onClick
             ) : base(VirtualBody.Empty)
             {
                 _items = items;
@@ -232,6 +247,7 @@ namespace Fiber.DragAndDrop
                 _animationType = animationType;
                 _isItemDragHandle = isItemDragHandle;
                 _moveItem = moveItem;
+                _onClick = onClick;
             }
 
             public override VirtualBody Render()
@@ -273,7 +289,12 @@ namespace Fiber.DragAndDrop
                             item: item,
                             children: child,
                             animationType: _animationType,
-                            isItemDragHandle: _isItemDragHandle
+                            isItemDragHandle: _isItemDragHandle,
+                            onClick: _onClick != null ? (e) =>
+                            {
+                                _onClick.Invoke(item);
+                            }
+                        : null
                         ));
                     }
                 );
@@ -285,17 +306,20 @@ namespace Fiber.DragAndDrop
             private readonly ItemType _item;
             private readonly DragAndDropListAnimationType _animationType;
             private readonly bool _isItemDragHandle;
+            private readonly Action<PointerData> _onClick;
 
             public DragAndDropListItemComponent(
                 VirtualBody children,
                 ItemType item,
                 DragAndDropListAnimationType animationType,
-                bool isItemDragHandle
+                bool isItemDragHandle,
+                Action<PointerData> onClick
             ) : base(children)
             {
                 _item = item;
                 _animationType = animationType;
                 _isItemDragHandle = isItemDragHandle;
+                _onClick = onClick;
             }
 
             public override VirtualBody Render()
@@ -362,6 +386,7 @@ namespace Fiber.DragAndDrop
                     forwardRef: droppableRef,
                     value: _item,
                     children: F.Draggable(
+                        onClick: _onClick,
                         wrapperRef: droppableWrapperRef,
                         value: _item,
                         isDragHandle: _isItemDragHandle,
@@ -392,20 +417,23 @@ namespace Fiber.DragAndDrop
     {
         private readonly Style _style;
         private readonly DragHandlePointerMode _pointerMode;
+        private readonly Action<PointerData> _onClick;
         public DragHandleComponent(
             VirtualBody children,
             Style style = new(),
-            DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag
+            DragHandlePointerMode pointerMode = DragHandlePointerMode.HoldToDrag,
+            Action<PointerData> onClick = null
         ) : base(children)
         {
             _style = style;
             _pointerMode = pointerMode;
+            _onClick = onClick;
         }
 
         public override VirtualBody Render()
         {
             var draggableContext = F.GetContext<DraggableContext<T>>();
-            var dragHandleElement = F.CreateDragHandleElement<T>(draggableContext: draggableContext, pointerMode: _pointerMode);
+            var dragHandleElement = F.CreateDragHandleElement<T>(draggableContext: draggableContext, pointerMode: _pointerMode, onClick: _onClick);
 
             return F.ContextProvider(
                 value: dragHandleElement,
@@ -475,6 +503,7 @@ namespace Fiber.DragAndDrop
         private readonly Action _onDragStart;
         private readonly Action _onDragEnd;
         private readonly Action _onDragMove;
+        private readonly Action<PointerData> _onClick;
         private readonly Ref<VisualElement> _wrapperRef;
 
         public DraggableComponent(
@@ -486,6 +515,7 @@ namespace Fiber.DragAndDrop
             Action onDragStart = null,
             Action onDragEnd = null,
             Action onDragMove = null,
+            Action<PointerData> onClick = null,
             Ref<VisualElement> wrapperRef = null
         ) : base(children)
         {
@@ -508,6 +538,7 @@ namespace Fiber.DragAndDrop
             _onDragStart = onDragStart;
             _onDragEnd = onDragEnd;
             _onDragMove = onDragMove;
+            _onClick = onClick;
             _wrapperRef = wrapperRef;
 
             _isDragHandle = isDragHandle;
@@ -523,7 +554,7 @@ namespace Fiber.DragAndDrop
             var draggableElementRef = new Ref<VisualElement>();
             var draggableRef = new Ref<DragAndDropContext<T>.Draggable>();
             var draggableContext = new DraggableContext<T>(draggableRef);
-            DragHandleElement<T> dragHandleElement = _isDragHandle ? F.CreateDragHandleElement<T>(draggableContext: draggableContext, _ref: draggableElementRef, pointerMode: _dragHandlePointerMode) : null;
+            DragHandleElement<T> dragHandleElement = _isDragHandle ? F.CreateDragHandleElement<T>(draggableContext: draggableContext, _ref: draggableElementRef, pointerMode: _dragHandlePointerMode, onClick: _onClick) : null;
 
             F.CreateEffect(() =>
             {

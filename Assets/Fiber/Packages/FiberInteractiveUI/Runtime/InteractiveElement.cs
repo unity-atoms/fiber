@@ -3,6 +3,7 @@ using UnityEngine.UIElements;
 using Signals;
 using Fiber.Cursed;
 using FiberUtils;
+using UnityEngine;
 
 namespace Fiber.InteractiveUI
 {
@@ -31,17 +32,37 @@ namespace Fiber.InteractiveUI
         }
     }
 
+    public struct PointerData
+    {
+        public Vector3 Position;
+        public int PointerId;
+        private EventBase _evt;
+
+        public PointerData(Vector3 position, int pointerId, EventBase evt = null)
+        {
+            Position = position;
+            PointerId = pointerId;
+            _evt = evt;
+        }
+
+        public void StopImmediatePropagation()
+        {
+            _evt?.StopImmediatePropagation();
+        }
+    }
+
     public static partial class BaseComponentExtensions
     {
-
         private static IntIdGenerator _idGenerator = new IntIdGenerator();
+        private static readonly float MAX_CLICK_HOLD_TIME = 0.15f;
 
         public static InteractiveElement CreateInteractiveElement(
             this BaseComponent component,
             Ref<VisualElement> _ref = null,
             ISignal<bool> isDisabled = null,
-            Action<PointerUpEvent> onPressUp = null,
-            Action<PointerDownEvent> onPressDown = null,
+            Action<PointerData> onPressUp = null,
+            Action<PointerData> onPressDown = null,
+            Action<PointerData> onClick = null,
             InteractiveCursorTypes cursorType = new()
         )
         {
@@ -55,23 +76,57 @@ namespace Fiber.InteractiveUI
                 isDisabled: isDisabled
             );
 
+            // Keep track of how long time ago pointer was down in order to detect
+            // abortion of clicks (holding for too long) and detection of press down.
+            var isClicking = false;
+            var clickStartTime = -1f;
+            PointerData pointerDataLastPointerDown = default;
+            if (onClick != null)
+            {
+                component.CreateUpdateEffect((deltaTime) =>
+                {
+                    if (isClicking)
+                    {
+                        if (MAX_CLICK_HOLD_TIME + clickStartTime <= Time.unscaledTime)
+                        {
+                            isClicking = false;
+                            if (onPressDown != null)
+                            {
+                                onPressDown(pointerDataLastPointerDown);
+                            }
+                        }
+                    }
+                });
+            }
+
             component.CreateEffect(() =>
             {
-                interactiveElement.Ref.Current.RegisterCallback<MouseEnterEvent>(evt =>
+                interactiveElement.Ref.Current.RegisterCallback<PointerEnterEvent>(evt =>
                 {
                     interactiveElement.IsHovered.Value = true;
                 });
-                interactiveElement.Ref.Current.RegisterCallback<MouseLeaveEvent>(evt =>
+                interactiveElement.Ref.Current.RegisterCallback<PointerLeaveEvent>(evt =>
                 {
                     interactiveElement.IsHovered.Value = false;
                     interactiveElement.IsPressed.Value = false;
                 });
                 interactiveElement.Ref.Current.RegisterCallback<PointerDownEvent>(evt =>
                 {
+                    var isEnabled = isDisabled == null || !isDisabled.Get();
+
                     interactiveElement.IsPressed.Value = true;
-                    if (onPressDown != null && (isDisabled == null || !isDisabled.Get()))
+                    if (isEnabled)
                     {
-                        onPressDown(evt);
+                        if (onClick != null)
+                        {
+                            isClicking = true;
+                            clickStartTime = Time.unscaledTime;
+                            pointerDataLastPointerDown = new PointerData(evt.position, evt.pointerId, evt);
+                        }
+                        else if (onPressDown != null)
+                        {
+                            onPressDown(new PointerData(evt.position, evt.pointerId, evt));
+                        }
                     }
                     // Need to specify useTrickleDown in order to catch the event for buttons
                     // See this thread for more info: https://forum.unity.com/threads/pointerdownevent-on-buttons-not-working.1211238/
@@ -80,13 +135,36 @@ namespace Fiber.InteractiveUI
                 {
                     if (interactiveElement.IsPressed.Value)
                     {
+                        var isEnabled = isDisabled == null || !isDisabled.Get();
                         interactiveElement.IsPressed.Value = false;
-                        if (onPressUp != null && (isDisabled == null || !isDisabled.Get()))
+                        if (isClicking)
                         {
-                            onPressUp(evt);
+                            isClicking = false;
+                            if (isEnabled)
+                            {
+                                onClick(new PointerData(evt.position, evt.pointerId, evt));
+                            }
+                        }
+                        else if (onPressUp != null && isEnabled)
+                        {
+                            onPressUp(new PointerData(evt.position, evt.pointerId, evt));
                         }
                     }
                 });
+                if (onClick != null)
+                {
+                    interactiveElement.Ref.Current.RegisterCallback<PointerMoveEvent>(evt =>
+                    {
+                        if (isClicking)
+                        {
+                            isClicking = false;
+                            if (onPressDown != null)
+                            {
+                                onPressDown(new PointerData(evt.position, evt.pointerId, evt));
+                            }
+                        }
+                    });
+                }
                 return null;
             });
 
