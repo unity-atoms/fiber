@@ -13,6 +13,7 @@ namespace SilkUI
             this BaseComponent component,
             SignalProp<string> iconName,
             Action<PointerData> onPress,
+            IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
@@ -23,6 +24,7 @@ namespace SilkUI
             return new SilkIconButtonComponent(
                 iconName: iconName,
                 onPress: onPress,
+                size: size,
                 role: role,
                 subRole: subRole,
                 variant: variant,
@@ -36,6 +38,7 @@ namespace SilkUI
     {
         private readonly SignalProp<string> _iconName;
         private readonly Action<PointerData> _onPress;
+        private readonly IconSize _size;
         private readonly string _role;
         private readonly string _subRole;
         private readonly SignalProp<string> _variant;
@@ -45,6 +48,7 @@ namespace SilkUI
         public SilkIconButtonComponent(
             SignalProp<string> iconName,
             Action<PointerData> onPress,
+            IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
@@ -54,12 +58,32 @@ namespace SilkUI
         {
             _iconName = iconName;
             _onPress = onPress;
+            _size = size;
             _role = role;
             _subRole = subRole;
             _variant = variant;
             _style = style;
             _forwardRef = forwardRef;
         }
+
+        private float GetDimensionSpacing()
+        {
+            switch (_size)
+            {
+                case IconSize.Tiny:
+                    return 4;
+                case IconSize.Small:
+                    return 6;
+                case IconSize.Large:
+                    return 8;
+                case IconSize.XL:
+                    return 10;
+                case IconSize.Medium:
+                default:
+                    return 6;
+            }
+        }
+
         public override VirtualBody Render()
         {
             var interactiveElement = F.CreateInteractiveElement(_ref: _forwardRef, isDisabled: null, onPressUp: _onPress);
@@ -104,13 +128,13 @@ namespace SilkUI
             return F.SilkIcon(
                 forwardRef: interactiveElement.Ref,
                 iconName: _iconName,
-                size: IconSize.Medium,
+                size: _size,
                 style: new Style(
                     mergedStyle: _style,
                     color: color,
                     backgroundColor: backgroundColor,
-                    width: themeStore.Spacing(8),
-                    height: themeStore.Spacing(8),
+                    width: themeStore.Spacing(GetDimensionSpacing()),
+                    height: themeStore.Spacing(GetDimensionSpacing()),
                     borderTopRightRadius: new Length(50, LengthUnit.Percent),
                     borderTopLeftRadius: new Length(50, LengthUnit.Percent),
                     borderBottomRightRadius: new Length(50, LengthUnit.Percent),
