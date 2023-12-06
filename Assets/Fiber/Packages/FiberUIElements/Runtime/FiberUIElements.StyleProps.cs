@@ -1048,6 +1048,48 @@ namespace Fiber.UIElements
         public StyleEnum<WhiteSpace> Get() => WorkLoopSignalProp.Get();
     }
 
+    public struct VisibilityProp
+    {
+        public SignalProp<StyleEnum<Visibility>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public VisibilityProp(StyleEnum<Visibility> value)
+        {
+            SignalProp = value;
+        }
+
+        public VisibilityProp(BaseSignal<StyleEnum<Visibility>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator VisibilityProp(Visibility value)
+        {
+            return new VisibilityProp(value);
+        }
+
+        public static implicit operator VisibilityProp(StyleKeyword keyword)
+        {
+            return new VisibilityProp(keyword);
+        }
+
+        public StyleEnum<Visibility> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopVisibilityProp
+    {
+        public WorkLoopSignalProp<StyleEnum<Visibility>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopVisibilityProp(VisibilityProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleEnum<Visibility> Get() => WorkLoopSignalProp.Get();
+    }
+
     public struct Style
     {
         public PositionProp Position { get; private set; }
@@ -1109,6 +1151,7 @@ namespace Fiber.UIElements
         public OverflowProp Overflow { get; private set; }
         public TextOverflowProp TextOverflow { get; private set; }
         public WhiteSpaceProp WhiteSpace { get; private set; }
+        public VisibilityProp Visibility { get; private set; }
 
         public Style(
             PositionProp position = new(),
@@ -1169,7 +1212,8 @@ namespace Fiber.UIElements
             StyleFloatProp opacity = new(),
             OverflowProp overflow = new(),
             TextOverflowProp textOverflow = new(),
-            WhiteSpaceProp whiteSpace = new()
+            WhiteSpaceProp whiteSpace = new(),
+            VisibilityProp visibility = new()
         )
         {
             Position = position;
@@ -1231,6 +1275,7 @@ namespace Fiber.UIElements
             Overflow = overflow;
             TextOverflow = textOverflow;
             WhiteSpace = whiteSpace;
+            Visibility = visibility;
         }
 
         public Style(
@@ -1293,7 +1338,8 @@ namespace Fiber.UIElements
             StyleFloatProp opacity = new(),
             OverflowProp overflow = new(),
             TextOverflowProp textOverflow = new(),
-            WhiteSpaceProp whiteSpace = new()
+            WhiteSpaceProp whiteSpace = new(),
+            VisibilityProp visibility = new()
         )
         {
             Position = mergedStyle.Position.IsEmpty ? position : mergedStyle.Position;
@@ -1355,6 +1401,7 @@ namespace Fiber.UIElements
             Overflow = mergedStyle.Overflow.IsEmpty ? overflow : mergedStyle.Overflow;
             TextOverflow = mergedStyle.TextOverflow.IsEmpty ? textOverflow : mergedStyle.TextOverflow;
             WhiteSpace = mergedStyle.WhiteSpace.IsEmpty ? whiteSpace : mergedStyle.WhiteSpace;
+            Visibility = mergedStyle.Visibility.IsEmpty ? visibility : mergedStyle.Visibility;
         }
     }
 }

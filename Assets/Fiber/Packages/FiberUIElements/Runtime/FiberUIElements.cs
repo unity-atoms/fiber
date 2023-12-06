@@ -1018,6 +1018,7 @@ namespace Fiber.UIElements
         private WorkLoopOverflowProp _overflowWorkLoopItem;
         private WorkLoopTextOverflowProp _textOverflowWorkLoopItem;
         private WorkLoopWhiteSpaceProp _whiteSpaceWorkLoopItem;
+        private WorkLoopVisibilityProp _visibilityWorkLoopItem;
 
         #endregion
         private WorkLoopSignalProp<string> _nameWorkLoopItem;
@@ -1631,6 +1632,16 @@ namespace Fiber.UIElements
                 }
                 _whiteSpaceWorkLoopItem = new(style.WhiteSpace);
 
+                if (!style.Visibility.IsEmpty)
+                {
+                    Instance.style.visibility = style.Visibility.Get();
+                    if (style.Visibility.IsSignal)
+                    {
+                        style.Visibility.SignalProp.Signal.RegisterDependent(this);
+                    }
+                }
+                _visibilityWorkLoopItem = new(style.Visibility);
+
             }
             if (!virtualNode.Name.IsEmpty)
             {
@@ -1816,6 +1827,7 @@ namespace Fiber.UIElements
             // Overflow
             // TextOverflow
             // WhiteSpace
+            // Visibility
             if (!_styleWorkLoopItem.IsEmpty)
             {
                 if (_styleWorkLoopItem.IsSignal && !_styleWorkLoopItem.Check())
@@ -3933,6 +3945,42 @@ namespace Fiber.UIElements
                     }
                 }
 
+                // Visibility - Update instance value
+                if (style.Visibility.IsSignal)
+                {
+                    if (_visibilityWorkLoopItem.Check())
+                    {
+                        Instance.style.visibility = _visibilityWorkLoopItem.Get();
+                    }
+                }
+                else if (style.Visibility.IsValue)
+                {
+                    var value = style.Visibility.Get();
+                    if (Instance.style.visibility != value)
+                    {
+                        Instance.style.visibility = value;
+                    }
+                }
+                else if (style.Visibility.IsEmpty && !_lastStyleFromSignal.Visibility.IsEmpty)
+                {
+                    Instance.style.visibility = StyleKeyword.Initial;
+                }
+                // Visibility - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.Visibility.SignalProp.Signal != style.Visibility.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.Visibility.IsSignal)
+                        {
+                            _lastStyleFromSignal.Visibility.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.Visibility.IsSignal)
+                        {
+                            style.Visibility.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
+                }
+
 
                 _lastStyleFromSignal = style;
             }
@@ -4221,6 +4269,10 @@ namespace Fiber.UIElements
             if (_whiteSpaceWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
                 _whiteSpaceWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_visibilityWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _visibilityWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             // end style
             if (_nameWorkLoopItem.IsSignal)
