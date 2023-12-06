@@ -907,6 +907,11 @@ namespace Fiber.UIElements
             return new TextAnchorProp(keyword);
         }
 
+        public static implicit operator TextAnchorProp(BaseSignal<StyleEnum<TextAnchor>> signal)
+        {
+            return new TextAnchorProp(signal);
+        }
+
         public StyleEnum<TextAnchor> Get() => SignalProp.Get();
     }
 
@@ -947,6 +952,11 @@ namespace Fiber.UIElements
         public static implicit operator OverflowProp(StyleKeyword keyword)
         {
             return new OverflowProp(keyword);
+        }
+
+        public static implicit operator OverflowProp(BaseSignal<StyleEnum<Overflow>> signal)
+        {
+            return new OverflowProp(signal);
         }
 
         public StyleEnum<Overflow> Get() => SignalProp.Get();
@@ -991,6 +1001,11 @@ namespace Fiber.UIElements
             return new TextOverflowProp(keyword);
         }
 
+        public static implicit operator TextOverflowProp(BaseSignal<StyleEnum<TextOverflow>> signal)
+        {
+            return new TextOverflowProp(signal);
+        }
+
         public StyleEnum<TextOverflow> Get() => SignalProp.Get();
     }
 
@@ -1033,6 +1048,11 @@ namespace Fiber.UIElements
             return new WhiteSpaceProp(keyword);
         }
 
+        public static implicit operator WhiteSpaceProp(BaseSignal<StyleEnum<WhiteSpace>> signal)
+        {
+            return new WhiteSpaceProp(signal);
+        }
+
         public StyleEnum<WhiteSpace> Get() => SignalProp.Get();
     }
 
@@ -1073,6 +1093,11 @@ namespace Fiber.UIElements
         public static implicit operator VisibilityProp(StyleKeyword keyword)
         {
             return new VisibilityProp(keyword);
+        }
+
+        public static implicit operator VisibilityProp(BaseSignal<StyleEnum<Visibility>> signal)
+        {
+            return new VisibilityProp(signal);
         }
 
         public StyleEnum<Visibility> Get() => SignalProp.Get();
