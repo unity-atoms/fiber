@@ -903,7 +903,7 @@ namespace Fiber.DragAndDrop
         public override VirtualBody Render()
         {
             var id = _intIdGenerator.NextId();
-            var portalDestinationId = PORTAL_DESTINATION_BASE_ID + id;
+            var portalDestinationId = $"{PORTAL_DESTINATION_BASE_ID}-{typeof(T)}-{id}";
             var portalDestinationRef = new Ref<VisualElement>();
 
             return F.ContextProvider(
