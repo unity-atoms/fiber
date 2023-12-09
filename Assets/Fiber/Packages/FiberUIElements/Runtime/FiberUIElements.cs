@@ -990,6 +990,7 @@ namespace Fiber.UIElements
         private WorkLoopFlexDirectionProp _flexDirectionWorkLoopItem;
         private WorkLoopJustifyProp _justifyContentWorkLoopItem;
         private WorkLoopAlignProp _alignItemsWorkLoopItem;
+        private WorkLoopWrapProp _flexWrapWorkLoopItem;
         private WorkLoopStyleLengthProp _widthWorkLoopItem;
         private WorkLoopStyleLengthProp _maxWidthWorkLoopItem;
         private WorkLoopStyleLengthProp _minWidthWorkLoopItem;
@@ -1351,6 +1352,16 @@ namespace Fiber.UIElements
                     }
                 }
                 _alignItemsWorkLoopItem = new(style.AlignItems);
+
+                if (!style.FlexWrap.IsEmpty)
+                {
+                    Instance.style.flexWrap = style.FlexWrap.Get();
+                    if (style.FlexWrap.IsSignal)
+                    {
+                        style.FlexWrap.SignalProp.Signal.RegisterDependent(this);
+                    }
+                }
+                _flexWrapWorkLoopItem = new(style.FlexWrap);
 
                 if (!style.Width.IsEmpty)
                 {
@@ -1799,6 +1810,7 @@ namespace Fiber.UIElements
             // FlexDirection
             // JustifyContent
             // AlignItems
+            // FlexWrap
             // Width
             // MaxWidth
             // MinWidth
@@ -2933,6 +2945,42 @@ namespace Fiber.UIElements
                         if (style.AlignItems.IsSignal)
                         {
                             style.AlignItems.SignalProp.Signal.RegisterDependent(this);
+                        }
+                    }
+                }
+
+                // FlexWrap - Update instance value
+                if (style.FlexWrap.IsSignal)
+                {
+                    if (_flexWrapWorkLoopItem.Check())
+                    {
+                        Instance.style.flexWrap = _flexWrapWorkLoopItem.Get();
+                    }
+                }
+                else if (style.FlexWrap.IsValue)
+                {
+                    var value = style.FlexWrap.Get();
+                    if (Instance.style.flexWrap != value)
+                    {
+                        Instance.style.flexWrap = value;
+                    }
+                }
+                else if (style.FlexWrap.IsEmpty && !_lastStyleFromSignal.FlexWrap.IsEmpty)
+                {
+                    Instance.style.flexWrap = StyleKeyword.Initial;
+                }
+                // FlexWrap - Register / unregister dependant signals
+                if (_styleWorkLoopItem.IsSignal)
+                {
+                    if (_lastStyleFromSignal.FlexWrap.SignalProp.Signal != style.FlexWrap.SignalProp.Signal)
+                    {
+                        if (_lastStyleFromSignal.FlexWrap.IsSignal)
+                        {
+                            _lastStyleFromSignal.FlexWrap.SignalProp.Signal.UnregisterDependent(this);
+                        }
+                        if (style.FlexWrap.IsSignal)
+                        {
+                            style.FlexWrap.SignalProp.Signal.RegisterDependent(this);
                         }
                     }
                 }
@@ -4157,6 +4205,10 @@ namespace Fiber.UIElements
             if (_alignItemsWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {
                 _alignItemsWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
+            }
+            if (_flexWrapWorkLoopItem.WorkLoopSignalProp.IsSignal)
+            {
+                _flexWrapWorkLoopItem.WorkLoopSignalProp.SignalProp.Signal.UnregisterDependent(this);
             }
             if (_widthWorkLoopItem.WorkLoopSignalProp.IsSignal)
             {

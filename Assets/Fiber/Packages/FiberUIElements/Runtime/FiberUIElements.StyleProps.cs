@@ -405,6 +405,55 @@ namespace Fiber.UIElements
         public StyleEnum<Align> Get() => WorkLoopSignalProp.Get();
     }
 
+    public struct WrapProp
+    {
+        public SignalProp<StyleEnum<Wrap>> SignalProp { get; private set; }
+        public bool IsEmpty { get => SignalProp.IsEmpty; }
+        public bool IsValue { get => SignalProp.IsValue; }
+        public bool IsSignal { get => SignalProp.IsSignal; }
+
+        public WrapProp(StyleEnum<Wrap> value)
+        {
+            SignalProp = value;
+        }
+
+        public WrapProp(BaseSignal<StyleEnum<Wrap>> signal)
+        {
+            SignalProp = signal;
+        }
+
+        public static implicit operator WrapProp(StyleKeyword keyword)
+        {
+            StyleEnum<Wrap> styleEnum = keyword;
+            return new WrapProp(styleEnum);
+        }
+
+        public static implicit operator WrapProp(Wrap wrap)
+        {
+            StyleEnum<Wrap> styleEnum = wrap;
+            return new WrapProp(styleEnum);
+        }
+
+        public static implicit operator WrapProp(BaseSignal<StyleEnum<Wrap>> signal)
+        {
+            return new WrapProp(signal);
+        }
+
+        public StyleEnum<Wrap> Get() => SignalProp.Get();
+    }
+
+    public struct WorkLoopWrapProp
+    {
+        public WorkLoopSignalProp<StyleEnum<Wrap>> WorkLoopSignalProp { get; private set; }
+
+        public WorkLoopWrapProp(WrapProp prop)
+        {
+            WorkLoopSignalProp = new(prop.SignalProp);
+        }
+        public bool Check() => WorkLoopSignalProp.Check();
+        public StyleEnum<Wrap> Get() => WorkLoopSignalProp.Get();
+    }
+
     public struct StyleFontProp
     {
         public SignalProp<StyleFont> SignalProp { get; private set; }
@@ -1148,6 +1197,7 @@ namespace Fiber.UIElements
         public FlexDirectionProp FlexDirection { get; private set; }
         public JustifyProp JustifyContent { get; private set; }
         public AlignProp AlignItems { get; private set; }
+        public WrapProp FlexWrap { get; private set; }
         public StyleLengthProp Width { get; private set; }
         public StyleLengthProp MaxWidth { get; private set; }
         public StyleLengthProp MinWidth { get; private set; }
@@ -1210,6 +1260,7 @@ namespace Fiber.UIElements
             FlexDirectionProp flexDirection = new(),
             JustifyProp justifyContent = new(),
             AlignProp alignItems = new(),
+            WrapProp flexWrap = new(),
             StyleLengthProp width = new(),
             StyleLengthProp maxWidth = new(),
             StyleLengthProp minWidth = new(),
@@ -1272,6 +1323,7 @@ namespace Fiber.UIElements
             FlexDirection = flexDirection;
             JustifyContent = justifyContent;
             AlignItems = alignItems;
+            FlexWrap = flexWrap;
             Width = width;
             MaxWidth = maxWidth;
             MinWidth = minWidth;
@@ -1336,6 +1388,7 @@ namespace Fiber.UIElements
             FlexDirectionProp flexDirection = new(),
             JustifyProp justifyContent = new(),
             AlignProp alignItems = new(),
+            WrapProp flexWrap = new(),
             StyleLengthProp width = new(),
             StyleLengthProp maxWidth = new(),
             StyleLengthProp minWidth = new(),
@@ -1398,6 +1451,7 @@ namespace Fiber.UIElements
             FlexDirection = mergedStyle.FlexDirection.IsEmpty ? flexDirection : mergedStyle.FlexDirection;
             JustifyContent = mergedStyle.JustifyContent.IsEmpty ? justifyContent : mergedStyle.JustifyContent;
             AlignItems = mergedStyle.AlignItems.IsEmpty ? alignItems : mergedStyle.AlignItems;
+            FlexWrap = mergedStyle.FlexWrap.IsEmpty ? flexWrap : mergedStyle.FlexWrap;
             Width = mergedStyle.Width.IsEmpty ? width : mergedStyle.Width;
             MaxWidth = mergedStyle.MaxWidth.IsEmpty ? maxWidth : mergedStyle.MaxWidth;
             MinWidth = mergedStyle.MinWidth.IsEmpty ? minWidth : mergedStyle.MinWidth;

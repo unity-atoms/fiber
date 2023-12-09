@@ -7,14 +7,14 @@ namespace SilkUI
 {
     public static partial class BaseComponentExtensions
     {
-        public static DividerComponent Divider(
+        public static SilkDividerComponent SilkDivider(
             this BaseComponent component,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new()
         )
         {
-            return new DividerComponent(
+            return new SilkDividerComponent(
                 role: role,
                 subRole: subRole,
                 variant: variant
@@ -23,13 +23,13 @@ namespace SilkUI
     }
 
 
-    public class DividerComponent : BaseComponent
+    public class SilkDividerComponent : BaseComponent
     {
         private readonly string _role;
         private readonly string _subRole;
         private readonly SignalProp<string> _variant;
 
-        public DividerComponent(
+        public SilkDividerComponent(
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new()
