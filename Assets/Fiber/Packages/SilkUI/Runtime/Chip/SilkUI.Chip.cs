@@ -14,6 +14,7 @@ namespace SilkUI
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
+            SignalProp<string> icon = new(),
             Ref<VisualElement> forwardRef = null
         )
         {
@@ -23,6 +24,7 @@ namespace SilkUI
                 subRole: subRole,
                 variant: variant,
                 style: style,
+                icon: icon,
                 forwardRef: forwardRef
             );
         }
@@ -36,6 +38,7 @@ namespace SilkUI
         private readonly SignalProp<string> _variant;
         private readonly SignalProp<string> _label;
         private readonly Style _style;
+        private readonly SignalProp<string> _icon;
         private readonly Ref<VisualElement> _forwardRef;
 
         public SilkChipComponent(
@@ -44,6 +47,7 @@ namespace SilkUI
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
+            SignalProp<string> icon = new(),
             Ref<VisualElement> forwardRef = null
         ) : base()
         {
@@ -52,6 +56,7 @@ namespace SilkUI
             _subRole = subRole;
             _variant = variant;
             _style = style;
+            _icon = icon;
             _forwardRef = forwardRef;
         }
 
@@ -63,11 +68,7 @@ namespace SilkUI
             var backgroundColor = themeStore.Color(role, ElementType.Background, subRole, _variant);
             var borderColor = themeStore.Color(role, ElementType.Border, subRole, _variant);
 
-            return F.SilkTypography(
-                type: TypographyType.Body2,
-                text: _label,
-                role: role,
-                subRole: subRole,
+            return F.View(
                 style: new Style(
                     mergedStyle: _style,
                     backgroundColor: backgroundColor,
@@ -83,12 +84,32 @@ namespace SilkUI
                     borderTopLeftRadius: themeStore.Spacing(3),
                     borderBottomRightRadius: themeStore.Spacing(3),
                     borderBottomLeftRadius: themeStore.Spacing(3),
-                    paddingLeft: themeStore.Spacing(1.5f),
-                    paddingRight: themeStore.Spacing(1.5f),
-                    paddingTop: themeStore.Spacing(0.5f),
-                    paddingBottom: themeStore.Spacing(0.5f)
+                    paddingLeft: themeStore.Spacing(0.5f),
+                    paddingRight: themeStore.Spacing(0.5f),
+                    paddingTop: themeStore.Spacing(0f),
+                    paddingBottom: themeStore.Spacing(0f),
+                    display: DisplayStyle.Flex,
+                    flexDirection: FlexDirection.Row
                 ),
-                forwardRef: _forwardRef
+                _ref: _forwardRef,
+                children: F.Nodes(
+                    !_icon.IsEmpty ? F.SilkIcon(
+                        iconName: _icon,
+                        size: IconSize.Small,
+                        role: role,
+                        subRole: subRole,
+                        variant: _variant,
+                        style: new Style(
+                            marginRight: themeStore.Spacing(0.5f)
+                        )
+                    ) : null,
+                    F.SilkTypography(
+                        type: TypographyType.Body2,
+                        text: _label,
+                        role: role,
+                        subRole: subRole
+                    )
+                )
             );
         }
     }
