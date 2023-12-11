@@ -42,14 +42,15 @@ namespace SilkUI
         private readonly Ref<VisualElement> _forwardRef;
 
         public SilkChipComponent(
-            SignalProp<string> label,
+            SignalProp<string> label = new(),
+            VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
             SignalProp<string> icon = new(),
             Ref<VisualElement> forwardRef = null
-        ) : base()
+        ) : base(children)
         {
             _label = label;
             _role = role;
@@ -103,12 +104,13 @@ namespace SilkUI
                             marginRight: themeStore.Spacing(0.5f)
                         )
                     ) : null,
-                    F.SilkTypography(
+                    !_label.IsEmpty ? F.SilkTypography(
                         type: TypographyType.Body2,
                         text: _label,
                         role: role,
                         subRole: subRole
-                    )
+                    ) : null,
+                    F.Fragment(Children)
                 )
             );
         }
