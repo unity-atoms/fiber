@@ -1623,6 +1623,7 @@ namespace Fiber
             }
 
             FiberNode previousChildFiberNode = null;
+            var childIndex = 0;
             for (var i = 0; i < children.Count; ++i)
             {
                 var child = children[i];
@@ -1635,7 +1636,7 @@ namespace Fiber
                         parent: fiberNode,
                         sibling: null
                     );
-                    if (i == 0)
+                    if (childIndex == 0)
                     {
                         fiberNode.Child = childFiberNode;
                     }
@@ -1645,6 +1646,7 @@ namespace Fiber
                     }
                     previousChildFiberNode = childFiberNode;
                     renderQueue.Enqueue(childFiberNode);
+                    ++childIndex;
                 }
             }
         }
