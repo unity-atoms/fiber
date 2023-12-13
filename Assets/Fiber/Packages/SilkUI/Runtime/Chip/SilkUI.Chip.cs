@@ -108,7 +108,8 @@ namespace SilkUI
                         type: TypographyType.Body2,
                         text: _label,
                         role: role,
-                        subRole: subRole
+                        subRole: subRole,
+                        variant: _variant
                     ) : null,
                     F.Fragment(Children)
                 )
