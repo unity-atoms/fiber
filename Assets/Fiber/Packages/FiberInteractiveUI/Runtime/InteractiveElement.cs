@@ -21,9 +21,9 @@ namespace Fiber.InteractiveUI
         }
 
         public static InteractiveCursorTypes Default = new(
-            CursorType.Pointer,
-            CursorType.Pointer,
-            CursorType.NotAllowed
+            onHover: CursorType.Pointer,
+            onPressedDown: CursorType.Pointer,
+            onDisabled: CursorType.NotAllowed
         );
 
         public readonly bool IsEmpty()
@@ -172,7 +172,7 @@ namespace Fiber.InteractiveUI
             var id = _idGenerator.NextId();
             component.CreateEffect((isHovered, isPressed, isDisabled) =>
             {
-                if (isDisabled)
+                if (isDisabled && (isHovered || isPressed))
                 {
                     cursorManager.WishCursorUIElements(id, cursorType.OnDisabled, interactiveElement.Ref.Current);
                 }
