@@ -137,8 +137,23 @@ namespace Fiber.Router
             }
         }
 
+        private class CurrentRouteSignal_Implementation : ComputedSignal<IList<Route>, Route>
+        {
+            public CurrentRouteSignal_Implementation(SignalList<Route> routeStack) : base(routeStack) { }
+            protected override Route Compute(IList<Route> routeStack)
+            {
+                if (routeStack.Count == 0)
+                {
+                    return null;
+                }
+                var route = routeStack[routeStack.Count - 1];
+                return route;
+            }
+        }
+
         public RouteDefinition RouterTree { get; private set; }
         public SignalList<Route> RouteStack;
+        public BaseSignal<Route> CurrentRouteSignal;
         private readonly ISignal _parent;
 
         public Router(RouteDefinition routerTree, ISignal parent = null)
@@ -150,6 +165,7 @@ namespace Fiber.Router
                 _parent = parent;
                 RegisterDependent(parent);
             }
+            CurrentRouteSignal = new CurrentRouteSignal_Implementation(RouteStack);
         }
 
         ~Router()
