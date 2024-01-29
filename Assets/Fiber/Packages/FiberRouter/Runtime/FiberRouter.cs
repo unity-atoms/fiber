@@ -109,6 +109,11 @@ namespace Fiber.Router
                 NotifySignalUpdate();
             }
 
+            public ModalRoute PeekModal()
+            {
+                return Modals.Count == 0 ? null : Modals[Modals.Count - 1];
+            }
+
             public bool IsModalPushed(string id)
             {
                 for (var i = 0; Modals != null && i < Modals.Count; i++)
@@ -151,9 +156,20 @@ namespace Fiber.Router
             }
         }
 
+        private class CurrentModalSignal_Implementation : ComputedSignal<Route, ModalRoute>
+        {
+            public CurrentModalSignal_Implementation(BaseSignal<Route> currentRoute) : base(currentRoute) { }
+            protected override ModalRoute Compute(Route currentRoute)
+            {
+                var modalRoute = currentRoute.PeekModal();
+                return modalRoute;
+            }
+        }
+
         public RouteDefinition RouterTree { get; private set; }
         public SignalList<Route> RouteStack;
         public BaseSignal<Route> CurrentRouteSignal;
+        public BaseSignal<ModalRoute> CurrentModalSignal;
         private readonly ISignal _parent;
 
         public Router(RouteDefinition routerTree, ISignal parent = null)
@@ -166,6 +182,7 @@ namespace Fiber.Router
                 RegisterDependent(parent);
             }
             CurrentRouteSignal = new CurrentRouteSignal_Implementation(RouteStack);
+            CurrentModalSignal = new CurrentModalSignal_Implementation(CurrentRouteSignal);
         }
 
         ~Router()
