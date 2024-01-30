@@ -1040,6 +1040,15 @@ namespace Fiber
             };
             return nodes;
         }
+        public void CreateOnEnableEffect(Action<bool> onEnable)
+        {
+            var enableContext = GetContext<Renderer.EnableContext>();
+            CreateEffect(() =>
+            {
+                var id = enableContext.Subscribe(onEnable);
+                return () => enableContext.Unsubscribe(id);
+            });
+        }
     }
 
     public abstract class Component<P> : BaseComponent
@@ -2287,40 +2296,80 @@ namespace Fiber
             return new EnableComponent(whenSignal, children, this);
         }
 
+
+        public class EnableContext
+        {
+            public class Subscription
+            {
+                public Action<bool> Handler;
+                public bool LastValue;
+                public Subscription(Action<bool> handler, bool lastValue)
+                {
+                    Handler = handler;
+                    LastValue = lastValue;
+                }
+            }
+
+            public IndexedDictionary<int, Subscription> Subscriptions;
+            private readonly ISignal<bool> _whenSignal;
+            private IntIdGenerator _idGenerator;
+
+            public EnableContext(ISignal<bool> whenSignal)
+            {
+                _whenSignal = whenSignal;
+                _idGenerator = new IntIdGenerator();
+            }
+
+            public int Subscribe(Action<bool> handler)
+            {
+                if (Subscriptions == null)
+                {
+                    Subscriptions = new();
+                }
+                var id = _idGenerator.NextId();
+                var enabled = _whenSignal.Get();
+                Subscriptions.Add(id, new Subscription(handler, enabled));
+                handler(enabled);
+                return id;
+            }
+
+            public void Unsubscribe(int subscriptionId)
+            {
+                Subscriptions.Remove(subscriptionId);
+            }
+        }
+
         private class EnableComponent : VirtualNode, IBuiltInComponent
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
+            private readonly EnableContext _enableContext;
+            private EnabledEffect _enabledEffect;
 
             public EnableComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children)
             {
                 _whenSignal = whenSignal;
                 _renderer = renderer;
+                _enableContext = new(_whenSignal);
             }
 
             private class EnabledEffect : Effect<bool>
             {
                 private readonly FiberNode _fiberNode;
                 private readonly Renderer _renderer;
+                private readonly EnableContext _enableContext;
 
                 public EnabledEffect(
                     ISignal<bool> whenSignal,
                     FiberNode fiberNode,
-                    Renderer renderer
+                    Renderer renderer,
+                    EnableContext enableContext
                 )
                     : base(whenSignal, runOnMount: true)
                 {
                     _fiberNode = fiberNode;
                     _renderer = renderer;
-                }
-
-                private void RehydrateSubTree(FiberNode root)
-                {
-                    _renderer.AddFiberNodeToUpdateQueue(root);
-                    for (var node = root.Child; node != null; node = node.NextNode(root: root, skipChildren: false))
-                    {
-                        _renderer.AddFiberNodeToUpdateQueue(node);
-                    }
+                    _enableContext = enableContext;
                 }
 
                 protected override void Run(bool enabled)
@@ -2332,6 +2381,35 @@ namespace Fiber
                     for (var node = _fiberNode.Child; node != null; node = node.NextNode(root: _fiberNode, skipChildren: false))
                     {
                         _renderer.AddFiberNodeToUpdateQueue(node);
+                        if (node.VirtualNode is EnableComponent enableComponent)
+                        {
+                            // We need to run subscriptions here since decendent subscriptions might need to re-run based on
+                            // the new enabled state of this node (a great ancestor). In other words, decendent enable components
+                            // might not run since their where condition isn't tied to the enabled state of this node.
+                            //
+                            // An alternative solution would be for enable components to listen to the enabled state of their parent.
+                            // The most natural would in that case be to create an "is enabled signal". However, that signal won't trigger
+                            // effects in custom components since we treat custom components differently and thus it might be confusing.
+                            enableComponent._enabledEffect.RunSubscriptions();
+                        }
+                    }
+                    RunSubscriptions();
+                }
+
+                private void RunSubscriptions()
+                {
+                    if (_enableContext.Subscriptions != null)
+                    {
+                        var isFullTreeEnabled = _fiberNode.IsEnabled;
+                        for (var i = 0; i < _enableContext.Subscriptions.Count; ++i)
+                        {
+                            var subscription = _enableContext.Subscriptions[i];
+                            if (subscription.LastValue != isFullTreeEnabled)
+                            {
+                                subscription.Handler(isFullTreeEnabled);
+                                subscription.LastValue = isFullTreeEnabled;
+                            }
+                        }
                     }
                 }
                 public override void Cleanup() { }
@@ -2339,8 +2417,13 @@ namespace Fiber
 
             public VirtualBody Render(FiberNode fiberNode)
             {
-                fiberNode.PushEffect(new EnabledEffect(_whenSignal, fiberNode, _renderer));
-                return Children;
+                _enabledEffect = new EnabledEffect(_whenSignal, fiberNode, _renderer, _enableContext);
+                fiberNode.PushEffect(_enabledEffect);
+
+                return new ContextProvider<EnableContext>(
+                    value: _enableContext,
+                    children: Children
+                );
             }
         }
 
