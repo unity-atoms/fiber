@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Signals;
-using UnityEngine;
 
 namespace Fiber.Router
 {
@@ -154,6 +153,8 @@ namespace Fiber.Router
                 var route = routeStack[routeStack.Count - 1];
                 return route;
             }
+
+            protected override bool ShouldSetDirty(Route newValue, Route previousValue) => newValue?.Id != previousValue?.Id;
         }
 
         private class CurrentModalSignal_Implementation : ComputedSignal<Route, ModalRoute>
@@ -164,6 +165,8 @@ namespace Fiber.Router
                 var modalRoute = currentRoute.PeekModal();
                 return modalRoute;
             }
+
+            protected override bool ShouldSetDirty(ModalRoute newValue, ModalRoute previousValue) => newValue?.Id != previousValue?.Id;
         }
 
         public RouteDefinition RouterTree { get; private set; }
@@ -421,7 +424,7 @@ namespace Fiber.Router
         public Route PeekRoute()
         {
             // Top route will always be a none layout route
-            return RouteStack.Count == 0 ? null : RouteStack[RouteStack.Count - 1] as Route;
+            return RouteStack.Count == 0 ? null : RouteStack[RouteStack.Count - 1];
         }
 
         public ModalRoute PeekModal()
