@@ -2668,6 +2668,7 @@ namespace Fiber
                 {
                     var currentChildAtIndex = _fiberNode.Child;
                     FiberNode previousChildFiberNode = null;
+                    FiberNode previousFirstChildFiberNode = null;
                     _allKeys.Clear();
 
                     for (var i = 0; i < each.Count; ++i)
@@ -2696,6 +2697,7 @@ namespace Fiber
                                 );
                                 if (i == 0)
                                 {
+                                    previousFirstChildFiberNode = _fiberNode.Child;
                                     _fiberNode.Child = createdChildNode;
                                 }
                                 else if (previousChildFiberNode != null)
@@ -2717,7 +2719,6 @@ namespace Fiber
 
                     for (var currentChild = _fiberNode.Child; currentChild != null; currentChild = currentChild.Sibling)
                     {
-
                         var key = _currentIdToKeyMap[currentChild.Id];
                         if (!_allKeys.Contains(key))
                         {
@@ -2727,7 +2728,29 @@ namespace Fiber
                             _currentIdToKeyMap.Remove(currentChild.Id);
                         }
                     }
+
+                    // Special case when we are removing the first child. If that happens we want 
+                    // to iterate siblings until we found one that is still rendered and then stop.
+                    // We don't need to remove self from tree either since that is already done in
+                    // the first loop above, only mark it with the correct phase.
+                    for (var currentChild = previousFirstChildFiberNode; currentChild != null; currentChild = currentChild.Sibling)
+                    {
+                        if (!_currentIdToKeyMap.ContainsKey(currentChild.Id))
+                        {
+                            break;
+                        }
+                        var key = _currentIdToKeyMap[currentChild.Id];
+                        if (_allKeys.Contains(_currentIdToKeyMap[currentChild.Id]))
+                        {
+                            break;
+                        }
+                        currentChild.Phase = FiberNodePhase.RemovedFromVirtualTree;
+                        _operationsQueue.Enqueue(new UnmountOperation(parent: _fiberNode, child: currentChild));
+                        _currentKeyToIdMap.Remove(key);
+                        _currentIdToKeyMap.Remove(currentChild.Id);
+                    }
                 }
+
                 public override void Cleanup() { }
             }
 
