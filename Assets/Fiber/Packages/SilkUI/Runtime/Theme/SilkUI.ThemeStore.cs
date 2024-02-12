@@ -106,14 +106,19 @@ namespace SilkUI
             ISignal<bool> isPressed,
             ISignal<bool> isHovered,
             ISignal<bool> isSelected = null,
+            ISignal<bool> isDisabled = null,
             string subRole = null,
             SignalProp<string> variant = new()
         )
         {
-            var signal = new InlineComputedSignal<Theme, bool, bool, bool, string, StyleColor>((theme, isPressed, isHovered, isSelected, variant) =>
+            var signal = new InlineComputedSignal<Theme, bool, bool, bool, bool, string, StyleColor>((theme, isPressed, isHovered, isSelected, isDisabled, variant) =>
             {
                 var colorModifiers = theme.GetColorModifiers(role, elementType, subRole, variant);
-                if (isPressed && colorModifiers.Pressed.Get().keyword != StyleKeyword.Null)
+                if (isDisabled && colorModifiers.Disabled.Get().keyword != StyleKeyword.Null)
+                {
+                    return colorModifiers.Disabled.Get();
+                }
+                else if (isPressed && colorModifiers.Pressed.Get().keyword != StyleKeyword.Null)
                 {
                     return colorModifiers.Pressed.Get();
                 }
@@ -126,7 +131,7 @@ namespace SilkUI
                     return colorModifiers.Selected.Get();
                 }
                 return colorModifiers.Default.Get();
-            }, this, isPressed, isHovered, isSelected ?? new StaticSignal<bool>(false), variant.IsSignal ? variant.Signal : new StaticSignal<string>(variant.Value));
+            }, this, isPressed, isHovered, isSelected ?? new StaticSignal<bool>(false), isDisabled ?? new StaticSignal<bool>(false), variant.IsSignal ? variant.Signal : new StaticSignal<string>(variant.Value));
 
             return signal;
         }

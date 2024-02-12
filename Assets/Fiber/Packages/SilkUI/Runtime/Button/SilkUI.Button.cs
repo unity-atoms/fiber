@@ -16,7 +16,8 @@ namespace SilkUI
             string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Action<PointerData> onPress = null
+            Action<PointerData> onPress = null,
+            ISignal<bool> isDisabled = null
         )
         {
             return new SilkButtonComponent(
@@ -25,7 +26,8 @@ namespace SilkUI
                 subRole: subRole,
                 variant: variant,
                 style: style,
-                onPress: onPress
+                onPress: onPress,
+                isDisabled: isDisabled
             );
         }
     }
@@ -37,6 +39,7 @@ namespace SilkUI
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Action<PointerData> _onPress;
+        private readonly ISignal<bool> _isDisabled;
 
         public SilkButtonComponent(
             VirtualBody children,
@@ -44,7 +47,8 @@ namespace SilkUI
             string subRole = null,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Action<PointerData> onPress = null
+            Action<PointerData> onPress = null,
+            ISignal<bool> isDisabled = null
         ) : base(children)
         {
             _role = role;
@@ -52,11 +56,12 @@ namespace SilkUI
             _variant = variant;
             _style = style;
             _onPress = onPress;
+            _isDisabled = isDisabled;
         }
 
         public override VirtualBody Render()
         {
-            var interactiveElement = F.CreateInteractiveElement(isDisabled: null, onPressUp: _onPress);
+            var interactiveElement = F.CreateInteractiveElement(isDisabled: _isDisabled, onPressUp: _onPress);
 
             var themeStore = C<ThemeStore>();
             var backgroundColor = themeStore.Color(
@@ -65,6 +70,7 @@ namespace SilkUI
                 elementType: ElementType.Background,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,
+                isDisabled: interactiveElement.IsDisabled,
                 variant: _variant
             );
             var borderColor = themeStore.Color(
@@ -73,6 +79,7 @@ namespace SilkUI
                 elementType: ElementType.Border,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,
+                isDisabled: interactiveElement.IsDisabled,
                 variant: _variant
             );
             var textColor = themeStore.Color(
@@ -81,6 +88,7 @@ namespace SilkUI
                 elementType: ElementType.Text,
                 isPressed: interactiveElement.IsPressed,
                 isHovered: interactiveElement.IsHovered,
+                isDisabled: interactiveElement.IsDisabled,
                 variant: _variant
             );
 
