@@ -2335,7 +2335,8 @@ namespace Fiber
 
             public void Unsubscribe(int subscriptionId)
             {
-                Subscriptions.Remove(subscriptionId);
+                var subscription = Subscriptions.Remove(subscriptionId);
+                subscription.Handler(false);
             }
         }
 
