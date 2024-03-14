@@ -1042,7 +1042,8 @@ namespace Fiber
         }
         public void CreateOnEnableEffect(Action<bool> onEnable)
         {
-            var enableContext = GetContext<Renderer.EnableContext>();
+            var enableContext = GetContext<Renderer.EnableContext>(throwIfNotFound: false);
+            if (enableContext == null) return;
             CreateEffect(() =>
             {
                 var id = enableContext.Subscribe(onEnable);
