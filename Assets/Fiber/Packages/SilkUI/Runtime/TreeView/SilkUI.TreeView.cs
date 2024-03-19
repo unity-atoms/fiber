@@ -315,8 +315,8 @@ namespace SilkUI
                 var themeStore = C<ThemeStore>();
                 var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
-                var color = themeStore.Color(role, ElementType.Text, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected, subRole: subRole);
-                var backgroundColor = themeStore.Color(role, ElementType.Background, _interactiveElement.IsPressed, _interactiveElement.IsHovered, _isSelected, subRole: subRole);
+                var color = themeStore.Color(role, ElementType.Text, _interactiveElement, subRole: subRole);
+                var backgroundColor = themeStore.Color(role, ElementType.Background, _interactiveElement, subRole: subRole);
 
                 var iconName = CreateComputedSignal((isExpanded) => isExpanded ? "chevron-down" : "chevron-right", _isExpanded);
 

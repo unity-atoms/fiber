@@ -2,6 +2,7 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using Signals;
+using Fiber.InteractiveUI;
 
 namespace SilkUI
 {
@@ -15,7 +16,8 @@ namespace SilkUI
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Ref<VisualElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null,
+            InteractiveElement interactiveElement = null
         )
         {
             return new SilkTypographyComponent(
@@ -25,7 +27,8 @@ namespace SilkUI
                 subRole: subRole,
                 variant: variant,
                 style: style,
-                forwardRef: forwardRef
+                forwardRef: forwardRef,
+                interactiveElement: interactiveElement
             );
         }
     }
@@ -38,6 +41,7 @@ namespace SilkUI
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
+        private readonly InteractiveElement _interactiveElement;
 
         public SilkTypographyComponent(
             SignalProp<TypographyType> type,
@@ -46,7 +50,8 @@ namespace SilkUI
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Ref<VisualElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null,
+            InteractiveElement interactiveElement = null
         )
         {
             _type = type;
@@ -56,6 +61,7 @@ namespace SilkUI
             _variant = variant;
             _style = style;
             _forwardRef = forwardRef;
+            _interactiveElement = interactiveElement;
         }
 
         public override VirtualBody Render()
@@ -70,7 +76,8 @@ namespace SilkUI
                     subRole: _subRole,
                     variant: _variant,
                     style: _style,
-                    forwardRef: _forwardRef
+                    forwardRef: _forwardRef,
+                    interactiveElement: _interactiveElement
                 );
             }
 
@@ -88,7 +95,7 @@ namespace SilkUI
                     unityFontStyle: themeStore.FontStyle(_type),
                     color: themeStore.Color(role, ElementType.Text, subRole: subRole, _variant),
                     unityTextOutlineWidth: themeStore.OutlineWidth(_type),
-                    unityTextOutlineColor: themeStore.Color(role, ElementType.TextOutline, subRole: subRole, _variant)
+                    unityTextOutlineColor: themeStore.Color(role: role, elementType: ElementType.TextOutline, interactiveElement: _interactiveElement, subRole: subRole, variant: _variant)
                 )
             );
         }

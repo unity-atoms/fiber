@@ -1,6 +1,7 @@
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
+using Fiber.InteractiveUI;
 using Signals;
 
 namespace SilkUI
@@ -11,13 +12,15 @@ namespace SilkUI
             this BaseComponent component,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
-            SignalProp<string> variant = new()
+            SignalProp<string> variant = new(),
+            InteractiveElement interactiveElement = null
         )
         {
             return new SilkDividerComponent(
                 role: role,
                 subRole: subRole,
-                variant: variant
+                variant: variant,
+                interactiveElement: interactiveElement
             );
         }
     }
@@ -28,24 +31,27 @@ namespace SilkUI
         private readonly string _role;
         private readonly string _subRole;
         private readonly SignalProp<string> _variant;
+        private readonly InteractiveElement _interactiveElement;
 
         public SilkDividerComponent(
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
-            SignalProp<string> variant = new()
+            SignalProp<string> variant = new(),
+            InteractiveElement interactiveElement = null
         ) : base()
         {
             _role = role;
             _subRole = subRole;
             _variant = variant;
+            _interactiveElement = interactiveElement;
         }
 
         public override VirtualBody Render()
         {
             var themeStore = C<ThemeStore>();
             var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
-            var shine = themeStore.Color(role, elementType: ElementType.Gloom, subRole: subRole, variant: _variant);
-            var gloom = themeStore.Color(role, elementType: ElementType.Shine, subRole: subRole, variant: _variant);
+            var shine = themeStore.Color(role: role, elementType: ElementType.Gloom, interactiveElement: _interactiveElement, subRole: subRole, variant: _variant);
+            var gloom = themeStore.Color(role: role, elementType: ElementType.Shine, interactiveElement: _interactiveElement, subRole: subRole, variant: _variant);
 
             return F.Nodes(
                 F.View(

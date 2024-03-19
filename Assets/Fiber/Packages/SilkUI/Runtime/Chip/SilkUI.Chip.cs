@@ -1,6 +1,7 @@
 using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
+using Fiber.InteractiveUI;
 using Signals;
 
 namespace SilkUI
@@ -15,7 +16,8 @@ namespace SilkUI
             SignalProp<string> variant = new(),
             Style style = new(),
             SignalProp<string> icon = new(),
-            Ref<VisualElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null,
+            InteractiveElement interactiveElement = null
         )
         {
             return new SilkChipComponent(
@@ -25,7 +27,8 @@ namespace SilkUI
                 variant: variant,
                 style: style,
                 icon: icon,
-                forwardRef: forwardRef
+                forwardRef: forwardRef,
+                interactiveElement: interactiveElement
             );
         }
     }
@@ -40,6 +43,7 @@ namespace SilkUI
         private readonly Style _style;
         private readonly SignalProp<string> _icon;
         private readonly Ref<VisualElement> _forwardRef;
+        private readonly InteractiveElement _interactiveElement;
 
         public SilkChipComponent(
             SignalProp<string> label = new(),
@@ -49,7 +53,8 @@ namespace SilkUI
             SignalProp<string> variant = new(),
             Style style = new(),
             SignalProp<string> icon = new(),
-            Ref<VisualElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null,
+            InteractiveElement interactiveElement = null
         ) : base(children)
         {
             _label = label;
@@ -59,6 +64,7 @@ namespace SilkUI
             _style = style;
             _icon = icon;
             _forwardRef = forwardRef;
+            _interactiveElement = interactiveElement;
         }
 
         public override VirtualBody Render()
@@ -66,8 +72,8 @@ namespace SilkUI
             var themeStore = C<ThemeStore>();
             var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
-            var backgroundColor = themeStore.Color(role, ElementType.Background, subRole, _variant);
-            var borderColor = themeStore.Color(role, ElementType.Border, subRole, _variant);
+            var backgroundColor = themeStore.Color(role: role, elementType: ElementType.Background, interactiveElement: _interactiveElement, subRole: subRole, variant: _variant);
+            var borderColor = themeStore.Color(role: role, elementType: ElementType.Border, subRole: subRole, variant: _variant);
 
             return F.View(
                 style: new Style(
@@ -102,14 +108,16 @@ namespace SilkUI
                         variant: _variant,
                         style: new Style(
                             marginRight: themeStore.Spacing(0.5f)
-                        )
+                        ),
+                        interactiveElement: _interactiveElement
                     ) : null,
                     !_label.IsEmpty ? F.SilkTypography(
                         type: TypographyType.Body2,
                         text: _label,
                         role: role,
                         subRole: subRole,
-                        variant: _variant
+                        variant: _variant,
+                        interactiveElement: _interactiveElement
                     ) : null,
                     F.Fragment(Children)
                 )

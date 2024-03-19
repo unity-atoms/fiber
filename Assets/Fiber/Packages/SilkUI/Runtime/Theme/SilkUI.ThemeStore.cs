@@ -5,6 +5,7 @@ using UnityEngine.UIElements;
 using Fiber;
 using Signals;
 using Fiber.UIElements;
+using Fiber.InteractiveUI;
 
 namespace SilkUI
 {
@@ -103,35 +104,44 @@ namespace SilkUI
         public BaseSignal<StyleColor> Color(
             string role,
             ElementType elementType,
-            ISignal<bool> isPressed,
-            ISignal<bool> isHovered,
-            ISignal<bool> isSelected = null,
-            ISignal<bool> isDisabled = null,
+            InteractiveElement interactiveElement,
             string subRole = null,
             SignalProp<string> variant = new()
         )
         {
-            var signal = new InlineComputedSignal<Theme, bool, bool, bool, bool, string, StyleColor>((theme, isPressed, isHovered, isSelected, isDisabled, variant) =>
+            if (interactiveElement == null)
             {
-                var colorModifiers = theme.GetColorModifiers(role, elementType, subRole, variant);
-                if (isDisabled && colorModifiers.Disabled.Get().keyword != StyleKeyword.Null)
+                return Color(role: role, elementType: elementType, subRole: subRole, variant: variant);
+            }
+
+            var signal = new InlineComputedSignal<Theme, bool, bool, bool, bool, string, StyleColor>((theme, isPressed, isHovered, isSelected, isDisabled, variant) =>
                 {
-                    return colorModifiers.Disabled.Get();
-                }
-                else if (isPressed && colorModifiers.Pressed.Get().keyword != StyleKeyword.Null)
-                {
-                    return colorModifiers.Pressed.Get();
-                }
-                else if (isHovered && colorModifiers.Hovered.Get().keyword != StyleKeyword.Null)
-                {
-                    return colorModifiers.Hovered.Get();
-                }
-                else if (isSelected && colorModifiers.Selected.Get().keyword != StyleKeyword.Null)
-                {
-                    return colorModifiers.Selected.Get();
-                }
-                return colorModifiers.Default.Get();
-            }, this, isPressed, isHovered, isSelected ?? new StaticSignal<bool>(false), isDisabled ?? new StaticSignal<bool>(false), variant.IsSignal ? variant.Signal : new StaticSignal<string>(variant.Value));
+                    var colorModifiers = theme.GetColorModifiers(role, elementType, subRole, variant);
+                    if (isDisabled && colorModifiers.Disabled.Get().keyword != StyleKeyword.Null)
+                    {
+                        return colorModifiers.Disabled.Get();
+                    }
+                    else if (isPressed && colorModifiers.Pressed.Get().keyword != StyleKeyword.Null)
+                    {
+                        return colorModifiers.Pressed.Get();
+                    }
+                    else if (isHovered && colorModifiers.Hovered.Get().keyword != StyleKeyword.Null)
+                    {
+                        return colorModifiers.Hovered.Get();
+                    }
+                    else if (isSelected && colorModifiers.Selected.Get().keyword != StyleKeyword.Null)
+                    {
+                        return colorModifiers.Selected.Get();
+                    }
+                    return colorModifiers.Default.Get();
+                },
+                this,
+                interactiveElement.IsPressed,
+                interactiveElement.IsHovered,
+                interactiveElement.IsSelected ?? new StaticSignal<bool>(false),
+                interactiveElement.IsDisabled ?? new StaticSignal<bool>(false),
+                variant.IsSignal ? variant.Signal : new StaticSignal<string>(variant.Value)
+            );
 
             return signal;
         }

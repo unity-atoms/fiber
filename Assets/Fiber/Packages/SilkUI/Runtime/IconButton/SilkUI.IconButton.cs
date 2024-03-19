@@ -109,19 +109,15 @@ namespace SilkUI
             var color = themeStore.Color(
                 role: role,
                 elementType: ElementType.Text,
+                interactiveElement: interactiveElement,
                 subRole: subRole,
-                isPressed: interactiveElement.IsPressed,
-                isHovered: interactiveElement.IsHovered,
-                isSelected: null,
                 variant: _variant
             );
             var backgroundColor = themeStore.Color(
                 role: role,
                 elementType: ElementType.Background,
+                interactiveElement: interactiveElement,
                 subRole: subRole,
-                isPressed: interactiveElement.IsPressed,
-                isHovered: interactiveElement.IsHovered,
-                isSelected: null,
                 variant: _variant
             );
 
@@ -139,7 +135,8 @@ namespace SilkUI
                     borderTopLeftRadius: new Length(50, LengthUnit.Percent),
                     borderBottomRightRadius: new Length(50, LengthUnit.Percent),
                     borderBottomLeftRadius: new Length(50, LengthUnit.Percent)
-                )
+                ),
+                interactiveElement: interactiveElement
             );
         }
     }

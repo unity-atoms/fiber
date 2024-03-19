@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UIElements;
 using Fiber;
+using Fiber.InteractiveUI;
 using Fiber.UIElements;
 using Signals;
 
@@ -16,7 +17,8 @@ namespace SilkUI
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Ref<VisualElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null,
+            InteractiveElement interactiveElement = null
         )
         {
             return new SilkIconComponent(
@@ -26,7 +28,8 @@ namespace SilkUI
                 subRole: subRole,
                 variant: variant,
                 style: style,
-                forwardRef: forwardRef
+                forwardRef: forwardRef,
+                interactiveElement: interactiveElement
             );
         }
     }
@@ -40,6 +43,7 @@ namespace SilkUI
         private readonly SignalProp<string> _variant;
         private readonly Style _style;
         private readonly Ref<VisualElement> _forwardRef;
+        private readonly InteractiveElement _interactiveElement;
 
         public SilkIconComponent(
             SignalProp<string> iconName,
@@ -48,7 +52,8 @@ namespace SilkUI
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
             Style style = new(),
-            Ref<VisualElement> forwardRef = null
+            Ref<VisualElement> forwardRef = null,
+            InteractiveElement interactiveElement = null
         )
         {
             _iconName = iconName;
@@ -58,6 +63,7 @@ namespace SilkUI
             _variant = variant;
             _style = style;
             _forwardRef = forwardRef;
+            _interactiveElement = interactiveElement;
         }
         public override VirtualBody Render()
         {
@@ -77,7 +83,7 @@ namespace SilkUI
             var themeStore = C<ThemeStore>();
             var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
 
-            var color = themeStore.Color(role, ElementType.Text, subRole, _variant);
+            var color = themeStore.Color(role: role, elementType: ElementType.Text, interactiveElement: _interactiveElement, subRole: subRole, variant: _variant);
             var fontAwesomeSolid = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-solid");
             var fontAwesomeBrands = Resources.Load<Font>("Fonts/FontAwesome/fontawesome-brands");
 

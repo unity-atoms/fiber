@@ -2,6 +2,7 @@ using UnityEngine.UIElements;
 using Fiber;
 using Fiber.UIElements;
 using Signals;
+using Fiber.InteractiveUI;
 
 namespace SilkUI
 {
@@ -13,7 +14,8 @@ namespace SilkUI
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
-            EventCallback<ClickEvent> onClick = null
+            EventCallback<ClickEvent> onClick = null,
+            InteractiveElement interactiveElement = null
         )
         {
             return new SilkBackdropComponent(
@@ -21,7 +23,8 @@ namespace SilkUI
                 role: role,
                 subRole: subRole,
                 variant: variant,
-                onClick: onClick
+                onClick: onClick,
+                interactiveElement: interactiveElement
             );
         }
     }
@@ -32,18 +35,21 @@ namespace SilkUI
         private readonly string _subRole;
         private readonly SignalProp<string> _variant;
         private readonly EventCallback<ClickEvent> _onClick;
+        private readonly InteractiveElement _interactiveElement;
         public SilkBackdropComponent(
             VirtualBody children = default,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
             SignalProp<string> variant = new(),
-            EventCallback<ClickEvent> onClick = null
+            EventCallback<ClickEvent> onClick = null,
+            InteractiveElement interactiveElement = null
         ) : base(children)
         {
             _role = role;
             _subRole = subRole;
             _variant = variant;
             _onClick = onClick;
+            _interactiveElement = interactiveElement;
         }
         public override VirtualBody Render()
         {
@@ -61,7 +67,7 @@ namespace SilkUI
 
             var themeStore = C<ThemeStore>();
             var (role, subRole) = F.ResolveRoleAndSubRole(_role, _subRole);
-            var backgroundColor = themeStore.Color(role: role, ElementType.Overlay, subRole: subRole, variant: _variant);
+            var backgroundColor = themeStore.Color(role: role, ElementType.Overlay, interactiveElement: _interactiveElement, subRole: subRole, variant: _variant);
 
             return F.View(
                 style: new Style(

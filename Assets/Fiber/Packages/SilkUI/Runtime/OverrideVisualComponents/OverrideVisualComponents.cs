@@ -130,7 +130,8 @@ namespace SilkUI
             string subRole,
             SignalProp<string> variant,
             Style style,
-            Ref<VisualElement> forwardRef
+            Ref<VisualElement> forwardRef,
+            InteractiveElement interactiveElement
         );
         public CreateTypographyDelegate CreateTypography { get; private set; }
 

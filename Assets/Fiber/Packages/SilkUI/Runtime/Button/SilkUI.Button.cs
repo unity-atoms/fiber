@@ -68,27 +68,21 @@ namespace SilkUI
                 role: _role,
                 subRole: _subRole,
                 elementType: ElementType.Background,
-                isPressed: interactiveElement.IsPressed,
-                isHovered: interactiveElement.IsHovered,
-                isDisabled: interactiveElement.IsDisabled,
+                interactiveElement: interactiveElement,
                 variant: _variant
             );
             var borderColor = themeStore.Color(
                 role: _role,
                 subRole: _subRole,
                 elementType: ElementType.Border,
-                isPressed: interactiveElement.IsPressed,
-                isHovered: interactiveElement.IsHovered,
-                isDisabled: interactiveElement.IsDisabled,
+                interactiveElement: interactiveElement,
                 variant: _variant
             );
             var textColor = themeStore.Color(
                 role: _role,
                 subRole: _subRole,
                 elementType: ElementType.Text,
-                isPressed: interactiveElement.IsPressed,
-                isHovered: interactiveElement.IsHovered,
-                isDisabled: interactiveElement.IsDisabled,
+                interactiveElement: interactiveElement,
                 variant: _variant
             );
 

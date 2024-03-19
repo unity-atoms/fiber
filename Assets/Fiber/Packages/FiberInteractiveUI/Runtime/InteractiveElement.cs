@@ -60,6 +60,7 @@ namespace Fiber.InteractiveUI
             this BaseComponent component,
             Ref<VisualElement> _ref = null,
             ISignal<bool> isDisabled = null,
+            ISignal<bool> isSelected = null,
             Action<PointerData> onPressUp = null,
             Action<PointerData> onPressDown = null,
             Action<PointerData> onClick = null,
@@ -73,7 +74,8 @@ namespace Fiber.InteractiveUI
 
             var interactiveElement = new InteractiveElement(
                 _ref: _ref,
-                isDisabled: isDisabled
+                isDisabled: isDisabled,
+                isSelected: isSelected
             );
 
             // Keep track of how long time ago pointer was down in order to detect
@@ -212,18 +214,21 @@ namespace Fiber.InteractiveUI
         public Ref<VisualElement> Ref { get; private set; }
         public Signal<bool> IsHovered { get; private set; }
         public Signal<bool> IsPressed { get; private set; }
-        // IsDisabled will most likely be derived from external state, but can be handled interanlly
+        // IsDisabled and IsSelected will most likely be derived from external state, but can be handled interanlly
         public ISignal<bool> IsDisabled { get; private set; }
+        public ISignal<bool> IsSelected { get; private set; }
 
         public InteractiveElement(
             Ref<VisualElement> _ref = null,
-            ISignal<bool> isDisabled = null
+            ISignal<bool> isDisabled = null,
+            ISignal<bool> isSelected = null
         )
         {
             Ref = _ref ?? new Ref<VisualElement>();
             IsHovered = new Signal<bool>();
             IsPressed = new Signal<bool>();
             IsDisabled = isDisabled;
+            IsSelected = isSelected;
         }
     }
 }
