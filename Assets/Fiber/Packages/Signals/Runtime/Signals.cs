@@ -503,7 +503,7 @@ namespace Signals
         {
             for (var i = 0; i < _list.Count; i++)
             {
-                _list[i].UnregisterDependent(this);
+                _list[i]?.UnregisterDependent(this);
             }
             _list.Clear();
             NotifySignalUpdate();
