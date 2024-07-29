@@ -23,12 +23,22 @@ namespace Fiber.Router
     [Serializable]
     public class Router : BaseSignal<Router>
     {
-        public class ModalRoute
+        public class ModalRoute : IEquatable<ModalRoute>
         {
             public string Id { get; private set; }
             public ModalRoute(string id)
             {
                 Id = id;
+            }
+
+            public virtual bool Equals(ModalRoute other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+
+                return Id == other.Id;
             }
         }
 
@@ -40,10 +50,20 @@ namespace Fiber.Router
             {
                 Context = context;
             }
+
+            public override bool Equals(ModalRoute other)
+            {
+                if (other == null || other is not ModalRoute<C> otherModalRoute)
+                {
+                    return false;
+                }
+
+                return Id == other.Id && otherModalRoute.Context.Equals(Context);
+            }
         }
 
         [Serializable]
-        public class Route : BaseSignal
+        public class Route : BaseSignal, IEquatable<Route>
         {
             public string Id;
             public bool IsLayoutRoute { get; private set; }
@@ -129,6 +149,16 @@ namespace Fiber.Router
             {
                 _dirtyBit++;
             }
+
+            public virtual bool Equals(Route other)
+            {
+                if (other == null)
+                {
+                    return false;
+                }
+
+                return Id == other.Id;
+            }
         }
 
         public class Route<C> : Route
@@ -138,6 +168,16 @@ namespace Fiber.Router
             public Route(string path, C context) : base(path, isLayoutRoute: false)
             {
                 Context = context;
+            }
+
+            public override bool Equals(Route other)
+            {
+                if (other == null || other is not Route<C> otherRoute)
+                {
+                    return false;
+                }
+
+                return Id == other.Id && otherRoute.Context.Equals(Context);
             }
         }
 
@@ -154,7 +194,7 @@ namespace Fiber.Router
                 return route;
             }
 
-            protected override bool ShouldSetDirty(Route newValue, Route previousValue) => newValue?.Id != previousValue?.Id;
+            protected override bool ShouldSetDirty(Route newValue, Route previousValue) => !newValue?.Equals(previousValue) ?? true;
         }
 
         private class CurrentModalSignal_Implementation : ComputedSignal<Route, ModalRoute>
@@ -166,7 +206,7 @@ namespace Fiber.Router
                 return modalRoute;
             }
 
-            protected override bool ShouldSetDirty(ModalRoute newValue, ModalRoute previousValue) => newValue?.Id != previousValue?.Id;
+            protected override bool ShouldSetDirty(ModalRoute newValue, ModalRoute previousValue) => !newValue?.Equals(previousValue) ?? true;
         }
 
         public RouteDefinition RouterTree { get; private set; }
