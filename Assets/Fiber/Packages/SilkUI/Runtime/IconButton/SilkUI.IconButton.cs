@@ -13,6 +13,7 @@ namespace SilkUI
             this BaseComponent component,
             SignalProp<string> iconName,
             Action<PointerData> onPress,
+            ISignal<bool> isDisabled = null,
             IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
@@ -24,6 +25,7 @@ namespace SilkUI
             return new SilkIconButtonComponent(
                 iconName: iconName,
                 onPress: onPress,
+                isDisabled: isDisabled,
                 size: size,
                 role: role,
                 subRole: subRole,
@@ -38,6 +40,7 @@ namespace SilkUI
     {
         private readonly SignalProp<string> _iconName;
         private readonly Action<PointerData> _onPress;
+        private readonly ISignal<bool> _isDisabled;
         private readonly IconSize _size;
         private readonly string _role;
         private readonly string _subRole;
@@ -48,6 +51,7 @@ namespace SilkUI
         public SilkIconButtonComponent(
             SignalProp<string> iconName,
             Action<PointerData> onPress,
+            ISignal<bool> isDisabled = null,
             IconSize size = IconSize.Medium,
             string role = THEME_CONSTANTS.INHERIT,
             string subRole = THEME_CONSTANTS.INHERIT,
@@ -58,6 +62,7 @@ namespace SilkUI
         {
             _iconName = iconName;
             _onPress = onPress;
+            _isDisabled = isDisabled;
             _size = size;
             _role = role;
             _subRole = subRole;
@@ -86,7 +91,7 @@ namespace SilkUI
 
         public override VirtualBody Render()
         {
-            var interactiveElement = F.CreateInteractiveElement(_ref: _forwardRef, isDisabled: null, onPressUp: _onPress);
+            var interactiveElement = F.CreateInteractiveElement(_ref: _forwardRef, isDisabled: _isDisabled, onPressUp: _onPress);
 
             var overrideVisualComponents = C<OverrideVisualComponents>(throwIfNotFound: false);
             if (overrideVisualComponents?.CreateIconButton != null)
