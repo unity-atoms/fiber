@@ -1249,18 +1249,6 @@ namespace Fiber
             return false;
         }
 
-        public FiberNode FindChild(int id)
-        {
-            for (var child = Child; child != null; child = child.Sibling)
-            {
-                if (child.Id == id)
-                {
-                    return child;
-                }
-            }
-
-            return null;
-        }
 
         // Get the index of the provided child in this node's current list of native node children by traversing the
         // tree depth first. Assumes that this node has a native node and that the child is a descendant of this node.
@@ -1750,101 +1738,65 @@ namespace Fiber
             else if (operationType == typeof(MoveOperation))
             {
                 var moveOperation = _operationsQueue.Dequeue<MoveOperation>();
+
                 // A node might have been deleted already if it for example was a child of a node that was deleted
-                if (moveOperation.Child.Phase != FiberNodePhase.Mounted)
+                if (moveOperation.Child.Phase != FiberNodePhase.Mounted || moveOperation.Parent == null)
                 {
                     return;
                 }
 
-                if (moveOperation.Parent != null)
+                // Figure out what native nodes need to be moved.
+                // There can be more than one native node being a descendent of the node being moved,
+                // so a consecutive chunk of native nodes (0-n) might need to be moved. 
+                var closestParentWithNativeNode = moveOperation.Child.FindClosestAncestorWithNativeNodeOrPortalDestination();
+
+                var moveCount = 0;
+                var moveFromIndex = -1;
+                var moveToFirstChunkIndex = -1;
+
+                for (var i = 0; i < closestParentWithNativeNode.NativeNodeChildren.Count; ++i)
                 {
-                    // Delete references
-                    if (moveOperation.Parent.Child == moveOperation.Child)
+                    var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[i];
+                    if (nativeNodeChild.IsDescendentOf(moveOperation.Child))
                     {
-                        moveOperation.Parent.Child = moveOperation.Child.Sibling;
+                        if (moveCount == 0)
+                        {
+                            moveFromIndex = i;
+                            // Calling FindNativeNodeIndex to get the first index here works 
+                            //since we have already updated the virtual tree above.
+                            moveToFirstChunkIndex = closestParentWithNativeNode.FindNativeNodeIndex(moveOperation.Child);
+                        }
+
+                        moveCount++;
+                    }
+                    else if (moveCount != 0)
+                    {
+                        // If we have found at least one native node to move, but this sibling native node
+                        // isn't a descendent, then no other native nodes should be moved.
+                        break;
+                    }
+                }
+
+                // Do the actual move and update the order of the list of native node children in the closest parent with native node.
+                var isMovingForward = moveToFirstChunkIndex > moveFromIndex;
+
+                for (var i = 0; i < moveCount; ++i)
+                {
+                    if (isMovingForward)
+                    {
+                        // Since we are moving items further down in the list, then that means that the next item to
+                        // move will be pushed back, meaning that the move from index never changes.
+                        var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[moveFromIndex];
+                        closestParentWithNativeNode.NativeNode.MoveChild(nativeNodeChild, moveToFirstChunkIndex + moveCount - 1);
+                        closestParentWithNativeNode.NativeNodeChildren.Move(moveFromIndex, moveToFirstChunkIndex + moveCount);
                     }
                     else
                     {
-                        var sibling = moveOperation.Parent.Child;
-                        while (sibling.Sibling != moveOperation.Child)
-                        {
-                            sibling = sibling.Sibling;
-                        }
-                        sibling.Sibling = moveOperation.Child.Sibling;
-                    }
-
-                    // Insert references
-                    if (moveOperation.Index == 0)
-                    {
-                        var currentChild = moveOperation.Parent.Child;
-                        moveOperation.Parent.Child = moveOperation.Child;
-                        moveOperation.Child.Sibling = currentChild;
-                    }
-                    else
-                    {
-                        FiberNode siblingBefore = moveOperation.Parent.Child;
-                        for (var i = 0; i < moveOperation.Index - 1; ++i)
-                        {
-                            siblingBefore = siblingBefore.Sibling;
-                        }
-                        var siblingAfter = siblingBefore.Sibling;
-                        siblingBefore.Sibling = moveOperation.Child;
-                        moveOperation.Child.Sibling = siblingAfter;
-                    }
-
-                    // Figure out what native nodes need to be moved.
-                    // There can be more than one native node being a descendent of the node being moved,
-                    // so a consecutive chunk of native nodes (0-n) might need to be moved. 
-                    var closestParentWithNativeNode = moveOperation.Child.FindClosestAncestorWithNativeNodeOrPortalDestination();
-
-                    var moveCount = 0;
-                    var moveFromIndex = -1;
-                    var moveToFirstChunkIndex = -1;
-
-                    for (var i = 0; i < closestParentWithNativeNode.NativeNodeChildren.Count; ++i)
-                    {
-                        var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[i];
-                        if (nativeNodeChild.IsDescendentOf(moveOperation.Child))
-                        {
-                            if (moveCount == 0)
-                            {
-                                moveFromIndex = i;
-                                // Calling FindNativeNodeIndex to get the first index here works 
-                                //since we have already updated the virtual tree above.
-                                moveToFirstChunkIndex = closestParentWithNativeNode.FindNativeNodeIndex(moveOperation.Child);
-                            }
-
-                            moveCount++;
-                        }
-                        else if (moveCount != 0)
-                        {
-                            // If we have found at least one native node to move, but this sibling native node
-                            // isn't a descendent, then no other native nodes should be moved.
-                            break;
-                        }
-                    }
-
-                    // Do the actual move and update the order of the list of native node children in the closest parent with native node.
-                    var isMovingForward = moveToFirstChunkIndex > moveFromIndex;
-
-                    for (var i = 0; i < moveCount; ++i)
-                    {
-                        if (isMovingForward)
-                        {
-                            // Since we are moving items further down in the list, then that means that the next item to
-                            // move will be pushed back, meaning that the move from index never changes.
-                            var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[moveFromIndex];
-                            closestParentWithNativeNode.NativeNode.MoveChild(nativeNodeChild, moveToFirstChunkIndex + moveCount - 1);
-                            closestParentWithNativeNode.NativeNodeChildren.Move(moveFromIndex, moveToFirstChunkIndex + moveCount);
-                        }
-                        else
-                        {
-                            var moveTo = moveToFirstChunkIndex + i;
-                            var moveFrom = moveFromIndex + i;
-                            var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[moveFrom];
-                            closestParentWithNativeNode.NativeNode.MoveChild(nativeNodeChild, moveTo);
-                            closestParentWithNativeNode.NativeNodeChildren.Move(moveFrom, moveTo);
-                        }
+                        var moveTo = moveToFirstChunkIndex + i;
+                        var moveFrom = moveFromIndex + i;
+                        var nativeNodeChild = closestParentWithNativeNode.NativeNodeChildren[moveFrom];
+                        closestParentWithNativeNode.NativeNode.MoveChild(nativeNodeChild, moveTo);
+                        closestParentWithNativeNode.NativeNodeChildren.Move(moveFrom, moveTo);
                     }
                 }
             }
@@ -2643,6 +2595,8 @@ namespace Fiber
                 private readonly Dictionary<KeyType, int> _currentKeyToIdMap;
                 private readonly Dictionary<int, KeyType> _currentIdToKeyMap;
                 private readonly HashSet<KeyType> _allKeys;
+                private readonly List<ValueTuple<KeyType, VirtualNode>> _childrenAndKeyPairs;
+                private readonly List<FiberNode> _previousFiberNodes;
 
                 public ForEffect(
                     ISignalList<ItemType> eachSignal,
@@ -2663,62 +2617,25 @@ namespace Fiber
                     _fiberNode = fiberNode;
                     _currentKeyToIdMap = currentKeyToIdMap;
                     _currentIdToKeyMap = currentIdToKeyMap;
-                    _allKeys = new();
+                    _allKeys = new(10);
+                    _childrenAndKeyPairs = new(10);
+                    _previousFiberNodes = new(10);
                 }
 
                 protected override void Run(IList<ItemType> each)
                 {
-                    var currentChildAtIndex = _fiberNode.Child;
-                    FiberNode previousChildFiberNode = null;
-                    FiberNode previousFirstChildFiberNode = null;
                     _allKeys.Clear();
+                    _childrenAndKeyPairs.Clear();
 
+                    // Create all children and extract keys
                     for (var i = 0; i < each.Count; ++i)
                     {
-                        var (key, child) = _children(each[i], i);
-                        _allKeys.Add(key);
-
-                        var currentChildFiberId = _currentKeyToIdMap.ContainsKey(key) ? _currentKeyToIdMap[key] : -1;
-                        var currentChildOfKey = currentChildFiberId == -1 ? null : _fiberNode.FindChild(currentChildFiberId);
-
-                        FiberNode createdChildNode = null;
-                        if (currentChildAtIndex == null || currentChildOfKey == null || currentChildOfKey.Id != currentChildAtIndex.Id)
-                        {
-                            if (currentChildOfKey != null)
-                            {
-                                _operationsQueue.Enqueue(new MoveOperation(_fiberNode, currentChildOfKey, i));
-                            }
-                            else
-                            {
-                                createdChildNode = new FiberNode(
-                                    renderer: _renderer,
-                                    nativeNode: null,
-                                    virtualNode: child,
-                                    parent: _fiberNode,
-                                    sibling: currentChildAtIndex
-                                );
-                                if (i == 0)
-                                {
-                                    previousFirstChildFiberNode = _fiberNode.Child;
-                                    _fiberNode.Child = createdChildNode;
-                                }
-                                else if (previousChildFiberNode != null)
-                                {
-                                    previousChildFiberNode.Sibling = createdChildNode;
-                                }
-                                _renderQueue.Enqueue(createdChildNode);
-                                _currentKeyToIdMap.Add(key, createdChildNode.Id);
-                                _currentIdToKeyMap.Add(createdChildNode.Id, key);
-                            }
-                        }
-
-                        previousChildFiberNode = createdChildNode ?? currentChildAtIndex;
-                        if (currentChildAtIndex != null)
-                        {
-                            currentChildAtIndex = currentChildAtIndex.Sibling;
-                        }
+                        var keyChildPair = _children(each[i], i);
+                        _childrenAndKeyPairs.Add(keyChildPair);
+                        _allKeys.Add(keyChildPair.Item1);
                     }
 
+                    // Remove children not in the updated list
                     for (var currentChild = _fiberNode.Child; currentChild != null; currentChild = currentChild.Sibling)
                     {
                         var key = _currentIdToKeyMap[currentChild.Id];
@@ -2731,25 +2648,87 @@ namespace Fiber
                         }
                     }
 
-                    // Special case when we are removing the first child. If that happens we want 
-                    // to iterate siblings until we found one that is still rendered and then stop.
-                    // We don't need to remove self from tree either since that is already done in
-                    // the first loop above, only mark it with the correct phase.
-                    for (var currentChild = previousFirstChildFiberNode; currentChild != null; currentChild = currentChild.Sibling)
+                    // Save previous fiber nodes
+                    _previousFiberNodes.Clear();
+                    for (var currentChild = _fiberNode.Child; currentChild != null; currentChild = currentChild.Sibling)
                     {
-                        if (!_currentIdToKeyMap.ContainsKey(currentChild.Id))
+                        _previousFiberNodes.Add(currentChild);
+                    }
+
+                    // Move nodes to correct position and create new nodes
+                    FiberNode previousChildFiberNode = null;
+                    for (var i = 0; i < _childrenAndKeyPairs.Count; ++i)
+                    {
+                        var (key, child) = _childrenAndKeyPairs[i];
+
+                        var currentChildFiberId = _currentKeyToIdMap.ContainsKey(key) ? _currentKeyToIdMap[key] : -1;
+
+                        if (currentChildFiberId != -1)
                         {
-                            break;
+                            // Find current child and index
+                            FiberNode currentChildOfKey = null;
+                            int currentChildOfKeyIndex = -1;
+                            for (var j = 0; j < _previousFiberNodes.Count; ++j)
+                            {
+                                var previousChild = _previousFiberNodes[j];
+                                if (_currentIdToKeyMap[previousChild.Id].Equals(key))
+                                {
+                                    currentChildOfKey = previousChild;
+                                    currentChildOfKeyIndex = j;
+                                    break;
+                                }
+                            }
+
+                            // Update sibling / child references
+                            if (i == 0)
+                            {
+                                _fiberNode.Child = currentChildOfKey;
+                            }
+                            else if (i == _childrenAndKeyPairs.Count - 1)
+                            {
+                                currentChildOfKey.Sibling = null;
+                            }
+
+                            if (previousChildFiberNode != null)
+                            {
+                                previousChildFiberNode.Sibling = currentChildOfKey;
+                            }
+                            previousChildFiberNode = currentChildOfKey;
+
+
+                            // Decide if we should move the child
+                            if (currentChildOfKey != null && currentChildOfKeyIndex != i)
+                            {
+                                _operationsQueue.Enqueue(new MoveOperation(_fiberNode, currentChildOfKey, i));
+                            }
                         }
-                        var key = _currentIdToKeyMap[currentChild.Id];
-                        if (_allKeys.Contains(_currentIdToKeyMap[currentChild.Id]))
+                        else
                         {
-                            break;
+                            // Create new child
+                            var createdChildNode = new FiberNode(
+                                renderer: _renderer,
+                                nativeNode: null,
+                                virtualNode: child,
+                                parent: _fiberNode,
+                                sibling: null
+                            );
+
+                            // Update sibling / child references
+                            if (i == 0)
+                            {
+                                _fiberNode.Child = createdChildNode;
+                            }
+                            else if (previousChildFiberNode != null)
+                            {
+                                previousChildFiberNode.Sibling = createdChildNode;
+                            }
+                            previousChildFiberNode = createdChildNode;
+
+                            // Add to render queue and update caches
+                            _renderQueue.Enqueue(createdChildNode);
+                            _currentKeyToIdMap.Add(key, createdChildNode.Id);
+                            _currentIdToKeyMap.Add(createdChildNode.Id, key);
                         }
-                        currentChild.Phase = FiberNodePhase.RemovedFromVirtualTree;
-                        _operationsQueue.Enqueue(new UnmountOperation(parent: _fiberNode, child: currentChild));
-                        _currentKeyToIdMap.Remove(key);
-                        _currentIdToKeyMap.Remove(currentChild.Id);
                     }
                 }
 
