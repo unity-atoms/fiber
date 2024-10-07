@@ -102,13 +102,18 @@ namespace Signals
             return _signals[index].Get();
         }
 
+        public ISignal<T> GetSignal(int index)
+        {
+            return _signals[index];
+        }
+
         public int Count => _count;
     }
 
     [Serializable]
     public abstract class DynamicComputedSignal<DT, RT> : BaseComputedSignal<RT>
     {
-        private readonly DynamicDependencies<DT> _dynamicDependencies;
+        protected readonly DynamicDependencies<DT> _dynamicDependencies;
 
         public DynamicComputedSignal(IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
@@ -141,7 +146,7 @@ namespace Signals
     {
         protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
-        private readonly DynamicDependencies<DT> _dynamicDependencies;
+        protected readonly DynamicDependencies<DT> _dynamicDependencies;
 
         public DynamicComputedSignal(ISignal<T1> signal1, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
@@ -186,7 +191,7 @@ namespace Signals
         protected byte _lastDirtyBit1;
         protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
-        private readonly DynamicDependencies<DT> _dynamicDependencies;
+        protected readonly DynamicDependencies<DT> _dynamicDependencies;
 
         public DynamicComputedSignal(ISignal<T1> signal1, ISignal<T2> signal2, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
