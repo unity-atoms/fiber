@@ -195,7 +195,7 @@ namespace Fiber.InteractiveUI
                 {
                     cursorManager.UnwishCursor(id);
                 };
-            }, interactiveElement.IsHovered, interactiveElement.IsPressed, interactiveElement.IsDisabled ?? new StaticSignal<bool>(false));
+            }, interactiveElement.IsHovered, interactiveElement.IsPressed, interactiveElement.IsDisabled ?? StaticSignals.FALSE);
 
             component.CreateOnEnableEffect((enable) =>
             {

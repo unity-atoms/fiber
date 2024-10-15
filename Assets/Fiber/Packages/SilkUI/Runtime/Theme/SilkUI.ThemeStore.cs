@@ -138,8 +138,8 @@ namespace SilkUI
                 this,
                 interactiveElement.IsPressed,
                 interactiveElement.IsHovered,
-                interactiveElement.IsSelected ?? new StaticSignal<bool>(false),
-                interactiveElement.IsDisabled ?? new StaticSignal<bool>(false),
+                interactiveElement.IsSelected ?? StaticSignals.FALSE,
+                interactiveElement.IsDisabled ?? StaticSignals.FALSE,
                 variant.IsSignal ? variant.Signal : new StaticSignal<string>(variant.Value)
             );
 

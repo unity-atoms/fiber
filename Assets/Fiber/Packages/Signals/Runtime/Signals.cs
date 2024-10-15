@@ -147,27 +147,6 @@ namespace Signals
     }
 
     [Serializable]
-    public class StaticSignal<T> : BaseSignal<T>
-    {
-        [SerializeField]
-        protected T _value;
-
-        public StaticSignal() { }
-
-        public StaticSignal(T value)
-        {
-            _value = value;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
-        public override sealed T Get() => _value;
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
-    }
-
-    [Serializable]
     public class Signal<T> : BaseSignal<T>
     {
         [SerializeField]
