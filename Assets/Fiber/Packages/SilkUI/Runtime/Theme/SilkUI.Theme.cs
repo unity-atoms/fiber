@@ -64,23 +64,29 @@ namespace SilkUI
 
         public ColorModifiers GetColorModifiers(string role, ElementType elementType, string subRole, string variant = null)
         {
-            Element element;
+            Element element = null;
             if (Color.ContainsKey(role))
             {
+                // Prefer sub role if it exists
                 if (subRole != null && Color[role].SubRoles.ContainsKey(subRole) && !Color[role].SubRoles[subRole].IsElementEmpty(elementType))
                 {
                     element = Color[role].SubRoles[subRole].GetElement(elementType);
                 }
-                else
+
+                // Fallback to role if sub role doesn't exist or element is empty for the sub role
+                if (element == null)
                 {
                     element = Color[role].GetElement(elementType);
                 }
             }
-            else
+
+            // If no element was found, fallback to the fallback role
+            if (element == null)
             {
                 element = Color[FallbackRole].GetElement(elementType);
             }
 
+            // If a variant isn't present, fallback to the default element colors
             var colorModifiers = variant != null && element.Variants.ContainsKey(variant) ? element.Variants[variant] : element;
             return colorModifiers;
         }
