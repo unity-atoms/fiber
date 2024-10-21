@@ -989,4 +989,22 @@ namespace Signals
             return value.ToString();
         }
     }
+
+    public class IsNullSignal<T> : ComputedSignal<T, bool> where T : class
+    {
+        public IsNullSignal(ISignal<T> signal) : base(signal) { }
+        protected override bool Compute(T value)
+        {
+            return value == null;
+        }
+    }
+
+    public class IsNotNullSignal<T> : ComputedSignal<T, bool> where T : class
+    {
+        public IsNotNullSignal(ISignal<T> signal) : base(signal) { }
+        protected override bool Compute(T value)
+        {
+            return value != null;
+        }
+    }
 }
