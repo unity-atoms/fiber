@@ -46,36 +46,55 @@ namespace SilkUI
     public enum BorderWidthType
     {
         Default = 0,
-        Thick = 1,
-        Thin = 2,
-        None = 3
+        Thin = 1,
+        Thick = 2,
+        Thicker = 3,
+        Thickest = 4,
+        None = -1
     }
     public class BorderWidthTokens : BaseSignal<BorderWidthTokens>
     {
         public const float DEFAULT = 1f;
-        public const float THICK = 2f;
         public const float THIN = 0.5f;
+        public const float THICK = 2f;
+        public const float THICKER = 4f;
+        public const float THICKEST = 8f;
 
         public Signal<float> Default { get; private set; }
-        public Signal<float> Thick { get; private set; }
         public Signal<float> Thin { get; private set; }
+        public Signal<float> Thick { get; private set; }
+        public Signal<float> Thicker { get; private set; }
+        public Signal<float> Thickest { get; private set; }
+
         private StaticSignal<float> _none = new(0f);
 
-        public BorderWidthTokens(float @default = DEFAULT, float thick = THICK, float thin = THIN)
+        public BorderWidthTokens(
+            float @default = DEFAULT,
+            float thin = THIN,
+            float thick = THICK,
+            float thicker = THICKER,
+            float thickest = THICKEST
+        )
         {
             Default = new(@default);
             Default.RegisterDependent(this);
-            Thick = new(thick);
-            Thick.RegisterDependent(this);
             Thin = new(thin);
             Thin.RegisterDependent(this);
+            Thick = new(thick);
+            Thick.RegisterDependent(this);
+            Thicker = new(thicker);
+            Thicker.RegisterDependent(this);
+            Thickest = new(thickest);
+            Thickest.RegisterDependent(this);
         }
 
         ~BorderWidthTokens()
         {
             Default.UnregisterDependent(this);
-            Thick.UnregisterDependent(this);
             Thin.UnregisterDependent(this);
+            Thick.UnregisterDependent(this);
+            Thicker.UnregisterDependent(this);
+            Thickest.UnregisterDependent(this);
         }
 
         public BaseSignal<float> GetBorderWidthSignal(BorderWidthType borderWidthType)
@@ -84,10 +103,14 @@ namespace SilkUI
             {
                 case BorderWidthType.Default:
                     return Default;
-                case BorderWidthType.Thick:
-                    return Thick;
                 case BorderWidthType.Thin:
                     return Thin;
+                case BorderWidthType.Thick:
+                    return Thick;
+                case BorderWidthType.Thicker:
+                    return Thicker;
+                case BorderWidthType.Thickest:
+                    return Thickest;
                 case BorderWidthType.None:
                     return _none;
                 default:
