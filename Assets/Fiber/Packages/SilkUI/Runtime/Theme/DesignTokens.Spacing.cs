@@ -12,8 +12,10 @@ namespace SilkUI
         public SpacingTokens(
             int baseline = DEFAULT_BASELINE,
             float borderWidthDefault = BorderWidthTokens.DEFAULT,
-            float borderWidthThick = BorderWidthTokens.THICK,
             float borderWidthThin = BorderWidthTokens.THIN,
+            float borderWidthThick = BorderWidthTokens.THICK,
+            float borderWidthThicker = BorderWidthTokens.THICKER,
+            float borderWidthThickest = BorderWidthTokens.THICKEST,
             float textOutlineDefault = TextOutlineTokens.DEFAULT,
             float textOutlineEmphasis = TextOutlineTokens.EMPHASIS,
             float textOutlineLight = TextOutlineTokens.LIGHT
@@ -21,7 +23,7 @@ namespace SilkUI
         {
             Baseline = new(baseline);
             Baseline.RegisterDependent(this);
-            BorderWidth = new(borderWidthDefault, borderWidthThick, borderWidthThin);
+            BorderWidth = new(@default: borderWidthDefault, thin: borderWidthThin, thick: borderWidthThick, thicker: borderWidthThicker, thickest: borderWidthThickest);
             BorderWidth.RegisterDependent(this);
             TextOutline = new(textOutlineDefault, textOutlineEmphasis, textOutlineLight);
             TextOutline.RegisterDependent(this);
