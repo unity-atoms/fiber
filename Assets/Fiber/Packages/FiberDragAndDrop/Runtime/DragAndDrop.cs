@@ -329,39 +329,37 @@ namespace Fiber.DragAndDrop
 
                 if (_animationType != DragAndDropListAnimationType.None)
                 {
-                    // Reset mount time when component is enabled
-                    var montTimeRef = new Ref<float>(Time.fixedUnscaledTime);
+                    // Handler that inverts changes of the droppable's position from flexbox in order to be able to animate it (see hook further down)
+                    var enabledTimeRef = new Ref<float>(Time.fixedUnscaledTime);
+                    EventCallback<GeometryChangedEvent> onGeometryChanged = new((e) =>
+                    {
+                        // Prevent animations when:
+                        // 1) Item is first mounted
+                        // 2) The full list is re-enabled
+                        if (enabledTimeRef.Current + 1f > Time.fixedUnscaledTime)
+                        {
+                            return;
+                        }
+
+                        var oldCenter = e.oldRect.center;
+                        var newCenter = e.newRect.center;
+                        if (oldCenter != newCenter)
+                        {
+                            var delta = oldCenter - newCenter;
+                            droppableRef.Current.transform.position = (Vector3)delta;
+                        }
+                    });
                     F.CreateOnEnableEffect((enabled) =>
                     {
                         if (enabled)
                         {
-                            montTimeRef.Current = Time.fixedUnscaledTime;
+                            enabledTimeRef.Current = Time.fixedUnscaledTime;
+                            droppableRef.Current.RegisterCallback(onGeometryChanged);
                         }
-                    });
-
-                    // Effect that inverts changes of the droppable's position from flexbox in order to be able to animate it (see next hook)
-                    F.CreateEffect(() =>
-                    {
-                        EventCallback<GeometryChangedEvent> onGeometryChanged = new((e) =>
-                        {
-                            if (montTimeRef.Current + 1f > Time.fixedUnscaledTime)
-                            {
-                                return;
-                            }
-
-                            var oldCenter = e.oldRect.center;
-                            var newCenter = e.newRect.center;
-                            if (oldCenter != newCenter)
-                            {
-                                var delta = oldCenter - newCenter;
-                                droppableRef.Current.transform.position = (Vector3)delta;
-                            }
-                        });
-                        droppableRef.Current.RegisterCallback(onGeometryChanged);
-                        return () =>
+                        else
                         {
                             droppableRef.Current.UnregisterCallback(onGeometryChanged);
-                        };
+                        }
                     });
 
                     // Very simple linear animation of transform that always moves towards 0,0
