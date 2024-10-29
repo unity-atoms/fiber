@@ -329,13 +329,22 @@ namespace Fiber.DragAndDrop
 
                 if (_animationType != DragAndDropListAnimationType.None)
                 {
+                    // Reset mount time when component is enabled
+                    var montTimeRef = new Ref<float>(Time.fixedUnscaledTime);
+                    F.CreateOnEnableEffect((enabled) =>
+                    {
+                        if (enabled)
+                        {
+                            montTimeRef.Current = Time.fixedUnscaledTime;
+                        }
+                    });
+
                     // Effect that inverts changes of the droppable's position from flexbox in order to be able to animate it (see next hook)
                     F.CreateEffect(() =>
                     {
-                        var mountTime = Time.fixedUnscaledTime;
                         EventCallback<GeometryChangedEvent> onGeometryChanged = new((e) =>
                         {
-                            if (mountTime + 1f > Time.fixedUnscaledTime)
+                            if (montTimeRef.Current + 1f > Time.fixedUnscaledTime)
                             {
                                 return;
                             }
