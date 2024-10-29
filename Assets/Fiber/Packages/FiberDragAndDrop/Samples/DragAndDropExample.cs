@@ -245,9 +245,10 @@ public class DragAndDropExample : MonoBehaviour
                                 ),
                                 children: F.DragAndDropList(
                                     items: items,
-                                    children: (item, index, isDraggedSignal) =>
+                                    createItemKey: (item, index) => item,
+                                    renderItem: (item, index, isDraggedSignal) =>
                                     {
-                                        return (item, new ItemComponent(item, isDraggedSignal));
+                                        return new ItemComponent(item, isDraggedSignal);
                                     },
                                     animationType: DragAndDropListAnimationType.Linear,
                                     isItemDragHandle: true

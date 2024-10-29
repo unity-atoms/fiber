@@ -203,15 +203,17 @@ namespace Fiber.Suite
                                 ),
                                 For(
                                     each: todoItemsSignal,
-                                    children: (item, i) =>
+                                    createItemKey: (item, i) => item.Id,
+                                    renderItem: (item, i) =>
                                     {
-                                        return (item.Id, For(
+                                        return For(
                                             each: todoItemsSignal,
-                                            children: (item, i) =>
+                                            createItemKey: (item, i) => item.Id,
+                                            renderItem: (item, i) =>
                                             {
-                                                return (item.Id, F.Text(text: item.Text));
+                                                return F.Text(text: item.Text);
                                             }
-                                        ));
+                                        );
                                     }
                                 ),
                                 F.Button(

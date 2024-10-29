@@ -143,7 +143,8 @@ namespace Fiber.DragAndDrop
         public static DragAndDropListComponent<ItemType, KeyType> DragAndDropList<ItemType, KeyType>(
             this BaseComponent component,
             ISignalList<ItemType> items,
-            Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
+            Func<ItemType, int, BaseSignal<bool>, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true,
             Action<int, int> moveItem = null,
@@ -152,7 +153,8 @@ namespace Fiber.DragAndDrop
         {
             return new DragAndDropListComponent<ItemType, KeyType>(
                 items: items,
-                children: children,
+                renderItem: renderItem,
+                createItemKey: createItemKey,
                 animationType: animationType,
                 isItemDragHandle: isItemDragHandle,
                 moveItem: moveItem,
@@ -187,7 +189,8 @@ namespace Fiber.DragAndDrop
     public class DragAndDropListComponent<ItemType, KeyType> : BaseComponent where ItemType : IEquatable<ItemType>
     {
         private readonly ISignalList<ItemType> _items;
-        private readonly Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> _children;
+        private readonly Func<ItemType, int, BaseSignal<bool>, VirtualNode> _renderItem;
+        private readonly Func<ItemType, int, KeyType> _createItemKey;
         private readonly DragAndDropListAnimationType _animationType;
         private readonly bool _isItemDragHandle;
         private readonly Action<int, int> _moveItem;
@@ -195,7 +198,8 @@ namespace Fiber.DragAndDrop
 
         public DragAndDropListComponent(
             ISignalList<ItemType> items,
-            Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
+            Func<ItemType, int, BaseSignal<bool>, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true,
             Action<int, int> moveItem = null,
@@ -203,7 +207,8 @@ namespace Fiber.DragAndDrop
         ) : base(VirtualBody.Empty)
         {
             _items = items;
-            _children = children;
+            _renderItem = renderItem;
+            _createItemKey = createItemKey;
             _animationType = animationType;
             _isItemDragHandle = isItemDragHandle;
             _moveItem = moveItem;
@@ -215,7 +220,8 @@ namespace Fiber.DragAndDrop
             return F.DragAndDropProvider<ItemType>(
                 children: new DragAndDropListInner(
                     items: _items,
-                    children: _children,
+                    renderItem: _renderItem,
+                    createItemKey: _createItemKey,
                     animationType: _animationType,
                     isItemDragHandle: _isItemDragHandle,
                     moveItem: _moveItem,
@@ -227,7 +233,8 @@ namespace Fiber.DragAndDrop
         private class DragAndDropListInner : BaseComponent
         {
             private readonly ISignalList<ItemType> _items;
-            private readonly Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> _children;
+            private readonly Func<ItemType, int, BaseSignal<bool>, VirtualNode> _renderItem;
+            private readonly Func<ItemType, int, KeyType> _createItemKey;
             private readonly DragAndDropListAnimationType _animationType;
             private readonly bool _isItemDragHandle;
             private readonly Action<int, int> _moveItem;
@@ -235,7 +242,8 @@ namespace Fiber.DragAndDrop
 
             public DragAndDropListInner(
                 ISignalList<ItemType> items,
-                Func<ItemType, int, BaseSignal<bool>, ValueTuple<KeyType, VirtualNode>> children,
+                Func<ItemType, int, BaseSignal<bool>, VirtualNode> renderItem,
+                Func<ItemType, int, KeyType> createItemKey,
                 DragAndDropListAnimationType animationType,
                 bool isItemDragHandle,
                 Action<int, int> moveItem,
@@ -243,7 +251,8 @@ namespace Fiber.DragAndDrop
             ) : base(VirtualBody.Empty)
             {
                 _items = items;
-                _children = children;
+                _renderItem = renderItem;
+                _createItemKey = createItemKey;
                 _animationType = animationType;
                 _isItemDragHandle = isItemDragHandle;
                 _moveItem = moveItem;
@@ -278,14 +287,15 @@ namespace Fiber.DragAndDrop
 
                 return F.For(
                     each: _items,
-                    children: (item, index) =>
+                    createItemKey: _createItemKey,
+                    renderItem: (item, index) =>
                     {
                         var isDraggedSignal = F.CreateComputedSignal((currentlyDragged) =>
                         {
                             return currentlyDragged != null && currentlyDragged.Value != null && currentlyDragged.Value.Equals(item);
                         }, dndContext.CurrentlyDragged);
-                        var (key, child) = _children(item, index, isDraggedSignal);
-                        return (key, new DragAndDropListItemComponent(
+                        var child = _renderItem(item, index, isDraggedSignal);
+                        return new DragAndDropListItemComponent(
                             item: item,
                             children: child,
                             animationType: _animationType,
@@ -295,7 +305,7 @@ namespace Fiber.DragAndDrop
                                 _onClick.Invoke(item);
                             }
                         : null
-                        ));
+                        );
                     }
                 );
             }

@@ -106,7 +106,8 @@ namespace Fiber
         public VirtualNode Mount(ISignal<bool> whenSignal, VirtualBody children);
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
-            Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
+            Func<ItemType, int, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey
         );
         public VirtualNode Switch(VirtualBody fallback, VirtualBody children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children);
@@ -902,10 +903,11 @@ namespace Fiber
         public VirtualNode Mount(ISignal<bool> when, VirtualBody children) => Api.Mount(when, children);
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
-            Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
+            Func<ItemType, int, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey
         )
         {
-            return Api.For<ItemType, KeyType>(each, children);
+            return Api.For<ItemType, KeyType>(each, renderItem, createItemKey);
         }
         public VirtualNode Switch(VirtualBody fallback, VirtualBody children) => Api.Switch(fallback, children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children) => Api.Match(when, children);
@@ -2554,10 +2556,11 @@ namespace Fiber
 
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
-            Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children
+            Func<ItemType, int, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey
         )
         {
-            return new ForComponent<ItemType, KeyType>(each, children, _renderQueue, _operationsQueue, this);
+            return new ForComponent<ItemType, KeyType>(each, renderItem, createItemKey, _renderQueue, _operationsQueue, this);
         }
 
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
@@ -2570,7 +2573,8 @@ namespace Fiber
         private class ForComponent<ItemType, KeyType> : BaseForComponent
         {
             private readonly ISignalList<ItemType> _eachSignal;
-            private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
+            private readonly Func<ItemType, int, VirtualNode> _renderItem;
+            private readonly Func<ItemType, int, KeyType> _createItemKey;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
             private readonly Renderer _renderer;
@@ -2579,14 +2583,16 @@ namespace Fiber
 
             public ForComponent(
                 ISignalList<ItemType> eachSignal,
-                Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+                Func<ItemType, int, VirtualNode> renderItem,
+                Func<ItemType, int, KeyType> createItemKey,
                 Queue<FiberNode> renderQueue,
                 MixedQueue operationsQueue,
                 Renderer renderer
             ) : base()
             {
                 _eachSignal = eachSignal;
-                _children = children;
+                _renderItem = renderItem;
+                _createItemKey = createItemKey;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
                 _renderer = renderer;
@@ -2597,20 +2603,21 @@ namespace Fiber
 
             private class ForEffect : Effect<IList<ItemType>>
             {
-                private readonly Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> _children;
+                private readonly Func<ItemType, int, VirtualNode> _renderItem;
+                private readonly Func<ItemType, int, KeyType> _createItemKey;
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
                 private readonly Renderer _renderer;
                 private readonly FiberNode _fiberNode;
                 private readonly Dictionary<KeyType, int> _currentKeyToIdMap;
                 private readonly Dictionary<int, KeyType> _currentIdToKeyMap;
-                private readonly HashSet<KeyType> _allKeys;
-                private readonly List<ValueTuple<KeyType, VirtualNode>> _childrenAndKeyPairs;
+                private readonly List<KeyType> _allKeys;
                 private readonly List<FiberNode> _previousFiberNodes;
 
                 public ForEffect(
                     ISignalList<ItemType> eachSignal,
-                    Func<ItemType, int, ValueTuple<KeyType, VirtualNode>> children,
+                    Func<ItemType, int, VirtualNode> renderItem,
+                    Func<ItemType, int, KeyType> createItemKey,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
                     Renderer renderer,
@@ -2620,7 +2627,8 @@ namespace Fiber
                 )
                     : base(eachSignal, runOnMount: false)
                 {
-                    _children = children;
+                    _renderItem = renderItem;
+                    _createItemKey = createItemKey;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
                     _renderer = renderer;
@@ -2628,21 +2636,18 @@ namespace Fiber
                     _currentKeyToIdMap = currentKeyToIdMap;
                     _currentIdToKeyMap = currentIdToKeyMap;
                     _allKeys = new(10);
-                    _childrenAndKeyPairs = new(10);
                     _previousFiberNodes = new(10);
                 }
 
                 protected override void Run(IList<ItemType> each)
                 {
                     _allKeys.Clear();
-                    _childrenAndKeyPairs.Clear();
 
                     // Create all children and extract keys
                     for (var i = 0; i < each.Count; ++i)
                     {
-                        var keyChildPair = _children(each[i], i);
-                        _childrenAndKeyPairs.Add(keyChildPair);
-                        _allKeys.Add(keyChildPair.Item1);
+                        var key = _createItemKey(each[i], i);
+                        _allKeys.Add(key);
                     }
 
                     // Remove children not in the updated list
@@ -2667,9 +2672,9 @@ namespace Fiber
 
                     // Move nodes to correct position and create new nodes
                     FiberNode previousChildFiberNode = null;
-                    for (var i = 0; i < _childrenAndKeyPairs.Count; ++i)
+                    for (var i = 0; i < _allKeys.Count; ++i)
                     {
-                        var (key, child) = _childrenAndKeyPairs[i];
+                        var key = _allKeys[i];
 
                         var currentChildFiberId = _currentKeyToIdMap.ContainsKey(key) ? _currentKeyToIdMap[key] : -1;
 
@@ -2694,7 +2699,7 @@ namespace Fiber
                             {
                                 _fiberNode.Child = currentChildOfKey;
                             }
-                            else if (i == _childrenAndKeyPairs.Count - 1)
+                            else if (i == _allKeys.Count - 1)
                             {
                                 currentChildOfKey.Sibling = null;
                             }
@@ -2715,6 +2720,7 @@ namespace Fiber
                         else
                         {
                             // Create new child
+                            var child = _renderItem(each[i], i);
                             var createdChildNode = new FiberNode(
                                 renderer: _renderer,
                                 nativeNode: null,
@@ -2752,13 +2758,14 @@ namespace Fiber
                 _currentIdToKeyMap.Clear();
 
 
-                fiberNode.PushEffect(new ForEffect(_eachSignal, _children, _renderQueue, _operationsQueue, _renderer, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
+                fiberNode.PushEffect(new ForEffect(_eachSignal, _renderItem, _createItemKey, _renderQueue, _operationsQueue, _renderer, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
 
                 var each = _eachSignal.Get();
                 FiberNode previousChildFiberNode = null;
                 for (var i = 0; i < each.Count; ++i)
                 {
-                    var (key, child) = _children(each[i], i);
+                    var key = _createItemKey(each[i], i);
+                    var child = _renderItem(each[i], i);
 
                     if (child != null)
                     {
