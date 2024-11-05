@@ -9,7 +9,7 @@ namespace SilkUI
     }
 
 
-    public class Theme : BaseSignal<Theme>, IGetName
+    public class Theme : BaseSignal<Theme>
     {
         public string Name;
         public string FallbackRole;
@@ -90,7 +90,5 @@ namespace SilkUI
             var colorModifiers = variant != null && element.Variants.ContainsKey(variant) ? element.Variants[variant] : element;
             return colorModifiers;
         }
-
-        public string GetName() => Name;
     }
 }
