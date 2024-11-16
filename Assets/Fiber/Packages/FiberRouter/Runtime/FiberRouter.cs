@@ -18,6 +18,25 @@ namespace Fiber.Router
         {
             return new OutletComponent();
         }
+
+        private static Dictionary<string, BaseSignal<bool>> _isRouteSignals = new();
+        public static BaseSignal<bool> GetIsRouteSignal(this BaseComponent component, string id)
+        {
+            if (_isRouteSignals.ContainsKey(id))
+            {
+                return _isRouteSignals[id];
+            }
+
+            var router = component.C<Router>();
+            var isRouteSignal = component.F.CreateComputedSignal((currentRoute) =>
+            {
+                return currentRoute.Id == id;
+            }, router.CurrentRouteSignal);
+
+            _isRouteSignals.Add(id, isRouteSignal);
+
+            return isRouteSignal;
+        }
     }
 
     [Serializable]

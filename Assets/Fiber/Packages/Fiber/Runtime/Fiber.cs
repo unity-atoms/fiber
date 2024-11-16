@@ -1571,7 +1571,8 @@ namespace Fiber
         private void RenderNextInQueue()
         {
             var fiberNode = _renderQueue.Dequeue();
-            if (fiberNode.IsRemovedFromVirtualTree())
+            // Checking if virtual node is null here allows us to render null in components
+            if (fiberNode.IsRemovedFromVirtualTree() || fiberNode.VirtualNode == null)
             {
                 return;
             }
