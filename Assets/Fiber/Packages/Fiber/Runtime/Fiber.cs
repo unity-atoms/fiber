@@ -1674,7 +1674,7 @@ namespace Fiber
             {
                 if (current.VirtualNode is VisibleComponent visibleComponent)
                 {
-                    return visibleComponent.IsVisible;
+                    return visibleComponent.IsVisible.Get();
                 }
                 current = current.Parent;
             }
@@ -2401,8 +2401,10 @@ namespace Fiber
 
         public class VisibleComponent : VirtualNode, IBuiltInComponent
         {
-            public bool IsVisible { get => _whenSignal.Get(); }
+            public ISignal<bool> IsVisible { get => _isVisibleSignal; }
             private readonly ISignal<bool> _whenSignal;
+            private ISignal<bool> _isVisibleSignal;
+
             public VisibleComponent(ISignal<bool> whenSignal, VirtualBody children) : base(children)
             {
                 _whenSignal = whenSignal;
@@ -2412,10 +2414,10 @@ namespace Fiber
             {
                 private readonly FiberNode _fiberNode;
                 public VisibleEffect(
-                    ISignal<bool> whenSignal,
+                    ISignal<bool> isVisibleSignal,
                     FiberNode fiberNode
                 )
-                    : base(whenSignal, runOnMount: true)
+                    : base(isVisibleSignal, runOnMount: true)
                 {
                     _fiberNode = fiberNode;
                 }
@@ -2436,9 +2438,26 @@ namespace Fiber
                 public override void Cleanup() { }
             }
 
+            private VisibleComponent FindVisibleComponentAncestor(FiberNode fiberNode)
+            {
+                var current = fiberNode.Parent;
+                while (current != null)
+                {
+                    if (current.VirtualNode != null && current.VirtualNode is VisibleComponent visibleComponent)
+                    {
+                        return visibleComponent;
+                    }
+                    current = current.Parent;
+                }
+                return null;
+            }
+
             public VirtualBody Render(FiberNode fiberNode)
             {
-                fiberNode.PushEffect(new VisibleEffect(_whenSignal, fiberNode));
+                var ancestorVisibleComponent = FindVisibleComponentAncestor(fiberNode);
+                var isAncestorVisible = ancestorVisibleComponent == null ? StaticSignals.TRUE : ancestorVisibleComponent.IsVisible;
+                _isVisibleSignal = new InlineComputedSignal<bool, bool, bool>((when, isParentVisible) => when && isParentVisible, _whenSignal, isAncestorVisible);
+                fiberNode.PushEffect(new VisibleEffect(_isVisibleSignal, fiberNode));
                 return Children;
             }
         }
