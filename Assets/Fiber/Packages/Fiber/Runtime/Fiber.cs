@@ -23,7 +23,7 @@ namespace Fiber
     public abstract class NativeNode : BaseSignal
     {
         public abstract void AddChild(FiberNode node, int index);
-        public abstract void RemoveChild(FiberNode node);
+        public abstract void RemoveChild(FiberNode node, bool destroyInstance);
         public abstract void MoveChild(FiberNode node, int index);
         public abstract void Update();
         public abstract void Cleanup();
@@ -1842,7 +1842,7 @@ namespace Fiber
                         if (nativeNodeChild.IsDescendentOf(node))
                         {
                             closestParentWithNativeNode.NativeNodeChildren.RemoveAt(i);
-                            closestParentWithNativeNode.NativeNode.RemoveChild(nativeNodeChild);
+                            closestParentWithNativeNode.NativeNode.RemoveChild(nativeNodeChild, destroyInstance: false);
                         }
                     }
 
@@ -1860,7 +1860,7 @@ namespace Fiber
                 }
                 else
                 {
-                    portalDestinationBefore.NativeNode.RemoveChild(node);
+                    portalDestinationBefore.NativeNode.RemoveChild(node, destroyInstance: false);
                     portalDestinationBefore.NativeNodeChildren.Remove(node);
 
                     if (node.PortalDestination == null)
@@ -1921,7 +1921,7 @@ namespace Fiber
                     }
 
                     var closestAncestor = parent.FindClosestAncestorWithNativeNode(includeSelf: true);
-                    closestAncestor.NativeNode.RemoveChild(fiberNode);
+                    closestAncestor.NativeNode.RemoveChild(fiberNode, destroyInstance: true);
                     closestAncestor.NativeNodeChildren.Remove(fiberNode);
                 }
                 return;
@@ -3108,7 +3108,7 @@ namespace Fiber
                     }
 
                     // Move the native node back to the its original parent. Before being removed again by Fiber.
-                    _fiberNode.PortalDestination.NativeNode.RemoveChild(_fiberNode);
+                    _fiberNode.PortalDestination.NativeNode.RemoveChild(_fiberNode, destroyInstance: false);
                     _fiberNode.PortalDestination.NativeNodeChildren.Remove(_fiberNode);
 
                     var closestParentWithNativeNode = _fiberNode.FindClosestAncestorWithNativeNodeOrPortalDestination();
@@ -3131,7 +3131,7 @@ namespace Fiber
 
     public abstract class PortalDestinationBaseComponent : VirtualNode
     {
-        private readonly string _id;
+        protected readonly string _id;
         public PortalDestinationBaseComponent(
             string id
         ) : base(VirtualBody.Empty)

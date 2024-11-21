@@ -248,8 +248,8 @@ namespace Fiber.UIElements
             SignalProp<bool> active = new(),
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
-            Func<GameObject, GameObject> getInstance = null,
-            Action<GameObject> removeInstance = null,
+            Func<GameObject, GameObject> createInstance = null,
+            Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
             VirtualBody children = new()
@@ -260,8 +260,8 @@ namespace Fiber.UIElements
                 active: active,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
-                getInstance: getInstance,
-                removeInstance: removeInstance,
+                createInstance: createInstance,
+                destroyInstance: destroyInstance,
                 panelSettings: panelSettings,
                 sortingOrder: sortingOrder,
                 children: children
@@ -274,8 +274,8 @@ namespace Fiber.UIElements
             SignalProp<bool> active = new(),
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
-            Func<GameObject, GameObject> getInstance = null,
-            Action<GameObject> removeInstance = null,
+            Func<GameObject, GameObject> createInstance = null,
+            Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
             VirtualBody children = default
@@ -286,8 +286,8 @@ namespace Fiber.UIElements
                 active: active,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
-                getInstance: getInstance,
-                removeInstance: removeInstance,
+                createInstance: createInstance,
+                destroyInstance: destroyInstance,
                 panelSettings: panelSettings,
                 sortingOrder: sortingOrder,
                 children: children
@@ -560,8 +560,8 @@ namespace Fiber.UIElements
         private new SignalProp<bool> Active { get; set; }
         private Ref<GameObject> Ref { get; set; }
         private Action<GameObject> OnCreateRef { get; set; }
-        private Func<GameObject, GameObject> GetInstance { get; set; }
-        private Action<GameObject> RemoveInstance { get; set; }
+        private Func<GameObject, GameObject> CreateInstance { get; set; }
+        private Action<GameObject> DestroyInstance { get; set; }
         private PanelSettings PanelSettings { get; set; }
         private SignalProp<float> SortingOrder { get; set; }
 
@@ -570,8 +570,8 @@ namespace Fiber.UIElements
             SignalProp<bool> active = new(),
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
-            Func<GameObject, GameObject> getInstance = null,
-            Action<GameObject> removeInstance = null,
+            Func<GameObject, GameObject> createInstance = null,
+            Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
             VirtualBody children = default
@@ -581,8 +581,8 @@ namespace Fiber.UIElements
             Active = active;
             Ref = _ref;
             OnCreateRef = onCreateRef;
-            GetInstance = getInstance;
-            RemoveInstance = removeInstance;
+            CreateInstance = createInstance;
+            DestroyInstance = destroyInstance;
             PanelSettings = panelSettings;
             SortingOrder = !sortingOrder.IsEmpty ? sortingOrder : 0f;
         }
@@ -604,8 +604,8 @@ namespace Fiber.UIElements
                             rootRef.Current = root;
                             OnCreateRef?.Invoke(_ref);
                         },
-                        getInstance: GetInstance,
-                        removeInstance: RemoveInstance,
+                        createInstance: CreateInstance,
+                        destroyInstance: DestroyInstance,
                         panelSettings: PanelSettings,
                         sortingOrder: SortingOrder,
                         children: Children
@@ -625,8 +625,8 @@ namespace Fiber.UIElements
             SignalProp<bool> active = new(),
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
-            Func<GameObject, GameObject> getInstance = null,
-            Action<GameObject> removeInstance = null,
+            Func<GameObject, GameObject> createInstance = null,
+            Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
             VirtualBody children = new()
@@ -635,8 +635,8 @@ namespace Fiber.UIElements
                 active: active,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
-                getInstance: getInstance,
-                removeInstance: removeInstance,
+                createInstance: createInstance,
+                destroyInstance: destroyInstance,
                 children: children
             )
         {
@@ -1756,7 +1756,8 @@ namespace Fiber.UIElements
             throw new Exception($"Trying to add child of unknown type {node.VirtualNode.GetType()} at index {index}.");
         }
 
-        public override void RemoveChild(FiberNode node)
+        // We are currently just ignoring the destroyInstance flag here, since it's not relevant for UI Elements
+        public override void RemoveChild(FiberNode node, bool destroyInstance)
         {
             if (node.NativeNode is VisualElementNativeNode visualElementChildNode)
             {
@@ -4384,7 +4385,7 @@ namespace Fiber.UIElements
             base.AddChild(node, index);
         }
 
-        public override void RemoveChild(FiberNode node)
+        public override void RemoveChild(FiberNode node, bool destroyInstance)
         {
             if (node.NativeNode is VisualElementNativeNode visualElementChildNode)
             {
@@ -4392,7 +4393,7 @@ namespace Fiber.UIElements
                 return;
             }
 
-            base.RemoveChild(node);
+            base.RemoveChild(node, destroyInstance);
         }
 
         public override void MoveChild(FiberNode node, int index)

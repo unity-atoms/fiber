@@ -25,8 +25,8 @@ namespace Fiber.GameObjects
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
             Action<GameObject> onMount = null,
-            Func<GameObject, GameObject> getInstance = null,
-            Action<GameObject> removeInstance = null,
+            Func<GameObject, GameObject> createInstance = null,
+            Action<GameObject> destroyInstance = null,
             VirtualBody children = default
         )
         {
@@ -39,8 +39,8 @@ namespace Fiber.GameObjects
                 primitiveType: primitiveType,
                 onCreateRef: onCreateRef,
                 onMount: onMount,
-                getInstance: getInstance,
-                removeInstance: removeInstance,
+                createInstance: createInstance,
+                destroyInstance: destroyInstance,
                 children: children
             );
         }
@@ -65,7 +65,7 @@ namespace Fiber.GameObjects
         public VirtualBody Render(FiberNode fiberNode)
         {
             BaseImplementation(fiberNode);
-            return new GameObjectComponent();
+            return new GameObjectComponent(name: $"PortalDestination_{_id}");
         }
     }
 
@@ -87,10 +87,9 @@ namespace Fiber.GameObjects
         public Action<GameObject> OnMount { get; set; }
 
         // Function that is called when creating the instance. Can be used for using already existing game objects instead of creating new ones.
-        public Func<GameObject, GameObject> GetInstance { get; set; }
-        public Action<GameObject> RemoveInstance { get; set; }
+        public Func<GameObject, GameObject> CreateInstance { get; set; }
+        public Action<GameObject> DestroyInstance { get; set; }
 
-        public GameObjectComponent() : base() { }
         public GameObjectComponent(VirtualBody children) : base(children) { }
 
         public GameObjectComponent(
@@ -102,8 +101,8 @@ namespace Fiber.GameObjects
             Ref<GameObject> _ref = null,
             Action<GameObject> onCreateRef = null,
             Action<GameObject> onMount = null,
-            Func<GameObject, GameObject> getInstance = null,
-            Action<GameObject> removeInstance = null,
+            Func<GameObject, GameObject> createInstance = null,
+            Action<GameObject> destroyInstance = null,
             VirtualBody children = new()
         ) : base(children)
         {
@@ -119,8 +118,8 @@ namespace Fiber.GameObjects
             OnCreateRef = onCreateRef;
             OnMount = onMount;
 
-            GetInstance = getInstance;
-            RemoveInstance = removeInstance;
+            CreateInstance = createInstance;
+            DestroyInstance = destroyInstance;
         }
     }
 
@@ -215,14 +214,26 @@ namespace Fiber.GameObjects
             throw new Exception($"Trying to add child of unknown type {node.VirtualNode.GetType()} at index {index}.");
         }
 
-        public override void RemoveChild(FiberNode node)
+        public override void RemoveChild(FiberNode node, bool destroyInstance)
         {
             if (node.NativeNode is GameObjectNativeNode goChildNode)
             {
-                var goChildVirtualNode = (GameObjectComponent)node.VirtualNode;
-                if (goChildVirtualNode.RemoveInstance != null)
+                // OPEN POINT: Not setting the parent to null since it casuses issues
+                // when exiting play mode / unloading the scene. We are either not really
+                // caring if we remove the parent here either, since when destroyInstance
+                // is false, we are about to move the instance to a new game object anyways.
+
+                // goChildNode.Instance.transform.SetParent(null);
+
+                if (!destroyInstance)
                 {
-                    goChildVirtualNode.RemoveInstance(goChildNode.Instance);
+                    return;
+                }
+
+                var goChildVirtualNode = (GameObjectComponent)node.VirtualNode;
+                if (goChildVirtualNode.DestroyInstance != null)
+                {
+                    goChildVirtualNode.DestroyInstance(goChildNode.Instance);
                     return;
                 }
                 MonoBehaviour.Destroy(goChildNode.Instance);
@@ -295,11 +306,11 @@ namespace Fiber.GameObjects
         {
             GameObject gameObject = null;
 
-            // Try get GameObject using GetInstance prop
-            if (gameObject == null && virtualNode.GetInstance != null)
+            // Try get GameObject using CreateInstance prop
+            if (gameObject == null && virtualNode.CreateInstance != null)
             {
                 var parentNode = fiberNode.FindClosestAncestorWithNativeNodeOrPortalDestination();
-                gameObject = virtualNode.GetInstance(parentNode != null ? (parentNode.NativeNode as GameObjectNativeNode).Instance : null);
+                gameObject = virtualNode.CreateInstance(parentNode != null ? (parentNode.NativeNode as GameObjectNativeNode).Instance : null);
             }
 
             if (gameObject == null)

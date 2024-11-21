@@ -48,7 +48,7 @@ namespace Fiber.Suite
                 _ref.Current.GetComponent<Rigidbody>().isKinematic = isKinematic;
                 return null;
             }, IsKinematicSignal, runOnMount: true);
-            return F.GameObject(_ref: _ref, getInstance: (parentGo) =>
+            return F.GameObject(_ref: _ref, createInstance: (parentGo) =>
             {
                 var go = new GameObject();
                 go.AddComponent<Rigidbody>();
