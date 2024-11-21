@@ -173,7 +173,7 @@ public class PhysicsObjectComponent : BaseComponent
             _ref.Current.GetComponent<Rigidbody>().isKinematic = isKinematic;
             return null;
         }, IsKinematicSignal, runOnMount: true);
-        return F.GameObject(_ref: _ref, getInstance: () =>
+        return F.GameObject(_ref: _ref, createInstance: () =>
         {
             var go = new GameObject();
             go.AddComponent<Rigidbody>();
