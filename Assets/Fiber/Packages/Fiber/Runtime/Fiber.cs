@@ -3026,6 +3026,7 @@ namespace Fiber
             {
                 private readonly FiberNode _fiberNode;
                 private readonly MixedQueue _operationsQueue;
+                private string _lastId;
                 public PortalEffect(
                     BaseSignal<string> id,
                     ShallowSignalDictionary<string, FiberNode> portalDestinations,
@@ -3039,13 +3040,18 @@ namespace Fiber
 
                 protected override void Run(string id, ShallowSignalDictionary<string, FiberNode> portalDestinations)
                 {
+                    _lastId = id;
+
                     FiberNode portalDestination = string.IsNullOrWhiteSpace(id) || !portalDestinations.ContainsKey(id) ? null : portalDestinations[id];
                     var node = _fiberNode.NextNode(root: _fiberNode);
                     while (node != null)
                     {
                         if (node.NativeNode != null)
                         {
-                            _operationsQueue.Enqueue(new SetPortalDestinationOperation(node: node, portalDestination: portalDestination));
+                            if (node.PortalDestination != portalDestination)
+                            {
+                                _operationsQueue.Enqueue(new SetPortalDestinationOperation(node: node, portalDestination: portalDestination));
+                            }
                             node = node.NextNode(root: _fiberNode, skipChildren: true);
                         }
                         else if (node.PortalDestination != null)
@@ -3061,6 +3067,13 @@ namespace Fiber
 
                 public override void Cleanup()
                 {
+                    // Hacky, but prevents effect from running again when the id is the same as last time,
+                    // but still runs when the fiber node is unmounted.
+                    if (_lastId != null && _lastId.Equals(_signal1.Get()) && _fiberNode.Phase == FiberNodePhase.Mounted)
+                    {
+                        return;
+                    }
+
                     var node = _fiberNode.NextNode(root: _fiberNode);
                     while (node != null)
                     {
