@@ -3069,7 +3069,7 @@ namespace Fiber
                 {
                     // Hacky, but prevents effect from running again when the id is the same as last time,
                     // but still runs when the fiber node is unmounted.
-                    if (_lastId != null && _lastId.Equals(_signal1.Get()) && _fiberNode.Phase == FiberNodePhase.Mounted)
+                    if (_lastId != null && _lastId.Equals(_signal1.Get()) && _fiberNode.Phase == FiberNodePhase.Mounted && _fiberNode.PortalDestinations.ContainsKey(_lastId))
                     {
                         return;
                     }
