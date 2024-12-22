@@ -28,6 +28,14 @@ namespace Signals
             Type = SignalPropType.Signal;
         }
 
+        private SignalProp(T value, BaseSignal<T> signal, SignalPropType type)
+        {
+            Value = value;
+            Signal = signal;
+            Type = type;
+        }
+
+
         public static implicit operator SignalProp<T>(T value)
         {
             return new SignalProp<T>(value);
@@ -58,6 +66,8 @@ namespace Signals
         {
             return Type == SignalPropType.Signal ? Signal : new StaticSignal<T>(Value);
         }
+
+        public static SignalProp<T> Empty => new SignalProp<T>(default, null, SignalPropType.Empty);
     }
 
     // Struct used by nodes in work loop when updating properties via signals
