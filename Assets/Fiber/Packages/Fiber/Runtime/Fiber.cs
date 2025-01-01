@@ -78,27 +78,48 @@ namespace Fiber
         public ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(
             Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
+            Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
+        );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, ItemType>(
+            Action<T1, T2, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, ItemType>(
+            Action<T1, T2, T3, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
+        );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, ItemType>(
+            Action<T1, T2, T3, T4, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
+        );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, ItemType>(
+            Action<T1, T2, T3, T4, T5, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
+        );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
+        );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
+        );
         public ISignalList<ItemType> CreateComputedSignalList<T1, ItemType>(
-            Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1
-        );
+            Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
+        ) where ItemType : ISignal;
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, ItemType>(
-            Func<T1, T2, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
-        );
+            Action<T1, T2, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        ) where ItemType : ISignal;
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, ItemType>(
-            Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
-        );
+            Action<T1, T2, T3, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
+        ) where ItemType : ISignal;
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, ItemType>(
-            Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
-        );
+            Action<T1, T2, T3, T4, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
+        ) where ItemType : ISignal;
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(
-            Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
-        );
+            Action<T1, T2, T3, T4, T5, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
+        ) where ItemType : ISignal;
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
-            Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
-        );
+            Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
+        ) where ItemType : ISignal;
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
-            Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
-        );
+            Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
+        ) where ItemType : ISignal;
         public VirtualNode Fragment(VirtualBody children);
         public VirtualNode Enable(ISignal<bool> whenSignal, VirtualBody children);
         public VirtualNode Visible(ISignal<bool> whenSignal, VirtualBody children);
@@ -530,11 +551,11 @@ namespace Fiber
         }
     }
 
-    public class InlineComputedSignalList<T1, ItemType> : ComputedSignal<T1, IList<ItemType>>, ISignalList<ItemType>
+    public class InlineComputedShallowSignalList<T1, ItemType> : ComputedSignal<T1, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
-        private readonly Func<T1, IList<ItemType>, IList<ItemType>> _compute;
-        public InlineComputedSignalList(Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1)
+        private readonly Action<T1, IList<ItemType>> _compute;
+        public InlineComputedShallowSignalList(Action<T1, IList<ItemType>> compute, ISignal<T1> signal1)
             : base(signal1)
         {
             _compute = compute;
@@ -543,17 +564,18 @@ namespace Fiber
         protected override IList<ItemType> Compute(T1 value1)
         {
             _list.Clear();
-            return _compute(value1, _list);
+            _compute(value1, _list);
+            return _list;
         }
         public int Count => LastValue?.Count ?? 0;
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
-    public class InlineComputedSignalList<T1, T2, ItemType> : ComputedSignal<T1, T2, IList<ItemType>>, ISignalList<ItemType>
+    public class InlineComputedShallowSignalList<T1, T2, ItemType> : ComputedSignal<T1, T2, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
-        private readonly Func<T1, T2, IList<ItemType>, IList<ItemType>> _compute;
-        public InlineComputedSignalList(Func<T1, T2, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2)
+        private readonly Action<T1, T2, IList<ItemType>> _compute;
+        public InlineComputedShallowSignalList(Action<T1, T2, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2)
             : base(signal1, signal2)
         {
             _compute = compute;
@@ -562,17 +584,18 @@ namespace Fiber
         protected override IList<ItemType> Compute(T1 value1, T2 value2)
         {
             _list.Clear();
-            return _compute(value1, value2, _list);
+            _compute(value1, value2, _list);
+            return _list;
         }
         public int Count => LastValue?.Count ?? 0;
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
-    public class InlineComputedSignalList<T1, T2, T3, ItemType> : ComputedSignal<T1, T2, T3, IList<ItemType>>, ISignalList<ItemType>
+    public class InlineComputedShallowSignalList<T1, T2, T3, ItemType> : ComputedSignal<T1, T2, T3, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
-        private readonly Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> _compute;
-        public InlineComputedSignalList(Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3)
+        private readonly Action<T1, T2, T3, IList<ItemType>> _compute;
+        public InlineComputedShallowSignalList(Action<T1, T2, T3, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3)
             : base(signal1, signal2, signal3)
         {
             _compute = compute;
@@ -581,17 +604,18 @@ namespace Fiber
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3)
         {
             _list.Clear();
-            return _compute(value1, value2, value3, _list);
+            _compute(value1, value2, value3, _list);
+            return _list;
         }
         public int Count => LastValue?.Count ?? 0;
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
-    public class InlineComputedSignalList<T1, T2, T3, T4, ItemType> : ComputedSignal<T1, T2, T3, T4, IList<ItemType>>, ISignalList<ItemType>
+    public class InlineComputedShallowSignalList<T1, T2, T3, T4, ItemType> : ComputedSignal<T1, T2, T3, T4, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
-        private readonly Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> _compute;
-        public InlineComputedSignalList(Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4)
+        private readonly Action<T1, T2, T3, T4, IList<ItemType>> _compute;
+        public InlineComputedShallowSignalList(Action<T1, T2, T3, T4, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4)
             : base(signal1, signal2, signal3, signal4)
         {
             _compute = compute;
@@ -600,17 +624,18 @@ namespace Fiber
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4)
         {
             _list.Clear();
-            return _compute(value1, value2, value3, value4, _list);
+            _compute(value1, value2, value3, value4, _list);
+            return _list;
         }
         public int Count => LastValue?.Count ?? 0;
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
-    public class InlineComputedSignalList<T1, T2, T3, T4, T5, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, IList<ItemType>>, ISignalList<ItemType>
+    public class InlineComputedShallowSignalList<T1, T2, T3, T4, T5, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
-        private readonly Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> _compute;
-        public InlineComputedSignalList(Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5)
+        private readonly Action<T1, T2, T3, T4, T5, IList<ItemType>> _compute;
+        public InlineComputedShallowSignalList(Action<T1, T2, T3, T4, T5, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5)
             : base(signal1, signal2, signal3, signal4, signal5)
         {
             _compute = compute;
@@ -619,17 +644,18 @@ namespace Fiber
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
         {
             _list.Clear();
-            return _compute(value1, value2, value3, value4, value5, _list);
+            _compute(value1, value2, value3, value4, value5, _list);
+            return _list;
         }
         public int Count => LastValue?.Count ?? 0;
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
-    public class InlineComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, IList<ItemType>>, ISignalList<ItemType>
+    public class InlineComputedShallowSignalList<T1, T2, T3, T4, T5, T6, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
-        private readonly Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> _compute;
-        public InlineComputedSignalList(Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6)
+        private readonly Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> _compute;
+        public InlineComputedShallowSignalList(Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6)
             : base(signal1, signal2, signal3, signal4, signal5, signal6)
         {
             _compute = compute;
@@ -638,17 +664,18 @@ namespace Fiber
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6)
         {
             _list.Clear();
-            return _compute(value1, value2, value3, value4, value5, value6, _list);
+            _compute(value1, value2, value3, value4, value5, value6, _list);
+            return _list;
         }
         public int Count => LastValue?.Count ?? 0;
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
     }
 
-    public class InlineComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>>, ISignalList<ItemType>
+    public class InlineComputedShallowSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
-        private readonly Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> _compute;
-        public InlineComputedSignalList(Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7)
+        private readonly Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> _compute;
+        public InlineComputedShallowSignalList(Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7)
             : base(signal1, signal2, signal3, signal4, signal5, signal6, signal7)
         {
             _compute = compute;
@@ -657,7 +684,155 @@ namespace Fiber
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7)
         {
             _list.Clear();
-            return _compute(value1, value2, value3, value4, value5, value6, value7, _list);
+            _compute(value1, value2, value3, value4, value5, value6, value7, _list);
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, ItemType> : ComputedSignal<T1, IList<ItemType>>, ISignalList<ItemType>
+        where ItemType : ISignal
+    {
+        private readonly SignalList<ItemType> _list;
+        private readonly Action<T1, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Action<T1, IList<ItemType>> compute, ISignal<T1> signal1)
+            : base(signal1)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1)
+        {
+            _list.Clear();
+            _compute(value1, _list);
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, ItemType> : ComputedSignal<T1, T2, IList<ItemType>>, ISignalList<ItemType>
+        where ItemType : ISignal
+    {
+        private readonly SignalList<ItemType> _list;
+        private readonly Action<T1, T2, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Action<T1, T2, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2)
+            : base(signal1, signal2)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2)
+        {
+            _list.Clear();
+            _compute(value1, value2, _list);
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, ItemType> : ComputedSignal<T1, T2, T3, IList<ItemType>>, ISignalList<ItemType>
+        where ItemType : ISignal
+    {
+        private readonly SignalList<ItemType> _list;
+        private readonly Action<T1, T2, T3, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Action<T1, T2, T3, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3)
+            : base(signal1, signal2, signal3)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3)
+        {
+            _list.Clear();
+            _compute(value1, value2, value3, _list);
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, ItemType> : ComputedSignal<T1, T2, T3, T4, IList<ItemType>>, ISignalList<ItemType>
+        where ItemType : ISignal
+    {
+        private readonly SignalList<ItemType> _list;
+        private readonly Action<T1, T2, T3, T4, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Action<T1, T2, T3, T4, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4)
+            : base(signal1, signal2, signal3, signal4)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4)
+        {
+            _list.Clear();
+            _compute(value1, value2, value3, value4, _list);
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, T5, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, IList<ItemType>>, ISignalList<ItemType>
+        where ItemType : ISignal
+    {
+        private readonly SignalList<ItemType> _list;
+        private readonly Action<T1, T2, T3, T4, T5, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Action<T1, T2, T3, T4, T5, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5)
+            : base(signal1, signal2, signal3, signal4, signal5)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
+        {
+            _list.Clear();
+            _compute(value1, value2, value3, value4, value5, _list);
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, IList<ItemType>>, ISignalList<ItemType>
+        where ItemType : ISignal
+    {
+        private readonly SignalList<ItemType> _list;
+        private readonly Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6)
+            : base(signal1, signal2, signal3, signal4, signal5, signal6)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6)
+        {
+            _list.Clear();
+            _compute(value1, value2, value3, value4, value5, value6, _list);
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
+    public class InlineComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType> : ComputedSignal<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>>, ISignalList<ItemType>
+        where ItemType : ISignal
+    {
+        private readonly SignalList<ItemType> _list;
+        private readonly Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> _compute;
+        public InlineComputedSignalList(Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7)
+            : base(signal1, signal2, signal3, signal4, signal5, signal6, signal7)
+        {
+            _compute = compute;
+            _list = new();
+        }
+        protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7)
+        {
+            _list.Clear();
+            _compute(value1, value2, value3, value4, value5, value6, value7, _list);
+            return _list;
         }
         public int Count => LastValue?.Count ?? 0;
         public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
@@ -875,27 +1050,48 @@ namespace Fiber
         public ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(
             Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) => Api.CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
+            Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
+        ) => Api.CreateComputedShallowSignalList<T1, ItemType>(compute, signal1);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, ItemType>(
+            Action<T1, T2, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        ) => Api.CreateComputedShallowSignalList<T1, T2, ItemType>(compute, signal1, signal2);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, ItemType>(
+            Action<T1, T2, T3, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
+        ) => Api.CreateComputedShallowSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, ItemType>(
+            Action<T1, T2, T3, T4, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
+        ) => Api.CreateComputedShallowSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, ItemType>(
+            Action<T1, T2, T3, T4, T5, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
+        ) => Api.CreateComputedShallowSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
+        ) => Api.CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
+        ) => Api.CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         public ISignalList<ItemType> CreateComputedSignalList<T1, ItemType>(
-            Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1
-        ) => Api.CreateComputedSignalList<T1, ItemType>(compute, signal1);
+            Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
+        ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, ItemType>(compute, signal1);
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, ItemType>(
-            Func<T1, T2, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
-        ) => Api.CreateComputedSignalList<T1, T2, ItemType>(compute, signal1, signal2);
+            Action<T1, T2, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, ItemType>(compute, signal1, signal2);
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, ItemType>(
-            Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
-        ) => Api.CreateComputedSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
+            Action<T1, T2, T3, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3
+        ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, ItemType>(
-            Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
-        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
+            Action<T1, T2, T3, T4, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4
+        ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(
-            Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
-        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
+            Action<T1, T2, T3, T4, T5, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5
+        ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
-            Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
-        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
+            Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6
+        ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
-            Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
-        ) => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+            Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
+        ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         public VirtualNode Fragment(VirtualBody children) => Api.Fragment(children);
         public VirtualNode Enable(ISignal<bool> when, VirtualBody children) => Api.Enable(when, children);
         public VirtualNode Visible(ISignal<bool> when, VirtualBody children) => Api.Visible(when, children);
@@ -2153,45 +2349,45 @@ namespace Fiber
             return new InlineComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         }
 
-        public ISignalList<ItemType> CreateComputedSignalList<T1, ItemType>(
-            Func<T1, IList<ItemType>, IList<ItemType>> compute, ISignal<T1> signal1
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
+            Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
         )
         {
-            return new InlineComputedSignalList<T1, ItemType>(compute, signal1);
+            return new InlineComputedShallowSignalList<T1, ItemType>(compute, signal1);
         }
 
-        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, ItemType>(
-            Func<T1, T2, IList<ItemType>, IList<ItemType>> compute,
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, ItemType>(
+            Action<T1, T2, IList<ItemType>> compute,
             ISignal<T1> signal1,
             ISignal<T2> signal2
         )
         {
-            return new InlineComputedSignalList<T1, T2, ItemType>(compute, signal1, signal2);
+            return new InlineComputedShallowSignalList<T1, T2, ItemType>(compute, signal1, signal2);
         }
 
-        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, ItemType>(
-            Func<T1, T2, T3, IList<ItemType>, IList<ItemType>> compute,
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, ItemType>(
+            Action<T1, T2, T3, IList<ItemType>> compute,
             ISignal<T1> signal1,
             ISignal<T2> signal2,
             ISignal<T3> signal3
         )
         {
-            return new InlineComputedSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
+            return new InlineComputedShallowSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
         }
 
-        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, ItemType>(
-            Func<T1, T2, T3, T4, IList<ItemType>, IList<ItemType>> compute,
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, ItemType>(
+            Action<T1, T2, T3, T4, IList<ItemType>> compute,
             ISignal<T1> signal1,
             ISignal<T2> signal2,
             ISignal<T3> signal3,
             ISignal<T4> signal4
         )
         {
-            return new InlineComputedSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
+            return new InlineComputedShallowSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
         }
 
-        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(
-            Func<T1, T2, T3, T4, T5, IList<ItemType>, IList<ItemType>> compute,
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, ItemType>(
+            Action<T1, T2, T3, T4, T5, IList<ItemType>> compute,
             ISignal<T1> signal1,
             ISignal<T2> signal2,
             ISignal<T3> signal3,
@@ -2199,11 +2395,11 @@ namespace Fiber
             ISignal<T5> signal5
         )
         {
-            return new InlineComputedSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
+            return new InlineComputedShallowSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
         }
 
-        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
-            Func<T1, T2, T3, T4, T5, T6, IList<ItemType>, IList<ItemType>> compute,
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute,
             ISignal<T1> signal1,
             ISignal<T2> signal2,
             ISignal<T3> signal3,
@@ -2212,11 +2408,11 @@ namespace Fiber
             ISignal<T6> signal6
         )
         {
-            return new InlineComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
+            return new InlineComputedShallowSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
         }
 
-        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
-            Func<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>, IList<ItemType>> compute,
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute,
             ISignal<T1> signal1,
             ISignal<T2> signal2,
             ISignal<T3> signal3,
@@ -2225,6 +2421,82 @@ namespace Fiber
             ISignal<T6> signal6,
             ISignal<T7> signal7
         )
+        {
+            return new InlineComputedShallowSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, ItemType>(
+            Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
+        ) where ItemType : ISignal
+        {
+            return new InlineComputedSignalList<T1, ItemType>(compute, signal1);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, ItemType>(
+            Action<T1, T2, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2
+        ) where ItemType : ISignal
+        {
+            return new InlineComputedSignalList<T1, T2, ItemType>(compute, signal1, signal2);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, ItemType>(
+            Action<T1, T2, T3, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3
+        ) where ItemType : ISignal
+        {
+            return new InlineComputedSignalList<T1, T2, T3, ItemType>(compute, signal1, signal2, signal3);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, ItemType>(
+            Action<T1, T2, T3, T4, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4
+        ) where ItemType : ISignal
+        {
+            return new InlineComputedSignalList<T1, T2, T3, T4, ItemType>(compute, signal1, signal2, signal3, signal4);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, ItemType>(
+            Action<T1, T2, T3, T4, T5, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5
+        ) where ItemType : ISignal
+        {
+            return new InlineComputedSignalList<T1, T2, T3, T4, T5, ItemType>(compute, signal1, signal2, signal3, signal4, signal5);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6
+        ) where ItemType : ISignal
+        {
+            return new InlineComputedSignalList<T1, T2, T3, T4, T5, T6, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6);
+        }
+
+        public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
+            Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2,
+            ISignal<T3> signal3,
+            ISignal<T4> signal4,
+            ISignal<T5> signal5,
+            ISignal<T6> signal6,
+            ISignal<T7> signal7
+        ) where ItemType : ISignal
         {
             return new InlineComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         }
@@ -2663,7 +2935,7 @@ namespace Fiber
                 {
                     _allKeys.Clear();
 
-                    // Create all children and extract keys
+                    // Create all keys
                     for (var i = 0; i < each.Count; ++i)
                     {
                         var key = _createItemKey(each[i], i);
