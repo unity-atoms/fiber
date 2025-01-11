@@ -145,16 +145,18 @@ namespace Fiber.DragAndDrop
             ISignalList<ItemType> items,
             Func<ItemType, int, BaseSignal<bool>, VirtualNode> renderItem,
             Func<ItemType, int, KeyType> createItemKey,
+            IEqualityComparer<ItemType> itemComparer = null,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true,
             Action<int, int> moveItem = null,
             Action<ItemType> onClick = null
-        ) where ItemType : IEquatable<ItemType>
+        )
         {
             return new DragAndDropListComponent<ItemType, KeyType>(
                 items: items,
                 renderItem: renderItem,
                 createItemKey: createItemKey,
+                itemComparer: itemComparer,
                 animationType: animationType,
                 isItemDragHandle: isItemDragHandle,
                 moveItem: moveItem,
@@ -186,11 +188,12 @@ namespace Fiber.DragAndDrop
         Linear
     }
 
-    public class DragAndDropListComponent<ItemType, KeyType> : BaseComponent where ItemType : IEquatable<ItemType>
+    public class DragAndDropListComponent<ItemType, KeyType> : BaseComponent
     {
         private readonly ISignalList<ItemType> _items;
         private readonly Func<ItemType, int, BaseSignal<bool>, VirtualNode> _renderItem;
         private readonly Func<ItemType, int, KeyType> _createItemKey;
+        private readonly IEqualityComparer<ItemType> _itemComparer;
         private readonly DragAndDropListAnimationType _animationType;
         private readonly bool _isItemDragHandle;
         private readonly Action<int, int> _moveItem;
@@ -200,6 +203,7 @@ namespace Fiber.DragAndDrop
             ISignalList<ItemType> items,
             Func<ItemType, int, BaseSignal<bool>, VirtualNode> renderItem,
             Func<ItemType, int, KeyType> createItemKey,
+            IEqualityComparer<ItemType> itemComparer = null,
             DragAndDropListAnimationType animationType = DragAndDropListAnimationType.Linear,
             bool isItemDragHandle = true,
             Action<int, int> moveItem = null,
@@ -209,6 +213,7 @@ namespace Fiber.DragAndDrop
             _items = items;
             _renderItem = renderItem;
             _createItemKey = createItemKey;
+            _itemComparer = itemComparer ?? EqualityComparer<ItemType>.Default;
             _animationType = animationType;
             _isItemDragHandle = isItemDragHandle;
             _moveItem = moveItem;
@@ -222,6 +227,7 @@ namespace Fiber.DragAndDrop
                     items: _items,
                     renderItem: _renderItem,
                     createItemKey: _createItemKey,
+                    itemComparer: _itemComparer,
                     animationType: _animationType,
                     isItemDragHandle: _isItemDragHandle,
                     moveItem: _moveItem,
@@ -235,6 +241,7 @@ namespace Fiber.DragAndDrop
             private readonly ISignalList<ItemType> _items;
             private readonly Func<ItemType, int, BaseSignal<bool>, VirtualNode> _renderItem;
             private readonly Func<ItemType, int, KeyType> _createItemKey;
+            private readonly IEqualityComparer<ItemType> _itemComparer;
             private readonly DragAndDropListAnimationType _animationType;
             private readonly bool _isItemDragHandle;
             private readonly Action<int, int> _moveItem;
@@ -244,6 +251,7 @@ namespace Fiber.DragAndDrop
                 ISignalList<ItemType> items,
                 Func<ItemType, int, BaseSignal<bool>, VirtualNode> renderItem,
                 Func<ItemType, int, KeyType> createItemKey,
+                IEqualityComparer<ItemType> itemComparer,
                 DragAndDropListAnimationType animationType,
                 bool isItemDragHandle,
                 Action<int, int> moveItem,
@@ -253,6 +261,7 @@ namespace Fiber.DragAndDrop
                 _items = items;
                 _renderItem = renderItem;
                 _createItemKey = createItemKey;
+                _itemComparer = itemComparer;
                 _animationType = animationType;
                 _isItemDragHandle = isItemDragHandle;
                 _moveItem = moveItem;
@@ -266,7 +275,7 @@ namespace Fiber.DragAndDrop
                 // Effect to change position of item when closer to another droppable.
                 F.CreateEffect((closestDroppable, currentlyDragged) =>
                 {
-                    if (closestDroppable != null && currentlyDragged != null && !currentlyDragged.Value.Equals(closestDroppable.Value))
+                    if (closestDroppable != null && currentlyDragged != null && !_itemComparer.Equals(currentlyDragged.Value, closestDroppable.Value))
                     {
                         var items = _items.Get();
                         var closestDroppableIndex = items.IndexOf(closestDroppable.Value);
@@ -292,7 +301,7 @@ namespace Fiber.DragAndDrop
                     {
                         var isDraggedSignal = F.CreateComputedSignal((currentlyDragged) =>
                         {
-                            return currentlyDragged != null && currentlyDragged.Value != null && currentlyDragged.Value.Equals(item);
+                            return currentlyDragged != null && currentlyDragged.Value != null && _itemComparer.Equals(currentlyDragged.Value, item);
                         }, dndContext.CurrentlyDragged);
                         var child = _renderItem(item, index, isDraggedSignal);
                         return new DragAndDropListItemComponent(
