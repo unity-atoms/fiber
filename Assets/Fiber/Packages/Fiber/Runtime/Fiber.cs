@@ -120,6 +120,11 @@ namespace Fiber
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
             Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) where ItemType : ISignal;
+        public ISignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal;
+        public ISignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null);
+        public ISignal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null);
+        public Ref<T> CreateRef<T>(T initialValue = default);
+        public BaseSignal<T> ToSignal<T>(SignalProp<T> signalProp);
         public VirtualNode Fragment(VirtualBody children);
         public VirtualNode Enable(ISignal<bool> whenSignal, VirtualBody children);
         public VirtualNode Visible(ISignal<bool> whenSignal, VirtualBody children);
@@ -1092,6 +1097,11 @@ namespace Fiber
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
             Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        public ISignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal => Api.CreateSignalList<ItemType>(dependent);
+        public ISignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null) => Api.CreateShallowSignalList<ItemType>(dependent);
+        public ISignal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null) => Api.CreateSignal<T>(value, dependent);
+        public Ref<T> CreateRef<T>(T initialValue = default) => Api.CreateRef<T>(initialValue);
+        public BaseSignal<T> ToSignal<T>(SignalProp<T> signalProp) => Api.ToSignal<T>(signalProp);
         public VirtualNode Fragment(VirtualBody children) => Api.Fragment(children);
         public VirtualNode Enable(ISignal<bool> when, VirtualBody children) => Api.Enable(when, children);
         public VirtualNode Visible(ISignal<bool> when, VirtualBody children) => Api.Visible(when, children);
@@ -2499,6 +2509,40 @@ namespace Fiber
         ) where ItemType : ISignal
         {
             return new InlineComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        }
+
+        public ISignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal
+        {
+            return new SignalList<ItemType>(dependent);
+        }
+
+        public ISignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null)
+        {
+            return new ShallowSignalList<ItemType>(dependent);
+        }
+
+        public ISignal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null)
+        {
+            return new Signal<T>(value, dependent);
+        }
+
+        public Ref<T> CreateRef<T>(T initialValue = default)
+        {
+            return new Ref<T>(initialValue);
+        }
+
+        public BaseSignal<T> ToSignal<T>(SignalProp<T> signalProp)
+        {
+            if (signalProp.IsValue)
+            {
+                return new StaticSignal<T>(signalProp.Value);
+            }
+            else if (signalProp.IsSignal)
+            {
+                return signalProp.Signal;
+            }
+
+            throw new Exception($"Trying to wrap empty signal prop");
         }
 
         public T GetRendererExtension<T>() where T : RendererExtension
