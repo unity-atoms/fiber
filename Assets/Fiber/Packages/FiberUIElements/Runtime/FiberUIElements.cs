@@ -4514,13 +4514,24 @@ namespace Fiber.UIElements
     {
         private readonly UIDocument _uiDocument;
         private WorkLoopSignalProp<float> _sortingOrderWorkLoopItem;
+        private readonly VisibilityStyleProp _setVisibilityStyleProp;
 
         public UIDocumentNativeNode(
             UIDocumentComponent component,
-            UIDocument uiDocument
+            UIDocument uiDocument,
+            UIElementsRendererExtension renderer
         ) : base(component, uiDocument.gameObject)
         {
             _uiDocument = uiDocument;
+
+            if (renderer.DefaultSetVisibilityStyleProp != VisibilityStyleProp.None)
+            {
+                _setVisibilityStyleProp = renderer.DefaultSetVisibilityStyleProp;
+            }
+            else
+            {
+                _setVisibilityStyleProp = VisibilityStyleProp.Display;
+            }
 
             if (!component.SortingOrder.IsEmpty)
             {
@@ -4538,7 +4549,25 @@ namespace Fiber.UIElements
             // Don't set UIDocument to inactive, since that will destroy the root visual element.
             // See this thread for more info: https://forum.unity.com/threads/does-uidocument-clear-contents-when-disabled.1097659/
             IsVisible_SetByFiber = true;
-            UpdateVisibility();
+
+            var root = _uiDocument.rootVisualElement;
+            switch (_setVisibilityStyleProp)
+            {
+                case VisibilityStyleProp.Display:
+                    root.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
+                    break;
+                case VisibilityStyleProp.Visibility:
+                    root.style.visibility = visible ? Visibility.Visible : Visibility.Hidden;
+                    break;
+                case VisibilityStyleProp.Opacity:
+                    root.style.opacity = visible ? 1 : 0;
+                    break;
+                case VisibilityStyleProp.Translate:
+                    root.style.translate = visible ? Translate.None() : new Translate(-5000, -5000);
+                    break;
+                default:
+                    throw new Exception($"Unknown visibility style prop: {_setVisibilityStyleProp}");
+            }
         }
 
         public override void AddChild(FiberNode node, int index)
@@ -4651,7 +4680,7 @@ namespace Fiber.UIElements
 #endif
                     uiDocument.panelSettings.fallbackDpi = dpi / scalingProvider.Multiplier;
                 }
-                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument);
+                return new UIDocumentNativeNode(uiDocumentComponent, uiDocument, this);
             }
             else if (virtualNode is ScrollViewComponent scrollViewComponent)
             {

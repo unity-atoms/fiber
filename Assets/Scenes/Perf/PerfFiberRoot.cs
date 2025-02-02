@@ -41,39 +41,39 @@ public class PerfRootComponent : BaseComponent
     {
         var visibleState = F.CreateSignal(0);
 
-        // var showPage1 = F.CreateComputedSignal((visibleState) => visibleState == 0, visibleState);
-        // var showPage2 = F.CreateComputedSignal((visibleState) => visibleState == 1, visibleState);
-
-        return F.CursorManager(
-            cursorDefinitionsStore: new Store<ShallowSignalList<CursorDefinition>>(),
-            children: F.Nodes(
-                F.UIRoot(
-                    name: "PerfRootDocument",
-                    children: new PerfPage1(visibleState)
-                ),
-                F.UIRoot(
-                    name: "PerfRootDocument2",
-                    children: new PerfPage2(visibleState)
-                )
-            )
-        );
+        var showPage1 = F.CreateComputedSignal((visibleState) => visibleState == 0, visibleState);
+        var showPage2 = F.CreateComputedSignal((visibleState) => visibleState == 1, visibleState);
 
         // return F.CursorManager(
         //     cursorDefinitionsStore: new Store<ShallowSignalList<CursorDefinition>>(),
-        //     children: F.UIRoot(
-        //         name: "PerfRootDocument",
-        //         children: F.Nodes(
-        //             F.Visible(
-        //                 when: showPage1,
-        //                 children: new PerfPage1(visibleState)
-        //             ),
-        //             F.Visible(
-        //                 when: showPage2,
-        //                 children: new PerfPage2(visibleState)
-        //             )
+        //     children: F.Nodes(
+        //         F.UIRoot(
+        //             name: "PerfRootDocument",
+        //             children: new PerfPage1(visibleState)
+        //         ),
+        //         F.UIRoot(
+        //             name: "PerfRootDocument2",
+        //             children: new PerfPage2(visibleState)
         //         )
         //     )
         // );
+
+        return F.CursorManager(
+            cursorDefinitionsStore: new Store<ShallowSignalList<CursorDefinition>>(),
+            children: F.UIRoot(
+                name: "PerfRootDocument",
+                children: F.Nodes(
+                    F.Visible(
+                        when: showPage1,
+                        children: new PerfPage1(visibleState)
+                    ),
+                    F.Visible(
+                        when: showPage2,
+                        children: new PerfPage2(visibleState)
+                    )
+                )
+            )
+        );
     }
 }
 
@@ -94,10 +94,10 @@ public class PerfPage1 : BaseComponent
 
         return F.View(
             style: new Style(
-                // translate: translate,
-                opacity: opacity
+            // translate: translate,
+            // opacity: opacity
             ),
-            pickingMode: pickingMode,
+            // pickingMode: pickingMode,
             usageHints: UsageHints.DynamicTransform,
             // style: new Style(
             //     display: DisplayStyle.Flex,
@@ -128,7 +128,7 @@ public class PerfPage1 : BaseComponent
                 )),
                 F.Button(
                     text: "Go to Page 2",
-                    pickingMode: pickingMode,
+                    // pickingMode: pickingMode,
                     onClick: (e) =>
                     {
                         _visibleState.Value = 1;
@@ -156,10 +156,10 @@ public class PerfPage2 : BaseComponent
 
         return F.View(
             style: new Style(
-                // translate: translate,
-                opacity: opacity
+            // translate: translate,
+            // opacity: opacity
             ),
-            pickingMode: pickingMode,
+            // pickingMode: pickingMode,
             usageHints: UsageHints.DynamicTransform,
             // style: new Style(
             //     display: DisplayStyle.Flex,

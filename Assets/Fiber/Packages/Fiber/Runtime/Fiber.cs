@@ -1875,17 +1875,17 @@ namespace Fiber
             _fiberNodesToUpdate.Enqueue(fiberNode);
         }
 
-        private bool IsVisible(FiberNode fiberNode)
+        private bool GetIsInitiallyVisible(FiberNode fiberNode)
         {
             var current = fiberNode;
-            while (current != null)
+            do
             {
                 if (current.VirtualNode is VisibleComponent visibleComponent)
                 {
                     return visibleComponent.IsVisible.Get();
                 }
                 current = current.Parent;
-            }
+            } while (current != null && current.NativeNode == null);
 
             return true;
         }
@@ -1916,7 +1916,7 @@ namespace Fiber
                         closestParentWithNativeNode.NativeNode.AddChild(mountOperation.Node, index);
                     }
 
-                    var isVisible = IsVisible(mountOperation.Node);
+                    var isVisible = GetIsInitiallyVisible(mountOperation.Node);
                     mountOperation.Node.NativeNode.SetVisible(isVisible);
                 }
 
@@ -2747,15 +2747,20 @@ namespace Fiber
 
                 protected override void Run(bool visible)
                 {
-                    // Iterate all decedents up to the point that a child is a VisibleComponent
+                    // Iterate all decedents up to the point that a child is a VisibleComponent or a NativeNode
                     var node = _fiberNode.Child;
                     while (node != null && node != _fiberNode)
                     {
-                        node.NativeNode?.SetVisible(visible);
+                        var hasNativeNode = node.NativeNode != null;
+
+                        if (hasNativeNode)
+                        {
+                            node.NativeNode.SetVisible(visible);
+                        }
 
                         var isChildVisibleComponent = node.Child != null && node.Child.VirtualNode is VisibleComponent;
                         var isCurrentVisibleComponent = node.VirtualNode is VisibleComponent; // Could be true if a Sibling is a VisibleComponent
-                        node = node.NextNode(root: _fiberNode, skipChildren: isChildVisibleComponent || isCurrentVisibleComponent);
+                        node = node.NextNode(root: _fiberNode, skipChildren: isChildVisibleComponent || isCurrentVisibleComponent || hasNativeNode);
                     }
                 }
                 public override void Cleanup() { }
