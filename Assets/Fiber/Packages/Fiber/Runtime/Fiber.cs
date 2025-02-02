@@ -123,6 +123,7 @@ namespace Fiber
         public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal;
         public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null);
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null);
+        public StaticSignal<T> CreateStaticSignal<T>(T value);
         public Ref<T> CreateRef<T>(T initialValue = default);
         public BaseSignal<T> ToSignal<T>(SignalProp<T> signalProp);
         public VirtualNode Fragment(VirtualBody children);
@@ -1100,6 +1101,7 @@ namespace Fiber
         public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal => Api.CreateSignalList<ItemType>(dependent);
         public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null) => Api.CreateShallowSignalList<ItemType>(dependent);
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null) => Api.CreateSignal<T>(value, dependent);
+        public StaticSignal<T> CreateStaticSignal<T>(T value) => Api.CreateStaticSignal<T>(value);
         public Ref<T> CreateRef<T>(T initialValue = default) => Api.CreateRef<T>(initialValue);
         public BaseSignal<T> ToSignal<T>(SignalProp<T> signalProp) => Api.ToSignal<T>(signalProp);
         public VirtualNode Fragment(VirtualBody children) => Api.Fragment(children);
@@ -2524,6 +2526,11 @@ namespace Fiber
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null)
         {
             return new Signal<T>(value, dependent);
+        }
+
+        public StaticSignal<T> CreateStaticSignal<T>(T value)
+        {
+            return new StaticSignal<T>(value);
         }
 
         public Ref<T> CreateRef<T>(T initialValue = default)

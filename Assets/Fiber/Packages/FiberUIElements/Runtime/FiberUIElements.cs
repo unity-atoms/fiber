@@ -61,6 +61,8 @@ namespace Fiber.UIElements
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         )
         {
@@ -72,6 +74,8 @@ namespace Fiber.UIElements
                 _ref: _ref,
                 onCreateRef: onCreateRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             );
         }
@@ -87,6 +91,8 @@ namespace Fiber.UIElements
             Ref<ScrollView> scrollRef = null,
             Action<ScrollView> onCreateScrollRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         )
         {
@@ -100,6 +106,8 @@ namespace Fiber.UIElements
                 scrollRef: scrollRef,
                 onCreateScrollRef: onCreateScrollRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             );
         }
@@ -117,6 +125,8 @@ namespace Fiber.UIElements
             Ref<Button> buttonRef = null,
             Action<Button> onCreateButtonRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         )
         {
@@ -132,6 +142,8 @@ namespace Fiber.UIElements
                 buttonRef: buttonRef,
                 onCreateButtonRef: onCreateButtonRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             );
         }
@@ -148,6 +160,8 @@ namespace Fiber.UIElements
             Ref<TextElement> textRef = null,
             Action<TextElement> onCreateTextRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         )
         {
@@ -162,6 +176,8 @@ namespace Fiber.UIElements
                 textRef: textRef,
                 onCreateTextRef: onCreateTextRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             );
         }
@@ -180,6 +196,8 @@ namespace Fiber.UIElements
             Ref<TextField> textFieldRef = null,
             Action<TextField> onCreateTextFieldRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         )
         {
@@ -196,6 +214,8 @@ namespace Fiber.UIElements
                 textFieldRef: textFieldRef,
                 onCreateTextFieldRef: onCreateTextFieldRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             );
         }
@@ -218,7 +238,9 @@ namespace Fiber.UIElements
             SignalProp<Sprite> sprite = new(),
             SignalProp<Color> tintColor = new(),
             SignalProp<Rect> uv = new(),
-            SignalProp<VectorImage> vectorImage = new()
+            SignalProp<VectorImage> vectorImage = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None
         )
         {
             return new ImageComponent(
@@ -238,7 +260,9 @@ namespace Fiber.UIElements
                 sprite: sprite,
                 tintColor: tintColor,
                 uv: uv,
-                vectorImage: vectorImage
+                vectorImage: vectorImage,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp
             );
         }
 
@@ -321,6 +345,8 @@ namespace Fiber.UIElements
         public Ref<VisualElement> Ref { get; private set; }
         public Action<VisualElement> OnCreateRef { get; private set; }
         public SignalProp<List<string>> ClassName { get; private set; }
+        public UsageHints UsageHints { get; private set; }
+        public VisibilityStyleProp SetVisibilityStyleProp { get; private set; }
 
         public ViewComponent(
             SignalProp<Style> style = new(),
@@ -330,6 +356,8 @@ namespace Fiber.UIElements
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         ) : base(
                 children: children
@@ -342,6 +370,8 @@ namespace Fiber.UIElements
             Ref = _ref;
             OnCreateRef = onCreateRef;
             ClassName = className;
+            UsageHints = usageHints;
+            SetVisibilityStyleProp = setVisibilityStyleProp;
         }
     }
 
@@ -360,6 +390,8 @@ namespace Fiber.UIElements
             Ref<ScrollView> scrollRef = null,
             Action<ScrollView> onCreateScrollRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         ) : base(
                 style: style,
@@ -369,6 +401,8 @@ namespace Fiber.UIElements
                 _ref: _ref,
                 onCreateRef: onCreateRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             )
         {
@@ -396,6 +430,8 @@ namespace Fiber.UIElements
             Ref<Button> buttonRef = null,
             Action<Button> onCreateButtonRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         ) : base(
                 style: style,
@@ -405,6 +441,8 @@ namespace Fiber.UIElements
                 _ref: _ref,
                 onCreateRef: onCreateRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             )
         {
@@ -432,6 +470,8 @@ namespace Fiber.UIElements
             Ref<TextElement> textRef = null,
             Action<TextElement> onCreateTextRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         ) : base(
                 style: style,
@@ -441,6 +481,8 @@ namespace Fiber.UIElements
                 _ref: _ref,
                 onCreateRef: onCreateRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             )
         {
@@ -471,6 +513,8 @@ namespace Fiber.UIElements
             Ref<TextField> textFieldRef = null,
             Action<TextField> onCreateTextFieldRef = null,
             SignalProp<List<string>> className = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         ) : base(
                 style: style,
@@ -480,6 +524,8 @@ namespace Fiber.UIElements
                 _ref: _ref,
                 onCreateRef: onCreateRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             )
         {
@@ -520,6 +566,8 @@ namespace Fiber.UIElements
             SignalProp<Sprite> sprite = new(),
             SignalProp<Color> tintColor = new(),
             SignalProp<Rect> uv = new(),
+            UsageHints usageHints = UsageHints.None,
+            VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             SignalProp<VectorImage> vectorImage = new()
         ) : base(
                 style: style,
@@ -529,6 +577,8 @@ namespace Fiber.UIElements
                 _ref: _ref,
                 onCreateRef: onCreateRef,
                 className: className,
+                usageHints: usageHints,
+                setVisibilityStyleProp: setVisibilityStyleProp,
                 children: children
             )
         {
@@ -593,23 +643,24 @@ namespace Fiber.UIElements
 
             return F.ContextProvider(
                 value: new UIRootContext(rootRef),
-                children: F.Nodes(
-                    F.UIDocument(
-                        name: Name,
-                        active: Active,
-                        _ref: Ref,
-                        onCreateRef: (_ref) =>
+                children: F.UIDocument(
+                    name: Name,
+                    active: Active,
+                    _ref: Ref,
+                    onCreateRef: (_ref) =>
+                    {
+                        if (OnCreateRef != null)
                         {
                             var root = _ref.GetComponent<UIDocument>().rootVisualElement;
                             rootRef.Current = root;
                             OnCreateRef?.Invoke(_ref);
-                        },
-                        createInstance: CreateInstance,
-                        destroyInstance: DestroyInstance,
-                        panelSettings: PanelSettings,
-                        sortingOrder: SortingOrder,
-                        children: Children
-                    )
+                        }
+                    },
+                    createInstance: CreateInstance,
+                    destroyInstance: DestroyInstance,
+                    panelSettings: PanelSettings,
+                    sortingOrder: SortingOrder,
+                    children: Children
                 )
             );
         }
@@ -650,7 +701,7 @@ namespace Fiber.UIElements
         public virtual TextField TextFieldElementInstance { get; private set; }
         private WorkLoopSignalProp<string> _valueWorkLoopItem;
 
-        public TextFieldNativeNode(TextFieldComponent virtualNode, TextField instance) : base(virtualNode, instance)
+        public TextFieldNativeNode(TextFieldComponent virtualNode, TextField instance, UIElementsRendererExtension renderer) : base(virtualNode, instance, renderer)
         {
             TextFieldElementInstance = instance;
 
@@ -706,7 +757,8 @@ namespace Fiber.UIElements
         private WorkLoopSignalProp<Rect> _uvWorkLoopItem;
         private WorkLoopSignalProp<VectorImage> _vectorImageWorkLoopItem;
 
-        public ImageNativeNode(ImageComponent virtualNode, Image instance) : base(virtualNode, instance)
+        public ImageNativeNode(ImageComponent virtualNode, Image instance, UIElementsRendererExtension renderer)
+            : base(virtualNode, instance, renderer)
         {
             ImageInstance = instance;
 
@@ -857,7 +909,8 @@ namespace Fiber.UIElements
         public virtual TextElement TextElementInstance { get; private set; }
         private WorkLoopSignalProp<string> _textWorkLoopItem;
 
-        public TextElementNativeNode(TextComponent virtualNode, TextElement instance) : base(virtualNode, instance)
+        public TextElementNativeNode(TextComponent virtualNode, TextElement instance, UIElementsRendererExtension renderer)
+            : base(virtualNode, instance, renderer)
         {
             TextElementInstance = instance;
 
@@ -898,7 +951,8 @@ namespace Fiber.UIElements
     {
         public virtual ScrollView ScrollViewInstance { get; private set; }
 
-        public ScrollViewNativeNode(ScrollViewComponent virtualNode, ScrollView instance) : base(virtualNode, instance)
+        public ScrollViewNativeNode(ScrollViewComponent virtualNode, ScrollView instance, UIElementsRendererExtension renderer)
+            : base(virtualNode, instance, renderer)
         {
             ScrollViewInstance = instance;
             if (virtualNode.ScrollRef != null) virtualNode.ScrollRef.Current = instance;
@@ -911,7 +965,8 @@ namespace Fiber.UIElements
         public virtual Button ButtonInstance { get; private set; }
         private WorkLoopSignalProp<string> _textWorkLoopItem;
 
-        public ButtonNativeNode(ButtonComponent virtualNode, Button instance) : base(virtualNode, instance)
+        public ButtonNativeNode(ButtonComponent virtualNode, Button instance, UIElementsRendererExtension renderer)
+            : base(virtualNode, instance, renderer)
         {
             ButtonInstance = instance;
 
@@ -1026,10 +1081,24 @@ namespace Fiber.UIElements
         private WorkLoopSignalProp<PickingMode> _pickingModeWorkLoopItem;
         private WorkLoopSignalProp<List<string>> _classNameWorkLoopItem;
         private readonly List<string> _previousClassNameList;
+        private readonly VisibilityStyleProp _setVisibilityStyleProp;
 
-        public VisualElementNativeNode(ViewComponent virtualNode, VisualElement instance)
+        public VisualElementNativeNode(ViewComponent virtualNode, VisualElement instance, UIElementsRendererExtension renderer)
         {
             Instance = instance;
+
+            if (virtualNode.SetVisibilityStyleProp != VisibilityStyleProp.None)
+            {
+                _setVisibilityStyleProp = virtualNode.SetVisibilityStyleProp;
+            }
+            else if (renderer.DefaultSetVisibilityStyleProp != VisibilityStyleProp.None)
+            {
+                _setVisibilityStyleProp = renderer.DefaultSetVisibilityStyleProp;
+            }
+            else
+            {
+                _setVisibilityStyleProp = VisibilityStyleProp.Display;
+            }
 
             if (virtualNode.Ref != null) virtualNode.Ref.Current = instance;
             virtualNode.OnCreateRef?.Invoke(instance);
@@ -1698,7 +1767,24 @@ namespace Fiber.UIElements
         public override void SetVisible(bool visible)
         {
             IsVisible_SetByFiber = visible;
-            UpdateDisplayStyle();
+
+            switch (_setVisibilityStyleProp)
+            {
+                case VisibilityStyleProp.Display:
+                    UpdateDisplayStyle();
+                    break;
+                case VisibilityStyleProp.Visibility:
+                    UpdateVisibilityStyle();
+                    break;
+                case VisibilityStyleProp.Opacity:
+                    UpdateOpacityStyle();
+                    break;
+                case VisibilityStyleProp.Translate:
+                    UpdateTranslateStyle();
+                    break;
+                default:
+                    throw new Exception($"Unknown visibility style prop: {_setVisibilityStyleProp}");
+            }
         }
 
         private void UpdateDisplayStyle()
@@ -1713,7 +1799,7 @@ namespace Fiber.UIElements
         private StyleEnum<DisplayStyle> GetCurrentDisplayStyle()
         {
             // Visibility set from Fiber always take precedence
-            if (!IsVisible_SetByFiber)
+            if (_setVisibilityStyleProp == VisibilityStyleProp.Display && !IsVisible_SetByFiber)
             {
                 return DisplayStyle.None;
             }
@@ -1739,6 +1825,141 @@ namespace Fiber.UIElements
                     return StyleKeyword.Initial;
                 }
                 return _displayWorkLoopItem.Get();
+            }
+
+            // The style prop is empty
+            return StyleKeyword.Initial;
+        }
+
+        private void UpdateOpacityStyle()
+        {
+            var currentStyle = GetCurrentOpacityStyle();
+            if (Instance.style.opacity != currentStyle)
+            {
+                Instance.style.opacity = currentStyle;
+            }
+        }
+
+
+        private StyleFloat GetCurrentOpacityStyle()
+        {
+            // Visibility set from Fiber always take precedence
+            if (_setVisibilityStyleProp == VisibilityStyleProp.Opacity && !IsVisible_SetByFiber)
+            {
+                return 0f;
+            }
+
+            // Handle if the style prop is a signal
+            if (_styleWorkLoopItem.IsSignal)
+            {
+                var style = _styleWorkLoopItem.Get();
+                if (!style.Opacity.IsEmpty)
+                {
+                    return style.Opacity.Get();
+                }
+                else
+                {
+                    return StyleKeyword.Initial;
+                }
+            }
+            // Handle if the style prop is a value (with individual values / signals as its props)
+            else if (_styleWorkLoopItem.IsValue)
+            {
+                if (_opacityWorkLoopItem.WorkLoopSignalProp.IsEmpty)
+                {
+                    return StyleKeyword.Initial;
+                }
+                return _opacityWorkLoopItem.Get();
+            }
+
+            // The style prop is empty
+            return StyleKeyword.Initial;
+        }
+
+        private void UpdateVisibilityStyle()
+        {
+            var currentStyle = GetCurrentVisibilityStyle();
+            if (Instance.style.visibility != currentStyle)
+            {
+                Instance.style.visibility = currentStyle;
+            }
+        }
+
+
+        private StyleEnum<Visibility> GetCurrentVisibilityStyle()
+        {
+            // Visibility set from Fiber always take precedence
+            if (_setVisibilityStyleProp == VisibilityStyleProp.Visibility && !IsVisible_SetByFiber)
+            {
+                return Visibility.Hidden;
+            }
+
+            // Handle if the style prop is a signal
+            if (_styleWorkLoopItem.IsSignal)
+            {
+                var style = _styleWorkLoopItem.Get();
+                if (!style.Visibility.IsEmpty)
+                {
+                    return style.Visibility.Get();
+                }
+                else
+                {
+                    return StyleKeyword.Initial;
+                }
+            }
+            // Handle if the style prop is a value (with individual values / signals as its props)
+            else if (_styleWorkLoopItem.IsValue)
+            {
+                if (_visibilityWorkLoopItem.WorkLoopSignalProp.IsEmpty)
+                {
+                    return StyleKeyword.Initial;
+                }
+                return _visibilityWorkLoopItem.Get();
+            }
+
+            // The style prop is empty
+            return StyleKeyword.Initial;
+        }
+
+        private void UpdateTranslateStyle()
+        {
+            var currentStyle = GetCurrentTranslateStyle();
+            if (Instance.style.translate != currentStyle)
+            {
+                Instance.style.translate = currentStyle;
+            }
+        }
+
+
+        private StyleTranslate GetCurrentTranslateStyle()
+        {
+            // Visibility set from Fiber always take precedence
+            if (_setVisibilityStyleProp == VisibilityStyleProp.Translate && !IsVisible_SetByFiber)
+            {
+                return new Translate(-5000, -5000);
+            }
+
+            // Handle if the style prop is a signal
+            if (_styleWorkLoopItem.IsSignal)
+            {
+                var style = _styleWorkLoopItem.Get();
+                if (!style.Translate.IsEmpty)
+                {
+                    return style.Translate.Get();
+                }
+                else
+                {
+                    return StyleKeyword.Initial;
+                }
+            }
+            // Handle if the style prop is a value (with individual values / signals as its props)
+            else if (_styleWorkLoopItem.IsValue)
+            {
+                if (_translateWorkLoopItem.WorkLoopSignalProp.IsEmpty)
+                {
+                    return StyleKeyword.Initial;
+                }
+                return _translateWorkLoopItem.Get();
             }
 
             // The style prop is empty
@@ -3743,25 +3964,7 @@ namespace Fiber.UIElements
                 }
 
                 // Translate - Update instance value
-                if (style.Translate.IsSignal)
-                {
-                    if (_translateWorkLoopItem.Check())
-                    {
-                        Instance.style.translate = _translateWorkLoopItem.Get();
-                    }
-                }
-                else if (style.Translate.IsValue)
-                {
-                    var value = style.Translate.Get();
-                    if (Instance.style.translate != value)
-                    {
-                        Instance.style.translate = value;
-                    }
-                }
-                else if (style.Translate.IsEmpty && !_lastStyleFromSignal.Translate.IsEmpty)
-                {
-                    Instance.style.translate = StyleKeyword.Initial;
-                }
+                UpdateTranslateStyle();
                 // Translate - Register / unregister dependant signals
                 if (_styleWorkLoopItem.IsSignal)
                 {
@@ -3851,25 +4054,7 @@ namespace Fiber.UIElements
                 }
 
                 // Opacity - Update instance value
-                if (style.Opacity.IsSignal)
-                {
-                    if (_opacityWorkLoopItem.Check())
-                    {
-                        Instance.style.opacity = _opacityWorkLoopItem.Get();
-                    }
-                }
-                else if (style.Opacity.IsValue)
-                {
-                    var value = style.Opacity.Get();
-                    if (Instance.style.opacity != value)
-                    {
-                        Instance.style.opacity = value;
-                    }
-                }
-                else if (style.Opacity.IsEmpty && !_lastStyleFromSignal.Opacity.IsEmpty)
-                {
-                    Instance.style.opacity = StyleKeyword.Initial;
-                }
+                UpdateOpacityStyle();
                 // Opacity - Register / unregister dependant signals
                 if (_styleWorkLoopItem.IsSignal)
                 {
@@ -3995,25 +4180,7 @@ namespace Fiber.UIElements
                 }
 
                 // Visibility - Update instance value
-                if (style.Visibility.IsSignal)
-                {
-                    if (_visibilityWorkLoopItem.Check())
-                    {
-                        Instance.style.visibility = _visibilityWorkLoopItem.Get();
-                    }
-                }
-                else if (style.Visibility.IsValue)
-                {
-                    var value = style.Visibility.Get();
-                    if (Instance.style.visibility != value)
-                    {
-                        Instance.style.visibility = value;
-                    }
-                }
-                else if (style.Visibility.IsEmpty && !_lastStyleFromSignal.Visibility.IsEmpty)
-                {
-                    Instance.style.visibility = StyleKeyword.Initial;
-                }
+                UpdateVisibilityStyle();
                 // Visibility - Register / unregister dependant signals
                 if (_styleWorkLoopItem.IsSignal)
                 {
@@ -4389,7 +4556,7 @@ namespace Fiber.UIElements
         {
             if (node.NativeNode is VisualElementNativeNode visualElementChildNode)
             {
-                _uiDocument.rootVisualElement.Remove(visualElementChildNode.Instance);
+                visualElementChildNode.Instance.parent.Remove(visualElementChildNode.Instance);
                 return;
             }
 
@@ -4440,13 +4607,16 @@ namespace Fiber.UIElements
     public class UIElementsRendererExtension : GameObjectsRendererExtension
     {
         public PanelSettings DefaultPanelSettings { get; private set; }
+        public VisibilityStyleProp DefaultSetVisibilityStyleProp { get; private set; }
 
         public UIElementsRendererExtension(
-            PanelSettings defaultPanelSettings = null
+            PanelSettings defaultPanelSettings = null,
+            VisibilityStyleProp defaultSetVisibilityStyleProp = VisibilityStyleProp.None
         )
         : base()
         {
             DefaultPanelSettings = defaultPanelSettings;
+            DefaultSetVisibilityStyleProp = defaultSetVisibilityStyleProp;
         }
 
         public override NativeNode CreateNativeNode(FiberNode fiberNode)
@@ -4486,32 +4656,36 @@ namespace Fiber.UIElements
             else if (virtualNode is ScrollViewComponent scrollViewComponent)
             {
                 var scrollView = new ScrollView();
-                return new ScrollViewNativeNode(scrollViewComponent, scrollView);
+                return new ScrollViewNativeNode(scrollViewComponent, scrollView, this);
             }
             else if (virtualNode is TextFieldComponent textFieldComponent)
             {
                 var textField = new TextField();
-                return new TextFieldNativeNode(textFieldComponent, textField);
+                return new TextFieldNativeNode(textFieldComponent, textField, this);
             }
             else if (virtualNode is TextComponent textComponent)
             {
                 var textElement = new TextElement();
-                return new TextElementNativeNode(textComponent, textElement);
+                return new TextElementNativeNode(textComponent, textElement, this);
             }
             else if (virtualNode is ButtonComponent buttonComponent)
             {
                 var button = new Button();
-                return new ButtonNativeNode(buttonComponent, button);
+                return new ButtonNativeNode(buttonComponent, button, this);
             }
             else if (virtualNode is ImageComponent imageComponent)
             {
                 var image = new Image();
-                return new ImageNativeNode(imageComponent, image);
+                return new ImageNativeNode(imageComponent, image, this);
             }
             else if (virtualNode is ViewComponent viewComponent)
             {
                 var visualElement = new VisualElement();
-                return new VisualElementNativeNode(viewComponent, visualElement);
+                if (viewComponent.UsageHints != UsageHints.None)
+                {
+                    visualElement.usageHints = viewComponent.UsageHints;
+                }
+                return new VisualElementNativeNode(viewComponent, visualElement, this);
             }
 
             return null;
