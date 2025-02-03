@@ -535,10 +535,23 @@ namespace Fiber.Router
         }
     }
 
+    public class ActiveRouteComponent : BaseRouteComponent
+    {
+        public VirtualNode Component { get; private set; }
+        public ActiveRouteComponent(VirtualNode component) : base()
+        {
+            Component = component;
+        }
+        public override VirtualBody Render()
+        {
+            return Active(ShowSignal, Component);
+        }
+    }
+
     public class KeepMountedRouteComponent : BaseRouteComponent
     {
         public VirtualNode Component { get; private set; }
-        public KeepMountedRouteComponent(VirtualNode component, string debug = null) : base()
+        public KeepMountedRouteComponent(VirtualNode component) : base()
         {
             Component = component;
         }
