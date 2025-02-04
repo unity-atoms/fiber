@@ -905,7 +905,7 @@ namespace Fiber
         public static implicit operator VirtualBody(VirtualNode virtualNode) => new(virtualNode);
     }
 
-    public class VirtualNode
+    public abstract class VirtualNode
     {
         public VirtualBody Children { get; private set; }
         public VirtualNodeType Type { get; private set; }

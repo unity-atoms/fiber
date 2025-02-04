@@ -7,7 +7,7 @@ namespace Fiber.Router
 {
     public static class FiberRouter
     {
-        public static ObjectPool<OutletComponent> OutletComponentPool { get; private set; } = new();
+        public static ObjectPool<OutletComponent> OutletComponentPool { get; private set; } = new(5);
 
         static FiberRouter()
         {
