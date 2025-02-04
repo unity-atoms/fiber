@@ -360,7 +360,8 @@ namespace Fiber.UIElements
             VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
             VirtualBody children = default
         ) : base(
-                children: children
+                children: children,
+                VirtualNodeType.CustomComponent
             )
         {
             Style = style;

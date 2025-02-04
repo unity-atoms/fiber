@@ -1,9 +1,20 @@
 using System;
 using System.Collections.Generic;
 using Signals;
+using FiberUtils;
 
 namespace Fiber.Router
 {
+    public static class FiberRouter
+    {
+        public static ObjectPool<OutletComponent> OutletComponentPool { get; private set; } = new();
+
+        static FiberRouter()
+        {
+            OutletComponentPool.Preload(5);
+        }
+    }
+
     public static class BaseComponentExtensions
     {
         public static RouterProvider RouterProvider(
@@ -11,12 +22,13 @@ namespace Fiber.Router
             Router router
         )
         {
+            // No need to pool RouterProvider since it's a one-time use component
             return new RouterProvider(router);
         }
 
         public static OutletComponent Outlet(this BaseComponent component)
         {
-            return new OutletComponent();
+            return FiberRouter.OutletComponentPool.Get();
         }
 
         private static Dictionary<string, BaseSignal<bool>> _isRouteSignals = new();
@@ -760,6 +772,11 @@ namespace Fiber.Router
         {
             var outletContext = GetContext<OutletContext>();
             return outletContext.VirtualBody;
+        }
+
+        public sealed override void Dispose()
+        {
+            FiberRouter.OutletComponentPool.Release(this);
         }
     }
 

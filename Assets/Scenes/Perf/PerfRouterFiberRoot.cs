@@ -109,7 +109,6 @@ public class PerfRouterFiberRoot : MonoBehaviour
                             {
                                 var router = C<Router>();
                                 router.Navigate(ROUTES.PAGE2);
-                                Debug.Break();
                             }
                         )
                     )

@@ -908,16 +908,15 @@ namespace Fiber
     public class VirtualNode
     {
         public VirtualBody Children { get; private set; }
+        public VirtualNodeType Type { get; private set; }
 
-        public VirtualNode()
-        {
-            Children = new();
-        }
-
-        public VirtualNode(VirtualBody children)
+        public VirtualNode(VirtualBody children, VirtualNodeType type)
         {
             Children = children;
+            Type = type;
         }
+
+        public virtual void Dispose() { }
     }
 
     public interface IBuiltInComponent
@@ -927,7 +926,7 @@ namespace Fiber
 
     public abstract class BaseContextProvider : VirtualNode, IBuiltInComponent
     {
-        public BaseContextProvider(VirtualBody children) : base(children) { }
+        public BaseContextProvider(VirtualBody children) : base(children, VirtualNodeType.Context) { }
         public VirtualBody Render(FiberNode fiberNode)
         {
             return Children;
@@ -997,8 +996,8 @@ namespace Fiber
         public FiberNode FiberNode { private get; set; }
         public BaseComponent F { get => this; }
 
-        public BaseComponent() : base(new()) { }
-        public BaseComponent(VirtualBody children) : base(children) { }
+        public BaseComponent() : base(new(), VirtualNodeType.CustomComponent) { }
+        public BaseComponent(VirtualBody children) : base(children, VirtualNodeType.CustomComponent) { }
         public abstract VirtualBody Render();
 
         public VirtualNode ContextProvider<C>(C value, VirtualBody children) => Api.ContextProvider<C>(value, children);
@@ -1346,6 +1345,7 @@ namespace Fiber
         private List<BaseEffect> _effects = new List<BaseEffect>();
         private Renderer _renderer;
         public ShallowSignalDictionary<string, FiberNode> PortalDestinations { get => _renderer.PortalDestinations; }
+        private VirtualNodeType _virtualNodeType;
 
         public FiberNode(
             Renderer renderer,
@@ -1363,6 +1363,7 @@ namespace Fiber
             Sibling = sibling;
             Phase = FiberNodePhase.AddedToVirtualTree;
             IsEnabled = true;
+            _virtualNodeType = VirtualNode.Type;
         }
 
         public void PushEffect(BaseEffect effect)
@@ -1375,7 +1376,7 @@ namespace Fiber
         {
             // Node needs to be mounted and enabled in order to run effects.
             // The exception is built in components, which are always updated.
-            if (Phase != FiberNodePhase.Mounted || (!IsEnabled && VirtualNode is not IBuiltInComponent))
+            if (Phase != FiberNodePhase.Mounted || (!IsEnabled && !_virtualNodeType.IsBuiltInComponent()))
             {
                 return;
             }
@@ -1579,6 +1580,15 @@ namespace Fiber
             _renderer.AddFiberNodeToUpdateQueue(this);
         }
         public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
+
+        public void TryDisposeVirtualNode()
+        {
+            if (!_virtualNodeType.IsUsedByFiberAfterMount())
+            {
+                VirtualNode.Dispose();
+                VirtualNode = null;
+            }
+        }
     }
 
     public abstract class RendererExtension
@@ -1819,6 +1829,8 @@ namespace Fiber
 
             fiberNode.Phase = FiberNodePhase.Rendered;
             _operationsQueue.Enqueue(new MountOperation(node: fiberNode));
+
+            fiberNode.TryDisposeVirtualNode();
         }
 
         public static void RenderChildren(Renderer renderer, FiberNode fiberNode, VirtualBody children, Queue<FiberNode> renderQueue)
@@ -2573,7 +2585,7 @@ namespace Fiber
 
         private class FragmentComponent : VirtualNode, IBuiltInComponent
         {
-            public FragmentComponent(VirtualBody children) : base(children) { }
+            public FragmentComponent(VirtualBody children) : base(children, VirtualNodeType.Fragment) { }
             public VirtualBody Render(FiberNode fiberNode)
             {
                 return Children;
@@ -2636,7 +2648,7 @@ namespace Fiber
             private readonly EnableContext _enableContext;
             private EnabledEffect _enabledEffect;
 
-            public EnableComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children)
+            public EnableComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children, VirtualNodeType.EnableComponent)
             {
                 _whenSignal = whenSignal;
                 _renderer = renderer;
@@ -2728,7 +2740,7 @@ namespace Fiber
             private readonly ISignal<bool> _whenSignal;
             private ISignal<bool> _isVisibleSignal;
 
-            public VisibleComponent(ISignal<bool> whenSignal, VirtualBody children) : base(children)
+            public VisibleComponent(ISignal<bool> whenSignal, VirtualBody children) : base(children, VirtualNodeType.VisibleComponent)
             {
                 _whenSignal = whenSignal;
             }
@@ -2800,7 +2812,7 @@ namespace Fiber
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
 
-            public ActiveComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children)
+            public ActiveComponent(ISignal<bool> whenSignal, VirtualBody children, Renderer renderer) : base(children, VirtualNodeType.ActiveComponent)
             {
                 _whenSignal = whenSignal;
                 _renderer = renderer;
@@ -2837,7 +2849,7 @@ namespace Fiber
                 Queue<FiberNode> renderQueue,
                 MixedQueue operationsQueue,
                 Renderer renderer
-            ) : base(children)
+            ) : base(children, VirtualNodeType.MountComponent)
             {
                 _whenSignal = whenSignal;
                 _renderQueue = renderQueue;
@@ -2914,7 +2926,7 @@ namespace Fiber
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
         private abstract class BaseForComponent : VirtualNode
         {
-            protected BaseForComponent() : base(VirtualBody.Empty) { }
+            protected BaseForComponent() : base(VirtualBody.Empty, VirtualNodeType.ForComponent) { }
             public abstract void Render(FiberNode fiberNode);
         }
 
@@ -3161,7 +3173,7 @@ namespace Fiber
                 MixedQueue operationsQueue,
                 Renderer renderer
             )
-                : base(children)
+                : base(children, VirtualNodeType.SwitchComponent)
             {
                 _fallback = fallback;
                 _renderQueue = renderQueue;
@@ -3320,7 +3332,7 @@ namespace Fiber
             public ISignal<bool> When { get; private set; }
 
             public MatchComponent(ISignal<bool> when, VirtualBody children)
-                : base(children)
+                : base(children, VirtualNodeType.MatchComponent)
             {
                 When = when;
             }
@@ -3344,7 +3356,7 @@ namespace Fiber
                 VirtualBody children,
                 SignalProp<string> destinationId,
                 MixedQueue operationsQueue
-            ) : base(children)
+            ) : base(children, VirtualNodeType.PortalComponent)
             {
                 _destinationId = destinationId;
                 _operationsQueue = operationsQueue;
@@ -3475,7 +3487,7 @@ namespace Fiber
         protected readonly string _id;
         public PortalDestinationBaseComponent(
             string id
-        ) : base(VirtualBody.Empty)
+        ) : base(VirtualBody.Empty, VirtualNodeType.PortalDestinationComponent)
         {
             _id = id;
         }
