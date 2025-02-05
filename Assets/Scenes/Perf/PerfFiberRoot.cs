@@ -47,20 +47,23 @@ public class PerfRootComponent : BaseComponent
         return F.CursorManager(
             cursorDefinitionsStore: new Store<ShallowSignalList<CursorDefinition>>(),
             children: F.Nodes(
-                F.Visible(
-                    when: showPage1,
-                    children: F.UIRoot(
+                    // F.Visible(
+                    //     when: showPage1,
+                    //     children:
+                    F.UIRoot(
                         name: "PerfRootDocument",
                         children: new PerfPage1(visibleState)
                     )
-                ),
-                F.Visible(
-                    when: showPage2,
-                    children: F.UIRoot(
+                    ,
+                    // ),
+                    // F.Visible(
+                    //     when: showPage2,
+                    //     children:
+                    F.UIRoot(
                         name: "PerfRootDocument2",
                         children: new PerfPage2(visibleState)
                     )
-                )
+            // )
             )
         );
     }
@@ -82,7 +85,7 @@ public class PerfRootComponent : BaseComponent
 
             return F.View(
                 style: new Style(
-                // translate: translate,
+                translate: translate
                 // opacity: opacity
                 ),
                 // pickingMode: pickingMode,
@@ -144,7 +147,7 @@ public class PerfRootComponent : BaseComponent
 
             return F.View(
                 style: new Style(
-                // translate: translate,
+                translate: translate
                 // opacity: opacity
                 ),
                 // pickingMode: pickingMode,

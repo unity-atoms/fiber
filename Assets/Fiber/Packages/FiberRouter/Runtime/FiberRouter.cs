@@ -5,13 +5,15 @@ using FiberUtils;
 
 namespace Fiber.Router
 {
-    public static class FiberRouter
+    public static class Pooling
     {
         public static ObjectPool<OutletComponent> OutletComponentPool { get; private set; } = new(5);
+        public static ListPool<ModalRoute> ModalRouteListPool { get; private set; } = new(5);
 
-        static FiberRouter()
+        static Pooling()
         {
             OutletComponentPool.Preload(5);
+            ModalRouteListPool.Preload(5);
         }
     }
 
@@ -28,7 +30,7 @@ namespace Fiber.Router
 
         public static OutletComponent Outlet(this BaseComponent component)
         {
-            return FiberRouter.OutletComponentPool.Get();
+            return Pooling.OutletComponentPool.Get();
         }
 
         private static Dictionary<string, BaseSignal<bool>> _isRouteSignals = new();
@@ -54,178 +56,20 @@ namespace Fiber.Router
     [Serializable]
     public class Router : BaseSignal<Router>
     {
-        public class ModalRoute : IEquatable<ModalRoute>
-        {
-            public string Id { get; private set; }
-            public ModalRoute(string id)
-            {
-                Id = id;
-            }
-
-            public virtual bool Equals(ModalRoute other)
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-
-                return Id == other.Id;
-            }
-        }
-
-        public class ModalRoute<C> : ModalRoute
-        {
-            public C Context { get; private set; }
-
-            public ModalRoute(string id, C context) : base(id)
-            {
-                Context = context;
-            }
-
-            public override bool Equals(ModalRoute other)
-            {
-                if (other == null || other is not ModalRoute<C> otherModalRoute)
-                {
-                    return false;
-                }
-
-                return Id == other.Id && otherModalRoute.Context.Equals(Context);
-            }
-        }
-
-        [Serializable]
-        public class Route : BaseSignal, IEquatable<Route>
-        {
-            public string Id;
-            public bool IsLayoutRoute { get; private set; }
-            public List<ModalRoute> Modals { get; private set; }
-
-            public Route(string id, bool isLayoutRoute)
-            {
-                Id = id;
-                IsLayoutRoute = isLayoutRoute;
-                Modals = new();
-            }
-
-            public override bool IsDirty(byte otherDirtyBit)
-            {
-                return DirtyBit != otherDirtyBit;
-            }
-
-            public void PushModal(string id)
-            {
-                if (IsModalPushed(id))
-                {
-                    throw new Exception($"Modal with id {id} is already pushed");
-                }
-                // TODO: Pool routes
-                Modals.Add(new ModalRoute(id));
-                NotifySignalUpdate();
-            }
-
-            public void PushModal<C>(string id, C context)
-            {
-                if (IsModalPushed(id))
-                {
-                    throw new Exception($"Modal with id {id} is already pushed");
-                }
-
-                // TODO: Pool routes
-                Modals.Add(new ModalRoute<C>(id, context));
-                NotifySignalUpdate();
-            }
-
-            public void PopModal()
-            {
-                Modals.RemoveAt(Modals.Count - 1);
-                NotifySignalUpdate();
-            }
-
-            public void PopModal(string id)
-            {
-                if (!IsModalPushed(id))
-                {
-                    throw new Exception($"Modal with id {id} is not pushed");
-                }
-
-                for (var i = 0; i < Modals.Count; i++)
-                {
-                    if (Modals[i].Id == id)
-                    {
-                        Modals.RemoveAt(i);
-                        break;
-                    }
-                }
-                NotifySignalUpdate();
-            }
-
-            public ModalRoute PeekModal()
-            {
-                return Modals.Count == 0 ? null : Modals[Modals.Count - 1];
-            }
-
-            public bool IsModalPushed(string id)
-            {
-                for (var i = 0; Modals != null && i < Modals.Count; i++)
-                {
-                    if (Modals[i].Id == id)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            protected override sealed void OnNotifySignalUpdate()
-            {
-                _dirtyBit++;
-            }
-
-            public virtual bool Equals(Route other)
-            {
-                if (other == null)
-                {
-                    return false;
-                }
-
-                return Id == other.Id;
-            }
-        }
-
-        public class Route<C> : Route
-        {
-            public C Context { get; private set; }
-
-            public Route(string path, C context) : base(path, isLayoutRoute: false)
-            {
-                Context = context;
-            }
-
-            public override bool Equals(Route other)
-            {
-                if (other == null || other is not Route<C> otherRoute)
-                {
-                    return false;
-                }
-
-                return Id == other.Id && otherRoute.Context.Equals(Context);
-            }
-        }
-
         private class CurrentRouteSignal_Implementation : ComputedSignal<IList<Route>, Route>
         {
-            public CurrentRouteSignal_Implementation(SignalList<Route> routeStack) : base(routeStack) { }
+            public CurrentRouteSignal_Implementation(ShallowSignalList<Route> routeStack) : base(routeStack) { }
             protected override Route Compute(IList<Route> routeStack)
             {
                 if (routeStack.Count == 0)
                 {
-                    return null;
+                    return Route.Empty();
                 }
                 var route = routeStack[routeStack.Count - 1];
                 return route;
             }
 
-            protected override bool ShouldSetDirty(Route newValue, Route previousValue) => !newValue?.Equals(previousValue) ?? true;
+            protected override bool ShouldSetDirty(Route newValue, Route previousValue) => !newValue.Equals(previousValue);
         }
 
         private class CurrentModalSignal_Implementation : ComputedSignal<Route, ModalRoute>
@@ -237,11 +81,11 @@ namespace Fiber.Router
                 return modalRoute;
             }
 
-            protected override bool ShouldSetDirty(ModalRoute newValue, ModalRoute previousValue) => !newValue?.Equals(previousValue) ?? true;
+            protected override bool ShouldSetDirty(ModalRoute newValue, ModalRoute previousValue) => !newValue.Equals(previousValue);
         }
 
         public RouteDefinition RouterTree { get; private set; }
-        public SignalList<Route> RouteStack;
+        public ShallowSignalList<Route> RouteStack;
         public BaseSignal<Route> CurrentRouteSignal;
         public BaseSignal<ModalRoute> CurrentModalSignal;
         private readonly ISignal _parent;
@@ -264,30 +108,17 @@ namespace Fiber.Router
             UnregisterDependent(_parent);
         }
 
-        public Router Navigate(string path)
+        public Router Navigate(string path, string stringValue = default, int intValue = default)
         {
-            var currentRoute = RouteStack.Count != 0 ? RouteStack[RouteStack.Count - 1] : null;
-            while (currentRoute != null && !GetRouteDefinition(currentRoute.Id).HasNoneLayoutRouteDecedent(path))
+            var currentRoute = RouteStack.Count != 0 ? RouteStack[RouteStack.Count - 1] : Route.Empty();
+            while (!currentRoute.IsEmpty() && !GetRouteDefinition(currentRoute.Id).HasNoneLayoutRouteDecedent(path))
             {
                 RouteStack.RemoveAt(RouteStack.Count - 1);
-                currentRoute = RouteStack.Count != 0 ? RouteStack[RouteStack.Count - 1] : null;
+                currentRoute = RouteStack.Count != 0 ? RouteStack[RouteStack.Count - 1] : Route.Empty();
             }
 
-            PushRoute(path);
+            PushRoute(path, stringValue, intValue);
 
-            return this;
-        }
-
-        public Router Navigate<C>(string path, C context)
-        {
-            var currentRoute = RouteStack.Count != 0 ? RouteStack[RouteStack.Count - 1] : null;
-            while (currentRoute != null && !GetRouteDefinition(currentRoute.Id).HasNoneLayoutRouteDecedent(path))
-            {
-                RouteStack.RemoveAt(RouteStack.Count - 1);
-                currentRoute = RouteStack.Count != 0 ? RouteStack[RouteStack.Count - 1] : null;
-            }
-
-            PushRoute<C>(path, context);
             return this;
         }
 
@@ -295,7 +126,7 @@ namespace Fiber.Router
         {
             if (RouteStack.Count == 0)
             {
-                return null;
+                return RouteDefinition.Empty();
             }
 
             return GetRouteDefinition(RouteStack[RouteStack.Count - 1].Id);
@@ -316,26 +147,26 @@ namespace Fiber.Router
             for (var i = 0; currentDefinition.Children != null && i < currentDefinition.Children.Count; i++)
             {
                 var definition = GetRouteDefinitionRecursively(id, currentDefinition.Children[i]);
-                if (definition != null)
+                if (!definition.IsEmpty())
                 {
                     return definition;
                 }
             }
 
-            return null;
+            return RouteDefinition.Empty();
         }
 
         private void PushIntermediateLayoutRoutes(string id)
         {
             var peekedRouteDefinition = PeekRouteDefinition();
-            var startingRouteDefinition = peekedRouteDefinition ?? RouterTree;
+            var startingRouteDefinition = peekedRouteDefinition.IsEmpty() ? RouterTree : peekedRouteDefinition;
 
             PushIntermediateLayoutRoutesRecursively(id, peekedRouteDefinition, RouteStack.Count, startingRouteDefinition);
         }
 
         private bool PushIntermediateLayoutRoutesRecursively(string id, RouteDefinition peekedRouteDefinition, int stackCountBefore, RouteDefinition currentDefinition)
         {
-            if (currentDefinition == null)
+            if (currentDefinition.IsEmpty())
             {
                 return false;
             }
@@ -350,10 +181,9 @@ namespace Fiber.Router
                 var child = currentDefinition.Children[i];
                 if (PushIntermediateLayoutRoutesRecursively(id, peekedRouteDefinition, stackCountBefore, child))
                 {
-                    if (peekedRouteDefinition == null || peekedRouteDefinition.Id != currentDefinition.Id)
+                    if (peekedRouteDefinition.IsEmpty() || peekedRouteDefinition.Id != currentDefinition.Id)
                     {
-                        // TODO: Pool routes
-                        RouteStack.Insert(stackCountBefore, new Route(currentDefinition.Id, isLayoutRoute: true));
+                        RouteStack.Insert(stackCountBefore, new Route(currentDefinition.Id, isLayoutRoute: true, modals: Pooling.ModalRouteListPool.Get()));
                     }
                     return true;
                 }
@@ -362,29 +192,21 @@ namespace Fiber.Router
             return false;
         }
 
-        private Router PushRoute(string path)
+        private Router PushRoute(string id, string stringValue = default, int intValue = default)
         {
-            var topOfStackDefinition = PeekRouteDefinition() ?? RouterTree;
-            if (!topOfStackDefinition.HasNoneLayoutRouteDecedent(path))
+            var peekedRouteDefinition = PeekRouteDefinition();
+            var topOfStackDefinition = peekedRouteDefinition.IsEmpty() ? RouterTree : peekedRouteDefinition;
+            if (!topOfStackDefinition.HasNoneLayoutRouteDecedent(id))
             {
-                throw new Exception($"Route {path} is not a decedent of {topOfStackDefinition.Id}");
+                throw new Exception($"Route {id} is not a decedent of {topOfStackDefinition.Id}");
             }
 
-            PushIntermediateLayoutRoutes(path);
-            // TODO: Pool routes
-            RouteStack.Add(new Route(path, isLayoutRoute: false));
+            PushIntermediateLayoutRoutes(id);
+            RouteStack.Add(new Route(id, isLayoutRoute: false, modals: Pooling.ModalRouteListPool.Get(), stringValue, intValue));
             NotifySignalUpdate();
             return this;
         }
 
-        private Router PushRoute<C>(string path, C context)
-        {
-            PushIntermediateLayoutRoutes(path);
-            // TODO: Pool routes
-            RouteStack.Add(new Route<C>(path, context));
-            NotifySignalUpdate();
-            return this;
-        }
 
         private Router PopRoute()
         {
@@ -392,12 +214,19 @@ namespace Fiber.Router
             {
                 return this;
             }
-            RouteStack.RemoveAt(RouteStack.Count - 1);
+
+            var index = RouteStack.Count - 1;
+            var route = RouteStack[index];
+            Pooling.ModalRouteListPool.Release(route.Modals);
+            RouteStack.RemoveAt(index);
 
             // Pop intermediate layout routes
-            while (RouteStack.Count > 0 && RouteStack[RouteStack.Count - 1].GetType() == typeof(Route))
+            while (RouteStack.Count > 0 && RouteStack[RouteStack.Count - 1].IsLayoutRoute)
             {
-                RouteStack.RemoveAt(RouteStack.Count - 1);
+                index = RouteStack.Count - 1;
+                route = RouteStack[index];
+                Pooling.ModalRouteListPool.Release(route.Modals);
+                RouteStack.RemoveAt(index);
             }
 
             NotifySignalUpdate();
@@ -414,7 +243,7 @@ namespace Fiber.Router
             return this;
         }
 
-        public Router PushModal(string id)
+        public Router PushModal(string id, string stringValue = default, int intValue = default)
         {
             for (var i = RouteStack.Count - 1; i >= 0; i--)
             {
@@ -426,28 +255,7 @@ namespace Fiber.Router
                     var modalDefinition = definition.Modals[j];
                     if (modalDefinition.Id == id)
                     {
-                        route.PushModal(id);
-                        return this;
-                    }
-                }
-            }
-
-            return this;
-        }
-
-        public Router PushModal<C>(string id, C context)
-        {
-            for (var i = RouteStack.Count - 1; i >= 0; i--)
-            {
-                var route = RouteStack[i];
-                var definition = GetRouteDefinition(route.Id);
-
-                for (var j = 0; definition.Modals != null && j < definition.Modals.Count; ++j)
-                {
-                    var modalDefinition = definition.Modals[j];
-                    if (modalDefinition.Id == id)
-                    {
-                        route.PushModal<C>(id, context);
+                        route.PushModal(id, stringValue, intValue);
                         return this;
                     }
                 }
@@ -495,7 +303,7 @@ namespace Fiber.Router
         public Route PeekRoute()
         {
             // Top route will always be a none layout route
-            return RouteStack.Count == 0 ? null : RouteStack[RouteStack.Count - 1];
+            return RouteStack.Count == 0 ? Route.Empty() : RouteStack[RouteStack.Count - 1];
         }
 
         public ModalRoute PeekModal()
@@ -505,11 +313,11 @@ namespace Fiber.Router
                 var route = RouteStack[i];
                 if (route.Modals.Count > 0)
                 {
-                    return route.Modals[route.Modals.Count - 1];
+                    return route.Modals[^1];
                 }
             }
 
-            return null;
+            return ModalRoute.Empty();
         }
 
         public override sealed bool IsDirty(byte otherDirtyBit)
@@ -597,158 +405,6 @@ namespace Fiber.Router
         }
     }
 
-    public class RouteDefinition
-    {
-        public string Id { get; private set; }
-        // A layout route is a route that participates in the layout nesting.
-        // However, we don't need to care about layout routes when we are 
-        // navigating, since layout routes are automatically added and removed
-        // from the route stack. Translated to the web, a layout route would
-        // not add a segment to the path / URL.
-        public bool IsLayoutRoute { get; private set; }
-        public BaseRouteComponent Component { get; private set; }
-        public Func<VirtualBody, BaseComponent> Wrapper { get; private set; }
-        public List<RouteDefinition> Children { get; private set; }
-        public List<ModalRouteDefinition> Modals { get; private set; }
-        public RouteDefinition(
-            string id,
-            bool isLayoutRoute,
-            BaseRouteComponent component,
-            Func<VirtualBody, BaseComponent> wrapper = null,
-            List<RouteDefinition> children = null,
-            List<ModalRouteDefinition> modals = null
-        )
-        {
-            Id = id;
-            IsLayoutRoute = isLayoutRoute;
-            Component = component;
-            Wrapper = wrapper;
-            Children = children;
-            Modals = modals;
-        }
-
-        public virtual VirtualNode Render(BaseSignal<Router.Route> routeAtCurrentIndexSignal, BaseSignal<bool> isMatchSignal)
-        {
-            Component.ShowSignal = isMatchSignal;
-            return Component;
-        }
-
-        // Checks if there is a none layout route as a decedent of this route.
-        // A decedent is only considered if there are no none layout routes
-        // in between in the router tree.
-        public bool HasNoneLayoutRouteDecedent(string id)
-        {
-            for (var i = 0; Children != null && i < Children.Count; i++)
-            {
-                if (HasNoneLayoutRouteDecedent(id, Children[i]))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool HasNoneLayoutRouteDecedent(string id, RouteDefinition definition)
-        {
-            var isLayoutRoute = definition.IsLayoutRoute;
-            if (definition.Id == id && !isLayoutRoute)
-            {
-                return true;
-            }
-            else if (!isLayoutRoute)
-            {
-                return false;
-            }
-
-            for (var i = 0; definition.Children != null && i < definition.Children.Count; i++)
-            {
-                var childDefinition = definition.Children[i];
-                if (HasNoneLayoutRouteDecedent(id, childDefinition))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-    }
-
-    public class RouteDefinition<C> : RouteDefinition
-    {
-        public RouteDefinition(
-            string id,
-            BaseRouteComponent component,
-            Func<VirtualBody, BaseComponent> wrapper = null,
-            List<RouteDefinition> children = null,
-            List<ModalRouteDefinition> modals = null
-        ) : base(id, isLayoutRoute: false, component, wrapper, children, modals)
-        {
-        }
-
-
-        protected class ContextSignal : ComputedSignal<Router.Route, C>
-        {
-            public ContextSignal(BaseSignal<Router.Route> routeAtCurrentIndexSignal)
-                : base(routeAtCurrentIndexSignal)
-            {
-            }
-            protected override C Compute(Router.Route baseRoute)
-            {
-                if (baseRoute == null)
-                {
-                    return default(C);
-                }
-                var route = baseRoute as Router.Route<C>;
-                return route.Context;
-            }
-        }
-
-        public override VirtualNode Render(BaseSignal<Router.Route> routeAtCurrentIndexSignal, BaseSignal<bool> isMatchSignal)
-        {
-            var contextSignal = new ContextSignal(routeAtCurrentIndexSignal);
-            Component.ShowSignal = isMatchSignal;
-
-            return new ContextProvider<BaseSignal<C>>(
-                value: contextSignal,
-                children: Component
-            );
-        }
-    }
-
-    public class ModalRouteDefinition
-    {
-        public string Id { get; private set; }
-        public BaseRouteComponent Component { get; private set; }
-
-        public ModalRouteDefinition(string id, BaseRouteComponent component)
-        {
-            Id = id;
-            Component = component;
-        }
-
-        public virtual VirtualNode CreateContextProvider(Router.ModalRoute route, List<VirtualNode> children)
-        {
-            return null;
-        }
-    }
-
-    public class ModalRouteDefinition<C> : ModalRouteDefinition
-    {
-        public ModalRouteDefinition(string id, BaseRouteComponent component) : base(id, component)
-        {
-        }
-
-        public override VirtualNode CreateContextProvider(Router.ModalRoute baseModalRoute, List<VirtualNode> children)
-        {
-            var modalRoute = baseModalRoute as Router.ModalRoute<C>;
-            return new Fiber.ContextProvider<C>(
-                value: modalRoute.Context,
-                children: children
-            );
-        }
-    }
-
     public class OutletContext
     {
         public VirtualBody VirtualBody { get; set; }
@@ -776,15 +432,15 @@ namespace Fiber.Router
 
         public sealed override void Dispose()
         {
-            FiberRouter.OutletComponentPool.Release(this);
+            Pooling.OutletComponentPool.Release(this);
         }
     }
 
     public class RouterProvider : BaseComponent
     {
         private RouteDefinition _routeDefinition;
-        private Router _router;
-        private int _currentStackIndex;
+        private readonly Router _router;
+        private readonly int _currentStackIndex;
 
 
         public RouterProvider(Router router) : base()
@@ -806,25 +462,25 @@ namespace Fiber.Router
             _currentStackIndex = currentStackIndex;
         }
 
-        private class RouteAtCurrentIndexSignal : ComputedSignal<Router, Router.Route>
+        private class RouteAtCurrentIndexSignal : ComputedSignal<Router, Route>
         {
             private int _currentStackIndex;
-            public RouteAtCurrentIndexSignal(Router routeStack, int currentStackIndex) : base(routeStack)
+            public RouteAtCurrentIndexSignal(Router router, int currentStackIndex) : base(router)
             {
                 _currentStackIndex = currentStackIndex;
             }
-            protected override Router.Route Compute(Router routeStack)
+            protected override Route Compute(Router router)
             {
-                if (routeStack.RouteStack.Count <= _currentStackIndex)
+                if (router.RouteStack.Count <= _currentStackIndex)
                 {
-                    return null;
+                    return Route.Empty();
                 }
-                var route = routeStack.RouteStack[_currentStackIndex];
+                var route = router.RouteStack[_currentStackIndex];
                 return route;
             }
         }
 
-        private class IsMatchSignal : ComputedSignal<Router.Route, bool>
+        private class IsMatchSignal : ComputedSignal<Route, bool>
         {
             private readonly RouteDefinition _routeDefinition;
             private readonly int _currentStackIndex;
@@ -833,14 +489,14 @@ namespace Fiber.Router
                 _routeDefinition = routeDefinition;
                 _currentStackIndex = currentStackIndex;
             }
-            protected override bool Compute(Router.Route routeAtCurrentIndex)
+            protected override bool Compute(Route routeAtCurrentIndex)
             {
                 // Special case for the root layout route
                 if (_currentStackIndex == 0 && _routeDefinition.IsLayoutRoute)
                 {
                     return true;
                 }
-                else if (routeAtCurrentIndex == null)
+                else if (routeAtCurrentIndex.IsEmpty())
                 {
                     return false;
                 }
@@ -848,16 +504,16 @@ namespace Fiber.Router
                 return _routeDefinition.Id == routeAtCurrentIndex.Id;
             }
         }
-        private class ShowModalSignal : ComputedSignal<Router.Route, bool, bool>
+        private class ShowModalSignal : ComputedSignal<Route, bool, bool>
         {
             private string _id;
-            public ShowModalSignal(BaseSignal<Router.Route> routeSignal, BaseSignal<bool> isMatchSignal, string id) : base(routeSignal, isMatchSignal)
+            public ShowModalSignal(BaseSignal<Route> routeSignal, BaseSignal<bool> isMatchSignal, string id) : base(routeSignal, isMatchSignal)
             {
                 _id = id;
             }
-            protected override bool Compute(Router.Route route, bool isMatch)
+            protected override bool Compute(Route route, bool isMatch)
             {
-                if (!isMatch || route == null)
+                if (!isMatch || route.IsEmpty())
                 {
                     return false;
                 }
@@ -880,9 +536,10 @@ namespace Fiber.Router
             // Render component
             var routeSignal = new RouteAtCurrentIndexSignal(_router, _currentStackIndex);
             var isMatchSignal = new IsMatchSignal(_routeDefinition, _currentStackIndex, routeSignal);
-            var children = Nodes(
-                _routeDefinition.Render(routeSignal, isMatchSignal)
-            );
+
+            var component = _routeDefinition.Component;
+            component.ShowSignal = isMatchSignal;
+            var children = Nodes(component);
 
             // Render subpaths
             var subPaths = Nodes();

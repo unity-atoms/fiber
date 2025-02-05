@@ -2,9 +2,20 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FiberUtils;
 
 namespace Signals
 {
+    public static class Pooling
+    {
+        public static ListPool<ISignal> ISignalListPool { get; private set; } = new(20);
+
+        static Pooling()
+        {
+            ISignalListPool.Preload(20);
+        }
+    }
+
     public interface ISignal
     {
         byte DirtyBit { get; }
@@ -36,20 +47,9 @@ namespace Signals
 
         ~BaseSignal()
         {
-            if (_dependents != null)
+            if (_dependents != null && _dependents is List<ISignal> listOfDependents)
             {
-                if (_dependents is List<ISignal> listOfDependents)
-                {
-                    for (var i = listOfDependents.Count - 1; i >= 0; --i)
-                    {
-                        UnregisterDependent(listOfDependents[i]);
-                    }
-                }
-                else
-                {
-                    var dependent = (ISignal)_dependents;
-                    UnregisterDependent(dependent);
-                }
+                Pooling.ISignalListPool.Release(listOfDependents);
             }
         }
 
@@ -82,13 +82,12 @@ namespace Signals
             {
                 listOfDependentSignals.Add(dependant);
             }
-            else if (_dependents is ISignal)
+            else if (_dependents is ISignal currentSignal)
             {
-                _dependents = new List<ISignal>()
-                {
-                    (ISignal)_dependents,
-                    dependant
-                };
+                var list = Pooling.ISignalListPool.Get();
+                list.Add(currentSignal);
+                list.Add(dependant);
+                _dependents = list;
             }
             else
             {

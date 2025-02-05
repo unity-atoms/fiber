@@ -12,7 +12,7 @@ public class DocsTreeViewComponent : BaseComponent
         var selectedItemId = F.CreateComputedSignal((router) =>
         {
             var route = router.PeekRoute();
-            return route?.Id;
+            return route.Id;
         }, router);
 
         var expandedItemIds = new ShallowSignalList<string>();

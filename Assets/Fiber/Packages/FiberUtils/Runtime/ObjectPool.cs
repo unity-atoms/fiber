@@ -106,14 +106,4 @@ namespace FiberUtils
             return _currentPool.Dequeue();
         }
     }
-
-    public class ListPool<T> : ObjectPool<List<T>>
-    {
-        public override void Release(List<T> pooledObject)
-        {
-            if (pooledObject == null || _currentPool.Contains(pooledObject)) return;
-            pooledObject.Clear();
-            _currentPool.Enqueue(pooledObject);
-        }
-    }
 }
