@@ -80,8 +80,8 @@ public class PerfRouterFiberRoot : MonoBehaviour
         {
             return F.UIRoot(
                 name: "Page1",
+                usageHints: UsageHints.DynamicTransform,
                 children: F.View(
-                    usageHints: UsageHints.DynamicTransform,
                     children: F.Nodes(
                         F.Text(text: "Page 1"),
                         F.Text(text: "Page 1"),
@@ -123,8 +123,8 @@ public class PerfRouterFiberRoot : MonoBehaviour
         {
             return F.UIRoot(
                 name: "Page2",
+                usageHints: UsageHints.DynamicTransform,
                 children: F.View(
-                    usageHints: UsageHints.DynamicTransform,
                     children: F.Nodes(
                         F.Text(text: "Page 2"),
                         F.Text(text: "Page 2"),

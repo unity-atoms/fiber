@@ -276,6 +276,7 @@ namespace Fiber.UIElements
             Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
+            UsageHints usageHints = UsageHints.None,
             VirtualBody children = new()
         )
         {
@@ -288,6 +289,7 @@ namespace Fiber.UIElements
                 destroyInstance: destroyInstance,
                 panelSettings: panelSettings,
                 sortingOrder: sortingOrder,
+                usageHints: usageHints,
                 children: children
             );
         }
@@ -302,6 +304,7 @@ namespace Fiber.UIElements
             Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
+            UsageHints usageHints = UsageHints.None,
             VirtualBody children = default
         )
         {
@@ -314,6 +317,7 @@ namespace Fiber.UIElements
                 destroyInstance: destroyInstance,
                 panelSettings: panelSettings,
                 sortingOrder: sortingOrder,
+                usageHints: usageHints,
                 children: children
             );
         }
@@ -615,6 +619,7 @@ namespace Fiber.UIElements
         private Action<GameObject> DestroyInstance { get; set; }
         private PanelSettings PanelSettings { get; set; }
         private SignalProp<float> SortingOrder { get; set; }
+        private UsageHints UsageHints { get; set; }
 
         public UIRootComponent(
             SignalProp<string> name = new(),
@@ -625,6 +630,7 @@ namespace Fiber.UIElements
             Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
+            UsageHints usageHints = UsageHints.None,
             VirtualBody children = default
         ) : base(children: children)
         {
@@ -636,6 +642,7 @@ namespace Fiber.UIElements
             DestroyInstance = destroyInstance;
             PanelSettings = panelSettings;
             SortingOrder = !sortingOrder.IsEmpty ? sortingOrder : 0f;
+            UsageHints = usageHints;
         }
 
         public override VirtualBody Render()
@@ -661,6 +668,7 @@ namespace Fiber.UIElements
                     destroyInstance: DestroyInstance,
                     panelSettings: PanelSettings,
                     sortingOrder: SortingOrder,
+                    usageHints: UsageHints,
                     children: Children
                 )
             );
@@ -671,6 +679,7 @@ namespace Fiber.UIElements
     {
         public PanelSettings PanelSettings { get; private set; }
         public SignalProp<float> SortingOrder { get; private set; }
+        public UsageHints UsageHints { get; private set; }
 
         public UIDocumentComponent(
             SignalProp<string> name = new(),
@@ -681,6 +690,7 @@ namespace Fiber.UIElements
             Action<GameObject> destroyInstance = null,
             PanelSettings panelSettings = null,
             SignalProp<float> sortingOrder = new(),
+            UsageHints usageHints = UsageHints.None,
             VirtualBody children = new()
         ) : base(
                 name: name,
@@ -694,6 +704,7 @@ namespace Fiber.UIElements
         {
             PanelSettings = panelSettings;
             SortingOrder = !sortingOrder.IsEmpty ? sortingOrder : 0f;
+            UsageHints = usageHints;
         }
     }
 
@@ -4542,6 +4553,11 @@ namespace Fiber.UIElements
                     component.SortingOrder.Signal.RegisterDependent(this);
                 }
                 _sortingOrderWorkLoopItem = new(component.SortingOrder);
+            }
+
+            if (component.UsageHints != UsageHints.None)
+            {
+                uiDocument.rootVisualElement.usageHints = component.UsageHints;
             }
         }
 
