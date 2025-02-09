@@ -15,6 +15,7 @@ namespace Fiber
         PortalComponent = 10,
         PortalDestinationComponent = 11,
         RendererComponentSpecialHandling = 12,
+        Null = 13,
     }
 
     public static class VirtualNodeTypeExtensions

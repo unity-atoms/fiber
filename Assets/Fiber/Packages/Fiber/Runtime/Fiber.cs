@@ -1363,7 +1363,7 @@ namespace Fiber
             Sibling = sibling;
             Phase = FiberNodePhase.AddedToVirtualTree;
             IsEnabled = true;
-            _virtualNodeType = VirtualNode.Type;
+            _virtualNodeType = VirtualNode?.Type ?? VirtualNodeType.Null;
         }
 
         public void PushEffect(BaseEffect effect)
@@ -1897,6 +1897,9 @@ namespace Fiber
                     return visibleComponent.IsVisible.Get();
                 }
                 current = current.Parent;
+                // We return when we reach the first native node, since all 
+                // renderers will work the same way when it comes to visibility, 
+                // eg. when a parent is not visible, then all children are also not visible.
             } while (current != null && current.NativeNode == null);
 
             return true;
