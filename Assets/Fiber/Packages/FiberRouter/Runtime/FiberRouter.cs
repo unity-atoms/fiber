@@ -424,6 +424,15 @@ namespace Fiber.Router
 
     public class OutletComponent : BaseComponent
     {
+        private readonly bool _isPooled = false;
+        public OutletComponent() : base()
+        {
+            _isPooled = true;
+        }
+        public OutletComponent(bool isPooled) : base()
+        {
+            _isPooled = isPooled;
+        }
         public override VirtualBody Render()
         {
             var outletContext = GetContext<OutletContext>();
@@ -432,7 +441,10 @@ namespace Fiber.Router
 
         public sealed override void Dispose()
         {
-            Pooling.OutletComponentPool.Release(this);
+            if (_isPooled)
+            {
+                Pooling.OutletComponentPool.Release(this);
+            }
         }
     }
 
