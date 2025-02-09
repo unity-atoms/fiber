@@ -17,11 +17,12 @@ namespace Fiber.Suite
             GameObject rootGameObject,
             Dictionary<Type, object> globals = null,
             PanelSettings defaultPanelSettings = null,
+            VisibilityStyleProp defaultVisibilityStyleProp = VisibilityStyleProp.Translate,
             bool autonomousWorkLoop = true,
             long workLoopTimeBudgetMs = Renderer.DEFAULT_WORK_LOOP_TIME_BUDGET_MS
         )
         {
-            var uiElementsRendererExtension = new UIElementsRendererExtension(defaultPanelSettings);
+            var uiElementsRendererExtension = new UIElementsRendererExtension(defaultPanelSettings, defaultVisibilityStyleProp);
             var gameObjectRendererExtension = new GameObjectsRendererExtension();
             _renderer = new Fiber.Renderer(
                 rendererExtensions: new List<RendererExtension>()

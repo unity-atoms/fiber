@@ -10,9 +10,9 @@ namespace Fiber.UIElements
     public struct PositionProp
     {
         public SignalProp<StyleEnum<Position>> SignalProp { get; private set; }
-        public bool IsEmpty { get => SignalProp.IsEmpty; }
-        public bool IsValue { get => SignalProp.IsValue; }
-        public bool IsSignal { get => SignalProp.IsSignal; }
+        public readonly bool IsEmpty { get => SignalProp.IsEmpty; }
+        public readonly bool IsValue { get => SignalProp.IsValue; }
+        public readonly bool IsSignal { get => SignalProp.IsSignal; }
 
         public PositionProp(StyleEnum<Position> value)
         {
@@ -41,7 +41,7 @@ namespace Fiber.UIElements
             return new PositionProp(signal);
         }
 
-        public StyleEnum<Position> Get() => SignalProp.Get();
+        public readonly StyleEnum<Position> Get() => SignalProp.Get();
     }
 
     public struct WorkLoopPositionProp

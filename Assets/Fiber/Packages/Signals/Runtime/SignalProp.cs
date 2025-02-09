@@ -10,9 +10,9 @@ namespace Signals
 
         private enum SignalPropType { Empty = 0, Value = 1, Signal = 2 }
         private SignalPropType Type;
-        public bool IsEmpty { get => Type == SignalPropType.Empty; }
-        public bool IsValue { get => Type == SignalPropType.Value; }
-        public bool IsSignal { get => Type == SignalPropType.Signal; }
+        public readonly bool IsEmpty { get => Type == SignalPropType.Empty; }
+        public readonly bool IsValue { get => Type == SignalPropType.Value; }
+        public readonly bool IsSignal { get => Type == SignalPropType.Signal; }
 
         public SignalProp(T value)
         {
@@ -46,7 +46,7 @@ namespace Signals
             return new SignalProp<T>(signal);
         }
 
-        public T Get()
+        public readonly T Get()
         {
             if (Type == SignalPropType.Signal)
             {

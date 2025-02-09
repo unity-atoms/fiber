@@ -188,7 +188,7 @@ public static class DocsRouting
                     new RouteDefinition(
                         id: ROUTES.PACKAGES,
                         isLayoutRoute: true,
-                        component: new SimpleRouteComponent(component: new OutletComponent()),
+                        component: new SimpleRouteComponent(component: new OutletComponent(isPooled: false)),
                         children: new List<RouteDefinition>()
                         {
                             new RouteDefinition(

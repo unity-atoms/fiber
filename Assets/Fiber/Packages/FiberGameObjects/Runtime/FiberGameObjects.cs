@@ -90,7 +90,7 @@ namespace Fiber.GameObjects
         public Func<GameObject, GameObject> CreateInstance { get; set; }
         public Action<GameObject> DestroyInstance { get; set; }
 
-        public GameObjectComponent(VirtualBody children) : base(children) { }
+        public GameObjectComponent(VirtualBody children) : base(children, VirtualNodeType.CustomComponent) { }
 
         public GameObjectComponent(
             SignalProp<string> name = new(),
@@ -104,7 +104,7 @@ namespace Fiber.GameObjects
             Func<GameObject, GameObject> createInstance = null,
             Action<GameObject> destroyInstance = null,
             VirtualBody children = new()
-        ) : base(children)
+        ) : base(children, VirtualNodeType.RendererComponentSpecialHandling)
         {
             Name = name;
             Active = !active.IsEmpty ? active : true;
