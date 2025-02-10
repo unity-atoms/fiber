@@ -22,20 +22,16 @@ namespace Signals
         private readonly ISignal _dependent;
         public List<ISignal<T>> Signals { get => _signals; }
         private readonly List<ISignal<T>> _signals;
-        private readonly List<byte> _dirtyBits;
         private int _count = 0;
-        private int _previousCount = 0;
 
-        public DynamicDependencies(ISignal dependent, IList<ISignal<T>> dependencies = null, bool initializeDirty = true)
+        public DynamicDependencies(ISignal dependent, IList<ISignal<T>> dependencies = null)
         {
             _dependent = dependent;
             _signals = dependencies != null ? new(dependencies) : new();
-            _dirtyBits = new(_signals.Count);
             for (var i = 0; i < _signals.Count; ++i)
             {
                 var signal = _signals[i];
                 signal.RegisterDependent(_dependent);
-                _dirtyBits.Add(initializeDirty ? (byte)(signal.DirtyBit - 1) : signal.DirtyBit);
                 _count++;
             }
         }
@@ -47,28 +43,10 @@ namespace Signals
             }
         }
 
-        public bool IsDirty()
-        {
-            bool isDirty = _count != _previousCount;
-            _previousCount = _count;
-
-            for (int i = 0; i < _count; ++i)
-            {
-                if (_signals[i].IsDirty(_dirtyBits[i]))
-                {
-                    isDirty = true;
-                    _dirtyBits[i] = _signals[i].DirtyBit;
-                }
-            }
-
-            return isDirty;
-        }
-
         public void Add<ST>(ST signal) where ST : ISignal<T>
         {
             _signals.Add(signal);
             signal.RegisterDependent(_dependent);
-            _dirtyBits.Add((byte)(signal.DirtyBit - 1));
             _count++;
         }
 
@@ -77,7 +55,6 @@ namespace Signals
             var index = _signals.IndexOf(signal);
             signal.UnregisterDependent(_dependent);
             _signals.RemoveAt(index);
-            _dirtyBits.RemoveAt(index);
             _count--;
         }
 
@@ -86,7 +63,6 @@ namespace Signals
             var signal = _signals[index];
             signal.UnregisterDependent(_dependent);
             _signals.RemoveAt(index);
-            _dirtyBits.RemoveAt(index);
             _count--;
         }
 
@@ -107,15 +83,17 @@ namespace Signals
     public abstract class DynamicComputedSignal<DT, RT> : BaseComputedSignal<RT>
     {
         protected readonly DynamicDependencies<DT> _dynamicDependencies;
+        private byte _lastDirtyBit;
 
         public DynamicComputedSignal(IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
             _dynamicDependencies = new(dependent: this, dynamicDependencies);
+            _lastDirtyBit = (byte)(_dirtyBit - 1);
         }
 
         public override RT Get()
         {
-            if (_dynamicDependencies.IsDirty())
+            if (_lastDirtyBit != _dirtyBit)
             {
                 var previousValue = _lastValue;
                 _lastValue = Compute(_dynamicDependencies);
@@ -125,6 +103,8 @@ namespace Signals
                     _dirtyBit++;
                 }
                 Cleanup(previousValue);
+
+                _lastDirtyBit = _dirtyBit;
             }
 
             return _lastValue;
@@ -140,6 +120,7 @@ namespace Signals
         protected ISignal<T1> _signal1;
         protected byte _lastDirtyBit1;
         protected readonly DynamicDependencies<DT> _dynamicDependencies;
+        private byte _lastDirtyBit;
 
         public DynamicComputedSignal(ISignal<T1> signal1, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
@@ -147,6 +128,7 @@ namespace Signals
             _signal1.RegisterDependent(this);
             _lastDirtyBit1 = (byte)(signal1.DirtyBit - 1);
             _dynamicDependencies = new(dependent: this, dynamicDependencies);
+            _lastDirtyBit = (byte)(_dirtyBit - 1);
         }
 
         ~DynamicComputedSignal()
@@ -157,7 +139,7 @@ namespace Signals
 
         public override RT Get()
         {
-            if (_signal1.IsDirty(_lastDirtyBit1) || _dynamicDependencies.IsDirty())
+            if (_signal1.IsDirty(_lastDirtyBit1) || _lastDirtyBit != _dirtyBit)
             {
                 var previousValue = _lastValue;
                 _lastValue = Compute(_signal1.Get(), _dynamicDependencies);
@@ -169,6 +151,8 @@ namespace Signals
                     _dirtyBit++;
                 }
                 Cleanup(previousValue);
+
+                _lastDirtyBit = _dirtyBit;
             }
 
             return _lastValue;
@@ -185,6 +169,7 @@ namespace Signals
         protected ISignal<T2> _signal2;
         protected byte _lastDirtyBit2;
         protected readonly DynamicDependencies<DT> _dynamicDependencies;
+        private byte _lastDirtyBit;
 
         public DynamicComputedSignal(ISignal<T1> signal1, ISignal<T2> signal2, IList<ISignal<DT>> dynamicDependencies = null) : base()
         {
@@ -195,6 +180,7 @@ namespace Signals
             _lastDirtyBit2 = (byte)(signal2.DirtyBit - 1);
             _signal2.RegisterDependent(this);
             _dynamicDependencies = new(dependent: this, dynamicDependencies);
+            _lastDirtyBit = (byte)(_dirtyBit - 1);
         }
 
         ~DynamicComputedSignal()
@@ -205,7 +191,7 @@ namespace Signals
 
         public override RT Get()
         {
-            if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _dynamicDependencies.IsDirty())
+            if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _lastDirtyBit != _dirtyBit)
             {
                 var previousValue = _lastValue;
                 _lastValue = Compute(_signal1.Get(), _signal2.Get(), _dynamicDependencies);
@@ -218,6 +204,8 @@ namespace Signals
                     _dirtyBit++;
                 }
                 Cleanup(previousValue);
+
+                _lastDirtyBit = _dirtyBit;
             }
 
             return _lastValue;

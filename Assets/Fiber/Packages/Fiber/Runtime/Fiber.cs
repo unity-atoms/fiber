@@ -183,15 +183,17 @@ namespace Fiber
     {
         private DynamicDependencies<T> _dynamicSignals;
         bool _hasRun = false;
+        private byte _lastDirtyBit;
 
         public DynamicEffect(IList<ISignal<T>> signals, bool runOnMount = true)
         {
-            _dynamicSignals = new DynamicDependencies<T>(this, signals, runOnMount);
+            _dynamicSignals = new DynamicDependencies<T>(this, signals);
+            _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
         }
 
         public sealed override void RunIfDirty()
         {
-            if (_dynamicSignals.IsDirty())
+            if (_lastDirtyBit != _dirtyBit)
             {
                 if (_hasRun)
                 {
@@ -199,6 +201,8 @@ namespace Fiber
                 }
                 Run(_dynamicSignals);
                 _hasRun = true;
+
+                _lastDirtyBit = _dirtyBit;
             }
         }
 
