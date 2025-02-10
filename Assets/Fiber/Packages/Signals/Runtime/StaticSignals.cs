@@ -16,12 +16,7 @@ namespace Signals
             _value = value;
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
         public override sealed T Get() => _value;
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public static class StaticSignals

@@ -14,13 +14,6 @@ namespace Signals
 
         protected virtual void Cleanup(RT previousValue) { }
         protected virtual bool ShouldSetDirty(RT newValue, RT previousValue) => true;
-
-        protected override sealed void OnNotifySignalUpdate() { }
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            Get(); // We need to run the signal in order to update the dirty bit
-            return DirtyBit != otherDirtyBit;
-        }
     }
 
     [Serializable]

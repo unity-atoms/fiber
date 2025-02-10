@@ -320,16 +320,7 @@ namespace Fiber.Router
             return ModalRoute.Empty();
         }
 
-        public override sealed bool IsDirty(byte otherDirtyBit)
-        {
-            return otherDirtyBit != DirtyBit;
-        }
         public override Router Get() => this;
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 
     public abstract class BaseRouteComponent : BaseComponent

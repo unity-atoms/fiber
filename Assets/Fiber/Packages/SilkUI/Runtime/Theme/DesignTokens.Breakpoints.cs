@@ -134,14 +134,5 @@ namespace SilkUI
         }
 
         public override BreakpointTokens Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 }

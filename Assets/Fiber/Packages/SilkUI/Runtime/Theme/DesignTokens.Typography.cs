@@ -81,10 +81,6 @@ namespace SilkUI
         }
 
         public override TypographyTokens Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
 
         public TypographyTypeTokens GetTypographyTypeTokens(TypographyType typographyType)
         {
@@ -105,11 +101,6 @@ namespace SilkUI
                 TypographyType.Overline => Overline,
                 _ => null,
             };
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
         }
     }
 
@@ -162,14 +153,5 @@ namespace SilkUI
         }
 
         public override TypographyTypeTokens Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 }

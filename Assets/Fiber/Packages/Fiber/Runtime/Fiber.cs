@@ -28,8 +28,6 @@ namespace Fiber
         public abstract void Update();
         public abstract void Cleanup();
         public abstract void SetVisible(bool visible);
-        protected override sealed void OnNotifySignalUpdate() { }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public interface IComponentAPI
@@ -159,8 +157,6 @@ namespace Fiber
 
         public abstract void RunIfDirty();
         public abstract void Cleanup();
-        protected override sealed void OnNotifySignalUpdate() { }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public abstract class Effect : BaseEffect
@@ -1364,6 +1360,7 @@ namespace Fiber
             Phase = FiberNodePhase.AddedToVirtualTree;
             IsEnabled = true;
             _virtualNodeType = VirtualNode?.Type ?? VirtualNodeType.Null;
+            _signalType = SignalType.FiberNode;
         }
 
         public void PushEffect(BaseEffect effect)
@@ -1573,13 +1570,12 @@ namespace Fiber
             }
         }
 
-        protected override sealed void OnNotifySignalUpdate()
+        protected override void OnNotifySignalUpdate()
         {
             // OPEN POINT: We could optimize this to see if already in queue.
             // Keeping it like this for now for simplicity reasons.
             _renderer.AddFiberNodeToUpdateQueue(this);
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
         public void TryDisposeVirtualNode()
         {

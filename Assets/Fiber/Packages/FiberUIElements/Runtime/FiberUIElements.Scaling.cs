@@ -120,9 +120,7 @@ namespace Fiber.UIElements
             return (dpWidth, dpHeight);
         }
 
-        protected override sealed void OnNotifySignalUpdate() { _dirtyBit++; }
         public override sealed ScreenSize Get() => _value;
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public class ScalingConfig

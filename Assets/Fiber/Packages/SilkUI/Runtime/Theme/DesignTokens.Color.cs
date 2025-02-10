@@ -107,11 +107,6 @@ namespace SilkUI
         }
 
         public override Role Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
         public Element GetElement(ElementType elementType)
         {
             return elementType switch
@@ -131,11 +126,6 @@ namespace SilkUI
         public bool IsElementEmpty(ElementType elementType)
         {
             return GetElement(elementType).IsEmpty();
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
         }
     }
 
@@ -213,15 +203,6 @@ namespace SilkUI
         }
 
         public override Modifiers<T> Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 
     public class ColorModifiers : Modifiers<StyleColor>

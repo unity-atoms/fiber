@@ -34,6 +34,7 @@ namespace Signals
             {
                 _onChange(_signal1.Get());
             }
+            _signalType = SignalType.Subscription;
         }
 
         protected override void OnNotifySignalUpdate()
@@ -53,7 +54,6 @@ namespace Signals
         {
             _signal1.UnregisterDependent(this);
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public class SignalSubscription<T1, T2> : BaseSignal, ISignalSubscription
@@ -86,6 +86,8 @@ namespace Signals
             {
                 _onChange(_signal1.Get(), _signal2.Get());
             }
+
+            _signalType = SignalType.Subscription;
         }
 
         protected override void OnNotifySignalUpdate()
@@ -108,7 +110,6 @@ namespace Signals
             _signal1.UnregisterDependent(this);
             _signal2.UnregisterDependent(this);
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public class SignalSubscription<T1, T2, T3> : BaseSignal, ISignalSubscription
@@ -147,6 +148,8 @@ namespace Signals
             {
                 _onChange(_signal1.Get(), _signal2.Get(), _signal3.Get());
             }
+
+            _signalType = SignalType.Subscription;
         }
 
         protected override void OnNotifySignalUpdate()
@@ -172,7 +175,6 @@ namespace Signals
             _signal2.UnregisterDependent(this);
             _signal3.UnregisterDependent(this);
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public class SignalSubscription<T1, T2, T3, T4> : BaseSignal, ISignalSubscription
@@ -217,6 +219,8 @@ namespace Signals
             {
                 _onChange(_signal1.Get(), _signal2.Get(), _signal3.Get(), _signal4.Get());
             }
+
+            _signalType = SignalType.Subscription;
         }
 
         protected override void OnNotifySignalUpdate()
@@ -245,7 +249,6 @@ namespace Signals
             _signal3.UnregisterDependent(this);
             _signal4.UnregisterDependent(this);
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     // Manager class that lets you subscribe to changes to signals.
