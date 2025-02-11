@@ -34,15 +34,6 @@ namespace SilkUI
         }
 
         public override SpacingTokens Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 
     public enum BorderWidthType
@@ -121,15 +112,6 @@ namespace SilkUI
         }
 
         public override BorderWidthTokens Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 
     public enum TextOutlineType
@@ -184,14 +166,5 @@ namespace SilkUI
         }
 
         public override TextOutlineTokens Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 }

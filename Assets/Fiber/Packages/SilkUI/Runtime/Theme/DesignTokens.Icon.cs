@@ -62,14 +62,5 @@ namespace SilkUI
         }
 
         public override IconTokens Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 }

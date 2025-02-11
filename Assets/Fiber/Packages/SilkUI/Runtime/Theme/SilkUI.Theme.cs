@@ -52,15 +52,6 @@ namespace SilkUI
         }
 
         public override Theme Get() => this;
-        public override bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
 
         public ColorModifiers GetColorModifiers(string role, ElementType elementType, string subRole, string variant = null)
         {

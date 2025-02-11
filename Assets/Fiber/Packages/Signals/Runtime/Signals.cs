@@ -36,6 +36,13 @@ namespace Signals
         T GetAt(int index);
     }
 
+    public enum SignalType
+    {
+        Default = 0,
+        FiberNode = 1,
+        Subscription = 2,
+    }
+
     [Serializable]
     public abstract class BaseSignal : ISignal
     {
@@ -44,6 +51,7 @@ namespace Signals
         [SerializeField]
         protected byte _dirtyBit = 0;
         public byte DirtyBit => _dirtyBit;
+        protected SignalType _signalType = SignalType.Default;
 
         ~BaseSignal()
         {
@@ -53,11 +61,17 @@ namespace Signals
             }
         }
 
-        protected abstract void OnNotifySignalUpdate();
+        protected virtual void OnNotifySignalUpdate() { }
 
         public void NotifySignalUpdate()
         {
-            OnNotifySignalUpdate();
+            _dirtyBit++;
+
+            if (_signalType != SignalType.Default)
+            {
+                OnNotifySignalUpdate();
+            }
+
             if (_dependents != null)
             {
                 if (_dependents is List<ISignal> listOfDependents)
@@ -107,42 +121,21 @@ namespace Signals
             }
         }
 
-        public abstract bool IsDirty(byte otherDirtyBit);
+        public bool IsDirty(byte otherDirtyBit)
+        {
+            return DirtyBit != otherDirtyBit;
+        }
+
+        public void SetDirty()
+        {
+            _dirtyBit++;
+        }
     }
 
     [Serializable]
     public abstract class BaseSignal<T> : BaseSignal, ISignal<T>
     {
         public abstract T Get();
-    }
-
-    public class NullableSignal<T, ST> : BaseSignal<T>
-        where ST : BaseSignal<T>
-    {
-        private ST _wrappedSignal;
-        public NullableSignal(ST wrappedSignal)
-        {
-            _wrappedSignal = wrappedSignal;
-            if (_wrappedSignal != null)
-            {
-                _wrappedSignal.RegisterDependent(this);
-            }
-        }
-
-        ~NullableSignal()
-        {
-            if (_wrappedSignal != null)
-            {
-                _wrappedSignal.UnregisterDependent(this);
-            }
-        }
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
-        public override sealed T Get() => _wrappedSignal == null ? default : _wrappedSignal.Get();
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     [Serializable]
@@ -166,12 +159,7 @@ namespace Signals
             _dependents = dependent;
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
         public override sealed T Get() => _value;
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     [Serializable]
@@ -216,12 +204,7 @@ namespace Signals
             }
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
         public override sealed T Get() => _value;
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     [Serializable]
@@ -349,16 +332,10 @@ namespace Signals
             return _list.GetEnumerator();
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
-
         public override sealed IList<T> Get()
         {
             return this;
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     // Tracks both mutations to the list and changes to the items in the list.
@@ -506,16 +483,10 @@ namespace Signals
             return _list.GetEnumerator();
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
-
         public override sealed IList<T> Get()
         {
             return this;
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     // Doesn't track changes of values, only mutations to the dictionary itself
@@ -596,16 +567,10 @@ namespace Signals
             return _dict.ContainsKey(key);
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
-
         public override sealed ShallowSignalDictionary<K, V> Get()
         {
             return this;
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
         public IEnumerator<KeyValuePair<K, V>> GetEnumerator() => _dict.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -729,16 +694,10 @@ namespace Signals
             return _dict.ContainsKey(key);
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
-
         public override sealed SignalDictionary<K, V> Get()
         {
             return this;
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
         public IEnumerator<KeyValuePair<K, V>> GetEnumerator() => _dict.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -885,16 +844,10 @@ namespace Signals
             return _list.Contains(value);
         }
 
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
-
         public override sealed IndexedSignalDictionary<K, V> Get()
         {
             return this;
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
         public IEnumerator GetEnumerator() => _dict.GetEnumerator();
     }

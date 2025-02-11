@@ -68,8 +68,6 @@ namespace Fiber.Router
                 var route = routeStack[routeStack.Count - 1];
                 return route;
             }
-
-            protected override bool ShouldSetDirty(Route newValue, Route previousValue) => !newValue.Equals(previousValue);
         }
 
         private class CurrentModalSignal_Implementation : ComputedSignal<Route, ModalRoute>
@@ -80,8 +78,6 @@ namespace Fiber.Router
                 var modalRoute = currentRoute.PeekModal();
                 return modalRoute;
             }
-
-            protected override bool ShouldSetDirty(ModalRoute newValue, ModalRoute previousValue) => !newValue.Equals(previousValue);
         }
 
         public RouteDefinition RouterTree { get; private set; }
@@ -320,16 +316,7 @@ namespace Fiber.Router
             return ModalRoute.Empty();
         }
 
-        public override sealed bool IsDirty(byte otherDirtyBit)
-        {
-            return otherDirtyBit != DirtyBit;
-        }
         public override Router Get() => this;
-
-        protected override sealed void OnNotifySignalUpdate()
-        {
-            _dirtyBit++;
-        }
     }
 
     public abstract class BaseRouteComponent : BaseComponent

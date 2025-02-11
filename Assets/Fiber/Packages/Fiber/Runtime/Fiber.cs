@@ -28,8 +28,6 @@ namespace Fiber
         public abstract void Update();
         public abstract void Cleanup();
         public abstract void SetVisible(bool visible);
-        protected override sealed void OnNotifySignalUpdate() { }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public interface IComponentAPI
@@ -159,8 +157,6 @@ namespace Fiber
 
         public abstract void RunIfDirty();
         public abstract void Cleanup();
-        protected override sealed void OnNotifySignalUpdate() { }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
     }
 
     public abstract class Effect : BaseEffect
@@ -187,15 +183,17 @@ namespace Fiber
     {
         private DynamicDependencies<T> _dynamicSignals;
         bool _hasRun = false;
+        private byte _lastDirtyBit;
 
         public DynamicEffect(IList<ISignal<T>> signals, bool runOnMount = true)
         {
-            _dynamicSignals = new DynamicDependencies<T>(this, signals, runOnMount);
+            _dynamicSignals = new DynamicDependencies<T>(this, signals);
+            _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
         }
 
         public sealed override void RunIfDirty()
         {
-            if (_dynamicSignals.IsDirty())
+            if (_lastDirtyBit != _dirtyBit)
             {
                 if (_hasRun)
                 {
@@ -203,6 +201,8 @@ namespace Fiber
                 }
                 Run(_dynamicSignals);
                 _hasRun = true;
+
+                _lastDirtyBit = _dirtyBit;
             }
         }
 
@@ -1364,6 +1364,7 @@ namespace Fiber
             Phase = FiberNodePhase.AddedToVirtualTree;
             IsEnabled = true;
             _virtualNodeType = VirtualNode?.Type ?? VirtualNodeType.Null;
+            _signalType = SignalType.FiberNode;
         }
 
         public void PushEffect(BaseEffect effect)
@@ -1573,13 +1574,12 @@ namespace Fiber
             }
         }
 
-        protected override sealed void OnNotifySignalUpdate()
+        protected override void OnNotifySignalUpdate()
         {
             // OPEN POINT: We could optimize this to see if already in queue.
             // Keeping it like this for now for simplicity reasons.
             _renderer.AddFiberNodeToUpdateQueue(this);
         }
-        public override sealed bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
 
         public void TryDisposeVirtualNode()
         {
@@ -1599,7 +1599,7 @@ namespace Fiber
 
     public class Renderer : IComponentAPI, IEffectAPI
     {
-        public const long DEFAULT_WORK_LOOP_TIME_BUDGET_MS = 5;
+        public const long DEFAULT_WORK_LOOP_TIME_BUDGET_MS = 4;
 
         private Queue<FiberNode> _renderQueue;
         private MixedQueue _operationsQueue;
