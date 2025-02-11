@@ -1599,7 +1599,7 @@ namespace Fiber
 
     public class Renderer : IComponentAPI, IEffectAPI
     {
-        public const long DEFAULT_WORK_LOOP_TIME_BUDGET_MS = 5;
+        public const long DEFAULT_WORK_LOOP_TIME_BUDGET_MS = 4;
 
         private Queue<FiberNode> _renderQueue;
         private MixedQueue _operationsQueue;

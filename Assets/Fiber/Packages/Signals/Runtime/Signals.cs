@@ -125,6 +125,11 @@ namespace Signals
         {
             return DirtyBit != otherDirtyBit;
         }
+
+        public void SetDirty()
+        {
+            _dirtyBit++;
+        }
     }
 
     [Serializable]
