@@ -121,6 +121,11 @@ namespace Signals
             }
         }
 
+        public void UnregisterAllDependents()
+        {
+            _dependents = null;
+        }
+
         public bool IsDirty(byte otherDirtyBit)
         {
             return DirtyBit != otherDirtyBit;
