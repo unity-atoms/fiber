@@ -710,7 +710,7 @@ namespace Fiber.UIElements
 
     public class TextFieldNativeNode : VisualElementNativeNode
     {
-        public virtual TextField TextFieldElementInstance { get; private set; }
+        public TextField TextFieldElementInstance { get; private set; }
         private WorkLoopSignalProp<string> _valueWorkLoopItem;
 
         public TextFieldNativeNode(TextFieldComponent virtualNode, TextField instance, UIElementsRendererExtension renderer) : base(virtualNode, instance, renderer)
@@ -760,7 +760,7 @@ namespace Fiber.UIElements
 
     public class ImageNativeNode : VisualElementNativeNode
     {
-        public virtual Image ImageInstance { get; private set; }
+        public Image ImageInstance { get; private set; }
         private WorkLoopSignalProp<Texture> _imageWorkLoopItem;
         private WorkLoopSignalProp<ScaleMode> _scaleModeWorkLoopItem;
         private WorkLoopSignalProp<Rect> _sourceRectWorkLoopItem;
@@ -918,7 +918,7 @@ namespace Fiber.UIElements
 
     public class TextElementNativeNode : VisualElementNativeNode
     {
-        public virtual TextElement TextElementInstance { get; private set; }
+        public TextElement TextElementInstance { get; private set; }
         private WorkLoopSignalProp<string> _textWorkLoopItem;
 
         public TextElementNativeNode(TextComponent virtualNode, TextElement instance, UIElementsRendererExtension renderer)
@@ -961,7 +961,7 @@ namespace Fiber.UIElements
 
     public class ScrollViewNativeNode : VisualElementNativeNode
     {
-        public virtual ScrollView ScrollViewInstance { get; private set; }
+        public ScrollView ScrollViewInstance { get; private set; }
 
         public ScrollViewNativeNode(ScrollViewComponent virtualNode, ScrollView instance, UIElementsRendererExtension renderer)
             : base(virtualNode, instance, renderer)
@@ -974,7 +974,7 @@ namespace Fiber.UIElements
 
     public class ButtonNativeNode : VisualElementNativeNode
     {
-        public virtual Button ButtonInstance { get; private set; }
+        public Button ButtonInstance { get; private set; }
         private WorkLoopSignalProp<string> _textWorkLoopItem;
 
         public ButtonNativeNode(ButtonComponent virtualNode, Button instance, UIElementsRendererExtension renderer)
@@ -1021,7 +1021,7 @@ namespace Fiber.UIElements
 
     public class VisualElementNativeNode : NativeNode
     {
-        public virtual VisualElement Instance { get; private set; }
+        public VisualElement Instance { get; private set; }
         private bool IsVisible_SetByFiber { get; set; }
         #region styles
         private WorkLoopSignalProp<Style> _styleWorkLoopItem;

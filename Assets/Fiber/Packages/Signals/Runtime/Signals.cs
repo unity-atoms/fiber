@@ -266,7 +266,7 @@ namespace Signals
             RegisterDependent(dependent);
         }
 
-        public virtual T this[int i]
+        public T this[int i]
         {
             get { return _list[i]; }
             set { _list[i] = value; NotifySignalUpdate(); }
@@ -277,7 +277,7 @@ namespace Signals
             return _list.IndexOf(item);
         }
 
-        public virtual void AddRange(IList<T> source)
+        public void AddRange(IList<T> source)
         {
             for (var i = 0; i < source.Count; ++i)
             {
@@ -286,33 +286,33 @@ namespace Signals
             NotifySignalUpdate();
         }
 
-        public virtual void Add(T item)
+        public void Add(T item)
         {
             _list.Add(item);
             NotifySignalUpdate();
         }
 
-        public virtual void Insert(int index, T item)
+        public void Insert(int index, T item)
         {
             _list.Insert(index, item);
             NotifySignalUpdate();
         }
 
-        public virtual bool Remove(T item)
+        public bool Remove(T item)
         {
             var result = _list.Remove(item);
             NotifySignalUpdate();
             return result;
         }
 
-        public virtual void RemoveAt(int index)
+        public void RemoveAt(int index)
         {
             var item = _list[index];
             _list.RemoveAt(index);
             NotifySignalUpdate();
         }
 
-        public virtual void Clear()
+        public void Clear()
         {
             _list.Clear();
             NotifySignalUpdate();
