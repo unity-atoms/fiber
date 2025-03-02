@@ -323,7 +323,7 @@ namespace Fiber.UIElements
         }
     }
 
-    public class UIPortalDestinationComponent : PortalDestinationBaseComponent, IBuiltInComponent
+    public class UIPortalDestinationComponent : PortalDestinationBaseComponent, IPortalDestination
     {
         private readonly Ref<VisualElement> _forwardRef;
         public UIPortalDestinationComponent(

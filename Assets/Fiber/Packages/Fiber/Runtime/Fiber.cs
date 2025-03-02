@@ -919,18 +919,9 @@ namespace Fiber
         public virtual void Dispose() { }
     }
 
-    public interface IBuiltInComponent
-    {
-        VirtualBody Render(FiberNode fiberNode);
-    }
-
-    public abstract class BaseContextProvider : VirtualNode, IBuiltInComponent
+    public abstract class BaseContextProvider : VirtualNode
     {
         public BaseContextProvider(VirtualBody children) : base(children, VirtualNodeType.Context) { }
-        public VirtualBody Render(FiberNode fiberNode)
-        {
-            return Children;
-        }
     }
 
     public class ContextProvider<C> : BaseContextProvider
@@ -1804,9 +1795,50 @@ namespace Fiber
                 var children = component.Render();
                 RenderChildren(this, fiberNode, children, _renderQueue);
             }
-            else if (fiberNode.VirtualNode is IBuiltInComponent builtInComponent)
+
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.Context || fiberNode.VirtualNode.Type == VirtualNodeType.Fragment)
             {
-                var children = builtInComponent.Render(fiberNode);
+                // These components doesn't render anything besides its children...
+                RenderChildren(this, fiberNode, fiberNode.VirtualNode.Children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.EnableComponent)
+            {
+                var children = ((EnableComponent)fiberNode.VirtualNode).Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.VisibleComponent)
+            {
+                var children = ((VisibleComponent)fiberNode.VirtualNode).Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.ActiveComponent)
+            {
+                var children = ((ActiveComponent)fiberNode.VirtualNode).Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.MountComponent)
+            {
+                var children = ((MountComponent)fiberNode.VirtualNode).Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.SwitchComponent)
+            {
+                var children = ((SwitchComponent)fiberNode.VirtualNode).Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.MatchComponent)
+            {
+                var children = ((MatchComponent)fiberNode.VirtualNode).Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode.Type == VirtualNodeType.PortalComponent)
+            {
+                var children = ((PortalComponent)fiberNode.VirtualNode).Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
+            else if (fiberNode.VirtualNode is IPortalDestination portalDestination)
+            {
+                var children = portalDestination.Render(fiberNode);
                 RenderChildren(this, fiberNode, children, _renderQueue);
             }
             else if (fiberNode.VirtualNode is BaseForComponent forComponent)
@@ -2586,13 +2618,9 @@ namespace Fiber
             return new FragmentComponent(children);
         }
 
-        private class FragmentComponent : VirtualNode, IBuiltInComponent
+        private class FragmentComponent : VirtualNode
         {
             public FragmentComponent(VirtualBody children) : base(children, VirtualNodeType.Fragment) { }
-            public VirtualBody Render(FiberNode fiberNode)
-            {
-                return Children;
-            }
         }
 
         public VirtualNode Enable(ISignal<bool> whenSignal, VirtualBody children)
@@ -2644,7 +2672,7 @@ namespace Fiber
             }
         }
 
-        private class EnableComponent : VirtualNode, IBuiltInComponent
+        private class EnableComponent : VirtualNode
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
@@ -2737,7 +2765,7 @@ namespace Fiber
             return new VisibleComponent(whenSignal, children);
         }
 
-        public class VisibleComponent : VirtualNode, IBuiltInComponent
+        public class VisibleComponent : VirtualNode
         {
             public ISignal<bool> IsVisible { get => _isVisibleSignal; }
             private readonly ISignal<bool> _whenSignal;
@@ -2810,7 +2838,7 @@ namespace Fiber
             return new ActiveComponent(whenSignal, children, this);
         }
 
-        private class ActiveComponent : VirtualNode, IBuiltInComponent
+        private class ActiveComponent : VirtualNode
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Renderer _renderer;
@@ -2839,7 +2867,7 @@ namespace Fiber
             return new MountComponent(whenSignal, children, _renderQueue, _operationsQueue, this);
         }
 
-        private class MountComponent : VirtualNode, IBuiltInComponent
+        private class MountComponent : VirtualNode
         {
             private readonly ISignal<bool> _whenSignal;
             private readonly Queue<FiberNode> _renderQueue;
@@ -3161,7 +3189,7 @@ namespace Fiber
             return new SwitchComponent(fallback, children, _renderQueue, _operationsQueue, this);
         }
 
-        private class SwitchComponent : VirtualNode, IBuiltInComponent
+        private class SwitchComponent : VirtualNode
         {
             private readonly VirtualBody _fallback;
             private readonly SignalList<ISignal<bool>> _matchSignals;
@@ -3330,7 +3358,7 @@ namespace Fiber
             return new MatchComponent(when, children);
         }
 
-        private class MatchComponent : VirtualNode, IBuiltInComponent
+        private class MatchComponent : VirtualNode
         {
             public ISignal<bool> When { get; private set; }
 
@@ -3351,7 +3379,7 @@ namespace Fiber
             return new PortalComponent(children: children, destinationId: destinationId, _operationsQueue);
         }
 
-        private class PortalComponent : VirtualNode, IBuiltInComponent
+        private class PortalComponent : VirtualNode
         {
             private readonly SignalProp<string> _destinationId;
             private readonly MixedQueue _operationsQueue;

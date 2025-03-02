@@ -59,7 +59,7 @@ namespace Fiber.GameObjects
         }
     }
 
-    public class GameObjectPortalDestinationComponent : PortalDestinationBaseComponent, IBuiltInComponent
+    public class GameObjectPortalDestinationComponent : PortalDestinationBaseComponent, IPortalDestination
     {
         public GameObjectPortalDestinationComponent(string id) : base(id) { }
         public VirtualBody Render(FiberNode fiberNode)
