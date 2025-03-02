@@ -65,7 +65,9 @@ public class DragAndDropExample : MonoBehaviour
                 return Colors.Gray.Value;
             }, delayedIsDragged, dragHandleElement.InteractiveElement.IsHovered);
 
-            // OPEN POINT: For some reason this change causes GC allocations 1.1KB + 1.5KB per frame when animation is playing (0.3s duration)
+            // OPEN POINT: For some reason this change causes GC allocations 1.1KB + 2.5KB per frame 
+            // when animation is playing (0.3s duration). This is however when profiling in the editor. 
+            // Seems like usage hints doens't matter either.
             var textColor = F.CreateComputedSignal<bool, bool, StyleColor>((isDragged, isHovered) =>
             {
                 if (isDragged)
