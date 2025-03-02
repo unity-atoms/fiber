@@ -4702,26 +4702,46 @@ namespace Fiber.UIElements
             else if (virtualNode is ScrollViewComponent scrollViewComponent)
             {
                 var scrollView = new ScrollView();
+                if (scrollViewComponent.UsageHints != UsageHints.None)
+                {
+                    scrollView.usageHints = scrollViewComponent.UsageHints;
+                }
                 return new ScrollViewNativeNode(scrollViewComponent, scrollView, this);
             }
             else if (virtualNode is TextFieldComponent textFieldComponent)
             {
                 var textField = new TextField();
+                if (textFieldComponent.UsageHints != UsageHints.None)
+                {
+                    textField.usageHints = textFieldComponent.UsageHints;
+                }
                 return new TextFieldNativeNode(textFieldComponent, textField, this);
             }
             else if (virtualNode is TextComponent textComponent)
             {
                 var textElement = new TextElement();
+                if (textComponent.UsageHints != UsageHints.None)
+                {
+                    textElement.usageHints = textComponent.UsageHints;
+                }
                 return new TextElementNativeNode(textComponent, textElement, this);
             }
             else if (virtualNode is ButtonComponent buttonComponent)
             {
                 var button = new Button();
+                if (buttonComponent.UsageHints != UsageHints.None)
+                {
+                    button.usageHints = buttonComponent.UsageHints;
+                }
                 return new ButtonNativeNode(buttonComponent, button, this);
             }
             else if (virtualNode is ImageComponent imageComponent)
             {
                 var image = new Image();
+                if (imageComponent.UsageHints != UsageHints.None)
+                {
+                    image.usageHints = imageComponent.UsageHints;
+                }
                 return new ImageNativeNode(imageComponent, image, this);
             }
             else if (virtualNode is ViewComponent viewComponent)

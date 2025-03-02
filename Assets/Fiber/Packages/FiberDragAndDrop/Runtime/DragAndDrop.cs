@@ -824,7 +824,7 @@ namespace Fiber.DragAndDrop
 
             // The portal destination transition might not happen directly, but we want to keep the dragged
             // element's position. We do that by: 
-            // 1) Making the parent of the dragged element always be kept in placen with the same dimensions.
+            // 1) Making the parent of the dragged element always be kept in place with the same dimensions.
             // 2) Absolute position the portal destination, set it's size to the same as that of the draggable,
             //  and move it to the exact same location as the draggable.
 

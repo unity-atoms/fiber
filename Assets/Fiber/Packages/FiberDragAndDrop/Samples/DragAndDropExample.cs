@@ -64,6 +64,8 @@ public class DragAndDropExample : MonoBehaviour
 
                 return Colors.Gray.Value;
             }, delayedIsDragged, dragHandleElement.InteractiveElement.IsHovered);
+
+            // OPEN POINT: For some reason this change causes GC allocations 1.1KB + 1.5KB per frame when animation is playing (0.3s duration)
             var textColor = F.CreateComputedSignal<bool, bool, StyleColor>((isDragged, isHovered) =>
             {
                 if (isDragged)
@@ -134,6 +136,7 @@ public class DragAndDropExample : MonoBehaviour
                 ),
                 children: F.Nodes(
                     F.View(
+                        usageHints: UsageHints.DynamicTransform,
                         style: new Style(
                             position: Position.Absolute,
                             width: dragDecaleSize,
@@ -154,6 +157,7 @@ public class DragAndDropExample : MonoBehaviour
                     ),
                     F.View(
                         pickingMode: PickingMode.Position,
+                        usageHints: UsageHints.DynamicColor,
                         style: new Style(
                             transitionProperty: new List<StylePropertyName>() { new("all") },
                             transitionDuration: new List<TimeValue>() { new(0.3f, TimeUnit.Second) },
@@ -179,8 +183,9 @@ public class DragAndDropExample : MonoBehaviour
                         children: F.Nodes(
                             F.Text(
                                 text: $"{_id}",
+                                usageHints: UsageHints.DynamicColor,
                                 style: new Style(
-                                    transitionProperty: new List<StylePropertyName>() { new("all") },
+                                    transitionProperty: new List<StylePropertyName>() { new("color") },
                                     transitionDuration: new List<TimeValue>() { new(0.3f, TimeUnit.Second) },
                                     color: textColor,
                                     unityFont: firaMono,
@@ -191,6 +196,7 @@ public class DragAndDropExample : MonoBehaviour
                             ),
                             F.Text(
                                 text: statusText,
+                                usageHints: UsageHints.DynamicColor,
                                 style: new Style(
                                     transitionProperty: new List<StylePropertyName>() { new("all") },
                                     transitionDuration: new List<TimeValue>() { new(0.3f, TimeUnit.Second) },
