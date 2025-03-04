@@ -18,12 +18,33 @@ namespace Signals
     [Serializable]
     public class DynamicDependencies<T>
     {
-        private readonly ISignal _dependent;
+        private ISignal _dependent;
         public List<ISignal<T>> Signals { get => _signals; }
-        private readonly List<ISignal<T>> _signals;
+        private List<ISignal<T>> _signals;
         private int _count = 0;
 
+        public DynamicDependencies() { }
+
         public DynamicDependencies(ISignal dependent, IList<ISignal<T>> dependencies = null)
+        {
+            Initialize(dependent, dependencies);
+        }
+
+        ~DynamicDependencies()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            for (int i = 0; i < _count; ++i)
+            {
+                _signals[i].UnregisterDependent(_dependent);
+            }
+            _signals.Clear();
+        }
+
+        public void Initialize(ISignal dependent, IList<ISignal<T>> dependencies = null)
         {
             _dependent = dependent;
             _signals = dependencies != null ? new(dependencies) : new();
@@ -32,13 +53,6 @@ namespace Signals
                 var signal = _signals[i];
                 signal.RegisterDependent(_dependent);
                 _count++;
-            }
-        }
-        ~DynamicDependencies()
-        {
-            for (int i = 0; i < _count; ++i)
-            {
-                _signals[i].UnregisterDependent(_dependent);
             }
         }
 

@@ -157,6 +157,7 @@ namespace Fiber
 
         public abstract void RunIfDirty();
         public abstract void Cleanup();
+        public virtual void Dispose() { }
     }
 
     public abstract class Effect : BaseEffect
@@ -181,14 +182,31 @@ namespace Fiber
 
     public abstract class DynamicEffect<T> : BaseEffect
     {
+        private static readonly ObjectPool<DynamicDependencies<T>> _dynamicDependenciesPool = new(10, (dynamicDeps) => { dynamicDeps.Dispose(); });
         private DynamicDependencies<T> _dynamicSignals;
         bool _hasRun = false;
         private byte _lastDirtyBit;
 
         public DynamicEffect(IList<ISignal<T>> signals, bool runOnMount = true)
         {
-            _dynamicSignals = new DynamicDependencies<T>(this, signals);
+            Initialize(signals, runOnMount);
+        }
+
+        public void Initialize(IList<ISignal<T>> signals, bool runOnMount = true)
+        {
+            if (_dynamicDependenciesPool.Count == 0)
+            {
+                _dynamicDependenciesPool.Preload(10);
+            }
+
+            _dynamicSignals = _dynamicDependenciesPool.Get();
+            _dynamicSignals.Initialize(this, signals);
             _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
+        }
+
+        public override void Dispose()
+        {
+            _dynamicDependenciesPool.Release(_dynamicSignals);
         }
 
         public sealed override void RunIfDirty()
@@ -1401,6 +1419,7 @@ namespace Fiber
             {
                 _effects[i].Cleanup();
                 _effects[i].UnregisterDependent(this);
+                _effects[i].Dispose();
             }
         }
 
@@ -3224,13 +3243,17 @@ namespace Fiber
 
             private class SwitchEffect : DynamicEffect<bool>
             {
-                private readonly VirtualBody _children;
-                private readonly VirtualBody _fallback;
-                private readonly FiberNode _fiberNode;
-                private readonly Queue<FiberNode> _renderQueue;
-                private readonly MixedQueue _operationsQueue;
-                private readonly Renderer _renderer;
-                private readonly Ref<int> _lastRenderedIndexRef;
+                public static readonly ObjectPool<SwitchEffect> Pool = new(10);
+
+                private VirtualBody _children;
+                private VirtualBody _fallback;
+                private FiberNode _fiberNode;
+                private Queue<FiberNode> _renderQueue;
+                private MixedQueue _operationsQueue;
+                private Renderer _renderer;
+                private Ref<int> _lastRenderedIndexRef;
+
+                public SwitchEffect() : base(null) { }
 
                 public SwitchEffect(
                     SignalList<ISignal<bool>> matchSignals,
@@ -3244,6 +3267,11 @@ namespace Fiber
                 )
                 : base(matchSignals, runOnMount: false)
                 {
+                    if (Pool.Count == 0)
+                    {
+                        Pool.Preload(10);
+                    }
+
                     _children = children;
                     _fallback = fallback;
                     _fiberNode = fiberNode;
@@ -3252,6 +3280,42 @@ namespace Fiber
                     _renderer = renderer;
                     _lastRenderedIndexRef = lastRenderedIndexRef;
                 }
+
+                public SwitchEffect Initialize(
+                    SignalList<ISignal<bool>> matchSignals,
+                    VirtualBody children,
+                    VirtualBody fallback,
+                    FiberNode fiberNode,
+                    Queue<FiberNode> renderQueue,
+                    MixedQueue operationsQueue,
+                    Renderer renderer,
+                    Ref<int> lastRenderedIndexRef
+                )
+                {
+                    base.Initialize(matchSignals, runOnMount: false);
+
+                    if (Pool.Count == 0)
+                    {
+                        Pool.Preload(10);
+                    }
+
+                    _children = children;
+                    _fallback = fallback;
+                    _fiberNode = fiberNode;
+                    _renderQueue = renderQueue;
+                    _operationsQueue = operationsQueue;
+                    _renderer = renderer;
+                    _lastRenderedIndexRef = lastRenderedIndexRef;
+
+                    return this;
+                }
+
+                public override void Dispose()
+                {
+                    base.Dispose();
+                    Pool.Release(this);
+                }
+
                 protected override void Run(DynamicDependencies<bool> matchSignals)
                 {
                     for (var i = 0; i < matchSignals.Count; ++i)
@@ -3332,7 +3396,7 @@ namespace Fiber
             public VirtualBody Render(FiberNode fiberNode)
             {
                 var _lastRenderedIndexRef = new Ref<int>(-1);
-                fiberNode.PushEffect(new SwitchEffect(_matchSignals, Children, _fallback, fiberNode, _renderQueue, _operationsQueue, _renderer, _lastRenderedIndexRef));
+                fiberNode.PushEffect(SwitchEffect.Pool.Get().Initialize(_matchSignals, Children, _fallback, fiberNode, _renderQueue, _operationsQueue, _renderer, _lastRenderedIndexRef));
 
                 for (var i = 0; i < Children.Count; ++i)
                 {
