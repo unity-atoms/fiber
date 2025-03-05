@@ -10,8 +10,12 @@ namespace FiberUtils
             list.Clear();
         }
 
-        public ListPool(int initialCapacity = 10) : base(initialCapacity, OnRelease)
+        public ListPool(int initialCapacity = 10, bool preload = false) : base(initialCapacity, OnRelease)
         {
+            if (preload)
+            {
+                Preload(initialCapacity);
+            }
         }
 
         public void Preload(int count)

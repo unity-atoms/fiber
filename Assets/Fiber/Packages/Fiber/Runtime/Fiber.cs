@@ -182,7 +182,6 @@ namespace Fiber
 
     public abstract class DynamicEffect<T> : BaseEffect
     {
-        private static readonly ObjectPool<DynamicDependencies<T>> _dynamicDependenciesPool = new(10, (dynamicDeps) => { dynamicDeps.Dispose(); });
         private DynamicDependencies<T> _dynamicSignals;
         bool _hasRun = false;
         private byte _lastDirtyBit;
@@ -194,19 +193,14 @@ namespace Fiber
 
         public void Initialize(IList<ISignal<T>> signals, bool runOnMount = true)
         {
-            if (_dynamicDependenciesPool.Count == 0)
-            {
-                _dynamicDependenciesPool.Preload(10);
-            }
-
-            _dynamicSignals = _dynamicDependenciesPool.Get();
+            _dynamicSignals = DynamicDependencies<T>.Pool.Get();
             _dynamicSignals.Initialize(this, signals);
             _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
         }
 
         public override void Dispose()
         {
-            _dynamicDependenciesPool.Release(_dynamicSignals);
+            DynamicDependencies<T>.Pool.Release(_dynamicSignals);
         }
 
         public sealed override void RunIfDirty()
@@ -3243,7 +3237,7 @@ namespace Fiber
 
             private class SwitchEffect : DynamicEffect<bool>
             {
-                public static readonly ObjectPool<SwitchEffect> Pool = new(10);
+                public static readonly ObjectPool<SwitchEffect> Pool = new(10, null, preload: true);
 
                 private VirtualBody _children;
                 private VirtualBody _fallback;
@@ -3267,11 +3261,6 @@ namespace Fiber
                 )
                 : base(matchSignals, runOnMount: false)
                 {
-                    if (Pool.Count == 0)
-                    {
-                        Pool.Preload(10);
-                    }
-
                     _children = children;
                     _fallback = fallback;
                     _fiberNode = fiberNode;
@@ -3293,11 +3282,6 @@ namespace Fiber
                 )
                 {
                     base.Initialize(matchSignals, runOnMount: false);
-
-                    if (Pool.Count == 0)
-                    {
-                        Pool.Preload(10);
-                    }
 
                     _children = children;
                     _fallback = fallback;

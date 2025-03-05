@@ -16,6 +16,16 @@ namespace Signals
         }
     }
 
+    public static class Pooling<T>
+    {
+        public static ListPool<ISignal<T>> ISignalListPool { get; private set; } = new(20);
+
+        static Pooling()
+        {
+            ISignalListPool.Preload(20);
+        }
+    }
+
     public interface ISignal
     {
         byte DirtyBit { get; }

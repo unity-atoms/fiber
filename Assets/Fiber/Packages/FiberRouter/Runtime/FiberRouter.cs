@@ -7,14 +7,8 @@ namespace Fiber.Router
 {
     public static class Pooling
     {
-        public static ObjectPool<OutletComponent> OutletComponentPool { get; private set; } = new(5);
-        public static ListPool<ModalRoute> ModalRouteListPool { get; private set; } = new(5);
-
-        static Pooling()
-        {
-            OutletComponentPool.Preload(5);
-            ModalRouteListPool.Preload(5);
-        }
+        public static ObjectPool<OutletComponent> OutletComponentPool { get; private set; } = new(5, null, preload: true);
+        public static ListPool<ModalRoute> ModalRouteListPool { get; private set; } = new(5, preload: true);
     }
 
     public static class BaseComponentExtensions

@@ -51,8 +51,12 @@ namespace FiberUtils
     public class ObjectPool<T> : BaseObjectPool<T>
         where T : new()
     {
-        public ObjectPool(int initialCapacity = 10, Action<T> onRelease = null) : base(initialCapacity, onRelease)
+        public ObjectPool(int initialCapacity = 10, Action<T> onRelease = null, bool preload = false) : base(initialCapacity, onRelease)
         {
+            if (preload)
+            {
+                Preload(initialCapacity);
+            }
         }
 
         public void Preload(int count)
