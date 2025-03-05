@@ -44,6 +44,8 @@ namespace FiberUtils
             _currentPool.Clear();
             _allObjectsCreated.Clear();
         }
+
+        public int Count => _currentPool.Count;
     }
 
     public class ObjectPool<T> : BaseObjectPool<T>
