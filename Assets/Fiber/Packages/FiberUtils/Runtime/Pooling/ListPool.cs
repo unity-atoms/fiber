@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FiberUtils
 {
-    public class ListPool<T> : BaseObjectPool<List<T>>
+    public class ListPool<T> : BaseObjectPool<List<T>>, IPreload
     {
         private static void OnRelease(List<T> list)
         {

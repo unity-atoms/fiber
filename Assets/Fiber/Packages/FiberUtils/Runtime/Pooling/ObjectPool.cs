@@ -48,7 +48,7 @@ namespace FiberUtils
         public int Count => _currentPool.Count;
     }
 
-    public class ObjectPool<T> : BaseObjectPool<T>
+    public class ObjectPool<T> : BaseObjectPool<T>, IPreload
         where T : new()
     {
         public ObjectPool(int initialCapacity = 10, Action<T> onRelease = null, bool preload = false) : base(initialCapacity, onRelease)
@@ -74,37 +74,6 @@ namespace FiberUtils
             if (_currentPool.Count == 0)
             {
                 var obj = new T();
-                _allObjectsCreated.Add(obj);
-                return obj;
-            }
-
-            return _currentPool.Dequeue();
-        }
-    }
-
-    public class ObjectPool<T, P1> : BaseObjectPool<T>
-    {
-        private readonly Func<P1, T> _createObject;
-        public ObjectPool(Func<P1, T> createObject, int initialCapacity = 10, Action<T> onRelease = null) : base(initialCapacity, onRelease)
-        {
-            _createObject = createObject;
-        }
-
-        public void Preload(int count, P1 p1)
-        {
-            for (int i = 0; i < count; i++)
-            {
-                var obj = _createObject(p1);
-                _currentPool.Enqueue(obj);
-                _allObjectsCreated.Add(obj);
-            }
-        }
-
-        public virtual T Get(P1 p1)
-        {
-            if (_currentPool.Count == 0)
-            {
-                var obj = _createObject(p1);
                 _allObjectsCreated.Add(obj);
                 return obj;
             }
