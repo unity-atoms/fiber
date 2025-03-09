@@ -55,9 +55,9 @@ namespace FiberUtils
         private void LateUpdate()
         {
             var deltaTime = Time.deltaTime;
-            for (var i = 0; i < _onUpdateHandlers.Count; ++i)
+            for (var i = 0; i < _onLateUpdateHandlers.Count; ++i)
             {
-                _onUpdateHandlers[i].Item2.Invoke(deltaTime);
+                _onLateUpdateHandlers[i].Item2.Invoke(deltaTime);
             }
         }
 

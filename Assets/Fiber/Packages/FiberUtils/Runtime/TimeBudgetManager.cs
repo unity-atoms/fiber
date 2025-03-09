@@ -20,12 +20,12 @@ namespace FiberUtils
             _timeBudgetMs = timeBudgetMs;
             _stopWatch = new Stopwatch();
 
-            _workLoopSubId = MonoBehaviourHelper.AddOnUpdateHandler(LateUpdate);
+            _workLoopSubId = MonoBehaviourHelper.AddOnLateUpdateHandler(LateUpdate);
         }
 
         ~TimeBudgetManager()
         {
-            MonoBehaviourHelper.RemoveOnUpdateHandler(_workLoopSubId);
+            MonoBehaviourHelper.RemoveOnLateUpdateHandler(_workLoopSubId);
         }
 
         private void LateUpdate(float deltaTime)
