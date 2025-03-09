@@ -1614,7 +1614,6 @@ namespace Fiber
         private FiberNode _root;
         private readonly bool _autonomousWorkLoop;
         private int _workLoopSubId = -1;
-        private readonly long _workLoopTimeBudgetMs;
 
         private bool _isUnmountingRoot = false;
         public bool IsMounted => _root != null;
@@ -1672,8 +1671,7 @@ namespace Fiber
         public Renderer(
             List<RendererExtension> rendererExtensions,
             Dictionary<Type, object> globals = null,
-            bool autonomousWorkLoop = true,
-            long workLoopTimeBudgetMs = DEFAULT_WORK_LOOP_TIME_BUDGET_MS
+            bool autonomousWorkLoop = true
         )
         {
             _renderQueue = new();
@@ -1683,7 +1681,6 @@ namespace Fiber
             _rendererExtensions = rendererExtensions;
             _contextsAPI = new();
             _autonomousWorkLoop = autonomousWorkLoop;
-            _workLoopTimeBudgetMs = workLoopTimeBudgetMs;
         }
 
         ~Renderer()
@@ -1751,10 +1748,9 @@ namespace Fiber
             WorkLoop();
         }
 
-        private Stopwatch _stopWatch = new Stopwatch();
         public void WorkLoop(bool immediatelyExecuteRemainingWork = false)
         {
-            _stopWatch.Restart();
+            TimeBudgetManager.Instance.StartTimer();
 
             do
             {
@@ -1784,9 +1780,9 @@ namespace Fiber
                 {
                     break;
                 }
-            } while (_stopWatch.ElapsedMilliseconds < _workLoopTimeBudgetMs || immediatelyExecuteRemainingWork);
+            } while (TimeBudgetManager.Instance.HasBudgetLeft() || immediatelyExecuteRemainingWork);
 
-            _stopWatch.Stop();
+            TimeBudgetManager.Instance.StopTimer();
         }
 
         FiberNode _currentFiberNode;
