@@ -8,22 +8,12 @@ namespace Signals
 {
     public static class Pooling
     {
-        public static ListPool<ISignal> ISignalListPool { get; private set; } = new(20);
-
-        static Pooling()
-        {
-            ISignalListPool.Preload(20);
-        }
+        public static ListPool<ISignal> ISignalListPool { get; private set; } = new(20, preload: true);
     }
 
     public static class Pooling<T>
     {
-        public static ListPool<ISignal<T>> ISignalListPool { get; private set; } = new(20);
-
-        static Pooling()
-        {
-            ISignalListPool.Preload(20);
-        }
+        public static ListPool<ISignal<T>> ISignalListPool { get; private set; } = new(20, preload: true);
     }
 
     public interface ISignal

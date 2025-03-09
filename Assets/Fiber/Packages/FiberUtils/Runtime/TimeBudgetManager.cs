@@ -52,5 +52,23 @@ namespace FiberUtils
         {
             return _stopWatch.ElapsedMilliseconds < _timeBudgetMs * percentage;
         }
+
+        public bool StartTimerIfNotAlreadytRunning()
+        {
+            if (!_stopWatch.IsRunning)
+            {
+                _stopWatch.Start();
+                return true;
+            }
+            return false;
+        }
+
+        public void StopTimerIf(bool condition)
+        {
+            if (condition)
+            {
+                _stopWatch.Stop();
+            }
+        }
     }
 }

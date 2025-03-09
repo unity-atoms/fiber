@@ -44,10 +44,10 @@ namespace FiberUtils
 
                 if (TimeBudgetManager.Instance.HasBudgetLeft(percentage: BUDGET_PERCENTAGE_THRESHOLD))
                 {
-                    TimeBudgetManager.Instance.StartTimer();
+                    var didStartTimer = TimeBudgetManager.Instance.StartTimerIfNotAlreadytRunning();
                     preloadScheduleData.Preloadable.Preload(preloadScheduleData.Count);
                     preloadedCount++;
-                    TimeBudgetManager.Instance.StopTimer();
+                    TimeBudgetManager.Instance.StopTimerIf(didStartTimer);
                 }
                 else
                 {
@@ -65,9 +65,9 @@ namespace FiberUtils
         {
             if (TimeBudgetManager.Instance.HasBudgetLeft(percentage: BUDGET_PERCENTAGE_THRESHOLD))
             {
-                TimeBudgetManager.Instance.StartTimer();
+                var didStartTimer = TimeBudgetManager.Instance.StartTimerIfNotAlreadytRunning();
                 preloadable.Preload(count);
-                TimeBudgetManager.Instance.StopTimer();
+                TimeBudgetManager.Instance.StopTimerIf(didStartTimer);
                 return;
             }
 

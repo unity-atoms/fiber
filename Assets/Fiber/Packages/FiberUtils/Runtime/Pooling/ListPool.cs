@@ -14,7 +14,7 @@ namespace FiberUtils
         {
             if (preload)
             {
-                Preload(initialCapacity);
+                PoolingPreloadScheduler.Instance.SchedulePreload(this, initialCapacity);
             }
         }
 
