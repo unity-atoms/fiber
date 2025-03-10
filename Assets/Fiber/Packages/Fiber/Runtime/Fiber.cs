@@ -6,6 +6,12 @@ using Signals;
 
 namespace Fiber
 {
+    public static class Pooling
+    {
+        // We know we are going to use a lot of virtual node lists, so we can preload them.
+        public static ListPool<VirtualNode> VirtualNodeListPool { get; private set; } = new(InitialCapacityConstants.LARGE, preload: true);
+    }
+
     public class Ref<T>
     {
         public T Current { get; set; }
@@ -33,7 +39,6 @@ namespace Fiber
     public interface IComponentAPI
     {
         public VirtualNode ContextProvider<C>(C value, VirtualBody children);
-        public VirtualNode ContextProvider<C>(VirtualBody children);
         public T GetGlobal<T>(bool throwIfNotFound = true);
         public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public NativeNode GetParentNativeNode();
@@ -200,7 +205,7 @@ namespace Fiber
 
         public override void Dispose()
         {
-            DynamicDependencies<T>.Pool.Release(_dynamicSignals);
+            DynamicDependencies<T>.Pool.TryRelease(_dynamicSignals);
         }
 
         public sealed override void RunIfDirty()
@@ -919,8 +924,8 @@ namespace Fiber
 
     public abstract class VirtualNode
     {
-        public VirtualBody Children { get; private set; }
-        public VirtualNodeType Type { get; private set; }
+        public VirtualBody Children { get; protected set; }
+        public VirtualNodeType Type { get; protected set; }
 
         public VirtualNode(VirtualBody children, VirtualNodeType type)
         {
@@ -931,61 +936,32 @@ namespace Fiber
         public virtual void Dispose() { }
     }
 
-    public class ContextProvider<C> : VirtualNode
+    public class ContextProviderNode<C> : VirtualNode
     {
+        public static readonly ObjectPool<ContextProviderNode<C>> Pool = new(InitialCapacityConstants.XS, onRelease: (contextProvider) =>
+        {
+            contextProvider.Value = default;
+            contextProvider.Children = VirtualBody.Empty;
+        }, preload: false);
+
         public C Value { get; private set; }
 
-        public ContextProvider(C value, VirtualBody children) : base(children, VirtualNodeType.Context)
+        public ContextProviderNode() : base(VirtualBody.Empty, VirtualNodeType.Context) { }
+        public ContextProviderNode(C value, VirtualBody children) : base(children, VirtualNodeType.Context)
         {
             Value = value;
         }
-    }
 
-    public abstract class BaseContext { }
-
-    public class Context<C> : BaseContext
-    {
-        C _initialValue;
-
-        public Context(C initialValue)
+        public ContextProviderNode<C> Initialize(C value, VirtualBody children)
         {
-            _initialValue = initialValue;
+            Value = value;
+            Children = children;
+            return this;
         }
 
-        public ContextProvider<C> ContextProvider(C value, VirtualBody children)
+        public override sealed void Dispose()
         {
-            return new ContextProvider<C>(value, children);
-        }
-
-        public ContextProvider<C> ContextProvider(VirtualBody children)
-        {
-            return new ContextProvider<C>(_initialValue, children);
-        }
-    }
-
-    public class ContextsAPI
-    {
-        private List<BaseContext> _contexts;
-
-        public ContextsAPI(List<BaseContext> contexts = null)
-        {
-            _contexts = contexts == null ? new List<BaseContext>() : contexts;
-        }
-
-        public Context<C> GetContext<C>()
-        {
-            for (var i = 0; i < _contexts.Count; ++i)
-            {
-                var context = _contexts[i];
-                if (context is Context<C> c)
-                {
-                    return c;
-                }
-            }
-
-            var newContext = new Context<C>(default);
-            _contexts.Add(newContext);
-            return newContext;
+            Pool.TryRelease(this);
         }
     }
 
@@ -1000,7 +976,6 @@ namespace Fiber
         public abstract VirtualBody Render();
 
         public VirtualNode ContextProvider<C>(C value, VirtualBody children) => Api.ContextProvider<C>(value, children);
-        public VirtualNode ContextProvider<C>(VirtualBody children) => Api.ContextProvider<C>(children);
         public T GetGlobal<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
         public T G<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
         public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
@@ -1581,13 +1556,15 @@ namespace Fiber
             _renderer.AddFiberNodeToUpdateQueue(this);
         }
 
-        public void TryDisposeVirtualNode()
+        public void DisposeVirtualNode()
         {
-            if (!_virtualNodeType.IsUsedByFiberAfterMount())
+            if (VirtualNode.Children.IsList)
             {
-                VirtualNode.Dispose();
-                VirtualNode = null;
+                Pooling.VirtualNodeListPool.TryRelease(VirtualNode.Children.VirtualNodes);
             }
+
+            VirtualNode.Dispose();
+            VirtualNode = null;
         }
     }
 
@@ -1606,7 +1583,6 @@ namespace Fiber
         private Queue<FiberNode> _fiberNodesToUpdate;
         protected List<RendererExtension> _rendererExtensions;
         private Dictionary<Type, object> _globals;
-        private ContextsAPI _contextsAPI;
         private FiberNode _root;
         private readonly bool _autonomousWorkLoop;
         private int _workLoopSubId = -1;
@@ -1675,7 +1651,6 @@ namespace Fiber
             _fiberNodesToUpdate = new();
             _globals = globals ?? new();
             _rendererExtensions = rendererExtensions;
-            _contextsAPI = new();
             _autonomousWorkLoop = autonomousWorkLoop;
         }
 
@@ -1865,9 +1840,13 @@ namespace Fiber
             }
 
             fiberNode.Phase = FiberNodePhase.Rendered;
+
             _operationsQueue.Enqueue(new MountOperation(node: fiberNode));
 
-            fiberNode.TryDisposeVirtualNode();
+            if (fiberNode.VirtualNode != null && !fiberNode.VirtualNode.Type.IsUsedByFiberAfterMount())
+            {
+                fiberNode.DisposeVirtualNode();
+            }
         }
 
         public static void RenderChildren(Renderer renderer, FiberNode fiberNode, VirtualBody children, Queue<FiberNode> renderQueue)
@@ -2241,19 +2220,14 @@ namespace Fiber
 
         public VirtualNode ContextProvider<C>(C value, VirtualBody children)
         {
-            return _contextsAPI.GetContext<C>().ContextProvider(value, children);
-        }
-
-        public VirtualNode ContextProvider<C>(VirtualBody children)
-        {
-            return _contextsAPI.GetContext<C>().ContextProvider(children);
+            return ContextProviderNode<C>.Pool.Get().Initialize(value, children);
         }
 
         public C GetContext<C>(FiberNode node, bool throwIfNotFound = true)
         {
             var fiberNode = node;
 
-            while (fiberNode != null && !(fiberNode.VirtualNode is ContextProvider<C>))
+            while (fiberNode != null && fiberNode.VirtualNode is not ContextProviderNode<C>)
             {
                 fiberNode = fiberNode.Parent;
             }
@@ -2266,7 +2240,7 @@ namespace Fiber
                 }
                 throw new Exception($"No context provider of type {typeof(C)} found.");
             }
-            return ((ContextProvider<C>)fiberNode.VirtualNode).Value;
+            return ((ContextProviderNode<C>)fiberNode.VirtualNode).Value;
         }
 
         public NativeNode GetParentNativeNode()
@@ -2758,7 +2732,7 @@ namespace Fiber
                 _enabledEffect = new EnabledEffect(_whenSignal, fiberNode, _renderer, _enableContext);
                 fiberNode.PushEffect(_enabledEffect);
 
-                return new ContextProvider<EnableContext>(
+                return _renderer.ContextProvider(
                     value: _enableContext,
                     children: Children
                 );
@@ -3289,7 +3263,7 @@ namespace Fiber
                 public override void Dispose()
                 {
                     base.Dispose();
-                    Pool.Release(this);
+                    Pool.TryRelease(this);
                 }
 
                 protected override void Run(DynamicDependencies<bool> matchSignals)

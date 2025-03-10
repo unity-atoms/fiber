@@ -29,7 +29,7 @@ namespace Signals
                 _signals[i].UnregisterDependent(_dependent);
             }
 
-            Pooling<T>.ISignalListPool.Release(_signals);
+            Pooling<T>.ISignalListPool.TryRelease(_signals);
         }
 
         public void Initialize(ISignal dependent, IList<ISignal<T>> dependencies = null)

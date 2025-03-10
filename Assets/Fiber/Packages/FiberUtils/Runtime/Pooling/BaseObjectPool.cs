@@ -17,7 +17,7 @@ namespace FiberUtils
             _onRelease = onRelease;
         }
 
-        public virtual void Release(T pooledObject)
+        public virtual void TryRelease(T pooledObject)
         {
             if (pooledObject == null)
             {
@@ -29,7 +29,7 @@ namespace FiberUtils
                 Debug.LogWarning("Tried to release an object that already was pooled.");
                 return;
             }
-            if (_allObjectsCreated.Contains(pooledObject))
+            if (!_allObjectsCreated.Contains(pooledObject))
             {
                 // Tried to release an object that was never owned by the pool.
                 // Not logging a warning here because this is a valid use case.

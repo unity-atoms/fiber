@@ -59,7 +59,7 @@ namespace Signals
         {
             if (_dependents != null && _dependents is List<ISignal> listOfDependents)
             {
-                Pooling.ISignalListPool.Release(listOfDependents);
+                Pooling.ISignalListPool.TryRelease(listOfDependents);
             }
         }
 
