@@ -931,15 +931,11 @@ namespace Fiber
         public virtual void Dispose() { }
     }
 
-    public abstract class BaseContextProvider : VirtualNode
-    {
-        public BaseContextProvider(VirtualBody children) : base(children, VirtualNodeType.Context) { }
-    }
-
-    public class ContextProvider<C> : BaseContextProvider
+    public class ContextProvider<C> : VirtualNode
     {
         public C Value { get; private set; }
-        public ContextProvider(C value, VirtualBody children) : base(children)
+
+        public ContextProvider(C value, VirtualBody children) : base(children, VirtualNodeType.Context)
         {
             Value = value;
         }
@@ -3233,7 +3229,7 @@ namespace Fiber
 
             private class SwitchEffect : DynamicEffect<bool>
             {
-                public static readonly ObjectPool<SwitchEffect> Pool = new(10, null, preload: true);
+                public static readonly ObjectPool<SwitchEffect> Pool = new(InitialCapacityConstants.SMALL, null, preload: false);
 
                 private VirtualBody _children;
                 private VirtualBody _fallback;

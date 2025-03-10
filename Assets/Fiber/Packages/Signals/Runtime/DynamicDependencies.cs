@@ -7,7 +7,7 @@ namespace Signals
     [Serializable]
     public class DynamicDependencies<T>
     {
-        public static readonly ObjectPool<DynamicDependencies<T>> Pool = new(10, (dynamicDeps) => { dynamicDeps.Dispose(); }, preload: true);
+        public static readonly ObjectPool<DynamicDependencies<T>> Pool = new(InitialCapacityConstants.SMALL, (dynamicDeps) => { dynamicDeps.Dispose(); }, preload: false);
 
         private ISignal _dependent;
         public List<ISignal<T>> Signals { get => _signals; }
@@ -83,5 +83,4 @@ namespace Signals
 
         public int Count => _count;
     }
-
 }

@@ -8,12 +8,14 @@ namespace Signals
 {
     public static class Pooling
     {
-        public static ListPool<ISignal> ISignalListPool { get; private set; } = new(20, preload: true);
+        // NOTE: This is an exception from the idea to never preload stuff that we are certain will be used. 
+        // The reason is that these will most likely be used a lot when working with more than a few signals.
+        public static ListPool<ISignal> ISignalListPool { get; private set; } = new(InitialCapacityConstants.MEDIUM, preload: true);
     }
 
     public static class Pooling<T>
     {
-        public static ListPool<ISignal<T>> ISignalListPool { get; private set; } = new(20, preload: true);
+        public static ListPool<ISignal<T>> ISignalListPool { get; private set; } = new(InitialCapacityConstants.SMALL, preload: false);
     }
 
     public interface ISignal
