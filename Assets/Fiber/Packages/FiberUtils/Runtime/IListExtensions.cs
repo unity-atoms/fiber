@@ -51,5 +51,13 @@ namespace FiberUtils
 
             list.Insert(newIndex, item);
         }
+
+        public static void AddRange<T>(this IList<T> list, IList<T> toAdd)
+        {
+            for (var i = 0; i < toAdd.Count; i++)
+            {
+                list.Add(toAdd[i]);
+            }
+        }
     }
 }

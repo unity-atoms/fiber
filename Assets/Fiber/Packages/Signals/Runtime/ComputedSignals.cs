@@ -814,6 +814,7 @@ namespace Signals
         protected abstract RT Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7);
     }
 
+
     public abstract class ComputedSignalsByKey<
         Key,
         KeysSignal,
@@ -855,6 +856,39 @@ namespace Signals
                 return !_signalsByKey.ContainsKey(key) ? default : _signalsByKey[key];
             }
             return _signalsByKey[key];
+        }
+
+        private class DerivedFromKeySignal : ComputedSignal<Key, ItemType>
+        {
+            ISignal<ItemType> _derivedSignal;
+            ComputedSignalsByKey<Key, KeysSignal, Keys, ItemSignal, ItemType> _computedSignalsByKey;
+
+            public DerivedFromKeySignal(ComputedSignalsByKey<Key, KeysSignal, Keys, ItemSignal, ItemType> computedSignalsByKey, ISignal<Key> signal1)
+                : base(signal1)
+            {
+                _computedSignalsByKey = computedSignalsByKey;
+
+                _derivedSignal?.RegisterDependent(this);
+            }
+            protected override ItemType Compute(Key value1)
+            {
+                var derivedSignal = _computedSignalsByKey.GetSignal(value1);
+
+                if (!ReferenceEquals(_derivedSignal, derivedSignal))
+                {
+                    _derivedSignal?.UnregisterDependent(this);
+                    derivedSignal?.RegisterDependent(this);
+
+                    _derivedSignal = derivedSignal;
+                }
+
+                return _derivedSignal != null ? _derivedSignal.Get() : default;
+            }
+        }
+
+        public ISignal<ItemType> GetDerivedSignal(ISignal<Key> keySignal)
+        {
+            return new DerivedFromKeySignal(this, keySignal);
         }
 
         protected override IndexedDictionary<Key, ItemSignal> Compute(Keys keys, DynamicDependencies<ItemType> dynamicDependencies)

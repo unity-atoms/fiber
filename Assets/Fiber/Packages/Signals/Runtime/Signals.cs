@@ -239,20 +239,18 @@ namespace Signals
     [Serializable]
     public class ShallowSignalList<T> : BaseSignalList<T>, IList<T>
     {
-        const int DEFAULT_CAPACITY = 5;
-
         public ShallowSignalList()
         {
-            _list = new(DEFAULT_CAPACITY);
-        }
+            _list = new(InitialCapacityConstants.XS);
 
+        }
         public ShallowSignalList(ISignal dependent = null)
         {
-            _list = new(DEFAULT_CAPACITY);
+            _list = new(InitialCapacityConstants.XS);
             RegisterDependent(dependent);
         }
 
-        public ShallowSignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
+        public ShallowSignalList(int capacity = InitialCapacityConstants.XS, ISignal dependent = null)
         {
             _list = new(capacity);
             RegisterDependent(dependent);
@@ -260,7 +258,7 @@ namespace Signals
 
         public ShallowSignalList(IList<T> source, ISignal dependent = null)
         {
-            _list = new(source?.Count ?? DEFAULT_CAPACITY);
+            _list = new(source?.Count ?? InitialCapacityConstants.XS);
             for (var i = 0; source != null && i < source.Count; ++i)
             {
                 _list.Add(source[i]);
@@ -350,20 +348,18 @@ namespace Signals
     public class SignalList<T> : BaseSignalList<T>, IList<T>
         where T : ISignal
     {
-        const int DEFAULT_CAPACITY = 5;
-
         public SignalList()
         {
-            _list = new(DEFAULT_CAPACITY);
+            _list = new(InitialCapacityConstants.XS);
         }
 
         public SignalList(ISignal dependent = null)
         {
-            _list = new(DEFAULT_CAPACITY);
+            _list = new(InitialCapacityConstants.XS);
             RegisterDependent(dependent);
         }
 
-        public SignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
+        public SignalList(int capacity = InitialCapacityConstants.XS, ISignal dependent = null)
         {
             _list = new(capacity);
             RegisterDependent(dependent);
@@ -371,7 +367,7 @@ namespace Signals
 
         public SignalList(IList<T> source, ISignal dependent = null)
         {
-            _list = new(source?.Count ?? DEFAULT_CAPACITY);
+            _list = new(source?.Count ?? InitialCapacityConstants.XS);
             for (var i = 0; source != null && i < source.Count; ++i)
             {
                 _list.Add(source[i]);
@@ -504,14 +500,12 @@ namespace Signals
 
         public int Count => _dict.Count;
 
-        const int DEFAULT_CAPACITY = 5;
-
         public ShallowSignalDictionary()
         {
-            _dict = new(DEFAULT_CAPACITY);
+            _dict = new(InitialCapacityConstants.XS);
         }
 
-        public ShallowSignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
+        public ShallowSignalDictionary(int capacity = InitialCapacityConstants.XS, ISignal dependent = null)
         {
             _dict = new(capacity);
             RegisterDependent(dependent);
