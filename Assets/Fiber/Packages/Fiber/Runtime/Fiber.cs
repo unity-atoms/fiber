@@ -2955,7 +2955,7 @@ namespace Fiber
             IEqualityComparer<KeyType> keyComparer = null
         )
         {
-            return new ForComponent<ItemType, KeyType>(each, renderItem, createItemKey, keyComparer, _renderQueue, _operationsQueue, this);
+            return new ForComponent<ItemType, KeyType>(each, renderItem, createItemKey, keyComparer ?? EqualityComparer<KeyType>.Default, _renderQueue, _operationsQueue, this);
         }
 
         public VirtualNode PooledFor<ItemType, KeyType>(
