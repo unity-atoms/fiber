@@ -7,14 +7,7 @@ namespace Fiber.Router
 {
     public static class Pooling
     {
-        public static ObjectPool<OutletComponent> OutletComponentPool { get; private set; } = new(5);
-        public static ListPool<ModalRoute> ModalRouteListPool { get; private set; } = new(5);
-
-        static Pooling()
-        {
-            OutletComponentPool.Preload(5);
-            ModalRouteListPool.Preload(5);
-        }
+        public static ListPool<ModalRoute> ModalRouteListPool { get; private set; } = new(InitialCapacityConstants.XS, preload: false);
     }
 
     public static class BaseComponentExtensions
@@ -30,7 +23,7 @@ namespace Fiber.Router
 
         public static OutletComponent Outlet(this BaseComponent component)
         {
-            return Pooling.OutletComponentPool.Get();
+            return OutletComponent.Pool.Get();
         }
 
         private static Dictionary<string, BaseSignal<bool>> _isRouteSignals = new();
@@ -213,7 +206,7 @@ namespace Fiber.Router
 
             var index = RouteStack.Count - 1;
             var route = RouteStack[index];
-            Pooling.ModalRouteListPool.Release(route.Modals);
+            Pooling.ModalRouteListPool.TryRelease(route.Modals);
             RouteStack.RemoveAt(index);
 
             // Pop intermediate layout routes
@@ -221,7 +214,7 @@ namespace Fiber.Router
             {
                 index = RouteStack.Count - 1;
                 route = RouteStack[index];
-                Pooling.ModalRouteListPool.Release(route.Modals);
+                Pooling.ModalRouteListPool.TryRelease(route.Modals);
                 RouteStack.RemoveAt(index);
             }
 

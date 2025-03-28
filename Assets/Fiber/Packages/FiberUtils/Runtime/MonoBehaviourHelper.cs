@@ -28,6 +28,7 @@ namespace FiberUtils
         }
 
         private List<ValueTuple<int, Action<float>>> _onUpdateHandlers = new();
+        private List<ValueTuple<int, Action<float>>> _onLateUpdateHandlers = new();
         private List<ValueTuple<int, Action>> _onFixedUpdateHandlers = new();
 
         private void Awake()
@@ -44,9 +45,19 @@ namespace FiberUtils
 
         private void Update()
         {
+            var deltaTime = Time.deltaTime;
             for (var i = 0; i < _onUpdateHandlers.Count; ++i)
             {
-                _onUpdateHandlers[i].Item2.Invoke(Time.deltaTime);
+                _onUpdateHandlers[i].Item2.Invoke(deltaTime);
+            }
+        }
+
+        private void LateUpdate()
+        {
+            var deltaTime = Time.deltaTime;
+            for (var i = 0; i < _onLateUpdateHandlers.Count; ++i)
+            {
+                _onLateUpdateHandlers[i].Item2.Invoke(deltaTime);
             }
         }
 
@@ -75,13 +86,34 @@ namespace FiberUtils
             }
             else
             {
-                UnityAction<Scene, LoadSceneMode> addHandler = null;
-                addHandler = (scene, mode) =>
+                void AddHandler(Scene scene, LoadSceneMode mode)
                 {
-                    SceneManager.sceneLoaded -= addHandler;
+                    SceneManager.sceneLoaded -= AddHandler;
                     Instance._onUpdateHandlers.Add(new ValueTuple<int, Action<float>>(id, handler));
-                };
-                SceneManager.sceneLoaded += addHandler;
+                }
+
+                SceneManager.sceneLoaded += AddHandler;
+            }
+
+            return id;
+        }
+
+        public static int AddOnLateUpdateHandler(Action<float> handler)
+        {
+            var id = _idGenerator.NextId();
+            if (Application.isPlaying)
+            {
+                Instance._onLateUpdateHandlers.Add(new ValueTuple<int, Action<float>>(id, handler));
+            }
+            else
+            {
+                void AddHandler(Scene scene, LoadSceneMode mode)
+                {
+                    SceneManager.sceneLoaded -= AddHandler;
+                    Instance._onLateUpdateHandlers.Add(new ValueTuple<int, Action<float>>(id, handler));
+                }
+
+                SceneManager.sceneLoaded += AddHandler;
             }
 
             return id;
@@ -96,13 +128,13 @@ namespace FiberUtils
             }
             else
             {
-                UnityAction<Scene, LoadSceneMode> addHandler = null;
-                addHandler = (scene, mode) =>
+                void AddHandler(Scene scene, LoadSceneMode mode)
                 {
-                    SceneManager.sceneLoaded -= addHandler;
+                    SceneManager.sceneLoaded -= AddHandler;
                     Instance._onFixedUpdateHandlers.Add(new ValueTuple<int, Action>(id, handler));
-                };
-                SceneManager.sceneLoaded += addHandler;
+                }
+
+                SceneManager.sceneLoaded += AddHandler;
             }
 
             return id;
@@ -117,6 +149,21 @@ namespace FiberUtils
                     if (_instance._onUpdateHandlers[i].Item1 == id)
                     {
                         _instance._onUpdateHandlers.RemoveAt(i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public static void RemoveOnLateUpdateHandler(int id)
+        {
+            if (_instance != null)
+            {
+                for (var i = _instance._onLateUpdateHandlers.Count - 1; i >= 0; --i)
+                {
+                    if (_instance._onLateUpdateHandlers[i].Item1 == id)
+                    {
+                        _instance._onLateUpdateHandlers.RemoveAt(i);
                         break;
                     }
                 }

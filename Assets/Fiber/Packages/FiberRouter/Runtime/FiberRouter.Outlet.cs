@@ -1,3 +1,5 @@
+using FiberUtils;
+
 namespace Fiber.Router
 {
     public class OutletContext
@@ -19,15 +21,8 @@ namespace Fiber.Router
 
     public class OutletComponent : BaseComponent
     {
-        private readonly bool _isPooled = false;
-        public OutletComponent() : base()
-        {
-            _isPooled = true;
-        }
-        public OutletComponent(bool isPooled) : base()
-        {
-            _isPooled = isPooled;
-        }
+        public static ObjectPool<OutletComponent> Pool { get; private set; } = new(InitialCapacityConstants.XS, null, preload: false);
+
         public override VirtualBody Render()
         {
             var outletContext = GetContext<OutletContext>();
@@ -36,10 +31,7 @@ namespace Fiber.Router
 
         public sealed override void Dispose()
         {
-            if (_isPooled)
-            {
-                Pooling.OutletComponentPool.Release(this);
-            }
+            Pool.TryRelease(this);
         }
     }
 }

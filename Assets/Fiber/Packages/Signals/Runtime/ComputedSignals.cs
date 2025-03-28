@@ -16,69 +16,6 @@ namespace Signals
     }
 
     [Serializable]
-    public class DynamicDependencies<T>
-    {
-        private readonly ISignal _dependent;
-        public List<ISignal<T>> Signals { get => _signals; }
-        private readonly List<ISignal<T>> _signals;
-        private int _count = 0;
-
-        public DynamicDependencies(ISignal dependent, IList<ISignal<T>> dependencies = null)
-        {
-            _dependent = dependent;
-            _signals = dependencies != null ? new(dependencies) : new();
-            for (var i = 0; i < _signals.Count; ++i)
-            {
-                var signal = _signals[i];
-                signal.RegisterDependent(_dependent);
-                _count++;
-            }
-        }
-        ~DynamicDependencies()
-        {
-            for (int i = 0; i < _count; ++i)
-            {
-                _signals[i].UnregisterDependent(_dependent);
-            }
-        }
-
-        public void Add<ST>(ST signal) where ST : ISignal<T>
-        {
-            _signals.Add(signal);
-            signal.RegisterDependent(_dependent);
-            _count++;
-        }
-
-        public void Remove<ST>(ST signal) where ST : ISignal<T>
-        {
-            var index = _signals.IndexOf(signal);
-            signal.UnregisterDependent(_dependent);
-            _signals.RemoveAt(index);
-            _count--;
-        }
-
-        public void RemoveAt(int index)
-        {
-            var signal = _signals[index];
-            signal.UnregisterDependent(_dependent);
-            _signals.RemoveAt(index);
-            _count--;
-        }
-
-        public T GetValue(int index)
-        {
-            return _signals[index].Get();
-        }
-
-        public ISignal<T> GetSignal(int index)
-        {
-            return _signals[index];
-        }
-
-        public int Count => _count;
-    }
-
-    [Serializable]
     public abstract class DynamicComputedSignal<DT, RT> : BaseComputedSignal<RT>
     {
         protected readonly DynamicDependencies<DT> _dynamicDependencies;
@@ -877,6 +814,7 @@ namespace Signals
         protected abstract RT Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7);
     }
 
+
     public abstract class ComputedSignalsByKey<
         Key,
         KeysSignal,
@@ -918,6 +856,39 @@ namespace Signals
                 return !_signalsByKey.ContainsKey(key) ? default : _signalsByKey[key];
             }
             return _signalsByKey[key];
+        }
+
+        private class DerivedFromKeySignal : ComputedSignal<Key, ItemType>
+        {
+            ISignal<ItemType> _derivedSignal;
+            ComputedSignalsByKey<Key, KeysSignal, Keys, ItemSignal, ItemType> _computedSignalsByKey;
+
+            public DerivedFromKeySignal(ComputedSignalsByKey<Key, KeysSignal, Keys, ItemSignal, ItemType> computedSignalsByKey, ISignal<Key> signal1)
+                : base(signal1)
+            {
+                _computedSignalsByKey = computedSignalsByKey;
+
+                _derivedSignal?.RegisterDependent(this);
+            }
+            protected override ItemType Compute(Key value1)
+            {
+                var derivedSignal = _computedSignalsByKey.GetSignal(value1);
+
+                if (!ReferenceEquals(_derivedSignal, derivedSignal))
+                {
+                    _derivedSignal?.UnregisterDependent(this);
+                    derivedSignal?.RegisterDependent(this);
+
+                    _derivedSignal = derivedSignal;
+                }
+
+                return _derivedSignal != null ? _derivedSignal.Get() : default;
+            }
+        }
+
+        public ISignal<ItemType> GetDerivedSignal(ISignal<Key> keySignal)
+        {
+            return new DerivedFromKeySignal(this, keySignal);
         }
 
         protected override IndexedDictionary<Key, ItemSignal> Compute(Keys keys, DynamicDependencies<ItemType> dynamicDependencies)

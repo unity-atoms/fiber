@@ -1989,7 +1989,7 @@ namespace Fiber.UIElements
             throw new Exception($"Trying to add child of unknown type {node.VirtualNode.GetType()} at index {index}.");
         }
 
-        // We are currently just ignoring the destroyInstance flag here, since it's not relevant for UI Elements
+        // NOTE: We are currently just ignoring the destroyInstance flag here, since it's not relevant for UI Elements
         public override void RemoveChild(FiberNode node, bool destroyInstance)
         {
             if (node.NativeNode is VisualElementNativeNode visualElementChildNode)
