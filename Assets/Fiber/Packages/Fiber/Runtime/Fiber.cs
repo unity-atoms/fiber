@@ -237,7 +237,7 @@ namespace Fiber
     public abstract class Effect<T1> : BaseEffect
     {
         protected ISignal<T1> _signal1;
-        protected byte _lastDirtyBit1;
+        protected byte _lastDirtyBit;
         bool _hasRun = false;
 
         public Effect(
@@ -245,8 +245,9 @@ namespace Fiber
             bool runOnMount = true
         )
         {
+            _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
+
             _signal1 = signal1;
-            _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
             _signal1.RegisterDependent(this);
         }
 
@@ -257,7 +258,7 @@ namespace Fiber
 
         public sealed override void RunIfDirty()
         {
-            if (_signal1.IsDirty(_lastDirtyBit1))
+            if (_lastDirtyBit != _dirtyBit)
             {
                 if (_hasRun)
                 {
@@ -265,7 +266,7 @@ namespace Fiber
                 }
 
                 Run(_signal1.Get());
-                _lastDirtyBit1 = _signal1.DirtyBit;
+                _lastDirtyBit = _signal1.DirtyBit;
 
                 _hasRun = true;
             }
@@ -277,9 +278,9 @@ namespace Fiber
     public abstract class Effect<T1, T2> : BaseEffect
     {
         protected ISignal<T1> _signal1;
-        protected byte _lastDirtyBit1;
         protected ISignal<T2> _signal2;
-        protected byte _lastDirtyBit2;
+        protected byte _lastDirtyBit;
+
         bool _hasRun = false;
 
         public Effect(
@@ -288,10 +289,10 @@ namespace Fiber
             bool runOnMount = true
         )
         {
+            _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
+
             _signal1 = signal1;
             _signal2 = signal2;
-            _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
-            _lastDirtyBit2 = (byte)(signal2.DirtyBit - (runOnMount ? 1 : 0));
             _signal1.RegisterDependent(this);
             _signal2.RegisterDependent(this);
         }
@@ -304,7 +305,7 @@ namespace Fiber
 
         public sealed override void RunIfDirty()
         {
-            if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2))
+            if (_lastDirtyBit != _dirtyBit)
             {
                 if (_hasRun)
                 {
@@ -312,9 +313,8 @@ namespace Fiber
                 }
 
                 Run(_signal1.Get(), _signal2.Get());
-                _lastDirtyBit1 = _signal1.DirtyBit;
-                _lastDirtyBit2 = _signal2.DirtyBit;
 
+                _lastDirtyBit = _dirtyBit;
                 _hasRun = true;
             }
         }
@@ -325,11 +325,9 @@ namespace Fiber
     public abstract class Effect<T1, T2, T3> : BaseEffect
     {
         protected ISignal<T1> _signal1;
-        protected byte _lastDirtyBit1;
         protected ISignal<T2> _signal2;
-        protected byte _lastDirtyBit2;
         protected ISignal<T3> _signal3;
-        protected byte _lastDirtyBit3;
+        protected byte _lastDirtyBit;
         bool _hasRun = false;
 
         public Effect(
@@ -339,12 +337,11 @@ namespace Fiber
             bool runOnMount = true
         )
         {
+            _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
+
             _signal1 = signal1;
             _signal2 = signal2;
             _signal3 = signal3;
-            _lastDirtyBit1 = (byte)(signal1.DirtyBit - (runOnMount ? 1 : 0));
-            _lastDirtyBit2 = (byte)(signal2.DirtyBit - (runOnMount ? 1 : 0));
-            _lastDirtyBit3 = (byte)(signal3.DirtyBit - (runOnMount ? 1 : 0));
             _signal1.RegisterDependent(this);
             _signal2.RegisterDependent(this);
             _signal3.RegisterDependent(this);
@@ -359,7 +356,7 @@ namespace Fiber
 
         public sealed override void RunIfDirty()
         {
-            if (_signal1.IsDirty(_lastDirtyBit1) || _signal2.IsDirty(_lastDirtyBit2) || _signal3.IsDirty(_lastDirtyBit3))
+            if (_dirtyBit != _lastDirtyBit)
             {
                 if (_hasRun)
                 {
@@ -367,10 +364,8 @@ namespace Fiber
                 }
 
                 Run(_signal1.Get(), _signal2.Get(), _signal3.Get());
-                _lastDirtyBit1 = _signal1.DirtyBit;
-                _lastDirtyBit2 = _signal2.DirtyBit;
-                _lastDirtyBit3 = _signal3.DirtyBit;
 
+                _lastDirtyBit = _dirtyBit;
                 _hasRun = true;
             }
         }

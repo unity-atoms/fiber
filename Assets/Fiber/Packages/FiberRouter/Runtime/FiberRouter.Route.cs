@@ -9,7 +9,6 @@ namespace Fiber.Router
         // Copied from BaseSignal.cs
         #region Signal
         public byte DirtyBit { get; set; }
-        public readonly bool IsDirty(byte otherDirtyBit) => DirtyBit != otherDirtyBit;
         public readonly Route Get() => this;
         private object _dependents;
         public readonly void NotifySignalUpdate()
