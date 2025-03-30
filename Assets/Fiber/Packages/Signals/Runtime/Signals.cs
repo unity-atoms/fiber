@@ -22,7 +22,6 @@ namespace Signals
         void RegisterDependent(ISignal dependant);
         void UnregisterDependent(ISignal dependant);
         void NotifySignalUpdate();
-        bool IsDirty(byte otherDirtyBit);
     }
 
     public interface ISignal<T> : ISignal
@@ -126,11 +125,6 @@ namespace Signals
             _dependents = null;
         }
 
-        public bool IsDirty(byte otherDirtyBit)
-        {
-            return DirtyBit != otherDirtyBit;
-        }
-
         public void SetDirty()
         {
             _dirtyBit++;
@@ -224,11 +218,6 @@ namespace Signals
         public T GetAt(int index)
         {
             return _list[index];
-        }
-
-        public override int GetHashCode()
-        {
-            return _list.GetHashCode();
         }
     }
 
