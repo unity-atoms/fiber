@@ -3257,13 +3257,10 @@ namespace Fiber
                 {
                     for (var i = 0; i < instanceKeys.Count; i++)
                     {
-                        var instanceKey = instanceKeys[i];
-                        for (var y = 0; y < instanceKeyItemKeyPairs.Count; y++)
+                        var instanceKey = instanceKeys.GetAt(i);
+                        if (!ContainsInstanceKey(instanceKey, instanceKeyItemKeyPairs))
                         {
-                            if (instanceKeyItemKeyPairs[y].Item1 == instanceKey)
-                            {
-                                return instanceKey;
-                            }
+                            return instanceKey;
                         }
                     }
 
@@ -3283,24 +3280,24 @@ namespace Fiber
                     return instanceKeys.Count + 1; // Next available id
                 }
 
-                static int FindInstanceKey(KeyType itemId, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, IEqualityComparer<KeyType> keyComparer)
+                static int FindInstanceKey(KeyType itemKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, IEqualityComparer<KeyType> keyComparer)
                 {
                     for (var i = 0; i < instanceKeyItemKeyPairs.Count; i++)
                     {
-                        if (keyComparer.Equals(instanceKeyItemKeyPairs[i].Item2, itemId))
+                        if (keyComparer.Equals(instanceKeyItemKeyPairs.GetAt(i).Item2, itemKey))
                         {
-                            return instanceKeyItemKeyPairs[i].Item1;
+                            return instanceKeyItemKeyPairs.GetAt(i).Item1;
                         }
                     }
 
                     return -1;
                 }
 
-                static bool ContainsInstanceKey(KeyType itemKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, IEqualityComparer<KeyType> keyComparer)
+                static bool ContainsItemKey(KeyType itemKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, IEqualityComparer<KeyType> keyComparer)
                 {
                     for (var i = 0; i < instanceKeyItemKeyPairs.Count; i++)
                     {
-                        if (keyComparer.Equals(instanceKeyItemKeyPairs[i].Item2, itemKey))
+                        if (keyComparer.Equals(instanceKeyItemKeyPairs.GetAt(i).Item2, itemKey))
                         {
                             return true;
                         }
@@ -3326,9 +3323,9 @@ namespace Fiber
                 protected sealed override void Run(IList<ItemType> items)
                 {
                     // Remove instance keys for items no longer existing
-                    for (var i = 0; i < _instanceKeyItemKeyPairs.Count; i++)
+                    for (var i = _instanceKeyItemKeyPairs.Count - 1; i >= 0; --i)
                     {
-                        var pair = _instanceKeyItemKeyPairs[i];
+                        var pair = _instanceKeyItemKeyPairs.GetAt(i);
 
                         if (!ContainsItemOfKey(pair.Item2, items, _keyComparer))
                         {
@@ -3341,14 +3338,14 @@ namespace Fiber
                     {
                         var item = items[i];
                         var itemKey = _createItemKey(item, i);
-                        if (!ContainsInstanceKey(itemKey, _instanceKeyItemKeyPairs, _keyComparer))
+                        if (!ContainsItemKey(itemKey, _instanceKeyItemKeyPairs, _keyComparer))
                         {
-                            var unusedKey = GetUnusedInstanceKey(_instanceKeys, _instanceKeyItemKeyPairs);
-                            if (unusedKey == -1)
+                            var unusedInstanceKey = GetUnusedInstanceKey(_instanceKeys, _instanceKeyItemKeyPairs);
+                            if (unusedInstanceKey == -1)
                             {
-                                unusedKey = ExpandPool(_instanceKeys);
+                                unusedInstanceKey = ExpandPool(_instanceKeys);
                             }
-                            _instanceKeyItemKeyPairs.Add((unusedKey, itemKey));
+                            _instanceKeyItemKeyPairs.Add((unusedInstanceKey, itemKey));
                         }
                     }
 
@@ -3383,17 +3380,17 @@ namespace Fiber
                 public sealed override void Cleanup() { }
             }
 
-            static ItemType FindItem(int instanceKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, ISignalList<ItemType> items, Func<ItemType, int, KeyType> createItemKey)
+            static ItemType FindItem(int instanceKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, ISignalList<ItemType> items, Func<ItemType, int, KeyType> createItemKey, IEqualityComparer<KeyType> keyComparer)
             {
                 for (var i = 0; i < instanceKeyItemKeyPairs.Count; ++i)
                 {
-                    if (instanceKeyItemKeyPairs[i].Item1 == instanceKey)
+                    if (instanceKeyItemKeyPairs.GetAt(i).Item1 == instanceKey)
                     {
                         for (var y = 0; y < items.Count; ++y)
                         {
                             var item = items.GetAt(y);
                             var itemKey = createItemKey(item, i);
-                            if (itemKey.Equals(instanceKeyItemKeyPairs[i].Item2))
+                            if (keyComparer.Equals(itemKey, instanceKeyItemKeyPairs.GetAt(i).Item2))
                             {
                                 return item;
                             }
@@ -3410,7 +3407,7 @@ namespace Fiber
             {
                 for (var i = 0; i < instanceKeyItemKeyPairs.Count; i++)
                 {
-                    if (instanceKeyItemKeyPairs[i].Item1 == instanceKey)
+                    if (instanceKeyItemKeyPairs.GetAt(i).Item1 == instanceKey)
                     {
                         return true;
                     }
@@ -3441,7 +3438,7 @@ namespace Fiber
 
                         var item = _renderer.CreateComputedSignal((pairs) =>
                         {
-                            return FindItem(instanceKey, instanceKeyItemKeyPairs, _eachSignal, _createItemKey);
+                            return FindItem(instanceKey, instanceKeyItemKeyPairs, _eachSignal, _createItemKey, _keyComparer);
                         }, instanceKeyItemKeyPairs);
 
 
