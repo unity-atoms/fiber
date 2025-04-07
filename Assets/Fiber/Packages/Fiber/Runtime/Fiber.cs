@@ -3269,15 +3269,21 @@ namespace Fiber
 
                 static int ExpandPool(ShallowSignalList<int> instanceKeys)
                 {
-
                     var currentCount = instanceKeys.Count;
+                    if (currentCount == 0)
+                    {
+                        instanceKeys.Add(0);
+                        instanceKeys.Add(1);
+                        return 0;
+                    }
+
                     var doubleCount = currentCount * 2;
                     for (var i = currentCount + 1; i < doubleCount; ++i)
                     {
                         instanceKeys.Add(i);
                     }
 
-                    return instanceKeys.Count + 1; // Next available id
+                    return currentCount + 1; // Next available id
                 }
 
                 static int FindInstanceKey(KeyType itemKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, IEqualityComparer<KeyType> keyComparer)
