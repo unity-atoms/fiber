@@ -29,6 +29,7 @@ namespace Signals
                 _signals[i].UnregisterDependent(_dependent);
             }
 
+            _count = 0;
             Pooling<T>.ISignalListPool.TryRelease(_signals);
         }
 
