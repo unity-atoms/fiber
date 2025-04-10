@@ -12,7 +12,6 @@ namespace Signals
         private ISignal _dependent;
         public List<ISignal<T>> Signals { get => _signals; }
         private List<ISignal<T>> _signals;
-        private int _count = 0;
 
         // Used when pooling
         public DynamicDependencies() { }
@@ -24,12 +23,11 @@ namespace Signals
 
         public void Dispose()
         {
-            for (int i = 0; i < _count; ++i)
+            for (int i = 0; i < _signals.Count; ++i)
             {
                 _signals[i].UnregisterDependent(_dependent);
             }
 
-            _count = 0;
             Pooling<T>.ISignalListPool.TryRelease(_signals);
         }
 
@@ -45,7 +43,6 @@ namespace Signals
             {
                 var signal = _signals[i];
                 signal.RegisterDependent(_dependent);
-                _count++;
             }
         }
 
@@ -53,7 +50,6 @@ namespace Signals
         {
             _signals.Add(signal);
             signal.RegisterDependent(_dependent);
-            _count++;
         }
 
         public void Remove<ST>(ST signal) where ST : ISignal<T>
@@ -61,7 +57,6 @@ namespace Signals
             var index = _signals.IndexOf(signal);
             signal.UnregisterDependent(_dependent);
             _signals.RemoveAt(index);
-            _count--;
         }
 
         public void RemoveAt(int index)
@@ -69,7 +64,6 @@ namespace Signals
             var signal = _signals[index];
             signal.UnregisterDependent(_dependent);
             _signals.RemoveAt(index);
-            _count--;
         }
 
         public T GetValue(int index)
@@ -82,6 +76,6 @@ namespace Signals
             return _signals[index];
         }
 
-        public int Count => _count;
+        public int Count => _signals.Count;
     }
 }
