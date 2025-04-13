@@ -6,6 +6,12 @@ using Signals;
 
 namespace Fiber
 {
+    public static class Pooling
+    {
+        // We know we are going to use a lot of virtual node lists, so we can preload them.
+        public static ListPool<VirtualNode> VirtualNodeListPool { get; private set; } = new(InitialCapacityConstants.LARGE, preload: true);
+    }
+
     public class Ref<T>
     {
         public T Current { get; set; }
@@ -33,7 +39,6 @@ namespace Fiber
     public interface IComponentAPI
     {
         public VirtualNode ContextProvider<C>(C value, VirtualBody children);
-        public VirtualNode ContextProvider<C>(VirtualBody children);
         public T GetGlobal<T>(bool throwIfNotFound = true);
         public C GetContext<C>(FiberNode node, bool throwIfNotFound = true);
         public NativeNode GetParentNativeNode();
@@ -118,8 +123,8 @@ namespace Fiber
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
             Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) where ItemType : ISignal;
-        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal;
-        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null);
+        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS) where ItemType : ISignal;
+        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS);
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null);
         public StaticSignal<T> CreateStaticSignal<T>(T value);
         public Ref<T> CreateRef<T>(T initialValue = default);
@@ -132,7 +137,15 @@ namespace Fiber
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
             Func<ItemType, int, VirtualNode> renderItem,
-            Func<ItemType, int, KeyType> createItemKey
+            Func<ItemType, int, KeyType> createItemKey,
+            IEqualityComparer<KeyType> keyComparer = null
+        );
+        public VirtualNode PooledFor<ItemType, KeyType>(
+            ISignalList<ItemType> each,
+            Func<BaseSignal<ItemType>, int, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey,
+            int initialCapacity = InitialCapacityConstants.XS,
+            IEqualityComparer<KeyType> keyComparer = null
         );
         public VirtualNode Switch(VirtualBody fallback, VirtualBody children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children);
@@ -157,6 +170,7 @@ namespace Fiber
 
         public abstract void RunIfDirty();
         public abstract void Cleanup();
+        public virtual void Dispose() { }
     }
 
     public abstract class Effect : BaseEffect
@@ -187,8 +201,19 @@ namespace Fiber
 
         public DynamicEffect(IList<ISignal<T>> signals, bool runOnMount = true)
         {
-            _dynamicSignals = new DynamicDependencies<T>(this, signals);
+            Initialize(signals, runOnMount);
+        }
+
+        public void Initialize(IList<ISignal<T>> signals, bool runOnMount = true)
+        {
+            _dynamicSignals = DynamicDependencies<T>.Pool.Get();
+            _dynamicSignals.Initialize(this, signals);
             _lastDirtyBit = (byte)(_dirtyBit - (runOnMount ? 1 : 0));
+        }
+
+        public override void Dispose()
+        {
+            DynamicDependencies<T>.Pool.TryRelease(_dynamicSignals);
         }
 
         public sealed override void RunIfDirty()
@@ -902,8 +927,8 @@ namespace Fiber
 
     public abstract class VirtualNode
     {
-        public VirtualBody Children { get; private set; }
-        public VirtualNodeType Type { get; private set; }
+        public VirtualBody Children { get; protected set; }
+        public VirtualNodeType Type { get; protected set; }
 
         public VirtualNode(VirtualBody children, VirtualNodeType type)
         {
@@ -914,65 +939,32 @@ namespace Fiber
         public virtual void Dispose() { }
     }
 
-    public abstract class BaseContextProvider : VirtualNode
+    public class ContextProviderNode<C> : VirtualNode
     {
-        public BaseContextProvider(VirtualBody children) : base(children, VirtualNodeType.Context) { }
-    }
+        public static readonly ObjectPool<ContextProviderNode<C>> Pool = new(InitialCapacityConstants.XS, onRelease: (contextProvider) =>
+        {
+            contextProvider.Value = default;
+            contextProvider.Children = VirtualBody.Empty;
+        }, preload: false);
 
-    public class ContextProvider<C> : BaseContextProvider
-    {
         public C Value { get; private set; }
-        public ContextProvider(C value, VirtualBody children) : base(children)
+
+        public ContextProviderNode() : base(VirtualBody.Empty, VirtualNodeType.Context) { }
+        public ContextProviderNode(C value, VirtualBody children) : base(children, VirtualNodeType.Context)
         {
             Value = value;
         }
-    }
 
-    public abstract class BaseContext { }
-
-    public class Context<C> : BaseContext
-    {
-        C _initialValue;
-
-        public Context(C initialValue)
+        public ContextProviderNode<C> Initialize(C value, VirtualBody children)
         {
-            _initialValue = initialValue;
+            Value = value;
+            Children = children;
+            return this;
         }
 
-        public ContextProvider<C> ContextProvider(C value, VirtualBody children)
+        public override sealed void Dispose()
         {
-            return new ContextProvider<C>(value, children);
-        }
-
-        public ContextProvider<C> ContextProvider(VirtualBody children)
-        {
-            return new ContextProvider<C>(_initialValue, children);
-        }
-    }
-
-    public class ContextsAPI
-    {
-        private List<BaseContext> _contexts;
-
-        public ContextsAPI(List<BaseContext> contexts = null)
-        {
-            _contexts = contexts == null ? new List<BaseContext>() : contexts;
-        }
-
-        public Context<C> GetContext<C>()
-        {
-            for (var i = 0; i < _contexts.Count; ++i)
-            {
-                var context = _contexts[i];
-                if (context is Context<C> c)
-                {
-                    return c;
-                }
-            }
-
-            var newContext = new Context<C>(default);
-            _contexts.Add(newContext);
-            return newContext;
+            Pool.TryRelease(this);
         }
     }
 
@@ -987,7 +979,6 @@ namespace Fiber
         public abstract VirtualBody Render();
 
         public VirtualNode ContextProvider<C>(C value, VirtualBody children) => Api.ContextProvider<C>(value, children);
-        public VirtualNode ContextProvider<C>(VirtualBody children) => Api.ContextProvider<C>(children);
         public T GetGlobal<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
         public T G<T>(bool throwIfNotFound = true) => Api.GetGlobal<T>(throwIfNotFound);
         public C GetContext<C>(bool throwIfNotFound = true) => Api.GetContext<C>(FiberNode, throwIfNotFound: throwIfNotFound);
@@ -1083,8 +1074,8 @@ namespace Fiber
         public ISignalList<ItemType> CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(
             Action<T1, T2, T3, T4, T5, T6, T7, IList<ItemType>> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
-        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal => Api.CreateSignalList<ItemType>(dependent);
-        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null) => Api.CreateShallowSignalList<ItemType>(dependent);
+        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS) where ItemType : ISignal => Api.CreateSignalList<ItemType>(dependent, initialCapacity);
+        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS) => Api.CreateShallowSignalList<ItemType>(dependent, initialCapacity);
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null) => Api.CreateSignal<T>(value, dependent);
         public StaticSignal<T> CreateStaticSignal<T>(T value) => Api.CreateStaticSignal<T>(value);
         public Ref<T> CreateRef<T>(T initialValue = default) => Api.CreateRef<T>(initialValue);
@@ -1097,10 +1088,21 @@ namespace Fiber
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
             Func<ItemType, int, VirtualNode> renderItem,
-            Func<ItemType, int, KeyType> createItemKey
+            Func<ItemType, int, KeyType> createItemKey,
+            IEqualityComparer<KeyType> keyComparer = null
         )
         {
-            return Api.For<ItemType, KeyType>(each, renderItem, createItemKey);
+            return Api.For<ItemType, KeyType>(each, renderItem, createItemKey, keyComparer);
+        }
+        public VirtualNode PooledFor<ItemType, KeyType>(
+            ISignalList<ItemType> each,
+            Func<BaseSignal<ItemType>, int, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey,
+            int initialCapacity = InitialCapacityConstants.XS,
+            IEqualityComparer<KeyType> keyComparer = null
+        )
+        {
+            return Api.PooledFor<ItemType, KeyType>(each, renderItem, createItemKey, initialCapacity, keyComparer);
         }
         public VirtualNode Switch(VirtualBody fallback, VirtualBody children) => Api.Switch(fallback, children);
         public VirtualNode Match(ISignal<bool> when, VirtualBody children) => Api.Match(when, children);
@@ -1396,6 +1398,7 @@ namespace Fiber
             {
                 _effects[i].Cleanup();
                 _effects[i].UnregisterDependent(this);
+                _effects[i].Dispose();
             }
         }
 
@@ -1567,13 +1570,15 @@ namespace Fiber
             _renderer.AddFiberNodeToUpdateQueue(this);
         }
 
-        public void TryDisposeVirtualNode()
+        public void DisposeVirtualNode()
         {
-            if (!_virtualNodeType.IsUsedByFiberAfterMount())
+            if (VirtualNode.Children.IsList)
             {
-                VirtualNode.Dispose();
-                VirtualNode = null;
+                Pooling.VirtualNodeListPool.TryRelease(VirtualNode.Children.VirtualNodes);
             }
+
+            VirtualNode.Dispose();
+            VirtualNode = null;
         }
     }
 
@@ -1592,11 +1597,9 @@ namespace Fiber
         private Queue<FiberNode> _fiberNodesToUpdate;
         protected List<RendererExtension> _rendererExtensions;
         private Dictionary<Type, object> _globals;
-        private ContextsAPI _contextsAPI;
         private FiberNode _root;
         private readonly bool _autonomousWorkLoop;
         private int _workLoopSubId = -1;
-        private readonly long _workLoopTimeBudgetMs;
 
         private bool _isUnmountingRoot = false;
         public bool IsMounted => _root != null;
@@ -1654,8 +1657,7 @@ namespace Fiber
         public Renderer(
             List<RendererExtension> rendererExtensions,
             Dictionary<Type, object> globals = null,
-            bool autonomousWorkLoop = true,
-            long workLoopTimeBudgetMs = DEFAULT_WORK_LOOP_TIME_BUDGET_MS
+            bool autonomousWorkLoop = true
         )
         {
             _renderQueue = new();
@@ -1663,9 +1665,7 @@ namespace Fiber
             _fiberNodesToUpdate = new();
             _globals = globals ?? new();
             _rendererExtensions = rendererExtensions;
-            _contextsAPI = new();
             _autonomousWorkLoop = autonomousWorkLoop;
-            _workLoopTimeBudgetMs = workLoopTimeBudgetMs;
         }
 
         ~Renderer()
@@ -1733,10 +1733,9 @@ namespace Fiber
             WorkLoop();
         }
 
-        private Stopwatch _stopWatch = new Stopwatch();
         public void WorkLoop(bool immediatelyExecuteRemainingWork = false)
         {
-            _stopWatch.Restart();
+            TimeBudgetManager.Instance.StartTimer();
 
             do
             {
@@ -1766,9 +1765,9 @@ namespace Fiber
                 {
                     break;
                 }
-            } while (_stopWatch.ElapsedMilliseconds < _workLoopTimeBudgetMs || immediatelyExecuteRemainingWork);
+            } while (TimeBudgetManager.Instance.HasBudgetLeft() || immediatelyExecuteRemainingWork);
 
-            _stopWatch.Stop();
+            TimeBudgetManager.Instance.StopTimer();
         }
 
         FiberNode _currentFiberNode;
@@ -1843,6 +1842,11 @@ namespace Fiber
                 // corresponding keys.
                 forComponent.Render(fiberNode);
             }
+            else if (fiberNode.VirtualNode is BaseForWithVirtualBodyComponent forWithVirtualBodyComponent)
+            {
+                var children = forWithVirtualBodyComponent.Render(fiberNode);
+                RenderChildren(this, fiberNode, children, _renderQueue);
+            }
             else
             {
                 fiberNode.NativeNode = CreateNativeNode(fiberNode);
@@ -1855,9 +1859,13 @@ namespace Fiber
             }
 
             fiberNode.Phase = FiberNodePhase.Rendered;
+
             _operationsQueue.Enqueue(new MountOperation(node: fiberNode));
 
-            fiberNode.TryDisposeVirtualNode();
+            if (fiberNode.VirtualNode != null && !fiberNode.VirtualNode.Type.IsUsedByFiberAfterMount())
+            {
+                fiberNode.DisposeVirtualNode();
+            }
         }
 
         public static void RenderChildren(Renderer renderer, FiberNode fiberNode, VirtualBody children, Queue<FiberNode> renderQueue)
@@ -2231,19 +2239,14 @@ namespace Fiber
 
         public VirtualNode ContextProvider<C>(C value, VirtualBody children)
         {
-            return _contextsAPI.GetContext<C>().ContextProvider(value, children);
-        }
-
-        public VirtualNode ContextProvider<C>(VirtualBody children)
-        {
-            return _contextsAPI.GetContext<C>().ContextProvider(children);
+            return ContextProviderNode<C>.Pool.Get().Initialize(value, children);
         }
 
         public C GetContext<C>(FiberNode node, bool throwIfNotFound = true)
         {
             var fiberNode = node;
 
-            while (fiberNode != null && !(fiberNode.VirtualNode is ContextProvider<C>))
+            while (fiberNode != null && fiberNode.VirtualNode is not ContextProviderNode<C>)
             {
                 fiberNode = fiberNode.Parent;
             }
@@ -2256,7 +2259,7 @@ namespace Fiber
                 }
                 throw new Exception($"No context provider of type {typeof(C)} found.");
             }
-            return ((ContextProvider<C>)fiberNode.VirtualNode).Value;
+            return ((ContextProviderNode<C>)fiberNode.VirtualNode).Value;
         }
 
         public NativeNode GetParentNativeNode()
@@ -2555,14 +2558,14 @@ namespace Fiber
             return new InlineComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         }
 
-        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null) where ItemType : ISignal
+        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS) where ItemType : ISignal
         {
-            return new SignalList<ItemType>(dependent);
+            return new SignalList<ItemType>(initialCapacity, dependent);
         }
 
-        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null)
+        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS)
         {
-            return new ShallowSignalList<ItemType>(dependent);
+            return new ShallowSignalList<ItemType>(initialCapacity, dependent);
         }
 
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null)
@@ -2748,7 +2751,7 @@ namespace Fiber
                 _enabledEffect = new EnabledEffect(_whenSignal, fiberNode, _renderer, _enableContext);
                 fiberNode.PushEffect(_enabledEffect);
 
-                return new ContextProvider<EnableContext>(
+                return _renderer.ContextProvider(
                     value: _enableContext,
                     children: Children
                 );
@@ -2943,10 +2946,22 @@ namespace Fiber
         public VirtualNode For<ItemType, KeyType>(
             ISignalList<ItemType> each,
             Func<ItemType, int, VirtualNode> renderItem,
-            Func<ItemType, int, KeyType> createItemKey
+            Func<ItemType, int, KeyType> createItemKey,
+            IEqualityComparer<KeyType> keyComparer = null
         )
         {
-            return new ForComponent<ItemType, KeyType>(each, renderItem, createItemKey, _renderQueue, _operationsQueue, this);
+            return new ForComponent<ItemType, KeyType>(each, renderItem, createItemKey, keyComparer ?? EqualityComparer<KeyType>.Default, _renderQueue, _operationsQueue, this);
+        }
+
+        public VirtualNode PooledFor<ItemType, KeyType>(
+            ISignalList<ItemType> each,
+            Func<BaseSignal<ItemType>, int, VirtualNode> renderItem,
+            Func<ItemType, int, KeyType> createItemKey,
+            int initialCapacity = InitialCapacityConstants.XS,
+            IEqualityComparer<KeyType> keyComparer = null
+        )
+        {
+            return new PooledForComponent<ItemType, KeyType>(each, renderItem, createItemKey, keyComparer, initialCapacity, this);
         }
 
         // Class is only added in order to be able to type check when rendering (not possible with generic class)
@@ -2956,11 +2971,18 @@ namespace Fiber
             public abstract void Render(FiberNode fiberNode);
         }
 
+        private abstract class BaseForWithVirtualBodyComponent : VirtualNode
+        {
+            protected BaseForWithVirtualBodyComponent() : base(VirtualBody.Empty, VirtualNodeType.ForComponent) { }
+            public abstract VirtualBody Render(FiberNode fiberNode);
+        }
+
         private class ForComponent<ItemType, KeyType> : BaseForComponent
         {
             private readonly ISignalList<ItemType> _eachSignal;
             private readonly Func<ItemType, int, VirtualNode> _renderItem;
             private readonly Func<ItemType, int, KeyType> _createItemKey;
+            private readonly IEqualityComparer<KeyType> _keyComparer;
             private readonly Queue<FiberNode> _renderQueue;
             private readonly MixedQueue _operationsQueue;
             private readonly Renderer _renderer;
@@ -2971,6 +2993,7 @@ namespace Fiber
                 ISignalList<ItemType> eachSignal,
                 Func<ItemType, int, VirtualNode> renderItem,
                 Func<ItemType, int, KeyType> createItemKey,
+                IEqualityComparer<KeyType> keyComparer,
                 Queue<FiberNode> renderQueue,
                 MixedQueue operationsQueue,
                 Renderer renderer
@@ -2979,6 +3002,7 @@ namespace Fiber
                 _eachSignal = eachSignal;
                 _renderItem = renderItem;
                 _createItemKey = createItemKey;
+                _keyComparer = keyComparer;
                 _renderQueue = renderQueue;
                 _operationsQueue = operationsQueue;
                 _renderer = renderer;
@@ -2991,6 +3015,7 @@ namespace Fiber
             {
                 private readonly Func<ItemType, int, VirtualNode> _renderItem;
                 private readonly Func<ItemType, int, KeyType> _createItemKey;
+                private readonly IEqualityComparer<KeyType> _keyComparer;
                 private readonly Queue<FiberNode> _renderQueue;
                 private readonly MixedQueue _operationsQueue;
                 private readonly Renderer _renderer;
@@ -3004,6 +3029,7 @@ namespace Fiber
                     ISignalList<ItemType> eachSignal,
                     Func<ItemType, int, VirtualNode> renderItem,
                     Func<ItemType, int, KeyType> createItemKey,
+                    IEqualityComparer<KeyType> keyComparer,
                     Queue<FiberNode> renderQueue,
                     MixedQueue operationsQueue,
                     Renderer renderer,
@@ -3015,6 +3041,7 @@ namespace Fiber
                 {
                     _renderItem = renderItem;
                     _createItemKey = createItemKey;
+                    _keyComparer = keyComparer;
                     _renderQueue = renderQueue;
                     _operationsQueue = operationsQueue;
                     _renderer = renderer;
@@ -3072,7 +3099,7 @@ namespace Fiber
                             for (var j = 0; j < _previousFiberNodes.Count; ++j)
                             {
                                 var previousChild = _previousFiberNodes[j];
-                                if (_currentIdToKeyMap[previousChild.Id].Equals(key))
+                                if (_keyComparer.Equals(_currentIdToKeyMap[previousChild.Id], key))
                                 {
                                     currentChildOfKey = previousChild;
                                     currentChildOfKeyIndex = j;
@@ -3144,7 +3171,7 @@ namespace Fiber
                 _currentIdToKeyMap.Clear();
 
 
-                fiberNode.PushEffect(new ForEffect(_eachSignal, _renderItem, _createItemKey, _renderQueue, _operationsQueue, _renderer, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
+                fiberNode.PushEffect(new ForEffect(_eachSignal, _renderItem, _createItemKey, _keyComparer, _renderQueue, _operationsQueue, _renderer, fiberNode, _currentKeyToIdMap, _currentIdToKeyMap));
 
                 var each = _eachSignal.Get();
                 FiberNode previousChildFiberNode = null;
@@ -3176,6 +3203,258 @@ namespace Fiber
                         _currentIdToKeyMap.Add(childFiberNode.Id, key);
                     }
                 }
+            }
+        }
+
+        private class PooledForComponent<ItemType, KeyType> : BaseForWithVirtualBodyComponent
+        {
+            private readonly ISignalList<ItemType> _eachSignal;
+            private readonly Func<BaseSignal<ItemType>, int, VirtualNode> _renderItem;
+            private readonly Func<ItemType, int, KeyType> _createItemKey;
+            private readonly IEqualityComparer<KeyType> _keyComparer;
+            private readonly int _initialCapacity;
+            private readonly Renderer _renderer;
+
+            public PooledForComponent(
+                ISignalList<ItemType> eachSignal,
+                Func<BaseSignal<ItemType>, int, VirtualNode> renderItem,
+                Func<ItemType, int, KeyType> createItemKey,
+                IEqualityComparer<KeyType> keyComparer,
+                int initialCapacity,
+                Renderer renderer
+            ) : base()
+            {
+                _eachSignal = eachSignal;
+                _renderItem = renderItem;
+                _createItemKey = createItemKey;
+                _keyComparer = keyComparer ?? EqualityComparer<KeyType>.Default;
+                _initialCapacity = initialCapacity;
+                _renderer = renderer;
+            }
+
+            private class SyncInstancesAndItemsEffect : Effect<IList<ItemType>>
+            {
+                readonly ShallowSignalList<ValueTuple<int, KeyType>> _instanceKeyItemKeyPairs;
+                readonly ShallowSignalList<int> _instanceKeys;
+                readonly Func<ItemType, int, KeyType> _createItemKey;
+                readonly IEqualityComparer<KeyType> _keyComparer;
+
+                public SyncInstancesAndItemsEffect(
+                    ISignalList<ItemType> items,
+                    ShallowSignalList<int> instanceKeys,
+                    ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs,
+                    Func<ItemType, int, KeyType> createItemKey,
+                    IEqualityComparer<KeyType> keyComparer
+                ) : base(items, runOnMount: true)
+                {
+                    _instanceKeys = instanceKeys;
+                    _instanceKeyItemKeyPairs = instanceKeyItemKeyPairs;
+                    _createItemKey = createItemKey;
+                    _keyComparer = keyComparer;
+                }
+
+                static int GetUnusedInstanceKey(ShallowSignalList<int> instanceKeys, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs)
+                {
+                    for (var i = 0; i < instanceKeys.Count; i++)
+                    {
+                        var instanceKey = instanceKeys.GetAt(i);
+                        if (!ContainsInstanceKey(instanceKey, instanceKeyItemKeyPairs))
+                        {
+                            return instanceKey;
+                        }
+                    }
+
+                    return -1;
+                }
+
+                static int ExpandPool(ShallowSignalList<int> instanceKeys)
+                {
+                    var currentCount = instanceKeys.Count;
+                    if (currentCount == 0)
+                    {
+                        instanceKeys.Add(0);
+                        instanceKeys.Add(1);
+                        return 0;
+                    }
+
+                    var doubleCount = currentCount * 2;
+                    for (var i = currentCount + 1; i < doubleCount; ++i)
+                    {
+                        instanceKeys.Add(i);
+                    }
+
+                    return currentCount + 1; // Next available id
+                }
+
+                static int FindInstanceKey(KeyType itemKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, IEqualityComparer<KeyType> keyComparer)
+                {
+                    for (var i = 0; i < instanceKeyItemKeyPairs.Count; i++)
+                    {
+                        if (keyComparer.Equals(instanceKeyItemKeyPairs.GetAt(i).Item2, itemKey))
+                        {
+                            return instanceKeyItemKeyPairs.GetAt(i).Item1;
+                        }
+                    }
+
+                    return -1;
+                }
+
+                static bool ContainsItemKey(KeyType itemKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, IEqualityComparer<KeyType> keyComparer)
+                {
+                    for (var i = 0; i < instanceKeyItemKeyPairs.Count; i++)
+                    {
+                        if (keyComparer.Equals(instanceKeyItemKeyPairs.GetAt(i).Item2, itemKey))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                bool ContainsItemOfKey(KeyType itemKey, IList<ItemType> items, IEqualityComparer<KeyType> keyComparer)
+                {
+                    for (var i = 0; i < items.Count; i++)
+                    {
+                        var currentItemKey = _createItemKey(items[i], i);
+                        if (keyComparer.Equals(currentItemKey, itemKey))
+                        {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+
+                protected sealed override void Run(IList<ItemType> items)
+                {
+                    // Remove instance keys for items no longer existing
+                    for (var i = _instanceKeyItemKeyPairs.Count - 1; i >= 0; --i)
+                    {
+                        var pair = _instanceKeyItemKeyPairs.GetAt(i);
+
+                        if (!ContainsItemOfKey(pair.Item2, items, _keyComparer))
+                        {
+                            _instanceKeyItemKeyPairs.RemoveAt(i);
+                        }
+                    }
+
+                    // Assign instance keys to new items
+                    for (var i = 0; i < items.Count; i++)
+                    {
+                        var item = items[i];
+                        var itemKey = _createItemKey(item, i);
+                        if (!ContainsItemKey(itemKey, _instanceKeyItemKeyPairs, _keyComparer))
+                        {
+                            var unusedInstanceKey = GetUnusedInstanceKey(_instanceKeys, _instanceKeyItemKeyPairs);
+                            if (unusedInstanceKey == -1)
+                            {
+                                unusedInstanceKey = ExpandPool(_instanceKeys);
+                            }
+                            _instanceKeyItemKeyPairs.Add((unusedInstanceKey, itemKey));
+                        }
+                    }
+
+                    // Sort
+                    for (var i = 0; i < items.Count; i++)
+                    {
+                        var item = items[i];
+                        var itemKey = _createItemKey(item, i);
+                        var instanceKeyPairedToItem = FindInstanceKey(itemKey, _instanceKeyItemKeyPairs, _keyComparer);
+                        var currentInstanceKeyAtPosition = _instanceKeys[i];
+
+                        if (instanceKeyPairedToItem != currentInstanceKeyAtPosition)
+                        {
+                            // We don't need to look at the previous items since they are already sorted
+                            for (var y = i + 1; y < _instanceKeys.Count; y++)
+                            {
+                                var consideredInstanceKey = _instanceKeys[y];
+
+                                if (consideredInstanceKey == instanceKeyPairedToItem)
+                                {
+                                    // Move the current instance key back to this position
+                                    _instanceKeys[y] = currentInstanceKeyAtPosition;
+                                    // Move the paired instance key to the current position
+                                    _instanceKeys[i] = consideredInstanceKey;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                }
+                public sealed override void Cleanup() { }
+            }
+
+            static ItemType FindItem(int instanceKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs, ISignalList<ItemType> items, Func<ItemType, int, KeyType> createItemKey, IEqualityComparer<KeyType> keyComparer)
+            {
+                for (var i = 0; i < instanceKeyItemKeyPairs.Count; ++i)
+                {
+                    if (instanceKeyItemKeyPairs.GetAt(i).Item1 == instanceKey)
+                    {
+                        for (var y = 0; y < items.Count; ++y)
+                        {
+                            var item = items.GetAt(y);
+                            var itemKey = createItemKey(item, i);
+                            if (keyComparer.Equals(itemKey, instanceKeyItemKeyPairs.GetAt(i).Item2))
+                            {
+                                return item;
+                            }
+                        }
+
+                        return default;
+                    }
+                }
+
+                return default;
+            }
+
+            static bool ContainsInstanceKey(int instanceKey, ShallowSignalList<ValueTuple<int, KeyType>> instanceKeyItemKeyPairs)
+            {
+                for (var i = 0; i < instanceKeyItemKeyPairs.Count; i++)
+                {
+                    if (instanceKeyItemKeyPairs.GetAt(i).Item1 == instanceKey)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            public override VirtualBody Render(FiberNode fiberNode)
+            {
+                var instanceKeys = _renderer.CreateShallowSignalList<int>(null, _initialCapacity);
+                for (var i = 0; i < _initialCapacity; ++i)
+                {
+                    instanceKeys.Add(i);
+                }
+                var instanceKeyItemKeyPairs = _renderer.CreateShallowSignalList<ValueTuple<int, KeyType>>();
+
+                fiberNode.PushEffect(new SyncInstancesAndItemsEffect(_eachSignal, instanceKeys, instanceKeyItemKeyPairs, _createItemKey, _keyComparer));
+
+                return _renderer.For(
+                    each: instanceKeys,
+                    renderItem: (instanceKey, index) =>
+                    {
+                        var isActive = _renderer.CreateComputedSignal((pairs) =>
+                        {
+                            return ContainsInstanceKey(instanceKey, instanceKeyItemKeyPairs);
+                        }, instanceKeyItemKeyPairs);
+
+                        var item = _renderer.CreateComputedSignal((pairs) =>
+                        {
+                            return FindItem(instanceKey, instanceKeyItemKeyPairs, _eachSignal, _createItemKey, _keyComparer);
+                        }, instanceKeyItemKeyPairs);
+
+
+                        return _renderer.Active(
+                            whenSignal: isActive,
+                            children: _renderItem(item, index)
+                        );
+                    },
+                    createItemKey: (instanceKey, index) => instanceKey
+                );
             }
         }
 
@@ -3219,13 +3498,17 @@ namespace Fiber
 
             private class SwitchEffect : DynamicEffect<bool>
             {
-                private readonly VirtualBody _children;
-                private readonly VirtualBody _fallback;
-                private readonly FiberNode _fiberNode;
-                private readonly Queue<FiberNode> _renderQueue;
-                private readonly MixedQueue _operationsQueue;
-                private readonly Renderer _renderer;
-                private readonly Ref<int> _lastRenderedIndexRef;
+                public static readonly ObjectPool<SwitchEffect> Pool = new(InitialCapacityConstants.SMALL, null, preload: false);
+
+                private VirtualBody _children;
+                private VirtualBody _fallback;
+                private FiberNode _fiberNode;
+                private Queue<FiberNode> _renderQueue;
+                private MixedQueue _operationsQueue;
+                private Renderer _renderer;
+                private Ref<int> _lastRenderedIndexRef;
+
+                public SwitchEffect() : base(null) { }
 
                 public SwitchEffect(
                     SignalList<ISignal<bool>> matchSignals,
@@ -3247,6 +3530,37 @@ namespace Fiber
                     _renderer = renderer;
                     _lastRenderedIndexRef = lastRenderedIndexRef;
                 }
+
+                public SwitchEffect Initialize(
+                    SignalList<ISignal<bool>> matchSignals,
+                    VirtualBody children,
+                    VirtualBody fallback,
+                    FiberNode fiberNode,
+                    Queue<FiberNode> renderQueue,
+                    MixedQueue operationsQueue,
+                    Renderer renderer,
+                    Ref<int> lastRenderedIndexRef
+                )
+                {
+                    base.Initialize(matchSignals, runOnMount: false);
+
+                    _children = children;
+                    _fallback = fallback;
+                    _fiberNode = fiberNode;
+                    _renderQueue = renderQueue;
+                    _operationsQueue = operationsQueue;
+                    _renderer = renderer;
+                    _lastRenderedIndexRef = lastRenderedIndexRef;
+
+                    return this;
+                }
+
+                public override void Dispose()
+                {
+                    base.Dispose();
+                    Pool.TryRelease(this);
+                }
+
                 protected override void Run(DynamicDependencies<bool> matchSignals)
                 {
                     for (var i = 0; i < matchSignals.Count; ++i)
@@ -3327,7 +3641,7 @@ namespace Fiber
             public VirtualBody Render(FiberNode fiberNode)
             {
                 var _lastRenderedIndexRef = new Ref<int>(-1);
-                fiberNode.PushEffect(new SwitchEffect(_matchSignals, Children, _fallback, fiberNode, _renderQueue, _operationsQueue, _renderer, _lastRenderedIndexRef));
+                fiberNode.PushEffect(SwitchEffect.Pool.Get().Initialize(_matchSignals, Children, _fallback, fiberNode, _renderQueue, _operationsQueue, _renderer, _lastRenderedIndexRef));
 
                 for (var i = 0; i < Children.Count; ++i)
                 {

@@ -18,8 +18,7 @@ namespace Fiber.Suite
             Dictionary<Type, object> globals = null,
             PanelSettings defaultPanelSettings = null,
             VisibilityStyleProp defaultVisibilityStyleProp = VisibilityStyleProp.Translate,
-            bool autonomousWorkLoop = true,
-            long workLoopTimeBudgetMs = Renderer.DEFAULT_WORK_LOOP_TIME_BUDGET_MS
+            bool autonomousWorkLoop = true
         )
         {
             var uiElementsRendererExtension = new UIElementsRendererExtension(defaultPanelSettings, defaultVisibilityStyleProp);
@@ -31,8 +30,7 @@ namespace Fiber.Suite
                     gameObjectRendererExtension,
                 },
                 globals: globals,
-                autonomousWorkLoop: autonomousWorkLoop,
-                workLoopTimeBudgetMs: workLoopTimeBudgetMs
+                autonomousWorkLoop: autonomousWorkLoop
             );
             _rootGameObjectNativeNode = new GameObjectNativeNode(new GameObjectComponent(), rootGameObject);
         }

@@ -8,12 +8,14 @@ namespace Signals
 {
     public static class Pooling
     {
-        public static ListPool<ISignal> ISignalListPool { get; private set; } = new(20);
+        // NOTE: This is an exception from the idea to never preload stuff that we are certain will be used. 
+        // The reason is that these will most likely be used a lot when working with more than a few signals.
+        public static ListPool<ISignal> ISignalListPool { get; private set; } = new(InitialCapacityConstants.MEDIUM, preload: true);
+    }
 
-        static Pooling()
-        {
-            ISignalListPool.Preload(20);
-        }
+    public static class Pooling<T>
+    {
+        public static ListPool<ISignal<T>> ISignalListPool { get; private set; } = new(InitialCapacityConstants.SMALL, preload: false);
     }
 
     public interface ISignal
@@ -56,7 +58,7 @@ namespace Signals
         {
             if (_dependents != null && _dependents is List<ISignal> listOfDependents)
             {
-                Pooling.ISignalListPool.Release(listOfDependents);
+                Pooling.ISignalListPool.TryRelease(listOfDependents);
             }
         }
 
@@ -226,20 +228,18 @@ namespace Signals
     [Serializable]
     public class ShallowSignalList<T> : BaseSignalList<T>, IList<T>
     {
-        const int DEFAULT_CAPACITY = 5;
-
         public ShallowSignalList()
         {
-            _list = new(DEFAULT_CAPACITY);
-        }
+            _list = new(InitialCapacityConstants.XS);
 
+        }
         public ShallowSignalList(ISignal dependent = null)
         {
-            _list = new(DEFAULT_CAPACITY);
+            _list = new(InitialCapacityConstants.XS);
             RegisterDependent(dependent);
         }
 
-        public ShallowSignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
+        public ShallowSignalList(int capacity = InitialCapacityConstants.XS, ISignal dependent = null)
         {
             _list = new(capacity);
             RegisterDependent(dependent);
@@ -247,7 +247,7 @@ namespace Signals
 
         public ShallowSignalList(IList<T> source, ISignal dependent = null)
         {
-            _list = new(source?.Count ?? DEFAULT_CAPACITY);
+            _list = new(source?.Count ?? InitialCapacityConstants.XS);
             for (var i = 0; source != null && i < source.Count; ++i)
             {
                 _list.Add(source[i]);
@@ -337,20 +337,18 @@ namespace Signals
     public class SignalList<T> : BaseSignalList<T>, IList<T>
         where T : ISignal
     {
-        const int DEFAULT_CAPACITY = 5;
-
         public SignalList()
         {
-            _list = new(DEFAULT_CAPACITY);
+            _list = new(InitialCapacityConstants.XS);
         }
 
         public SignalList(ISignal dependent = null)
         {
-            _list = new(DEFAULT_CAPACITY);
+            _list = new(InitialCapacityConstants.XS);
             RegisterDependent(dependent);
         }
 
-        public SignalList(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
+        public SignalList(int capacity = InitialCapacityConstants.XS, ISignal dependent = null)
         {
             _list = new(capacity);
             RegisterDependent(dependent);
@@ -358,7 +356,7 @@ namespace Signals
 
         public SignalList(IList<T> source, ISignal dependent = null)
         {
-            _list = new(source?.Count ?? DEFAULT_CAPACITY);
+            _list = new(source?.Count ?? InitialCapacityConstants.XS);
             for (var i = 0; source != null && i < source.Count; ++i)
             {
                 _list.Add(source[i]);
@@ -491,14 +489,12 @@ namespace Signals
 
         public int Count => _dict.Count;
 
-        const int DEFAULT_CAPACITY = 5;
-
         public ShallowSignalDictionary()
         {
-            _dict = new(DEFAULT_CAPACITY);
+            _dict = new(InitialCapacityConstants.XS);
         }
 
-        public ShallowSignalDictionary(int capacity = DEFAULT_CAPACITY, ISignal dependent = null)
+        public ShallowSignalDictionary(int capacity = InitialCapacityConstants.XS, ISignal dependent = null)
         {
             _dict = new(capacity);
             RegisterDependent(dependent);

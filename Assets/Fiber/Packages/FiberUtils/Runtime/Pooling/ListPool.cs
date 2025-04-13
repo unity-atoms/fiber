@@ -3,15 +3,19 @@ using System.Collections.Generic;
 
 namespace FiberUtils
 {
-    public class ListPool<T> : BaseObjectPool<List<T>>
+    public class ListPool<T> : BaseObjectPool<List<T>>, IPreload
     {
         private static void OnRelease(List<T> list)
         {
             list.Clear();
         }
 
-        public ListPool(int initialCapacity = 10) : base(initialCapacity, OnRelease)
+        public ListPool(int initialCapacity = 10, bool preload = false) : base(initialCapacity, OnRelease)
         {
+            if (preload)
+            {
+                PoolingPreloadScheduler.Instance.SchedulePreload(this, initialCapacity);
+            }
         }
 
         public void Preload(int count)
