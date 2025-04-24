@@ -16,6 +16,11 @@ namespace FiberUtils
             _nextId = nextId;
         }
 
+        public int CurrentId()
+        {
+            return _nextId;
+        }
+
         public int NextId()
         {
             return _nextId++;

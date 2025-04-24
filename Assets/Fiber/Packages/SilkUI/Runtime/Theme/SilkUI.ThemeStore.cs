@@ -9,6 +9,32 @@ using Fiber.InteractiveUI;
 
 namespace SilkUI
 {
+    public static partial class BaseComponentExtensions
+    {
+        public static BaseSignal<StyleColor> Color(
+            this BaseComponent component,
+            SignalProp<string> role,
+            SignalProp<ElementType> elementType,
+            SignalProp<string> subRole = default,
+            SignalProp<string> variant = default,
+            ThemeStore themeStore = null
+        )
+        {
+            themeStore ??= component.C<ThemeStore>();
+            return component.CreateComputedSignal((theme, role, elementType, subRole, variant) =>
+                {
+                    var colorModifiers = theme.GetColorModifiers(role, elementType, subRole, variant);
+                    return colorModifiers.Default.Get();
+                },
+                themeStore,
+                component.WrapSignalProp(role),
+                component.WrapSignalProp(elementType),
+                component.WrapSignalProp(subRole),
+                component.WrapSignalProp(variant)
+            );
+        }
+    }
+
     public class ThemeStore : Store<Theme>
     {
         private ScreenSizeSignal _screenSizeSignal;

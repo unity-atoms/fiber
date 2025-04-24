@@ -3,20 +3,21 @@ using System.Collections.Generic;
 
 namespace Fiber.Router
 {
+    [Serializable]
     public struct RouteDefinition
     {
-        public string Id { get; private set; }
+        public string Id;
 
         // A layout route is a route that participates in the layout nesting.
         // However, we don't need to care about layout routes when we are 
         // navigating, since layout routes are automatically added and removed
         // from the route stack. Translated to the web, a layout route would
         // not add a segment to the path / URL.
-        public bool IsLayoutRoute { get; private set; }
-        public BaseRouteComponent Component { get; private set; }
-        public Func<VirtualBody, BaseComponent> Wrapper { get; private set; }
-        public List<RouteDefinition> Children { get; private set; }
-        public List<ModalRouteDefinition> Modals { get; private set; }
+        public bool IsLayoutRoute;
+        public BaseRouteComponent Component;
+        public Func<VirtualBody, BaseComponent> Wrapper;
+        public List<RouteDefinition> Children;
+        public List<ModalRouteDefinition> Modals;
         public RouteDefinition(
             string id,
             bool isLayoutRoute,

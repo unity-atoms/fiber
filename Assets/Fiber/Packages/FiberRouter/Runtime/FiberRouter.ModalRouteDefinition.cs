@@ -1,9 +1,12 @@
+using System;
+
 namespace Fiber.Router
 {
+    [Serializable]
     public struct ModalRouteDefinition
     {
-        public string Id { get; private set; }
-        public BaseRouteComponent Component { get; private set; }
+        public string Id;
+        public BaseRouteComponent Component;
 
         public ModalRouteDefinition(string id, BaseRouteComponent component)
         {

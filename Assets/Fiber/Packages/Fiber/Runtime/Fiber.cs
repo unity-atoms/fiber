@@ -82,6 +82,9 @@ namespace Fiber
             Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         );
         public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
+            Func<T1, IList<ItemType>> select, ISignal<T1> signal1
+        );
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
             Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
         );
         public ISignalList<ItemType> CreateComputedShallowSignalList<T1, T2, ItemType>(
@@ -577,6 +580,30 @@ namespace Fiber
         }
     }
 
+    public class InlineSelectShallowSignalList<T1, ItemType> : ComputedSignal<T1, IList<ItemType>>, ISignalList<ItemType>
+    {
+        private readonly ShallowSignalList<ItemType> _list;
+        private readonly Func<T1, IList<ItemType>> _select;
+        public InlineSelectShallowSignalList(Func<T1, IList<ItemType>> select, ISignal<T1> signal1)
+            : base(signal1)
+        {
+            _select = select;
+            _list = new(InitialCapacityConstants.XS);
+        }
+        protected override IList<ItemType> Compute(T1 value1)
+        {
+            _list.Clear();
+            var selectedList = _select(value1);
+            if (selectedList != null)
+            {
+                _list.AddRange(selectedList);
+            }
+            return _list;
+        }
+        public int Count => LastValue?.Count ?? 0;
+        public ItemType GetAt(int index) => LastValue != null && LastValue.Count > index ? LastValue[index] : default;
+    }
+
     public class InlineComputedShallowSignalList<T1, ItemType> : ComputedSignal<T1, IList<ItemType>>, ISignalList<ItemType>
     {
         private readonly ShallowSignalList<ItemType> _list;
@@ -585,7 +612,7 @@ namespace Fiber
             : base(signal1)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1)
         {
@@ -605,7 +632,7 @@ namespace Fiber
             : base(signal1, signal2)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2)
         {
@@ -625,7 +652,7 @@ namespace Fiber
             : base(signal1, signal2, signal3)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3)
         {
@@ -645,7 +672,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4)
         {
@@ -665,7 +692,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4, signal5)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
         {
@@ -685,7 +712,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4, signal5, signal6)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6)
         {
@@ -705,7 +732,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4, signal5, signal6, signal7)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7)
         {
@@ -726,7 +753,7 @@ namespace Fiber
             : base(signal1)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1)
         {
@@ -747,7 +774,7 @@ namespace Fiber
             : base(signal1, signal2)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2)
         {
@@ -768,7 +795,7 @@ namespace Fiber
             : base(signal1, signal2, signal3)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3)
         {
@@ -789,7 +816,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4)
         {
@@ -810,7 +837,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4, signal5)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5)
         {
@@ -831,7 +858,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4, signal5, signal6)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6)
         {
@@ -852,7 +879,7 @@ namespace Fiber
             : base(signal1, signal2, signal3, signal4, signal5, signal6, signal7)
         {
             _compute = compute;
-            _list = new();
+            _list = new(InitialCapacityConstants.XS);
         }
         protected override IList<ItemType> Compute(T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6, T7 value7)
         {
@@ -1032,6 +1059,9 @@ namespace Fiber
         public ComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT> CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(
             Func<T1, T2, T3, T4, T5, T6, T7, RT> compute, ISignal<T1> signal1, ISignal<T2> signal2, ISignal<T3> signal3, ISignal<T4> signal4, ISignal<T5> signal5, ISignal<T6> signal6, ISignal<T7> signal7
         ) => Api.CreateComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
+            Func<T1, IList<ItemType>> select, ISignal<T1> signal1
+        ) => Api.CreateComputedShallowSignalList<T1, ItemType>(select, signal1);
         public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
             Action<T1, IList<ItemType>> compute, ISignal<T1> signal1
         ) => Api.CreateComputedShallowSignalList<T1, ItemType>(compute, signal1);
@@ -2347,14 +2377,15 @@ namespace Fiber
         {
             if (signalProp.IsValue)
             {
-                return new StaticSignal<T>(signalProp.Value);
+                return ReferenceEquals(signalProp.Value, null) ? FiberStaticSignals<T>.Default : FiberStaticSignals<T>.Get(signalProp.Value);
             }
             else if (signalProp.IsSignal)
             {
                 return signalProp.Signal;
             }
 
-            throw new Exception($"Trying to wrap empty signal prop");
+            // Returns a signal with the type's default value when the signal is empty.
+            return FiberStaticSignals<T>.Default;
         }
 
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
@@ -2404,6 +2435,13 @@ namespace Fiber
         )
         {
             return new InlineComputedSignal<T1, T2, T3, T4, T5, T6, T7, RT>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
+        }
+
+        public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(
+            Func<T1, IList<ItemType>> select, ISignal<T1> signal1
+        )
+        {
+            return new InlineSelectShallowSignalList<T1, ItemType>(select, signal1);
         }
 
         public ISignalList<ItemType> CreateComputedShallowSignalList<T1, ItemType>(

@@ -4,6 +4,7 @@ using Signals;
 
 namespace Fiber.Router
 {
+    [Serializable]
     public struct Route : IEquatable<Route>, ISignal<Route>
     {
         // Copied from BaseSignal.cs
@@ -50,10 +51,10 @@ namespace Fiber.Router
 
 
         public string Id;
-        public bool IsLayoutRoute { get; private set; }
-        public string StringValue { get; private set; }
-        public int IntValue { get; private set; }
-        public List<ModalRoute> Modals { get; private set; }
+        public bool IsLayoutRoute;
+        public string StringValue;
+        public int IntValue;
+        public List<ModalRoute> Modals;
 
         public Route(string id, bool isLayoutRoute, List<ModalRoute> modals, string stringValue = default, int intValue = default)
         {

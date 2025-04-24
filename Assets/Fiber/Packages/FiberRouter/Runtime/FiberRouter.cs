@@ -73,16 +73,16 @@ namespace Fiber.Router
             }
         }
 
-        public RouteDefinition RouterTree { get; private set; }
+        public RouteDefinition RouterTree;
         public ShallowSignalList<Route> RouteStack;
         public BaseSignal<Route> CurrentRouteSignal;
         public BaseSignal<ModalRoute> CurrentModalSignal;
         private readonly ISignal _parent;
 
-        public Router(RouteDefinition routerTree, ISignal parent = null)
+        public Router(RouteDefinition routerTree, ISignal parent = null, IList<Route> routeStack = null)
         {
             RouterTree = routerTree;
-            RouteStack = new(5, this);
+            RouteStack = routeStack != null ? new(routeStack, this) : new(5, this);
             if (parent != null)
             {
                 _parent = parent;

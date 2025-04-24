@@ -2,11 +2,12 @@ using System;
 
 namespace Fiber.Router
 {
+    [Serializable]
     public struct ModalRoute : IEquatable<ModalRoute>
     {
-        public string Id { get; private set; }
-        public string StringValue { get; private set; }
-        public int IntValue { get; private set; }
+        public string Id;
+        public string StringValue;
+        public int IntValue;
         public ModalRoute(string id, string stringValue = default, int intValue = default)
         {
             Id = id;
