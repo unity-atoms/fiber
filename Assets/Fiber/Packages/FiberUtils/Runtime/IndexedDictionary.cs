@@ -76,6 +76,15 @@ namespace FiberUtils
             return _dictionary[key];
         }
 
+        public V TryGetByKey(K key, V defaultValue = default)
+        {
+            if (_dictionary.TryGetValue(key, out var value))
+            {
+                return value;
+            }
+            return defaultValue;
+        }
+
         public V GetByIndex(int i)
         {
             return _list[i].Value;
