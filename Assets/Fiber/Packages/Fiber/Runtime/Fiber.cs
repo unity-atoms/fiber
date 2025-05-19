@@ -133,6 +133,8 @@ namespace Fiber
         ) where ItemType : ISignal;
         public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS) where ItemType : ISignal;
         public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS);
+        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent, IList<ItemType> source) where ItemType : ISignal;
+        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent, IList<ItemType> source);
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null);
         public StaticSignal<T> CreateStaticSignal<T>(T value);
         public Ref<T> CreateRef<T>(T initialValue = default);
@@ -1202,6 +1204,8 @@ namespace Fiber
         ) where ItemType : ISignal => Api.CreateComputedSignalList<T1, T2, T3, T4, T5, T6, T7, ItemType>(compute, signal1, signal2, signal3, signal4, signal5, signal6, signal7);
         public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS) where ItemType : ISignal => Api.CreateSignalList<ItemType>(dependent, initialCapacity);
         public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS) => Api.CreateShallowSignalList<ItemType>(dependent, initialCapacity);
+        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent, IList<ItemType> source) where ItemType : ISignal => Api.CreateSignalList<ItemType>(dependent, source);
+        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent, IList<ItemType> source) => Api.CreateShallowSignalList<ItemType>(dependent, source);
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null) => Api.CreateSignal<T>(value, dependent);
         public StaticSignal<T> CreateStaticSignal<T>(T value) => Api.CreateStaticSignal<T>(value);
         public Ref<T> CreateRef<T>(T initialValue = default) => Api.CreateRef<T>(initialValue);
@@ -2714,6 +2718,16 @@ namespace Fiber
         public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent = null, int initialCapacity = InitialCapacityConstants.XS)
         {
             return new ShallowSignalList<ItemType>(initialCapacity, dependent);
+        }
+
+        public ShallowSignalList<ItemType> CreateShallowSignalList<ItemType>(ISignal dependent, IList<ItemType> source)
+        {
+            return new ShallowSignalList<ItemType>(source, dependent);
+        }
+
+        public SignalList<ItemType> CreateSignalList<ItemType>(ISignal dependent, IList<ItemType> source) where ItemType : ISignal
+        {
+            return new SignalList<ItemType>(source, dependent);
         }
 
         public Signal<T> CreateSignal<T>(T value = default, BaseSignal dependent = null)
