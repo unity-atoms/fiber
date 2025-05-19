@@ -62,6 +62,9 @@ namespace Fiber
         public InlineDerivedSignal<T1, RS, RT> CreateDerivedSignal<T1, RS, RT>(
             Func<T1, RS> compute, ISignal<T1> signal1
         ) where RS : ISignal<RT>;
+        public InlineDerivedSignal<T1, T2, RS, RT> CreateDerivedSignal<T1, T2, RS, RT>(
+            Func<T1, T2, RS> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        ) where RS : ISignal<RT>;
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, ISignal<T1> signal1
         );
@@ -505,6 +508,52 @@ namespace Fiber
         protected override RT Compute(T1 value1)
         {
             var lastSignal = _compute(value1);
+            if (_lastSignal != null)
+            {
+                _lastSignal.UnregisterDependent(this);
+            }
+            if (lastSignal != null)
+            {
+                lastSignal.RegisterDependent(this);
+                _lastSignal = lastSignal;
+                return lastSignal.Get();
+            }
+            else
+            {
+                _lastSignal = default;
+                return default;
+            }
+        }
+    }
+
+    public class InlineDerivedSignal<T1, T2, RS, RT> : ComputedSignal<T1, T2, RT> where RS : ISignal<RT>
+    {
+        Func<T1, T2, RS> _compute;
+        RS _lastSignal;
+
+        public InlineDerivedSignal(
+            Func<T1, T2, RS> compute,
+            ISignal<T1> signal1,
+            ISignal<T2> signal2
+        )
+            : base(
+                signal1,
+                signal2
+            )
+        {
+            _compute = compute;
+        }
+        ~InlineDerivedSignal()
+        {
+            if (_lastSignal != null)
+            {
+                _lastSignal.UnregisterDependent(this);
+            }
+        }
+
+        protected override RT Compute(T1 value1, T2 value2)
+        {
+            var lastSignal = _compute(value1, value2);
             if (_lastSignal != null)
             {
                 _lastSignal.UnregisterDependent(this);
@@ -1082,6 +1131,9 @@ namespace Fiber
         public InlineDerivedSignal<T1, RS, RT> CreateDerivedSignal<T1, RS, RT>(
             Func<T1, RS> compute, ISignal<T1> signal1
         ) where RS : ISignal<RT> => Api.CreateDerivedSignal<T1, RS, RT>(compute, signal1);
+        public InlineDerivedSignal<T1, T2, RS, RT> CreateDerivedSignal<T1, T2, RS, RT>(
+            Func<T1, T2, RS> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        ) where RS : ISignal<RT> => Api.CreateDerivedSignal<T1, T2, RS, RT>(compute, signal1, signal2);
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
             Func<T1, RT> compute, ISignal<T1> signal1
         ) => Api.CreateComputedSignal<T1, RT>(compute, signal1);
@@ -2437,6 +2489,13 @@ namespace Fiber
         ) where RS : ISignal<RT>
         {
             return new InlineDerivedSignal<T1, RS, RT>(compute, signal1);
+        }
+
+        public InlineDerivedSignal<T1, T2, RS, RT> CreateDerivedSignal<T1, T2, RS, RT>(
+            Func<T1, T2, RS> compute, ISignal<T1> signal1, ISignal<T2> signal2
+        ) where RS : ISignal<RT>
+        {
+            return new InlineDerivedSignal<T1, T2, RS, RT>(compute, signal1, signal2);
         }
 
         public ComputedSignal<T1, RT> CreateComputedSignal<T1, RT>(
