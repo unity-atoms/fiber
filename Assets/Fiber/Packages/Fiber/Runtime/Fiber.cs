@@ -276,7 +276,7 @@ namespace Fiber
                 }
 
                 Run(_signal1.Get());
-                _lastDirtyBit = _signal1.DirtyBit;
+                _lastDirtyBit = _dirtyBit;
 
                 _hasRun = true;
             }
