@@ -60,6 +60,7 @@ namespace Fiber.UIElements
             EventCallback<ClickEvent> onClick = null,
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
+            Func<VisualElement> createInstance = null,
             SignalProp<List<string>> className = new(),
             UsageHints usageHints = UsageHints.None,
             VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
@@ -73,6 +74,7 @@ namespace Fiber.UIElements
                 onClick: onClick,
                 _ref: _ref,
                 onCreateRef: onCreateRef,
+                createInstance: createInstance,
                 className: className,
                 usageHints: usageHints,
                 setVisibilityStyleProp: setVisibilityStyleProp,
@@ -348,6 +350,7 @@ namespace Fiber.UIElements
         public EventCallback<ClickEvent> OnClick { get; private set; }
         public Ref<VisualElement> Ref { get; private set; }
         public Action<VisualElement> OnCreateRef { get; private set; }
+        public Func<VisualElement> CreateInstance { get; private set; }
         public SignalProp<List<string>> ClassName { get; private set; }
         public UsageHints UsageHints { get; private set; }
         public VisibilityStyleProp SetVisibilityStyleProp { get; private set; }
@@ -359,6 +362,7 @@ namespace Fiber.UIElements
             EventCallback<ClickEvent> onClick = null,
             Ref<VisualElement> _ref = null,
             Action<VisualElement> onCreateRef = null,
+            Func<VisualElement> createInstance = null,
             SignalProp<List<string>> className = new(),
             UsageHints usageHints = UsageHints.None,
             VisibilityStyleProp setVisibilityStyleProp = VisibilityStyleProp.None,
@@ -374,6 +378,7 @@ namespace Fiber.UIElements
             OnClick = onClick;
             Ref = _ref;
             OnCreateRef = onCreateRef;
+            CreateInstance = createInstance;
             ClassName = className;
             UsageHints = usageHints;
             SetVisibilityStyleProp = setVisibilityStyleProp;
@@ -4746,7 +4751,7 @@ namespace Fiber.UIElements
             }
             else if (virtualNode is ViewComponent viewComponent)
             {
-                var visualElement = new VisualElement();
+                var visualElement = viewComponent.CreateInstance != null ? viewComponent.CreateInstance()  : new VisualElement();
                 if (viewComponent.UsageHints != UsageHints.None)
                 {
                     visualElement.usageHints = viewComponent.UsageHints;
