@@ -64,6 +64,8 @@ namespace Fiber.InteractiveUI
             Action<PointerData> onPressUp = null,
             Action<PointerData> onPressDown = null,
             Action<PointerData> onClick = null,
+            Action<PointerData> onPointerEnter = null,
+            Action<PointerData> onPointerLeave = null,
             InteractiveCursorTypes cursorType = new()
         )
         {
@@ -106,11 +108,21 @@ namespace Fiber.InteractiveUI
                 interactiveElement.Ref.Current.RegisterCallback<PointerEnterEvent>(evt =>
                 {
                     interactiveElement.IsHovered.Value = true;
+
+                    if (onPointerEnter != null)
+                    {
+                        onPointerEnter(new PointerData(evt.position, evt.pointerId, evt));
+                    }
                 });
                 interactiveElement.Ref.Current.RegisterCallback<PointerLeaveEvent>(evt =>
                 {
                     interactiveElement.IsHovered.Value = false;
                     interactiveElement.IsPressed.Value = false;
+
+                    if (onPointerLeave != null)
+                    {
+                        onPointerLeave(new PointerData(evt.position, evt.pointerId, evt));
+                    }
                 });
                 interactiveElement.Ref.Current.RegisterCallback<PointerDownEvent>(evt =>
                 {
